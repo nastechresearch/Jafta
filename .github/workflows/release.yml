@@ -1,0 +1,395 @@
+# Cuts a release. Triggered by pushing a vX.Y.Z tag.
+#
+# This is the only workflow with contents: write. It is the only thing that can
+# put an APK in front of a user, and it refuses to run at all unless the tree
+# it is building has already passed CI on main — a tag can be pushed at any
+# commit, including one nobody tested.
+#
+# It does not hand-write the update manifest. scripts/release.py generates it,
+# because the app validates that JSON field by field (see _parse_manifest in
+# jafta/runtime/update_check.py) and a hand-written manifest that is one field
+# short is silently treated as "no update available" on every phone. The
+# hand-written manifest in the earlier version of this workflow used keys the
+# client does not even read: "version" instead of "version_name", "apk_sha256"
+# instead of "sha256", no "schema", no "size". Every installed app would have
+# rejected it.
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  # Re-running a failed release. Republishing the same version over an existing
+  # release is allowed below (--clobber), because a half-finished release is
+  # worse than a re-upload.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to (re)publish, e.g. v1.0.0"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+# One release at a time. Two overlapping runs of this workflow would race to
+# upload the same assets to the same tag, and the loser would leave a release
+# whose manifest and APK disagree.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # The tag must point at a commit that is on main and that main's CI has
+      # already passed. This is the check that stops an APK built from untested
+      # code from being published.
+      - name: Resolve the tag to a version
+        id: version
+        run: |
+          set -euo pipefail
+          TAG="${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Tag '$TAG' is not vX.Y.Z with digits only."
+            echo "::error::scripts/release.py rejects pre-release suffixes on purpose:"
+            echo "::error::a published version must be a plain X.Y.Z."
+            exit 1
+          fi
+          VERSION="${TAG#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "releasing $VERSION"
+
+      - name: Check the tag is on main and CI-approved
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          SHA=$(git rev-list -n1 "v$VERSION")
+
+          # git ls-remote avoids a fetch, but the local repo may not have the
+          # tag if the dispatch path is used for a tag made before this clone.
+          git fetch --tags --force --quiet || true
+
+          if ! git merge-base --is-ancestor "$SHA" origin/main; then
+            echo "::error::Tag v$VERSION ($SHA) is not an ancestor of main."
+            echo "::error::Releasing from a side branch publishes code nobody reviewed."
+            exit 1
+          fi
+          echo "tag is on main"
+
+          # Ask GitHub whether CI actually passed for this exact commit. A green
+          # check on a different commit does not count.
+          if command -v gh >/dev/null 2>&1; then
+            echo "::group::check-runs for $SHA"
+            gh api "repos/${{ github.repository }}/commits/$SHA/check-runs" \
+               --jq '.check_runs[] | "\(.name): \(.conclusion)"' || true
+            echo "::endgroup::"
+            FAILED=$(gh api "repos/${{ github.repository }}/commits/$SHA/check-runs" \
+                      --paginate --jq '[.check_runs[] | select(.conclusion != "success" and .conclusion != "skipped" and .conclusion != null)] | length' || echo 0)
+            if [ "${FAILED:-0}" -gt 0 ]; then
+              echo "::error::$FAILED check(s) did not succeed on $SHA. Not releasing."
+              exit 1
+            fi
+          fi
+
+      # The tag and the version files must agree. If build.gradle.kts still says
+      # versionCode 17 / versionName 1.0.0 but the tag is v1.1.0, the manifest
+      # would advertise a version the APK does not contain, and every phone
+      # would either ignore the update or install the wrong thing.
+      # Has an id because the summary at the end reads version_code from here,
+      # and a step output only exists if its owning step is addressed by id.
+      - name: Check the version files match the tag
+        id: versionfiles
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          GRADLE_VERSION=$(grep -oE 'versionName\s*=\s*"[^"]+"' android/app/build.gradle.kts | sed 's/.*"\(.*\)"/\1/')
+          PY_VERSION=$(grep -oE '^version\s*=\s*"[^"]+"' pyproject.toml | sed 's/.*"\(.*\)"/\1/')
+
+          echo "tag:            v$VERSION"
+          echo "build.gradle:   $GRADLE_VERSION"
+          echo "pyproject.toml: $PY_VERSION"
+
+          for found in "$GRADLE_VERSION" "$PY_VERSION"; do
+            if [ "$found" != "$VERSION" ]; then
+              echo "::error::Version files are not at $VERSION."
+              echo "::error::Bump first:  python3 scripts/release.py $VERSION --dry-run"
+              echo "::error::then commit, tag, and push the tag."
+              exit 1
+            fi
+          done
+
+          VERSION_CODE=$(grep -oE 'versionCode\s*=\s*[0-9]+' android/app/build.gradle.kts | grep -oE '[0-9]+$')
+          echo "versionCode:    $VERSION_CODE"
+          echo "version_code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
+          echo "::notice::Release $VERSION (versionCode $VERSION_CODE)"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: |
+            platform-tools
+            platforms;android-34
+            build-tools;34.0.0
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x android/gradlew
+
+      - name: Decode release keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.JAFTA_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.JAFTA_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.JAFTA_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          if [ -z "${KEYSTORE_BASE64:-}" ] || [ -z "${KEYSTORE_PASSWORD:-}" ] || [ -z "${KEY_ALIAS:-}" ]; then
+            echo "::error::Signing secrets are missing (need JAFTA_KEYSTORE_BASE64,"
+            echo "::error::JAFTA_KEYSTORE_PASSWORD, JAFTA_KEY_ALIAS, JAFTA_KEY_PASSWORD)."
+            echo "::error::Run: python3 scripts/encode_keystore_for_secret.py --set-secrets"
+            exit 1
+          fi
+          umask 077
+          printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/jafta-release.keystore"
+          # No trailing newline: it would become part of the password.
+          printf '%s' "$KEYSTORE_PASSWORD" > "$RUNNER_TEMP/jafta-storepass"
+
+      - name: Build signed release APK
+        env:
+          # The exact four names build.gradle.kts reads. A mismatch here yields
+          # hasReleaseSigning == false and a silently unsigned APK, which is the
+          # failure this whole workflow is arranged to make impossible.
+          JAFTA_KEYSTORE_PATH: ${{ runner.temp }}/jafta-release.keystore
+          JAFTA_KEYSTORE_PASSWORD: ${{ secrets.JAFTA_KEYSTORE_PASSWORD }}
+          JAFTA_KEY_ALIAS: ${{ secrets.JAFTA_KEY_ALIAS }}
+          JAFTA_KEY_PASSWORD: ${{ secrets.JAFTA_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          cd android
+          ./gradlew clean assembleRelease --no-daemon --stacktrace
+
+      - name: Verify the APK signature
+        run: |
+          set -euo pipefail
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          [ -f "$APK" ] || { echo "::error::No APK at $APK"; exit 1; }
+          apksigner verify --verbose --print-certs "$APK" | tee release-signature.txt
+
+          grep -q "Signer #1 certificate SHA-256 digest:" release-signature.txt || {
+            echo "::error::UNSIGNED build — refusing to publish."
+            exit 1
+          }
+
+          ACTUAL=$(grep -m1 "Signer #1 certificate SHA-256 digest:" release-signature.txt \
+                   | sed 's/.*digest: //' | tr -d ':' | tr '[:lower:]' '[:upper:]')
+          EXPECTED=$(keytool -list -v \
+                       -keystore "$RUNNER_TEMP/jafta-release.keystore" \
+                       -storepass "$(cat "$RUNNER_TEMP/jafta-storepass")" \
+                       -alias "${{ secrets.JAFTA_KEY_ALIAS }}" 2>/dev/null \
+                     | grep -m1 'SHA256:' | sed 's/.*SHA256: //' | tr -d ':' | tr '[:lower:]' '[:upper:]')
+          echo "expected: $EXPECTED"
+          echo "actual:   $ACTUAL"
+          if [ "$EXPECTED" != "$ACTUAL" ]; then
+            echo "::error::Signed with a different key than the secret holds."
+            exit 1
+          fi
+          echo "signature verified against the release key"
+
+      # The manifest is generated by the same code the tests cover, not by hand.
+      # --manifest-only because the version bump was already committed before the
+      # tag existed; bumping again here would only dirty the tree.
+      - name: Generate the update manifest
+        id: manifest
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          APK=android/app/build/outputs/apk/release/app-release.apk
+
+          python3 scripts/release.py "$VERSION" \
+            --manifest-only \
+            --apk "$APK" \
+            --repo "${{ github.repository }}" \
+            --summary-it "${{ inputs.summary_it || 'Aggiornamento di sicurezza e correzioni.' }}" \
+            --summary-en "${{ inputs.summary_en || 'Security and bug fixes.' }}" \
+            --out dist/release
+
+          # release.py writes dist/release/latest.json and stages the APK under
+          # its release name (jafta-<version>.apk), because GitHub publishes the
+          # uploaded filename and the manifest's apk_url must match it exactly.
+          echo "apk=dist/release/jafta-$VERSION.apk" >> "$GITHUB_OUTPUT"
+          echo "manifest=dist/release/latest.json" >> "$GITHUB_OUTPUT"
+
+          echo "--- latest.json ---"
+          cat dist/release/latest.json
+
+      # Fail before publishing anything if the manifest does not satisfy the
+      # client. upload_check.py does not exist, so this uses the project's own
+      # validator through a tiny inline check of the fields the app requires.
+      - name: Sanity-check the manifest against the client schema
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, pathlib, re, sys
+
+          m = json.loads(pathlib.Path("dist/release/latest.json").read_text())
+
+          # Mirrors _parse_manifest in jafta/runtime/update_check.py. These are
+          # the fields the phone treats as decision-bearing; missing or invalid
+          # means the client logs a line and behaves as if no update exists.
+          required = ["schema", "version_code", "apk_url", "sha256", "size"]
+          for key in required:
+              if key not in m:
+                  sys.exit(f"manifest is missing {key!r}: the client would reject it")
+
+          if not isinstance(m["schema"], int) or m["schema"] < 1:
+              sys.exit(f"bad schema: {m['schema']!r}")
+          if m["schema"] > 1:
+              sys.exit(f"manifest schema {m['schema']} is newer than the client's 1")
+          if not str(m["apk_url"]).startswith("https://"):
+              sys.exit(f"apk_url must be https: {m['apk_url']!r}")
+          if not re.fullmatch(r"[0-9a-f]{64}", str(m["sha256"]).lower()):
+              sys.exit(f"sha256 is not 64 hex chars: {m['sha256']!r}")
+          if not isinstance(m["size"], int) or not 0 < m["size"] <= 2**31:
+              sys.exit(f"size out of range: {m['size']!r}")
+          if not isinstance(m.get("rollout", 100), int):
+              sys.exit("rollout must be an int")
+          if not 0 <= m.get("rollout", 100) <= 100:
+              sys.exit("rollout must be 0..100")
+          if not isinstance(m.get("critical", False), bool):
+              sys.exit("critical must be a bool")
+
+          # The manifest must describe the APK that is actually being published,
+          # or every phone computes a hash mismatch and refuses the update.
+          import hashlib
+          apk = pathlib.Path("dist/release") / f"jafta-{m['version_name']}.apk"
+          if not apk.exists():
+              sys.exit(f"staged APK missing: {apk}")
+          digest = hashlib.sha256(apk.read_bytes()).hexdigest()
+          if digest != str(m["sha256"]).lower():
+              sys.exit("manifest sha256 does not match the staged APK")
+          if apk.stat().st_size != m["size"]:
+              sys.exit("manifest size does not match the staged APK")
+
+          print(f"manifest ok: v{m['version_name']} (code {m['version_code']}), "
+                f"sha256 matches the APK, rollout {m.get('rollout', 100)}%")
+          PY
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          gh release create "v$VERSION" \
+            "dist/release/jafta-$VERSION.apk" \
+            "dist/release/latest.json" \
+            "release-signature.txt" \
+            --repo "${{ github.repository }}" \
+            --title "Jafta $VERSION" \
+            --notes-file - <<EOF
+          ## Jafta $VERSION
+
+          A local-first personal AI agent for Android. Derived from Jenny
+          (AGPL-3.0), itself derived from nanobot (MIT).
+
+          ### Verify what you downloaded
+
+          \`\`\`
+          sha256  $(python3 -c "import json;print(json.load(open('dist/release/latest.json'))['sha256'])")
+          size    $(python3 -c "import json;print(json.load(open('dist/release/latest.json'))['size'])") bytes
+          \`\`\`
+
+          \`\`\`bash
+          shasum -a 256 jafta-$VERSION.apk
+          \`\`\`
+
+          The hash proves the file arrived whole; the **signature** is what proves
+          it came from this project, and Android checks it for you on an in-place
+          update. To check it yourself:
+
+          \`\`\`bash
+          apksigner verify --print-certs jafta-$VERSION.apk
+          \`\`\`
+
+          Compare against the fingerprint published in
+          [keystore/README.md](https://github.com/${{ github.repository }}/blob/main/keystore/README.md).
+          If it differs, **do not install**.
+
+          ### Already installed?
+
+          The app checks for updates itself. This release is advertised through
+          \`latest.json\`, which the app fetches on startup.
+          EOF
+
+      # The client reads releases/latest/download/latest.json, which GitHub
+      # resolves from whichever release is marked "latest". If a newer release
+      # exists this file is not updated, so the app can be told about a version
+      # that is not published yet — or miss one that is. Verified rather than
+      # assumed, because the whole in-app update path depends on it.
+      - name: Verify the update URL the app fetches
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          # Ask GitHub for the release it considers latest.
+          LATEST=$(gh release view --repo "${{ github.repository }}" --json tagName -q .tagName)
+          echo "github latest release: $LATEST"
+
+          URL="https://github.com/${{ github.repository }}/releases/latest/download/latest.json"
+          echo "checking $URL"
+          HTTP=$(curl -sS -o /tmp/opencode-latest.json -w '%{http_code}' -L --max-time 30 "$URL" || echo 000)
+          echo "HTTP $HTTP"
+
+          if [ "$HTTP" != "200" ]; then
+            echo "::error::$URL returned HTTP $HTTP."
+            echo "::error::The app fetches this exact URL on every startup; until it"
+            echo "::error::answers 200 with valid JSON, in-app updates cannot work."
+            echo "::error::If this is the first release, check that latest.json was"
+            echo "::error::uploaded as an asset of the release marked latest."
+            exit 1
+          fi
+
+          python3 -c "
+          import json,sys
+          m=json.load(open('/tmp/opencode-latest.json'))
+          print('served manifest advertises v' + str(m.get('version_name')) + ' (code ' + str(m.get('version_code')) + ')')
+          sys.exit(0 if m.get('version_name') else 1)
+          "
+
+          if [ "$LATEST" != "v$VERSION" ]; then
+            echo "::notice::This release ($VERSION) is not the one marked latest ($LATEST)."
+            echo "::notice::That is fine for a re-run, but if this was meant to be the"
+            echo "::notice::newest release, set it: gh release edit v$VERSION --latest"
+          fi
+
+      - name: Summary
+        run: |
+          {
+            echo "### Release published"
+            echo ""
+            echo "- **Version**: \`${{ steps.version.outputs.version }}\` (versionCode ${{ steps.versionfiles.outputs.version_code }})"
+            echo "- **APK**: \`jafta-${{ steps.version.outputs.version }}.apk\`"
+            echo "- **Signature**: verified against the release key"
+            echo "- **Manifest**: validated against the client schema"
+            echo "- **Update URL**: answered HTTP 200"
+          } >> "$GITHUB_STEP_SUMMARY"

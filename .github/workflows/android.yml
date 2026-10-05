@@ -1,0 +1,225 @@
+# Builds the APK. Every pull request gets a debug build; only main gets a
+# signed release build, because only main is a thing users can be sent.
+#
+# This does NOT publish anything. A release is cut by release.yml on a tag, and
+# the artifact this produces is what that workflow verifies and uploads. Keeping
+# the two apart means a broken main never publishes an APK, and a release never
+# builds untested code.
+#
+# The workflow this replaces lived only on the unmerged rebrand branch and could
+# not have worked on main. Four reasons, all of them fixed below:
+#
+#   1. It exported JAFTA_KEYSTORE_FILE. build.gradle.kts reads JAFTA_KEYSTORE_PATH
+#      (see signingCredential() there). With the wrong name, hasReleaseSigning is
+#      false and assembleRelease silently produces an UNSIGNED apk — which then
+#      gets uploaded as "jafta-release-apk" and looks like a successful release.
+#   2. It hardcoded keyAlias: jafta in the workflow. The alias lives in
+#      JAFTA_KEY_ALIAS and must come from the same place as the password.
+#   3. It passed the keystore path as a relative path ("keystore/...") while
+#      gradle runs with android/ as its working directory, so file() resolved it
+#      against android/keystore/... — a path that does not exist. Absolute here.
+#   4. setup-android@v3 defaults to packages: 'tools platform-tools', and Google
+#      removed the legacy tools package, so sdkmanager fails the whole job with
+#      "Failed to find package 'tools'". v4 defaults to 'platform-tools' only.
+name: Android Build
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "android/**"
+      - "jafta/**"
+      - "scripts/release.py"
+      - ".github/workflows/android.yml"
+  push:
+    branches: [main]
+    paths:
+      - "android/**"
+      - "jafta/**"
+      - "scripts/release.py"
+      - ".github/workflows/android.yml"
+  # Building takes ~20 minutes. Being able to retry one without pushing a commit
+  # is the difference between fixing a flaky runner and waiting for review.
+  workflow_dispatch:
+
+# Top level, not nested under `on:` — GitHub silently ignores it there.
+concurrency:
+  group: android-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# contents: read is the default and is all this needs. No write scopes: this
+# workflow builds and verifies, it does not publish.
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # Gradle resolves the version from git metadata; without history it
+          # either fails or stamps "unknown" into the APK.
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      # Gradle 8.9 (android/gradle/wrapper/gradle-wrapper.properties) wants a
+      # compileSdk of 34 and build-tools 34.0.0; the action only installs the
+      # platform-tools by default, so the rest is asked for by name.
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: |
+            platform-tools
+            platforms;android-34
+            build-tools;34.0.0
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x android/gradlew
+
+      # The keystore is decoded into the runner's filesystem, never into the
+      # workspace, so nothing downstream can accidentally commit or cache it.
+      # $RUNNER_TEMP is also outside the checkout, which means git add -A in any
+      # later step cannot reach it.
+      - name: Decode release keystore
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          KEYSTORE_BASE64: ${{ secrets.JAFTA_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.JAFTA_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.JAFTA_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          if [ -z "${KEYSTORE_BASE64:-}" ]; then
+            echo "::error::JAFTA_KEYSTORE_BASE64 is not set — cannot sign a release APK."
+            echo "::error::Run: python3 scripts/encode_keystore_for_secret.py --set-secrets"
+            exit 1
+          fi
+          if [ -z "${KEYSTORE_PASSWORD:-}" ]; then
+            echo "::error::JAFTA_KEYSTORE_PASSWORD is not set."
+            exit 1
+          fi
+          if [ -z "${KEY_ALIAS:-}" ]; then
+            echo "::error::JAFTA_KEY_ALIAS is not set."
+            exit 1
+          fi
+          umask 077
+          printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/jafta-release.keystore"
+          # echo -n: a trailing newline here becomes part of the password and
+          # keytool rejects it with a message that looks like a wrong password.
+          printf '%s' "$KEYSTORE_PASSWORD" > "$RUNNER_TEMP/jafta-storepass"
+          echo "keystore decoded to $RUNNER_TEMP/jafta-release.keystore"
+          echo "alias: $KEY_ALIAS"
+
+      - name: Build debug APK
+        run: |
+          set -euo pipefail
+          cd android
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Build signed release APK
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          # The four names build.gradle.kts actually reads. The old workflow got
+          # three of these wrong, which is why it could only ever have produced
+          # an unsigned APK on main.
+          JAFTA_KEYSTORE_PATH: ${{ runner.temp }}/jafta-release.keystore
+          JAFTA_KEYSTORE_PASSWORD: ${{ secrets.JAFTA_KEYSTORE_PASSWORD }}
+          JAFTA_KEY_ALIAS: ${{ secrets.JAFTA_KEY_ALIAS }}
+          JAFTA_KEY_PASSWORD: ${{ secrets.JAFTA_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          cd android
+          ./gradlew assembleRelease --no-daemon --stacktrace
+
+      # An unsigned APK is the failure mode that matters most here: it installs
+      # fine on a clean device, looks like a working release, and cannot ever be
+      # upgraded in place. So the signature is checked, not assumed — and the
+      # expected digest is read from the key we just decoded rather than
+      # hardcoded, so a legitimate key rotation updates this file instead of
+      # failing CI forever.
+      - name: Verify the release APK is signed with our key
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          KEYSTORE_BASE64: ${{ secrets.JAFTA_KEYSTORE_BASE64 }}
+        run: |
+          set -euo pipefail
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          if [ ! -f "$APK" ]; then
+            echo "::error::assembleRelease produced no APK at $APK"
+            exit 1
+          fi
+          echo "--- apksigner verify ---"
+          apksigner verify --verbose --print-certs "$APK" | tee android-signature.txt
+
+          # An APK with no signer at all: apksigner reports success on some
+          # builds when verification is skipped, so check the output for the
+          # actual signer rather than trusting the exit code alone.
+          if ! grep -q "Signer #1 certificate SHA-256 digest:" android-signature.txt; then
+            echo "::error::APK carries no v2/v3 signer — this is an UNSIGNED build."
+            echo "::error::Check that JAFTA_KEYSTORE_PATH points at a real file and that"
+            echo "::error::JAFTA_KEYSTORE_PASSWORD / JAFTA_KEY_ALIAS / JAFTA_KEY_PASSWORD are set."
+            exit 1
+          fi
+
+          ACTUAL=$(grep -m1 "Signer #1 certificate SHA-256 digest:" android-signature.txt \
+                   | sed 's/.*digest: //' | tr -d ':' | tr '[:lower:]' '[:upper:]')
+          # Digest of the keystore's own certificate. keytool cannot read a
+          # keystore from a pipe — it seeks, so /dev/stdin comes back empty and
+          # keytool reports "Keystore file exists, but is empty" — so this
+          # re-reads the file decoded in the previous step. Both digests are
+          # normalised to bare uppercase hex, because apksigner prints colons and
+          # keytool does not, and comparing them raw would always mismatch.
+          EXPECTED=$(keytool -list -v \
+                       -keystore "$RUNNER_TEMP/jafta-release.keystore" \
+                       -storepass "$(cat "$RUNNER_TEMP/jafta-storepass")" \
+                       -alias "${{ secrets.JAFTA_KEY_ALIAS }}" 2>/dev/null \
+                     | grep -m1 'SHA256:' | sed 's/.*SHA256: //' | tr -d ':' | tr '[:lower:]' '[:upper:]')
+          echo "expected: $EXPECTED"
+          echo "actual:   $ACTUAL"
+          if [ -z "$EXPECTED" ] || [ -z "$ACTUAL" ]; then
+            echo "::error::Could not read a digest to compare (expected='$EXPECTED' actual='$ACTUAL')."
+            exit 1
+          fi
+          if [ "$EXPECTED" != "$ACTUAL" ]; then
+            echo "::error::APK was signed with a DIFFERENT key than JAFTA_KEYSTORE_BASE64."
+            echo "::error::Publishing this would strand every installed app: Android refuses"
+            echo "::error::in-place updates across a signing-key change."
+            exit 1
+          fi
+          echo "::notice::APK signed by the expected key."
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: jafta-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Upload signed release APK
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: jafta-release-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 30
+          # error, not warn: this artifact is what release.yml signs off on, and a
+          # missing one should fail the build rather than pass quietly.
+          if-no-files-found: error
+
+      - name: Upload signature report
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: jafta-release-signature
+          path: android-signature.txt
+          retention-days: 90
+          if-no-files-found: error

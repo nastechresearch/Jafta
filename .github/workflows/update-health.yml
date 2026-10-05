@@ -1,0 +1,273 @@
+# Watches the published update path, not a build.
+#
+# Every other workflow here checks something it just produced. This one checks
+# the thing the app actually fetches, on a schedule, with nobody touching
+# anything: releases/latest/download/latest.json, the APK it points at, and the
+# signing certificate on that APK.
+#
+# It exists because that path fails in ways a green build cannot see:
+#
+#   * The manifest is an asset on a release. Deleting the release, or marking a
+#     newer release latest, changes what the URL serves without any code change.
+#   * GitHub's releases/latest/ resolves to whichever release is marked latest,
+#     so publishing v1.1.0 and then marking v1.0.0 latest silently rolls the
+#     advertised version backwards. Every phone then sees "no update" — the
+#     updater requires version_code to be strictly greater than installed
+#     (_installable in jafta/runtime/update_check.py).
+#   * The manifest's sha256 and size can drift from the APK if an asset is
+#     re-uploaded under the same name. The client verifies the hash before
+#     offering an update, so a drift means every phone rejects the update with
+#     no user-visible reason.
+#   * A release signed with the wrong key installs on a clean device and can
+#     never be upgraded in place. Nothing in the app detects this; only the
+#     certificate fingerprint does.
+#
+# It is scheduled rather than PR-triggered because there is nothing to review:
+# it reads the live published state. A failure here means phones are not being
+# offered updates, which is worth a notification.
+name: Update Path Health
+
+on:
+  schedule:
+    # 06:17 UTC. Off the hour on purpose: every workflow scheduled at :00
+    # competes for the same runner pool, and the top of the hour is the most
+    # contended minute of the day.
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+  # Catch a broken publish the moment it happens rather than the next morning.
+  release:
+    types: [published]
+
+# Read-only on purpose. This workflow reports; it must never be able to change a
+# release or its assets, so it cannot paper over the problem it finds.
+permissions:
+  contents: read
+
+concurrency:
+  group: update-health
+  cancel-in-progress: true
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      # No checkout-dependent state beyond this. If the repository has no release
+      # yet, that is a legitimate "not published" answer, not a failure: the
+      # first release has not happened, and failing every day about it would
+      # train everyone to ignore this workflow.
+      - name: Check whether anything is published yet
+        id: published
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          COUNT=$(gh release list --repo "${{ github.repository }}" --limit 1 --json tagName -q 'length')
+          if [ "$COUNT" -eq 0 ]; then
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No releases yet — nothing to check."
+          else
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Report the published update path
+        if: steps.published.outputs.exists == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p health
+          URL="https://github.com/${{ github.repository }}/releases/latest/download/latest.json"
+          echo "manifest URL: $URL"
+          HTTP=$(curl -sS -o health/latest.json -w '%{http_code}' -L --max-time 60 "$URL" || echo 000)
+          echo "HTTP $HTTP"
+          if [ "$HTTP" != "200" ]; then
+            echo "::error::In-app updates are broken: $URL returned $HTTP"
+            exit 1
+          fi
+
+          # gh's own view, to catch a release marked latest that is not the
+          # newest by version.
+          gh release view --repo "${{ github.repository }}" \
+             --json tagName,isLatest,isDraft,isPrerelease,createdAt,assets \
+             -q '"latest release: \(.tagName)  prerelease=\(.isPrerelease) draft=\(.isDraft)"' \
+             || true
+          gh release list --repo "${{ github.repository }}" --limit 20 \
+             --json tagName,isLatest,isDraft,createdAt \
+             -q '.[] | "  \(.tagName)  latest=\(.isLatest) draft=\(.isDraft) \(.createdAt)"'
+
+      - name: Validate the served manifest and the APK it points at
+        if: steps.published.outputs.exists == 'true'
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, pathlib, re, sys, urllib.request
+
+          fail, warn = [], []
+          m = json.loads(pathlib.Path("health/latest.json").read_text())
+
+          # The client rejects the whole manifest on any of these, so they are
+          # hard failures rather than warnings.
+          if m.get("schema") != 1:
+              fail.append(f"schema is {m.get('schema')!r}, the client requires 1")
+          url = str(m.get("apk_url", ""))
+          if not url.startswith("https://"):
+              fail.append(f"apk_url is not https: {url!r}")
+          if not re.fullmatch(r"[0-9a-f]{64}", str(m.get("sha256", "")).lower()):
+              fail.append(f"sha256 is not 64 hex chars: {m.get('sha256')!r}")
+          if not isinstance(m.get("size"), int) or m["size"] <= 0:
+              fail.append(f"size is not a positive int: {m.get('size')!r}")
+          rollout = m.get("rollout", 100)
+          if not isinstance(rollout, int) or not 0 <= rollout <= 100:
+              fail.append(f"rollout out of range: {rollout!r}")
+          if not isinstance(m.get("critical", False), bool):
+              fail.append("critical is not a bool")
+
+          if fail:
+              print("manifest invalid:")
+              for f in fail: print("  -", f)
+              sys.exit(1)
+
+          print(f"manifest ok: v{m.get('version_name')} code={m.get('version_code')} "
+                f"rollout={rollout}% critical={m.get('critical', False)} "
+                f"min_supported_code={m.get('min_supported_code')}")
+
+          if rollout < 100:
+              warn.append(f"rollout is {rollout}% — most installs are not being offered this version")
+
+          # Download and hash the APK the manifest advertises. This is the check
+          # that catches a re-uploaded asset: the manifest is right, the bytes
+          # served are not.
+          out = pathlib.Path("health/apk.apk")
+          try:
+              with urllib.request.urlopen(url, timeout=180) as r:
+                  data = r.read()
+          except Exception as exc:
+              sys.exit(f"apk_url is not downloadable: {exc}")
+
+          digest = hashlib.sha256(data).hexdigest()
+          if digest != str(m["sha256"]).lower():
+              sys.exit(f"APK hash mismatch\n  manifest: {m['sha256']}\n  served:   {digest}")
+          if len(data) != m["size"]:
+              sys.exit(f"APK size mismatch: manifest {m['size']}, served {len(data)}")
+          print(f"apk ok: {len(data)} bytes, sha256 matches the manifest")
+
+          # The certificate is what makes an in-place update possible, and it is
+          # the one thing an attacker with release access could substitute
+          # without breaking the hash check above (they would re-upload both).
+          expected_fp = pathlib.Path("keystore/README.md").read_text() if pathlib.Path("keystore/README.md").exists() else None
+          if expected_fp:
+              found = re.search(r"SHA-256 \| `([0-9A-Fa-f:]+)`", expected_fp)
+              if found:
+                  published = found.group(1).replace(":", "").upper()
+                  # Read the signing cert out of the APK without needing apksigner.
+                  # META-INF/CERT.RSA holds the PKCS#7 signature; hashing the raw
+                  # entry is not the certificate digest, so extract it properly.
+                  import zipfile
+                  with zipfile.ZipFile(out) as z:
+                      names = [n for n in z.namelist() if n.upper().startswith("META-INF/")
+                               and n.upper().endswith((".RSA", ".DSA", ".EC"))]
+                      if not names:
+                          warn.append("no META-INF signature block found (v2/v3 signing only?)")
+                      else:
+                          cert_sha = None
+                          try:
+                              # keytool can read a PKCS#7 file; apksigner is not
+                              # installed on the runner image without setup-android.
+                              import subprocess, tempfile
+                              with tempfile.TemporaryDirectory() as td:
+                                  p7 = pathlib.Path(td) / "sig.p7"
+                                  p7.write_bytes(z.read(names[0]))
+                                  proc = subprocess.run(
+                                      ["keytool", "-printcert", "-file", str(p7)],
+                                      capture_output=True, text=True,
+                                  )
+                              mm = re.search(r"SHA256:\s*([0-9A-F:]+)", proc.stdout)
+                              if mm:
+                                  cert_sha = mm.group(1).replace(":", "").upper()
+                          except Exception as exc:
+                              warn.append(f"could not read the signing certificate: {exc}")
+                          if cert_sha:
+                              if cert_sha == published:
+                                  print("certificate ok: signed by the published key")
+                              else:
+                                  sys.exit(
+                                      "CERTIFICATE MISMATCH\n"
+                                      f"  APK signed by: {cert_sha}\n"
+                                      f"  published key: {published}\n"
+                                      "  An APK signed by another key cannot be installed\n"
+                                      "  over an existing one: Android rejects it and users\n"
+                                      "  would have to uninstall, losing all on-device memory."
+                                  )
+          else:
+              warn.append("keystore/README.md not in this tree; certificate not checked")
+
+          if warn:
+              print("\nwarnings:")
+              for w in warn: print("  -", w)
+          PY
+
+      # Every release must be newer than the one before it. The updater demands a
+      # strictly greater version_code, so a release published with a lower one is
+      # invisible to everyone already on the newer build.
+      - name: Check release versions increase
+        if: steps.published.outputs.exists == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release list --repo "${{ github.repository }}" --limit 30 \
+            --json tagName,createdAt,isDraft \
+            -q 'sort_by(.createdAt) | reverse | .[] | "\(.tagName) \(.createdAt)"' > /tmp/rels.txt
+          python3 - <<'PY'
+          import pathlib, re, sys
+          rows = []
+          for line in pathlib.Path("/tmp/rels.txt").read_text().splitlines():
+              m = re.match(r"(v\d+\.\d+\.\d+)\s", line)
+              if m:
+                  rows.append(m.group(1))
+          if len(rows) < 2:
+              print(f"only {len(rows)} release(s); nothing to compare")
+              sys.exit(0)
+          bad = []
+          # rows is newest-first; check each is greater than the one below it.
+          def key(v): return tuple(int(x) for x in v[1:].split("."))
+          for newer, older in zip(rows, rows[1:]):
+              if key(newer) <= key(older):
+                  bad.append(f"{newer} is not newer than {older} (it was published later)")
+          if bad:
+              print("release versions do not increase:")
+              for b in bad: print("  -", b)
+              sys.exit(1)
+          print("release versions increase:", " < ".join(rows))
+          PY
+
+      - name: Summary
+        if: always()
+        run: |
+          set -euo pipefail
+          {
+            echo "### Update path health"
+            if [ "${{ steps.published.outputs.exists }}" != "true" ]; then
+              echo ""
+              echo "No releases published yet — nothing to check."
+            elif [ -s health/latest.json ]; then
+              echo ""
+              echo '```'
+              python3 -c "
+          import json
+          m = json.load(open('health/latest.json'))
+          for k in ('version_name','version_code','rollout','critical','min_supported_code'):
+              print(f'{k:20} {m.get(k)}')
+          " 2>/dev/null || cat health/latest.json
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
