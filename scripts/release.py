@@ -42,7 +42,7 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 #: Slug del repository GitHub su cui vivono le release (override con ``--repo``).
-DEFAULT_REPO = "nastechresearch/jafta-android-ai-agent"
+DEFAULT_REPO = "nastechresearch/Jafta"
 
 #: Il client legge il manifest da ``releases/latest/download/latest.json``:
 #: quell'URL funziona solo se l'asset si chiama esattamente così.
@@ -389,7 +389,7 @@ def verification_block(*, version: str, sha256: str, size: int) -> str:
         "```\n"
         "\n"
         "The certificate is the same one published with\n"
-        "[0.3.0](https://github.com/nastechresearch/jafta-android-ai-agent/releases/tag/v0.3.0) — if it\n"
+        "[0.3.0](https://github.com/flagdizero/jenny-android-ai-agent/releases/tag/v0.3.0) — if it\n"
         "ever differs, the build did not come from this project.\n"
     )
 

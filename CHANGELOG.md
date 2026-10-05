@@ -5,7 +5,7 @@ version numbers follow [Semantic Versioning](https://semver.org/): from 1.0 on, 
 breaks something you rely on gets a new major number.
 
 Releases before 1.0 are described only on their
-[GitHub release pages](https://github.com/nastechresearch/jafta-android-ai-agent/releases).
+[GitHub release pages](https://github.com/nastechresearch/Jafta/releases).
 
 ## [1.0.0] — 2026-10-02
 
