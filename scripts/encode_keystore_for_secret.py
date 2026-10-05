@@ -156,11 +156,18 @@ def verify_roundtrip(keystore: Path, storepass: str, alias: str) -> None:
 
 
 def set_secret(name: str, value: str, repo: str) -> None:
-    """Push one secret through ``gh``, value on stdin, never in argv or stdout."""
+    """Push one secret through ``gh``, value on stdin, never in argv or stdout.
+
+    The value goes in on stdin and ``--body`` is deliberately absent. ``--body``
+    takes the value literally: ``--body -`` stores the single character ``-``,
+    not stdin, so every secret silently becomes a one-character string. ``gh``
+    reports success for that, the secret exists in the repository settings, and
+    the first workflow to use it fails with a value that looks merely unset.
+    """
     if shutil.which("gh") is None:
         raise _die("gh not found; install the GitHub CLI to upload secrets.")
     proc = subprocess.run(
-        ["gh", "secret", "set", name, "--repo", repo, "--body", "-"],
+        ["gh", "secret", "set", name, "--repo", repo],
         input=value,
         text=True,
         capture_output=True,
