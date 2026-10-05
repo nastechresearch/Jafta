@@ -89,7 +89,7 @@ Jafta has **four** channels, all owned by `WebSocketDispatcher` (`jafta/channels
 | Notification | `jafta/channels/notification.py` | Android only. A reply typed into one of Jafta's notifications comes in on this channel, and her answer goes back as a system alert. No connection of its own. |
 | Floating | `jafta/channels/floating.py` | Android only. The floating mascot's bubble: what you type there comes in on this channel, and the answer is shown in the bubble. |
 
-`WebSocketDispatcher` also owns retry, delta coalescing for streaming updates, and progress-message filtering per channel — see [`dispatcher.py`](../../jafta/channels/dispatcher.py). This is a decomposition, not a generic channel registry: the four channels are wired explicitly in `_init_channel()`/`_init_telegram()`/`_init_notification()`/`_init_floating()`, not discovered.
+`WebSocketDispatcher` also owns retry, delta coalescing for streaming updates, and progress-message filtering per channel — see [`dispatcher.py`](https://github.com/nastechresearch/Jafta/blob/main/jafta/channels/dispatcher.py). This is a decomposition, not a generic channel registry: the four channels are wired explicitly in `_init_channel()`/`_init_telegram()`/`_init_notification()`/`_init_floating()`, not discovered.
 
 Useful docs:
 

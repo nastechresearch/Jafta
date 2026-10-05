@@ -85,7 +85,7 @@ Python 3.11+, asyncio throughout, 100-character line length. See [Code style](co
 
 ## Opening a PR
 
-Contribution flow, the Developer Certificate of Origin sign-off requirement, and licensing are covered in [`CONTRIBUTING.md`](../../CONTRIBUTING.md) at the repository root — read that before your first PR, since CI's `dco` job blocks merges on unsigned commits.
+Contribution flow, the Developer Certificate of Origin sign-off requirement, and licensing are covered in [`CONTRIBUTING.md`](https://github.com/nastechresearch/Jafta/blob/main/CONTRIBUTING.md) at the repository root — read that before your first PR, since CI's `dco` job blocks merges on unsigned commits.
 
 ## See also
 
