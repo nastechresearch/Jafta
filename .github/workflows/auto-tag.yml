@@ -1,0 +1,300 @@
+# Decides the next version and creates the tag. Triggered by a push to main.
+#
+# It does not build anything. It writes the version files, commits them, and pushes
+# a tag; release.yml is what reacts to that tag by building and publishing the APK.
+# Splitting it this way means the version history is decided from one place
+# (scripts/next_version.py) and the publishing rules stay in release.yml, where the
+# check that nothing untested gets shipped already lives.
+#
+# It writes to main directly, with no pull request. That is a deliberate trade: the
+# version bump is a mechanical edit of three files that no human needs to read, and
+# a release that waits on a PR is a release that waits on whoever is awake. The
+# commit it makes is signed off and carries the version in the subject, so it is
+# traceable like any other.
+
+name: Auto-tag
+
+on:
+  push:
+    branches: [main]
+  # The escape hatch, for a release the convention does not imply: a rollback, a
+  # hotfix out of band, or the very first tag. `bump: none` means "decide from the
+  # commits", which is also what a plain push to main does.
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Version bump to force, or none to decide from the commits"
+        required: true
+        default: none
+        type: choice
+        options: [none, patch, minor, major]
+      dry_run:
+        description: "Report the decision without writing, committing or tagging"
+        required: false
+        default: false
+        type: boolean
+
+# One decision at a time. Two runs racing would both compute a bump from the same
+# starting point, push two commits setting the same version, and then push two tags.
+concurrency:
+  group: auto-tag
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # The version comes from the last tag and from the commits since it, so a
+          # shallow clone would see neither.
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      # Outputs every other step reads, and the single place the run's inputs are
+      # normalised. On a push, `inputs.bump` is the empty string rather than "none",
+      # and an empty `--force` would be consumed by the script as a missing value.
+      - name: Read the inputs
+        id: opts
+        env:
+          EVENT: ${{ github.event_name }}
+          INPUT_BUMP: ${{ inputs.bump }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+
+          # A push has no inputs at all; anything but "patch"/"minor"/"major" means
+          # "decide from the commits", which is the default behaviour.
+          BUMP="none"
+          if [ "$INPUT_BUMP" = "patch" ] || [ "$INPUT_BUMP" = "minor" ] || [ "$INPUT_BUMP" = "major" ]; then
+            BUMP="$INPUT_BUMP"
+          fi
+          FORCED=no
+          if [ "$INPUT_BUMP" != "$BUMP" ]; then
+            echo "::warning::bump input '$INPUT_BUMP' is not one of patch/minor/major; deciding from the commits."
+          elif [ "$BUMP" != "none" ]; then
+            FORCED=yes
+          fi
+
+          # Same for dry_run: on a push the input is empty, which GitHub coerces to
+          # the boolean false. Treating an empty string as true would make every
+          # automatic run a dry run and nothing would ever be tagged.
+          DRY=no
+          if [ "$INPUT_DRY_RUN" = "true" ]; then
+            DRY=yes
+          fi
+
+          {
+            echo "bump=$BUMP"
+            echo "forced=$FORCED"
+            echo "dry_run=$DRY"
+            echo "push=$([ "$EVENT" = "push" ] && echo yes || echo no)"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Decide the next version
+        id: next
+        env:
+          FORCE: ${{ steps.opts.outputs.bump }}
+          REPO_ROOT_ENV: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+
+          LAST_TAG=$(git for-each-ref --sort=-creatordate \
+            --format='%(refname:short)' 'refs/tags/v*.*.*' | head -1)
+          echo "::group::commits since ${LAST_TAG:-the first commit}"
+          if [ -n "$LAST_TAG" ]; then
+            git log --oneline --no-merges "$LAST_TAG..HEAD"
+          else
+            git log --oneline --no-merges HEAD
+          fi
+          echo "::endgroup::"
+
+          ARGS=()
+          if [ "$FORCE" != "none" ]; then
+            ARGS+=(--force "$FORCE")
+          fi
+
+          # The script exits 0 even when it decides there is nothing to release, so a
+          # merge of documentation does not show up as a failed run.
+          python3 scripts/next_version.py "${ARGS[@]}" | tee decision.env
+
+          # Sourcing a file another script wrote is the one way this can go wrong
+          # quietly, so every key is checked rather than trusted: an unset variable
+          # under `set -u` would fail here instead of three steps later with an
+          # empty tag name.
+          for key in LEVEL CURRENT BASE VERSION TAG COMMITS DRIFT REASON; do
+            if ! grep -q "^$key=" decision.env; then
+              echo "::error::decision.env has no $key line:"
+              cat decision.env
+              exit 1
+            fi
+          done
+
+          {
+            echo "level=$(grep '^LEVEL=' decision.env | cut -d= -f2-)"
+            echo "current=$(grep '^CURRENT=' decision.env | cut -d= -f2-)"
+            echo "base=$(grep '^BASE=' decision.env | cut -d= -f2-)"
+            echo "version=$(grep '^VERSION=' decision.env | cut -d= -f2-)"
+            echo "tag=$(grep '^TAG=' decision.env | cut -d= -f2-)"
+            echo "commits=$(grep '^COMMITS=' decision.env | cut -d= -f2-)"
+            echo "drift=$(grep '^DRIFT=' decision.env | cut -d= -f2-)"
+            echo "reason=$(grep '^REASON=' decision.env | cut -d= -f2-)"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "::notice::$REASON"
+
+      - name: Say so when there is nothing to release
+        if: steps.next.outputs.level == 'none'
+        run: |
+          echo "::notice::No releasable commit since ${{ steps.next.outputs.tag || 'the first tag' }}."
+          echo "::notice::docs:, chore:, ci:, test: and unrecognised subjects do not ship an APK on their own."
+          echo "::notice::To publish anyway, run this workflow with bump set to patch, minor or major."
+
+      # A dry run stops here: every step below is gated on dry_run == 'no', so
+      # nothing is written, committed or tagged and the decision is still on the
+      # run's summary.
+      - name: Write the version files
+        if: steps.next.outputs.level != 'none' && steps.opts.outputs.dry_run == 'no'
+        run: |
+          set -euo pipefail
+          # All three files in one call: pyproject.toml, the fallback literal in
+          # jafta/__init__.py (the APK ships no pyproject, so that literal is what
+          # the app actually shows) and versionName/versionCode in the Gradle build.
+          python3 scripts/release.py "${{ steps.next.outputs.version }}"
+          git --no-pager diff --stat
+
+      - name: Commit the version bump
+        if: steps.next.outputs.level != 'none' && steps.opts.outputs.dry_run == 'no'
+        env:
+          VERSION: ${{ steps.next.outputs.version }}
+          LEVEL: ${{ steps.next.outputs.level }}
+        run: |
+          set -euo pipefail
+          # Signed off, because CONTRIBUTING.md asks for it and because a commit that
+          # lands on main unattended is exactly the kind nobody re-reads later.
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pyproject.toml jafta/__init__.py android/app/build.gradle.kts
+          git commit -s -m "chore(release): $VERSION" \
+            -m "$LEVEL bump decided by scripts/next_version.py, written by scripts/release.py."
+          git --no-pager log -1 --format='%H %s'
+
+      - name: Push the bump
+        if: steps.next.outputs.level != 'none' && steps.opts.outputs.dry_run == 'no'
+        run: |
+          set -euo pipefail
+          # A plain push, never --force: this workflow must not rewrite history a
+          # human may be reading.
+          git push origin HEAD:main
+
+      # release.yml refuses to publish from a tag whose commit has not passed CI,
+      # and it checks that on the tag's own commit. Tagging straight after the bump
+      # would race CI: the tag could land while the checks were still queued, and
+      # the release would refuse for a reason that has nothing to do with the code.
+      - name: Wait for CI on the bump commit
+        if: steps.next.outputs.level != 'none' && steps.opts.outputs.dry_run == 'no'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          SHA=$(git rev-parse HEAD)
+          echo "waiting for CI on $SHA"
+
+          # 15 minutes: CI here builds an APK, which is the slow part.
+          DEADLINE=$((SECONDS + 900))
+          while :; do
+            # A check that has not concluded has status != "completed", and GitHub
+            # also leaves conclusion null in that window. Counting either as success
+            # is how a release gets built from code that never passed anything.
+            PENDING=$(gh api "repos/$REPO/commits/$SHA/check-runs" --paginate \
+              --jq '[.check_runs[] | select(.status != "completed")] | length')
+            FAILED=$(gh api "repos/$REPO/commits/$SHA/check-runs" --paginate \
+              --jq '[.check_runs[] | select(.status == "completed" and
+                    .conclusion != "success" and .conclusion != "skipped")] | length')
+
+            if [ "${PENDING:-0}" -eq 0 ] && [ "${FAILED:-0}" -eq 0 ]; then
+              echo "CI is green on $SHA"
+              exit 0
+            fi
+            if [ "${FAILED:-0}" -gt 0 ]; then
+              echo "::error::CI is not green on $SHA; not tagging."
+              echo "::error::The version files are bumped but no tag was created. Re-run this"
+              echo "::error::workflow once the failure is fixed, or revert the bump commit."
+              gh api "repos/$REPO/commits/$SHA/check-runs" --paginate \
+                --jq '.check_runs[] | select(.conclusion != "success" and .conclusion != "skipped")
+                      | "  \(.name): \(.conclusion) — \(.html_url)"'
+              exit 1
+            fi
+            if [ "$SECONDS" -ge "$DEADLINE" ]; then
+              echo "::error::CI still running on $SHA after 15 minutes; not tagging."
+              exit 1
+            fi
+            echo "  ${PENDING:-?} check(s) still running..."
+            sleep 20
+          done
+
+      - name: Create and push the tag
+        if: steps.next.outputs.level != 'none' && steps.opts.outputs.dry_run == 'no'
+        env:
+          VERSION: ${{ steps.next.outputs.version }}
+          LEVEL: ${{ steps.next.outputs.level }}
+          REASON: ${{ steps.next.outputs.reason }}
+        run: |
+          set -euo pipefail
+          TAG="v$VERSION"
+
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "::error::tag $TAG already exists. Re-run release.yml with that tag to republish."
+            exit 1
+          fi
+
+          # Annotated, not lightweight: next_version.py reads tags by creatordate, and
+          # a lightweight tag carries the commit date instead, which makes two tags
+          # created out of order sort wrong and silently re-release an old version.
+          git tag -a "$TAG" -m "$TAG" -m "$REASON" \
+            -m "versionCode is bumped alongside; see android/app/build.gradle.kts."
+          git push origin "refs/tags/$TAG"
+
+          echo "::notice::pushed $TAG ($LEVEL). release.yml will build and publish it."
+
+      - name: Summary
+        if: always()
+        env:
+          LEVEL: ${{ steps.next.outputs.level }}
+          CURRENT: ${{ steps.next.outputs.current }}
+          BASE: ${{ steps.next.outputs.base }}
+          VERSION: ${{ steps.next.outputs.version }}
+          DRIFT: ${{ steps.next.outputs.drift }}
+          DRY: ${{ steps.opts.outputs.dry_run }}
+          REASON: ${{ steps.next.outputs.reason }}
+        run: |
+          set -euo pipefail
+          {
+            echo "## Auto-tag"
+            echo ""
+            echo "- **Decision**: $REASON"
+            echo "- **Level**: \`$LEVEL\`"
+            echo "- **Version in the files**: \`$CURRENT\`"
+            if [ "$DRIFT" = "yes" ]; then
+              echo "- **Bumped from**: \`$BASE\` — the tag was ahead of the files, so the higher one won"
+            fi
+            echo ""
+            if [ -z "$LEVEL" ] || [ "$LEVEL" = "none" ]; then
+              echo "Nothing to release. Run this workflow with an explicit bump to publish anyway."
+            elif [ "$DRY" = "yes" ]; then
+              echo "Dry run: **\`v$VERSION\` would have been tagged**, but nothing was written."
+            else
+              echo "Tagged **\`v$VERSION\`**. release.yml builds and publishes it;"
+              echo "update-health.yml then checks the published manifest and APK."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
