@@ -377,7 +377,7 @@ See [Mini-apps](../using/mini-apps.md).
 
 ## updates
 
-The in-app update check. It is the one outbound connection you did not switch on, so it is documented here rather than left to a contributor page — see [Privacy and security](https://github.com/nastechresearch/jafta-android-ai-agent#privacy-and-security) in the README for what it does and does not send.
+The in-app update check. It is the one outbound connection you did not switch on, so it is documented here rather than left to a contributor page — see [Privacy and security](https://github.com/nastechresearch/Jafta#privacy-and-security) in the README for what it does and does not send.
 
 | Key | Type | Default | Effect |
 |---|---|---|---|

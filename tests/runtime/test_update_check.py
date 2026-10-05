@@ -34,12 +34,12 @@ _MANIFEST: dict[str, Any] = {
     "version_code": 9,
     "version_name": "0.7.0",
     "apk_url": (
-        "https://github.com/nastechresearch/jafta-android-ai-agent/releases/download/"
+        "https://github.com/nastechresearch/Jafta/releases/download/"
         "v0.7.0/jafta-0.7.0.apk"
     ),
     "sha256": "a" * 64,
     "size": 48210944,
-    "notes_url": "https://github.com/nastechresearch/jafta-android-ai-agent/releases/tag/v0.7.0",
+    "notes_url": "https://github.com/nastechresearch/Jafta/releases/tag/v0.7.0",
     "summary_it": "Aggiornamenti in-app e meno consumo a schermo spento.",
     "summary_en": "In-app updates and less battery drain.",
     "min_supported_code": 6,

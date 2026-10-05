@@ -6,7 +6,7 @@ alternative, described further down, for anyone who'd rather not run someone els
 
 ## Download the APK
 
-Grab it from [**Releases**](https://github.com/nastechresearch/jafta-android-ai-agent/releases/latest). It targets Android 8.0 or newer and is
+Grab it from [**Releases**](https://github.com/nastechresearch/Jafta/releases/latest). It targets Android 8.0 or newer and is
 about 72 MB, most of which is the embedded CPython runtime.
 
 Verify what you downloaded before installing it. The expected hash is published on the

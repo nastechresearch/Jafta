@@ -21,7 +21,7 @@ Android is the only runtime target for the finished product, but nearly all of t
 ## Setting up a Python environment
 
 ```bash
-git clone https://github.com/nastechresearch/jafta-android-ai-agent.git jafta
+git clone https://github.com/nastechresearch/Jafta.git jafta
 cd jafta
 pip install -e ".[dev]"
 ```
