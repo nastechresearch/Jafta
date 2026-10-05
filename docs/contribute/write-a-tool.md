@@ -6,7 +6,7 @@ A tool is a Python class in `jafta/agent/tools/` that the LLM can call; this pag
 
 Every built-in tool is a `Tool` subclass (`jafta/agent/tools/base.py`) living in a module under `jafta/agent/tools/`. There is no plugin directory scanned at runtime and no entry-point discovery: the set of tool modules is a fixed, hardcoded list, and each module explicitly declares which classes it exports as tools.
 
-This is a deliberate fork boundary (see [`FORK_BOUNDARY.md`](../../FORK_BOUNDARY.md)): upstream nanobot used implicit `dir()` reflection to find tool classes, which is order-sensitive and lets a typo silently drop a tool. Jafta replaced that with two explicit lists that fail loudly instead.
+This is a deliberate fork boundary (see [`FORK_BOUNDARY.md`](https://github.com/nastechresearch/Jafta/blob/main/FORK_BOUNDARY.md)): upstream nanobot used implicit `dir()` reflection to find tool classes, which is order-sensitive and lets a typo silently drop a tool. Jafta replaced that with two explicit lists that fail loudly instead.
 
 ## Explicit registration
 

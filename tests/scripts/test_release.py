@@ -311,7 +311,7 @@ def test_manifest_matches_the_agreed_schema(repo: Path, apk: Path, tmp_path: Pat
             "--summary-en",
             "Automatic updates.",
             "--repo",
-            "nastechresearch/jafta-android-ai-agent",
+            "nastechresearch/Jafta",
         )
         == 0
     )
@@ -337,11 +337,11 @@ def test_manifest_matches_the_agreed_schema(repo: Path, apk: Path, tmp_path: Pat
     assert manifest["version_code"] == 9
     assert manifest["version_name"] == "0.7.0"
     assert manifest["apk_url"] == (
-        "https://github.com/nastechresearch/jafta-android-ai-agent/releases/download/"
+        "https://github.com/nastechresearch/Jafta/releases/download/"
         "v0.7.0/jafta-0.7.0.apk"
     )
     assert manifest["notes_url"] == (
-        "https://github.com/nastechresearch/jafta-android-ai-agent/releases/tag/v0.7.0"
+        "https://github.com/nastechresearch/Jafta/releases/tag/v0.7.0"
     )
     assert manifest["sha256"] == hashlib.sha256(apk.read_bytes()).hexdigest()
     assert manifest["size"] == apk.stat().st_size

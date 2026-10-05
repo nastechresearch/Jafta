@@ -29,7 +29,7 @@ python3 scripts/release.py 0.7.0 --manifest-only \
 
 # 4. publish — the script printed this command, it never runs it for you
 gh release create v0.7.0 dist/release/jafta-0.7.0.apk dist/release/latest.json \
-    --repo nastechresearch/jafta-android-ai-agent \
+    --repo nastechresearch/Jafta \
     --title "Jafta 0.7.0" --notes "Automatic updates and assorted fixes."
 ```
 
@@ -80,7 +80,7 @@ deliberate act, not something that happens because you typed a version number.
 
 ### 1. Bump the version
 
-First give the release its entry in [`CHANGELOG.md`](../../CHANGELOG.md): rename the
+First give the release its entry in [`CHANGELOG.md`](https://github.com/nastechresearch/Jafta/blob/main/CHANGELOG.md): rename the
 `Unreleased` heading to the version and today's date, and keep it written for the person
 holding the phone. The release notes on GitHub can link to it instead of repeating it.
 
@@ -148,7 +148,7 @@ The manifest must be attached to the release under exactly that name, because th
 it from GitHub's stable redirect:
 
 ```
-https://github.com/nastechresearch/jafta-android-ai-agent/releases/latest/download/latest.json
+https://github.com/nastechresearch/Jafta/releases/latest/download/latest.json
 ```
 
 GitHub resolves `/latest/` to whatever the most recent non-draft, non-prerelease release is. That
@@ -223,10 +223,10 @@ Jafta has already stopped being able to tell you.
   "schema": 1,
   "version_code": 9,
   "version_name": "0.7.0",
-  "apk_url": "https://github.com/nastechresearch/jafta-android-ai-agent/releases/download/v0.7.0/jafta-0.7.0.apk",
+  "apk_url": "https://github.com/nastechresearch/Jafta/releases/download/v0.7.0/jafta-0.7.0.apk",
   "sha256": "05592b9d8bc11f615c6217a942854399b9d8db5bbba29d69dfb3163cd7e696fc",
   "size": 2097152,
-  "notes_url": "https://github.com/nastechresearch/jafta-android-ai-agent/releases/tag/v0.7.0",
+  "notes_url": "https://github.com/nastechresearch/Jafta/releases/tag/v0.7.0",
   "summary_it": "Aggiornamenti automatici e correzioni varie.",
   "summary_en": "Automatic updates and assorted fixes.",
   "min_supported_code": 0,
@@ -370,7 +370,7 @@ new `version_code`, which would lock out literally everyone.
 | `--critical` | Mark the release critical. Default off. |
 | `--min-supported-code N` | Oldest `versionCode` allowed to update. Default: previous manifest, else `0`. |
 | `--out PATH` | Output directory, or a path ending in `latest.json`. Default `dist/release/`. |
-| `--repo SLUG` | Repository the URLs point at. Default `nastechresearch/jafta-android-ai-agent`. |
+| `--repo SLUG` | Repository the URLs point at. Default `nastechresearch/Jafta`. |
 | `--dry-run` | Print everything, write nothing. |
 
 ## Reference: the knobs on the device

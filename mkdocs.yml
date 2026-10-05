@@ -1,0 +1,114 @@
+# MkDocs configuration — the docs site is built and published by
+# .github/workflows/pages.yml on every push to main. Nothing about the site is
+# hand-maintained: `docs/` is the single source and this file only describes it.
+#
+# Two choices worth knowing about:
+#
+# * `theme: readthedocs` is the theme that ships inside mkdocs itself. The
+#   alternative is `material`, which looks better and drags in a theme package
+#   plus its own extensions — and the same reasoning that made `dco` an inline
+#   15-line script instead of a marketplace action applies here (see the comment
+#   in .github/workflows/ci.yml). Swapping themes is a one-line change plus a
+#   pinned dependency when you decide the dependency is worth it.
+#
+# * `site_url` is the project Pages site, `/Jafta/` under the org's user site.
+#   It is NOT `jafta.nastechresearch.github.io`, which the old links used: a
+#   `<subdomain>.<user>.github.io` host cannot exist without a custom domain,
+#   so every one of those links was dead. If a real custom domain is set up
+#   later, this is the line to change — and the README links with it.
+site_name: Jafta
+site_url: https://nastechresearch.github.io/Jafta/
+site_description: >-
+  A local-first personal AI agent that runs on your Android phone. On-device
+  memory, scheduled autonomous work, self-written mini-apps, and an optional
+  home-screen launcher.
+site_author: NasTech Research
+
+repo_url: https://github.com/nastechresearch/Jafta
+repo_name: nastechresearch/Jafta
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; 2026 NasTech Research. AGPL-3.0.
+
+docs_dir: docs
+use_directory_urls: true
+
+# Every page is listed below, and the build runs with --strict, so a file added
+# to docs/ without a nav entry fails CI instead of silently disappearing from
+# the sidebar. Order follows docs/README.md, which is the reader-facing index.
+nav:
+  - Home: README.md
+  - Start:
+      - Introduction: start/introduction.md
+      - Install the APK: start/install.md
+      - First run: start/first-run.md
+      - Set it as your launcher: start/launcher-setup.md
+      - Is Jafta for you?: start/is-jafta-for-you.md
+  - Using Jafta:
+      - Tour of the WebUI: using/webui-tour.md
+      - Chat basics: using/chat.md
+      - Files and attachments: using/attachments.md
+      - Memory and Dream: using/memory.md
+      - Notebooks: using/projects.md
+      - The gardener: using/gardener.md
+      - Scheduling and proactivity: using/scheduling.md
+      - Mini-apps: using/mini-apps.md
+      - Skills: using/skills.md
+      - Themes and mascot: using/themes-mascot.md
+      - SSH access: using/ssh.md
+      - Telegram bridge: using/telegram.md
+      - Location: using/location.md
+      - Backup and restore: using/backup.md
+      - Phone app launcher: using/app-launcher.md
+      - Wiki: using/wiki.md
+      - Slash commands: using/slash-commands.md
+      - Troubleshooting: using/troubleshooting.md
+  - Reference:
+      - Settings: reference/settings.md
+      - Configuration: reference/configuration.md
+      - Providers and models: reference/providers.md
+      - Local models: reference/local-models.md
+      - Tool reference: reference/tools.md
+      - Environment variables: reference/environment-variables.md
+      - Android permissions: reference/android-permissions.md
+      - WebSocket protocol: reference/websocket.md
+  - Internals:
+      - Architecture: internals/architecture.md
+      - Core concepts: internals/concepts.md
+      - The agent turn: internals/agent-turn.md
+      - Security model: internals/security-model.md
+      - Privacy: internals/privacy.md
+  - Contribute:
+      - Build from source: contribute/build-from-source.md
+      - Development setup: contribute/development.md
+      - Testing and CI: contribute/testing.md
+      - Write a tool: contribute/write-a-tool.md
+      - Write a mini-app: contribute/write-a-mini-app.md
+      - Add a provider: contribute/add-a-provider.md
+      - Code style: contribute/code-style.md
+      - Publishing a release: contribute/publish-a-release.md
+
+theme:
+  name: readthedocs
+  highlightjs: true
+  navigation_depth: 3
+  nav_style: dark
+  collapse_navigation: false
+
+markdown_extensions:
+  # All of these ship inside mkdocs itself. The `pymdownx.*` family would buy
+  # collapsible admonitions and nicer fences, but it is a separate package and
+  # this config deliberately adds no dependency beyond mkdocs — see the theme
+  # note above for the reasoning.
+  #
+  # Note there is no extension here for turning `](start/install.md)` into a
+  # site URL: that rewriting is core MkDocs behaviour, not an extension. If
+  # cross-references in the built site ever point at raw `.md` files, the cause
+  # is a broken link, not a missing extension.
+  - admonition
+  - attr_list
+  - def_list
+  - fenced_code
+  - footnotes
+  - tables
+  - toc:
+      permalink: true
