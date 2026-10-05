@@ -1,0 +1,27 @@
+# Defence in depth for the release signing key.
+#
+# The root .gitignore already covers `*.keystore`, `*.jks`, `*.p12` and
+# `keystore.properties`. This file repeats the rules that matter inside this
+# directory, for one reason: the root list is edited by anyone doing routine
+# Android work, and the consequence of deleting one line from it is that a
+# 30-year signing key gets committed. GitHub's push protection is a second net,
+# not a first one — a leaked private key stays leaked in the history.
+#
+# `keystore/README.md` IS tracked on purpose: it holds the public fingerprints
+# users verify installs against, and losing the key means losing the ability to
+# publish updates, so the fingerprints must be in the repository.
+
+# Patterns here are relative to THIS directory, so they carry no `keystore/`
+# prefix. A pattern containing a slash is anchored to the .gitignore's own
+# directory, which means `keystore/*.keystore` in here would only ever match
+# `keystore/keystore/*.keystore` — and match nothing at all. The version of
+# this file on the rebrand branch had exactly that bug: `.storepass` sat
+# unprotected, covered only by the root .gitignore.
+
+/*.keystore
+/*.jks
+/*.p12
+/.storepass
+*.pass
+*.pem
+*.key
