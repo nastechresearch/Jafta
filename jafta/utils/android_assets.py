@@ -104,6 +104,18 @@ _RETIRED_TEMPLATE_DIGESTS: dict[str, dict[str, str]] = {
         # versione con del testo dentro, prima che il file passasse a zero byte.
         "e23a60be0336c5220d3d0dbd256907f66b590156459422a244dcd24685eb49b7":
             "unreleased source builds (04de3cc)",
+        # Le due versioni qui sopra esistono anche con il nome «Jafta» dentro:
+        # il rename li ha riscritti byte per byte, e un digest è un digest del
+        # testo, non del nome. Senza queste due voci un ``USER.md`` intatto
+        # seminato da una build di sorgente di questo fork smetteva di
+        # combaciare e rientrava in ogni prompt come prosa scritta
+        # dall'utente. I digest con «Jenny» restano: sono loro che tengono
+        # fuori dal prompt i telefoni già installati, e le due coorti non si
+        # sovrappongono.
+        "2764ec2e9bc8b118ce57ee88df4765c33c6b2a5a4058b749711da4ceca1077cb":
+            "v0.3.0 to v0.7.1, rebranded (dd448c8)",
+        "a5cef31c1481f5e2e2b809a1303436bac2238fb892daffb05a54db7b290bfbbb":
+            "unreleased source builds (97d7b38), rebranded (dd448c8)",
     },
     # Le tre versioni di "# Agent Instructions", il manuale di cron e heartbeat
     # che si spediva dentro un file dell'utente. Oggi quel testo vive in
@@ -136,6 +148,10 @@ _RETIRED_TEMPLATE_DIGESTS: dict[str, dict[str, str]] = {
     "memory/MEMORY.md": {
         "d7d84cc166a24465a19ad90da2aefc4cb579b3278a893c4adbd36c368aab427d":
             "v0.3.0 to v0.7.1 (8833b94)",
+        # Stessa prosa di sopra con «Jafta» al posto di «Jenny» nell'ultima
+        # riga. V. la nota in ``USER.md`` sul perché le due versioni convivono.
+        "addbed97527987dcf22a17a55dcb292d186c48e6e60fba322ad500616bd4565f":
+            "v0.3.0 to v0.7.1, rebranded (dd448c8)",
     },
 }
 
