@@ -191,14 +191,28 @@ jobs:
       - name: Put apksigner on PATH
         run: |
           set -euo pipefail
-          APKSIGNER=$(ls -1 "$ANDROID_SDK_ROOT"/build-tools/*/apksigner 2>/dev/null | tail -1 || true)
-          if [ -z "$APKSIGNER" ]; then
-            echo "::error::No apksigner under $ANDROID_SDK_ROOT/build-tools/."
+          # Prefers 34.0.0 because the runner image preinstalls others (37.0.0),
+          # and no chmod: the image's SDK is root-owned and the runner user is
+          # not, so it fails with "Operation not permitted". apksigner already
+          # ships executable. See android.yml for the full reasoning.
+          PINNED="$ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner"
+          if [ -x "$PINNED" ]; then
+            APKSIGNER="$PINNED"
+          else
+            echo "note: build-tools 34.0.0/apksigner not found; falling back to any installed build-tools"
+            ls -1 "$ANDROID_SDK_ROOT"/build-tools/*/apksigner 2>/dev/null | head -1 > /tmp/apk || true
+            APKSIGNER=$(cat /tmp/apk)
+          fi
+          # -x rather than -f: a non-executable apksigner would fail later at
+          # the call site as exit 127, the bug this step prevents.
+          if [ -z "${APKSIGNER:-}" ] || [ ! -x "$APKSIGNER" ]; then
+            echo "::error::No executable apksigner under $ANDROID_SDK_ROOT/build-tools/."
             exit 1
           fi
-          chmod +x "$APKSIGNER"
-          echo "$ANDROID_HOME/build-tools/$(basename "$(dirname "$APKSIGNER")")" >> "$GITHUB_PATH"
-          apksigner version
+          echo "$(dirname "$APKSIGNER")" >> "$GITHUB_PATH"
+          # Full path, not bare name: $GITHUB_PATH applies to LATER steps only,
+          # so `apksigner version` here would still be "command not found".
+          "$APKSIGNER" version
 
       - name: Grant execute permission for gradlew
         run: chmod +x android/gradlew

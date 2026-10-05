@@ -145,17 +145,41 @@ jobs:
       - name: Put apksigner on PATH
         run: |
           set -euo pipefail
-          APKSIGNER=$(ls -1 "$ANDROID_SDK_ROOT"/build-tools/*/apksigner 2>/dev/null | tail -1 || true)
-          if [ -z "$APKSIGNER" ]; then
-            echo "::error::No apksigner under $ANDROID_SDK_ROOT/build-tools/."
-            echo "::error::The SDK step should have installed build-tools;34.0.0."
-            ls -1 "$ANDROID_SDK_ROOT/build-tools/" 2>/dev/null || echo "  (build-tools/ does not exist)"
+          # Prefer the version this project builds with. The runner image
+          # preinstalls other build-tools (37.0.0 among them), so taking the
+          # last match alphabetically picks one of those instead of the
+          # 34.0.0 requested above, and version sorting makes that worse, not
+          # better: "37" > "34". Fall back to whatever exists only if the
+          # pinned one is genuinely absent, since apksigner only has to be able
+          # to read a v2/v3 signature, not match the compiler.
+          PINNED="$ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner"
+          if [ -x "$PINNED" ]; then
+            APKSIGNER="$PINNED"
+          else
+            echo "note: build-tools 34.0.0/apksigner not found; falling back to any installed build-tools"
+            ls -1 "$ANDROID_SDK_ROOT"/build-tools/*/apksigner 2>/dev/null | head -1 > /tmp/apk || true
+            APKSIGNER=$(cat /tmp/apk)
+          fi
+          # -x, not -f: a build-tools tree that exists but whose apksigner is
+          # not executable would otherwise be accepted here and fail later at
+          # the call site as exit 127, which is the exact bug this step exists
+          # to prevent.
+          if [ -z "${APKSIGNER:-}" ] || [ ! -x "$APKSIGNER" ]; then
+            echo "::error::No executable apksigner under $ANDROID_SDK_ROOT/build-tools/."
+            echo "::error::The SDK step requests build-tools;34.0.0. Installed:"
+            ls -l "$ANDROID_SDK_ROOT"/build-tools/*/apksigner 2>/dev/null || echo "  (no apksigner found)"
             exit 1
           fi
-          chmod +x "$APKSIGNER"
-          echo "$ANDROID_HOME/build-tools/$(basename "$(dirname "$APKSIGNER")")" >> "$GITHUB_PATH"
+          # Deliberately no chmod. The runner image's SDK is root-owned while
+          # the runner user is not root, so chmod fails with "Operation not
+          # permitted" and takes the step down with it. apksigner already ships
+          # executable, which is why this is not needed.
+          echo "$(dirname "$APKSIGNER")" >> "$GITHUB_PATH"
           echo "apksigner: $APKSIGNER"
-          apksigner version
+          # Called by full path, not by name: $GITHUB_PATH only takes effect in
+          # LATER steps, so a bare `apksigner version` here is still "command
+          # not found" — the same failure this step is fixing.
+          "$APKSIGNER" version
 
       - name: Grant execute permission for gradlew
         run: chmod +x android/gradlew
