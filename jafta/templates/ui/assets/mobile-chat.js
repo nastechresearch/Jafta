@@ -3502,7 +3502,7 @@ export class ChatController {
   /* Scrive *text* nel composer **senza mandarlo** e senza buttare quel che
    * c'era.
    *
-   * Lo usano i comandi con un argomento (`/model `) e «Chiedi a Jenny» delle
+   * Lo usano i comandi con un argomento (`/model `) e «Chiedi a Jafta» delle
    * altre viste (`MobileApp.sendInChat`). Prima riscrivevano il campo, e la
    * domanda che stavi scrivendo spariva. Qui la bozza si mette da parte e
    * torna nel campo appena il testo precompilato parte (v. `sendMessage`):
