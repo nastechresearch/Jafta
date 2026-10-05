@@ -134,6 +134,29 @@ jobs:
         with:
           packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
 
+      # apksigner lives in build-tools/<version>/, and setup-android puts only
+      # cmdline-tools and platform-tools on PATH. So after asking for
+      # build-tools;34.0.0 above, the tool is installed but not reachable by
+      # name, and `apksigner verify` fails with "command not found" (exit 127).
+      # Resolve it by the directory rather than hardcoding a path: the version
+      # installed may not be 34.0.0 even though that is what was requested, and
+      # a glob that matches nothing has to fail loudly here instead of turning
+      # into a bare `apksigner` later.
+      - name: Put apksigner on PATH
+        run: |
+          set -euo pipefail
+          APKSIGNER=$(ls -1 "$ANDROID_SDK_ROOT"/build-tools/*/apksigner 2>/dev/null | tail -1 || true)
+          if [ -z "$APKSIGNER" ]; then
+            echo "::error::No apksigner under $ANDROID_SDK_ROOT/build-tools/."
+            echo "::error::The SDK step should have installed build-tools;34.0.0."
+            ls -1 "$ANDROID_SDK_ROOT/build-tools/" 2>/dev/null || echo "  (build-tools/ does not exist)"
+            exit 1
+          fi
+          chmod +x "$APKSIGNER"
+          echo "$ANDROID_HOME/build-tools/$(basename "$(dirname "$APKSIGNER")")" >> "$GITHUB_PATH"
+          echo "apksigner: $APKSIGNER"
+          apksigner version
+
       - name: Grant execute permission for gradlew
         run: chmod +x android/gradlew
 
