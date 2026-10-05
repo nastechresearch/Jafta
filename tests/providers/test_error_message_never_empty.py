@@ -2,7 +2,7 @@
 
 Misurato in produzione il 01/09/2026: la chat mostrava ``Error calling LLM:`` e
 nient'altro, e logcat riportava la stessa stringa vuota
-(``jenny.agent.loop:_run_agent_loop`` logga ``result.final_content``). La causa
+(``jafta.agent.loop:_run_agent_loop`` logga ``result.final_content``). La causa
 non era il provider: ``str(exc)`` e' vuoto per *tutta* la famiglia dei timeout e
 degli errori di connessione di httpx, che si costruiscono senza messaggio, e
 ``f"...: {exc}"`` non lascia niente dietro i due punti. Su un telefono quella
@@ -19,7 +19,7 @@ import asyncio
 import httpx
 import pytest
 
-from jenny.providers.base import StreamTimeout, describe_exc
+from jafta.providers.base import StreamTimeout, describe_exc
 
 # La famiglia con ``str()`` vuoto. Non e' un elenco inventato: sono le
 # eccezioni che httpx solleva su una rete mobile che cade, piu' StreamTimeout,

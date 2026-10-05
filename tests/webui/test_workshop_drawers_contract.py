@@ -27,10 +27,10 @@ from pathlib import Path
 from support.js_harness import requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 SETTINGS_JS = ASSETS / "mobile-settings.js"
 APP_JS = ASSETS / "mobile-app.js"
-WORKSHOP = ROOT / "jenny" / "templates" / "ui" / "workshop.html"
+WORKSHOP = ROOT / "jafta" / "templates" / "ui" / "workshop.html"
 
 
 def _src(name: str) -> str:
@@ -397,7 +397,7 @@ def test_the_workshop_no_longer_carries_a_wiki_of_its_own() -> None:
                  'id="drawer-files"', 'id="wiki-feedback-dialog"'):
         assert node not in html, f"{node} e' tornato in officina.html"
 
-    from jenny.utils.android_assets import _UI_MANIFEST
+    from jafta.utils.android_assets import _UI_MANIFEST
 
     for entry in ("assets/mobile-wiki.js", "assets/mobile-graph.js"):
         assert entry not in _UI_MANIFEST, f"il manifesto elenca ancora {entry}"
@@ -452,7 +452,7 @@ def test_the_notebook_did_not_disappear_with_it() -> None:
 def test_the_client_rule_for_the_base_url_is_the_servers() -> None:
     """Il client la dice nella sua lingua, il server la riapplica: due copie
     della stessa regola, e qui si tiene che dicano lo stesso."""
-    from jenny.webui.settings_api import WebUISettingsError, normalize_api_base
+    from jafta.webui.settings_api import WebUISettingsError, normalize_api_base
 
     cases = ["", "Http://10.0.2.2:8765/v1", "HTTPS://api.example.test/v1", "${BASE}",
              "Http:/10.0.2.2:8765/v1", "ftp://files.example.test", "api.example.test/v1", "https://"]

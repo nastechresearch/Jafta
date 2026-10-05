@@ -7,12 +7,12 @@ from typing import Any
 
 from support.aio import drain_nowait
 
-from jenny.bus.events import INTERNAL_CHANNEL, OutboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.runtime.delivery import ChannelDeliverer
-from jenny.session.keys import UNIFIED_SESSION_KEY
-from jenny.session.turn_visibility import silent_turn_metadata
-from jenny.webui.metadata import WEBUI_TURN_METADATA_KEY
+from jafta.bus.events import INTERNAL_CHANNEL, OutboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.runtime.delivery import ChannelDeliverer
+from jafta.session.keys import UNIFIED_SESSION_KEY
+from jafta.session.turn_visibility import silent_turn_metadata
+from jafta.webui.metadata import WEBUI_TURN_METADATA_KEY
 
 
 class StubSession:

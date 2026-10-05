@@ -5,9 +5,9 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.runner import AgentRunResult
-from jenny.agent.subagent import SubagentManager, SubagentSpec, SubagentStatus
-from jenny.bus.queue import MessageBus
+from jafta.agent.runner import AgentRunResult
+from jafta.agent.subagent import SubagentManager, SubagentSpec, SubagentStatus
+from jafta.bus.queue import MessageBus
 
 
 @pytest.mark.asyncio
@@ -53,12 +53,12 @@ def test_stale_goal_is_expired_at_first_turn_after_restart(tmp_path: Path) -> No
     """
     from datetime import datetime, timedelta
 
-    from jenny.session.goal_state import (
+    from jafta.session.goal_state import (
         GOAL_STATE_KEY,
         expire_stale_goal,
         runner_wall_llm_timeout_s,
     )
-    from jenny.session.manager import SessionManager
+    from jafta.session.manager import SessionManager
 
     sm = SessionManager(tmp_path)
     sess = sm.get_or_create("unified:default")

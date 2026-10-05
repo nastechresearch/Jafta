@@ -20,11 +20,11 @@ from pathlib import Path
 
 from support.js_harness import requires_node, run_js
 
-from jenny.utils.android_assets import _UI_MANIFEST
+from jafta.utils.android_assets import _UI_MANIFEST
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 MASCOT_JS = ASSETS / "shared" / "mascot.js"
-DEAD_KEY = "jenny-mascotte-color"
+DEAD_KEY = "jafta-mascotte-color"
 
 node = requires_node
 
@@ -58,17 +58,17 @@ def test_every_pose_in_the_manifest_exists_exactly_once() -> None:
 
     Dieci e non quindici: il pensa e i quattro frame del parlato sono passati
     all'arte a due livelli e non si esportano più. I sorgenti a due livelli
-    (``jenny-body-*`` / ``jenny-face-*``) sono un'altra famiglia e li conta
+    (``jafta-body-*`` / ``jafta-face-*``) sono un'altra famiglia e li conta
     ``test_mascot_layer_sources.py``.
     """
     poses = sorted(
         e for e in _UI_MANIFEST
-        if e.startswith("assets/jenny-") and e.endswith(".webp")
-        and not e.startswith(("assets/jenny-body-", "assets/jenny-face-"))
+        if e.startswith("assets/jafta-") and e.endswith(".webp")
+        and not e.startswith(("assets/jafta-body-", "assets/jafta-face-"))
     )
     assert len(poses) == 10, poses
     for entry in _UI_MANIFEST:
-        if entry.startswith("assets/jenny-") and entry.endswith(".webp"):
+        if entry.startswith("assets/jafta-") and entry.endswith(".webp"):
             assert (ASSETS.parent / entry).is_file(), f"{entry} è nel manifest ma non su disco"
 
 
@@ -98,7 +98,7 @@ def test_a_phone_that_had_chosen_black_and_white_gets_it_cleaned_up() -> None:
     """La chiave morta si cancella al caricamento, e non fa cambiare nient'altro."""
     _run(f"""
 import assert from 'node:assert/strict';
-const store = new Map([[{json.dumps(DEAD_KEY)}, '0'], ['jenny-mascot-size', 'lg']]);
+const store = new Map([[{json.dumps(DEAD_KEY)}, '0'], ['jafta-mascot-size', 'lg']]);
 globalThis.localStorage = {{
   getItem(k) {{ return store.has(k) ? store.get(k) : null; }},
   setItem(k, v) {{ store.set(k, String(v)); }},
@@ -139,8 +139,8 @@ def test_every_retired_preference_is_cleaned_up_and_nothing_reads_it() -> None:
     e nessun sorgente della WebUI le legge più, o la pulizia cancellerebbe
     una preferenza viva."""
     retired = [
-        "jenny-mascotte-dock-side", "jenny-mascotte-side", "jenny-advanced-mode",
-        "jenny-home-view", "locale",
+        "jafta-mascotte-dock-side", "jafta-mascotte-side", "jafta-advanced-mode",
+        "jafta-home-view", "locale",
     ]
     for path in sorted(ASSETS.rglob("*.js")):
         if "vendor" in path.parts or path == MASCOT_JS:

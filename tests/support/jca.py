@@ -1,6 +1,6 @@
 """Fake di javax.crypto (JCA) per testare ``AndroidAesGcmBackend`` su host.
 
-Riproduce il sottoinsieme usato da ``jenny/snapshot/crypto_backends/android.py``:
+Riproduce il sottoinsieme usato da ``jafta/snapshot/crypto_backends/android.py``:
 ``Cipher`` AES/GCM/NoPadding con AAD, ``SecretKeySpec``, ``GCMParameterSpec``.
 La crittografia vera è delegata a pyca/``cryptography``, così la parità di
 byte col backend dev è verificata davvero (stessi vettori known-answer) e non
@@ -89,7 +89,7 @@ JCA_CLASSES: dict[str, Any] = {
 
 def install_fake_jca(monkeypatch: pytest.MonkeyPatch) -> type[FakeCipher]:
     """Monta il modulo ``java`` finto e resetta la cache classi del backend."""
-    import jenny.snapshot.crypto_backends.android as android_mod
+    import jafta.snapshot.crypto_backends.android as android_mod
     from support.android import fake_java_module
 
     fake_java_module(monkeypatch, JCA_CLASSES)

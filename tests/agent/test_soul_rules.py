@@ -1,4 +1,4 @@
-"""Le regole che l'utente ha dato a Jenny sopravvivono a Dream.
+"""Le regole che l'utente ha dato a Jafta sopravvivono a Dream.
 
 Il problema che questo modulo esiste per risolvere non e' di interfaccia: e'
 che ``SOUL.md`` **viene riscritto**. Misurato sugli snapshot del dispositivo di
@@ -17,7 +17,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from jenny.agent.soul_rules import (
+from jafta.agent.soul_rules import (
     HEADING,
     MARK_END,
     MARK_START,
@@ -32,7 +32,7 @@ from jenny.agent.soul_rules import (
 
 SOUL = """# Soul
 
-I am Jenny.
+I am Jafta.
 
 ## Who I Am
 
@@ -183,7 +183,7 @@ def test_the_truth_lives_where_dream_cannot_write(tmp_path: Path) -> None:
     """Il registro di scrittura di Dream ammette esattamente ``SOUL.md``,
     ``USER.md``, ``memory/MEMORY.md`` e ``skills/<nome>/SKILL.md``: il file
     delle regole non e' nessuno di quelli, e non e' un caso."""
-    assert RULES_FILE.parts[0] == ".jenny"
+    assert RULES_FILE.parts[0] == ".jafta"
     assert RULES_FILE.name not in {"SOUL.md", "USER.md", "MEMORY.md", "SKILL.md"}
 
     write_rules(tmp_path, RULES)
@@ -372,7 +372,7 @@ def test_saving_and_syncing_share_one_lock(tmp_path: Path) -> None:
     serratura da un altro thread e controlla che il salvataggio la aspetti."""
     import threading
 
-    from jenny.agent import soul_rules
+    from jafta.agent import soul_rules
 
     (tmp_path / "SOUL.md").write_text(SOUL, encoding="utf-8")
     done = threading.Event()
@@ -402,7 +402,7 @@ def test_the_sync_after_dream_waits_for_the_lock_too(tmp_path: Path) -> None:
     """
     import threading
 
-    from jenny.agent import soul_rules
+    from jafta.agent import soul_rules
 
     (tmp_path / "SOUL.md").write_text(SOUL, encoding="utf-8")
     write_rules(tmp_path, RULES)
@@ -434,7 +434,7 @@ def test_every_dream_pass_puts_the_rules_back(tmp_path: Path) -> None:
     memoria su disco: e' l'unico modo perche' misuri il cablaggio e non se
     stesso.
     """
-    from jenny.agent.dream_cycle import finish_dream_cycle
+    from jafta.agent.dream_cycle import finish_dream_cycle
 
     workspace = tmp_path / "ws"
     workspace.mkdir()
@@ -468,7 +468,7 @@ def test_dreams_prompt_names_the_block_it_must_not_touch() -> None:
     """La proiezione ripara, ma il prompt e' il primo argine: dice a Dream che
     quel blocco lo scrive l'app. Il banco lega le due metà — se i marcatori
     cambiassero nel codice, il prompt nominerebbe un blocco che non esiste."""
-    from jenny.utils.helpers import load_bundled_template
+    from jafta.utils.helpers import load_bundled_template
 
     text = load_bundled_template("agent/dream.md") or ""
     assert MARK_START in text and MARK_END in text and HEADING.lstrip("# ") in text

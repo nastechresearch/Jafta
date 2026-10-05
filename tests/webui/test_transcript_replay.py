@@ -1,4 +1,4 @@
-"""Test unitari mirati per ``jenny.webui.transcript_replay``.
+"""Test unitari mirati per ``jafta.webui.transcript_replay``.
 
 `test_webui_transcript.py` copre gia estesamente il fold (delta, reasoning,
 tool_hint/progress, file_edit, media, turn_end) tramite `replay_transcript_to_ui_messages`;
@@ -8,7 +8,7 @@ mancanti, tipi inattesi) e la soppressione post-media fino a `turn_end`.
 
 from __future__ import annotations
 
-from jenny.webui.transcript_replay import replay_transcript_to_ui_messages
+from jafta.webui.transcript_replay import replay_transcript_to_ui_messages
 
 
 def test_unknown_event_type_is_ignored() -> None:

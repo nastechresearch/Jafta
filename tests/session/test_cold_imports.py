@@ -1,22 +1,22 @@
-"""Guardia: ogni modulo di `jenny/` regge di essere il primo import di un interprete.
+"""Guardia: ogni modulo di `jafta/` regge di essere il primo import di un interprete.
 
-Il 2026-08-17 `jenny/session/manager.py` importava `jenny.cron.session_turns` in
-testa, e quel modulo importa `jenny.session.keys` (:8). Toccare una foglia di
-`jenny.session` eseguiva `jenny/session/__init__.py`, che carica `manager`, che
+Il 2026-08-17 `jafta/session/manager.py` importava `jafta.cron.session_turns` in
+testa, e quel modulo importa `jafta.session.keys` (:8). Toccare una foglia di
+`jafta.session` eseguiva `jafta/session/__init__.py`, che carica `manager`, che
 tornava su `session_turns` ancora a metà inizializzazione: `ImportError` su
 `CRON_HISTORY_META`. La correzione è l'import dentro la funzione che lo usa.
 
 **Perché nessun controllo del progetto lo vedeva.** In una raccolta completa di
-pytest qualcosa carica `jenny.session` prima di `jenny.cron`, quindi il ciclo non
+pytest qualcosa carica `jafta.session` prima di `jafta.cron`, quindi il ciclo non
 scatta mai: la suite era verde, `pytest tests/session/` era verde (137 test), e
-`npx pyright jenny/session` — che è nel sottoinsieme bloccante — era a zero errori,
+`npx pyright jafta/session` — che è nel sottoinsieme bloccante — era a zero errori,
 perché pyright non modella i cicli di import. Si vedeva solo eseguendo
 `tests/session/test_webui_turns.py` da solo, o importando quei moduli a freddo.
 
 **Perché lo sweep è completo e non un elenco curato.** La prima versione di questo
 file elencava a mano undici moduli, e un elenco scritto a mano ha un solo modo di
 sbagliare: il modulo che nessuno ci aggiunge. Lo sweep prende ogni `.py` sotto
-`jenny/` — 233 moduli — ognuno in un interprete nuovo, in parallelo: circa due
+`jafta/` — 233 moduli — ognuno in un interprete nuovo, in parallelo: circa due
 secondi in tutto. Un test in-process non potrebbe farlo comunque, perché
 `sys.modules` è già caldo quando parte, ed è esattamente la condizione che
 nascondeva il difetto.
@@ -42,7 +42,7 @@ from pathlib import Path
 import pytest
 
 _REPO = Path(__file__).resolve().parents[2]
-_PKG = _REPO / "jenny"
+_PKG = _REPO / "jafta"
 
 # Moduli che NON reggono di essere importati per primi. **Vuoto**, e va tenuto
 # vuoto: l'insieme esiste per nominare il debito, non per ospitarlo.
@@ -50,7 +50,7 @@ _PKG = _REPO / "jenny"
 # Ci sono stati quattro nomi qui, tutti preesistenti a questo lavoro, e sono
 # bastate due correzioni. Tre (`webui.gateway_services`, `webui.media_api`,
 # `webui.media_gateway`) erano lo stesso ciclo: `media_api` importa
-# `jenny.channels.http_utils`, che esegue `jenny/channels/__init__.py`, che carica
+# `jafta.channels.http_utils`, che esegue `jafta/channels/__init__.py`, che carica
 # `websocket` → `ws_sender`, che in testa importava `media_attachment_kind` da
 # `media_api` — ancora a metà. Ora quell'import sta dentro la funzione che lo usa.
 # Il quarto (`utils.file_edit_streaming`) era un re-export in coda a
@@ -101,7 +101,7 @@ def test_no_new_module_fails_a_cold_import() -> None:
         + "\n\nQuasi sempre un ciclo di import a livello di modulo. È verde in una "
         "raccolta completa e fatale a freddo — il gateway non parte — e la "
         "correzione più piccola è spostare uno dei due import dentro la funzione "
-        "che lo usa (v. `jenny/session/manager.py::last_user_message_ms`)."
+        "che lo usa (v. `jafta/session/manager.py::last_user_message_ms`)."
     )
 
 
@@ -125,8 +125,8 @@ def test_the_known_failures_are_still_failing() -> None:
 @pytest.mark.parametrize(
     "package,name",
     [
-        ("jenny.session", "SessionManager"),
-        ("jenny.session", "Session"),
+        ("jafta.session", "SessionManager"),
+        ("jafta.session", "Session"),
     ],
 )
 def test_package_attribute_resolves_in_a_cold_interpreter(package: str, name: str) -> None:
@@ -135,15 +135,15 @@ def test_package_attribute_resolves_in_a_cold_interpreter(package: str, name: st
     Lo sweep importa il *modulo*; un package che ri-esporta può importarsi bene e
     lasciare comunque l'attributo irrisolto, quindi va provato a parte.
 
-    `jenny.cron` stava qui con `CronService` e `CronJob`: il suo `__init__`
+    `jafta.cron` stava qui con `CronService` e `CronJob`: il suo `__init__`
     risolveva `CronService` con una `__getattr__` pigra — che non passa dal
     modulo, ed è il caso in cui questa distinzione morde davvero. Quella
     `__getattr__` non c'è più (nessuno importava per quella via, e una
     `__getattr__` di modulo costava il controllo dei nomi di pyright su tutto il
     package, come dice il test qui sotto). Senza re-export non c'è più niente da
-    risolvere: `from jenny.cron import CronService` ora fallisce subito e in
+    risolvere: `from jafta.cron import CronService` ora fallisce subito e in
     chiaro, che è il modo in cui *non* serve una guardia. Restano i due nomi di
-    `jenny.session`, che il package esporta davvero.
+    `jafta.session`, che il package esporta davvero.
     """
     result = subprocess.run(
         [sys.executable, "-c", f"from {package} import {name}; print({name}.__name__)"],
@@ -159,10 +159,10 @@ def test_package_attribute_resolves_in_a_cold_interpreter(package: str, name: st
 def test_the_session_package_does_not_reach_into_cron() -> None:
     """L'invariante che chiude il ciclo, e il motivo per cui non è una `__getattr__`.
 
-    `jenny/session/__init__.py` resta *eager*: renderlo pigro chiuderebbe il ciclo,
+    `jafta/session/__init__.py` resta *eager*: renderlo pigro chiuderebbe il ciclo,
     ma una `__getattr__` di modulo fa diventare ``Any`` ogni attributo sconosciuto
-    del package — misurato: `jenny.session.SessionManagr` smette di essere un errore
-    — e `jenny/session` sta nel sottoinsieme **bloccante** di pyright. Si
+    del package — misurato: `jafta.session.SessionManagr` smette di essere un errore
+    — e `jafta/session` sta nel sottoinsieme **bloccante** di pyright. Si
     perderebbe il controllo dei nomi su tutto il package per chiudere un ciclo che
     si chiude altrove in tre righe.
     """
@@ -171,8 +171,8 @@ def test_the_session_package_does_not_reach_into_cron() -> None:
             sys.executable,
             "-c",
             "import sys\n"
-            "import jenny.session\n"
-            "print(any(m.startswith('jenny.cron') for m in sys.modules))\n",
+            "import jafta.session\n"
+            "print(any(m.startswith('jafta.cron') for m in sys.modules))\n",
         ],
         cwd=_REPO,
         capture_output=True,
@@ -181,7 +181,7 @@ def test_the_session_package_does_not_reach_into_cron() -> None:
 
     assert result.returncode == 0, result.stderr
     assert result.stdout.strip() == "False", (
-        "Importare `jenny.session` tira dentro `jenny.cron`: l'import è tornato in "
+        "Importare `jafta.session` tira dentro `jafta.cron`: l'import è tornato in "
         "testa a un modulo invece di stare nella funzione, e il ciclo con "
-        "`jenny.cron.session_turns` è di nuovo raggiungibile."
+        "`jafta.cron.session_turns` è di nuovo raggiungibile."
     )

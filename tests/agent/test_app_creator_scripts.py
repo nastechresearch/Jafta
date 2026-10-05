@@ -9,7 +9,7 @@ import importlib
 import sys
 from pathlib import Path
 
-SCRIPT_DIR = Path(__file__).resolve().parents[2] / "jenny" / "skills" / "app-creator" / "scripts"
+SCRIPT_DIR = Path(__file__).resolve().parents[2] / "jafta" / "skills" / "app-creator" / "scripts"
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
@@ -34,8 +34,8 @@ MANIFEST = """{
 # Preamble condiviso: linka kit e SDK, così i warning che restano nei test sono
 # solo quelli che il singolo caso vuole verificare.
 HEAD = (
-    '<link rel="stylesheet" href="/html-mobile/assets/apps/jenny-kit.css">'
-    '<script src="/html-mobile/assets/apps/jenny-sdk.js"></script>'
+    '<link rel="stylesheet" href="/html-mobile/assets/apps/jafta-kit.css">'
+    '<script src="/html-mobile/assets/apps/jafta-sdk.js"></script>'
 )
 
 
@@ -69,7 +69,7 @@ def test_form_is_rejected_even_with_a_submit_handler(tmp_path: Path) -> None:
         tmp_path,
         "<body><form id=\"f\"><input id=\"t\"></form>"
         '<script>document.getElementById("f").addEventListener("submit", function (e) {'
-        ' e.preventDefault(); jenny.action("add_task", {text: "x"}); });</script></body>',
+        ' e.preventDefault(); jafta.action("add_task", {text: "x"}); });</script></body>',
     )
 
     errors, _ = validate_app_module.validate_app(app_dir)
@@ -98,7 +98,7 @@ def test_button_with_click_handler_is_accepted(tmp_path: Path) -> None:
         tmp_path,
         '<body><div><input id="t"><button id="b" type="button">Add</button></div>'
         '<script>document.getElementById("b").addEventListener("click", function () {'
-        ' jenny.action("add_task", {text: document.getElementById("t").value}); });'
+        ' jafta.action("add_task", {text: document.getElementById("t").value}); });'
         'document.getElementById("t").addEventListener("keydown", function (e) {'
         ' if (e.key === "Enter") document.getElementById("b").click(); });</script></body>',
     )

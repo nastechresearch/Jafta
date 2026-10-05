@@ -11,7 +11,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from jenny.agent.tools.filesystem import ReadFileTool
+from jafta.agent.tools.filesystem import ReadFileTool
 
 _CAP = ReadFileTool._MAX_CHARS
 

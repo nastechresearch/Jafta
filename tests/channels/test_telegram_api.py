@@ -1,4 +1,4 @@
-"""Test per ``jenny.channels.telegram_api`` (client Bot API su httpx.MockTransport)."""
+"""Test per ``jafta.channels.telegram_api`` (client Bot API su httpx.MockTransport)."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from typing import Any
 import httpx
 import pytest
 
-from jenny.channels.telegram_api import TelegramAPI, TelegramAPIError
+from jafta.channels.telegram_api import TelegramAPI, TelegramAPIError
 
 
 def _make_api(handler) -> TelegramAPI:
@@ -63,7 +63,7 @@ async def test_rate_limit_retries_then_succeeds(monkeypatch) -> None:
     async def fake_sleep(s: float) -> None:
         sleeps.append(s)
 
-    monkeypatch.setattr("jenny.channels.telegram_api.asyncio.sleep", fake_sleep)
+    monkeypatch.setattr("jafta.channels.telegram_api.asyncio.sleep", fake_sleep)
 
     calls = {"n": 0}
 

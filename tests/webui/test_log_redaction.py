@@ -13,10 +13,10 @@ import asyncio
 import pytest
 from loguru import logger as loguru_logger
 
-from jenny.channels.http_utils import redact_query_secrets
-from jenny.runtime.context import get_runtime_context
-from jenny.session.manager import SessionManager
-from jenny.webui.commands import CommandContext, dispatch_command
+from jafta.channels.http_utils import redact_query_secrets
+from jafta.runtime.context import get_runtime_context
+from jafta.session.manager import SessionManager
+from jafta.webui.commands import CommandContext, dispatch_command
 
 # ---------------------------------------------------------------------------
 # Unit: redact_query_secrets

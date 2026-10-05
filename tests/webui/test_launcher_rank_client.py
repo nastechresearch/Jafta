@@ -7,7 +7,7 @@ il modulo si importa in node, e le asserzioni girano contro il codice vero.
 
 La casella che dà il nome al file è **3.6**: due voci con lo stesso nome in
 spazi di nomi diversi non si sovrascrivono nel ranking. È la classe di difetto
-più silenziosa di tutta la funzionalità — una skill "notes" e una Jenny App
+più silenziosa di tutta la funzionalità — una skill "notes" e una Jafta App
 "notes" che si contano a vicenda non rompono niente di visibile: l'ordine è
 semplicemente sbagliato, e nessuno saprebbe dire rispetto a cosa.
 """
@@ -21,7 +21,7 @@ from support.js_harness import requires_node, run_js
 
 RANK_JS = (
     Path(__file__).resolve().parents[2]
-    / "jenny" / "templates" / "ui" / "assets" / "shared" / "launcher-rank.js"
+    / "jafta" / "templates" / "ui" / "assets" / "shared" / "launcher-rank.js"
 )
 
 
@@ -58,7 +58,7 @@ def _entries_js(entries: list[dict]) -> str:
 
 _THREE_NAMESPACES = [
     {"key": "skill:notes", "name": "notes", "description": "prende appunti"},
-    {"key": "jenny:notes", "name": "notes", "description": "bacheca di note"},
+    {"key": "jafta:notes", "name": "notes", "description": "bacheca di note"},
     {"key": "android:com.example.notes", "name": "Notes", "description": "com.example.notes"},
 ]
 
@@ -66,14 +66,14 @@ _THREE_NAMESPACES = [
 # ── 3.6 — gli spazi di nomi non si sovrascrivono ────────────────────────────
 
 def test_same_name_in_two_namespaces_keeps_two_separate_counters() -> None:
-    """Aprire la skill "notes" non deve far salire la Jenny App "notes"."""
+    """Aprire la skill "notes" non deve far salire la Jafta App "notes"."""
     out = _run_js(
         """
 const usage = new UsageRanking(fakeStorage());
 usage.record('skill:notes', 1000);
 usage.record('skill:notes', 2000);
 assert.equal(usage.get('skill:notes').count, 2);
-assert.equal(usage.get('jenny:notes').count, 0, 'la Jenny App omonima è stata contaminata');
+assert.equal(usage.get('jafta:notes').count, 0, 'la Jafta App omonima è stata contaminata');
 assert.equal(usage.get('android:com.example.notes').count, 0);
 assert.equal(usage.size, 1, 'una sola chiave ricordata');
 console.log(JSON.stringify({ok: true}));
@@ -89,14 +89,14 @@ def test_ranking_puts_the_used_namespace_first_and_leaves_the_twin_behind() -> N
         f"""
 const entries = {_entries_js(_THREE_NAMESPACES)};
 const usage = new UsageRanking(fakeStorage());
-usage.record('jenny:notes', 5000);
+usage.record('jafta:notes', 5000);
 const order = rankEntries(entries, '', usage, 'it').map(e => e.key);
-assert.equal(order[0], 'jenny:notes', 'la voce aperta non è in cima: ' + order);
+assert.equal(order[0], 'jafta:notes', 'la voce aperta non è in cima: ' + order);
 assert.deepEqual(order.slice(1).sort(), ['android:com.example.notes', 'skill:notes']);
 console.log(JSON.stringify(order));
 """
     )
-    assert json.loads(out)[0] == "jenny:notes"
+    assert json.loads(out)[0] == "jafta:notes"
 
 
 def test_persisted_shape_keys_by_namespace_not_by_name() -> None:
@@ -114,7 +114,7 @@ assert.deepEqual(Object.keys(raw).sort(), ['android:com.example.notes', 'skill:n
 // Riletto da zero: il conteggio sopravvive al giro su disco separato per spazio.
 const reborn = new UsageRanking(storage);
 assert.equal(reborn.get('skill:notes').count, 1);
-assert.equal(reborn.get('jenny:notes').count, 0);
+assert.equal(reborn.get('jafta:notes').count, 0);
 console.log(JSON.stringify(raw));
 """
     )
@@ -128,13 +128,13 @@ def test_search_matches_name_and_description_across_namespaces() -> None:
         f"""
 const entries = {_entries_js([
     {"key": "skill:cron", "name": "cron", "description": "pianifica lavori ricorrenti"},
-    {"key": "jenny:spesa", "name": "Lista spesa", "description": "appunti del supermercato"},
+    {"key": "jafta:spesa", "name": "Lista spesa", "description": "appunti del supermercato"},
     {"key": "android:com.android.chrome", "name": "Chrome", "description": "com.android.chrome"},
 ])};
 const usage = new UsageRanking(null);
 // Solo dalla descrizione, e in uno spazio di nomi diverso da quello del nome.
 assert.deepEqual(rankEntries(entries, 'supermercato', usage, 'it').map(e => e.key),
-                 ['jenny:spesa']);
+                 ['jafta:spesa']);
 // Dal nome del pacchetto, che per una app Android è il testo secondario.
 assert.deepEqual(rankEntries(entries, 'com.android', usage, 'it').map(e => e.key),
                  ['android:com.android.chrome']);
@@ -142,7 +142,7 @@ assert.deepEqual(rankEntries(entries, 'com.android', usage, 'it').map(e => e.key
 assert.deepEqual(rankEntries(entries, 'zzz', usage, 'it'), []);
 // Due termini sono in AND, e possono cadere in campi diversi.
 assert.deepEqual(rankEntries(entries, 'lista supermercato', usage, 'it').map(e => e.key),
-                 ['jenny:spesa']);
+                 ['jafta:spesa']);
 assert.deepEqual(rankEntries(entries, 'lista cron', usage, 'it'), []);
 console.log(JSON.stringify({{ok: true}}));
 """
@@ -156,7 +156,7 @@ def test_search_ignores_accents_and_case() -> None:
     out = _run_js(
         f"""
 const entries = {_entries_js([
-    {"key": "jenny:caffe", "name": "Caffè", "description": "conta le tazzine"},
+    {"key": "jafta:caffe", "name": "Caffè", "description": "conta le tazzine"},
 ])};
 const usage = new UsageRanking(null);
 for (const q of ['caffe', 'CAFFÈ', 'Caffe', 'caffè']) {{
@@ -197,21 +197,21 @@ def test_relevance_outranks_usage_but_usage_breaks_the_tie() -> None:
     out = _run_js(
         f"""
 const entries = {_entries_js([
-    {"key": "jenny:alfa", "name": "Alfa note", "description": ""},
-    {"key": "jenny:beta", "name": "Beta note", "description": ""},
-    {"key": "jenny:noteria", "name": "Noteria", "description": ""},
+    {"key": "jafta:alfa", "name": "Alfa note", "description": ""},
+    {"key": "jafta:beta", "name": "Beta note", "description": ""},
+    {"key": "jafta:noteria", "name": "Noteria", "description": ""},
 ])};
 const storage = fakeStorage();
 const usage = new UsageRanking(storage);
-usage.record('jenny:beta', 9000);   // usata, ma con un riscontro peggiore
-usage.record('jenny:beta', 9500);
+usage.record('jafta:beta', 9000);   // usata, ma con un riscontro peggiore
+usage.record('jafta:beta', 9500);
 // "note" attacca il nome di Noteria e sta a metà parola negli altri due:
 // la pertinenza vince sulla frequenza.
 assert.deepEqual(rankEntries(entries, 'note', usage, 'it').map(e => e.key),
-                 ['jenny:noteria', 'jenny:beta', 'jenny:alfa']);
+                 ['jafta:noteria', 'jafta:beta', 'jafta:alfa']);
 // A pari pertinenza (campo vuoto) comanda la frequenza, poi l'alfabetico.
 assert.deepEqual(rankEntries(entries, '', usage, 'it').map(e => e.key),
-                 ['jenny:beta', 'jenny:alfa', 'jenny:noteria']);
+                 ['jafta:beta', 'jafta:alfa', 'jafta:noteria']);
 console.log(JSON.stringify({{ok: true}}));
 """
     )
@@ -222,14 +222,14 @@ def test_recency_breaks_a_frequency_tie() -> None:
     out = _run_js(
         f"""
 const entries = {_entries_js([
-    {"key": "jenny:vecchia", "name": "Vecchia", "description": ""},
-    {"key": "jenny:nuova", "name": "Nuova", "description": ""},
+    {"key": "jafta:vecchia", "name": "Vecchia", "description": ""},
+    {"key": "jafta:nuova", "name": "Nuova", "description": ""},
 ])};
 const usage = new UsageRanking(fakeStorage());
-usage.record('jenny:vecchia', 1000);
-usage.record('jenny:nuova', 9000);
+usage.record('jafta:vecchia', 1000);
+usage.record('jafta:nuova', 9000);
 assert.deepEqual(rankEntries(entries, '', usage, 'it').map(e => e.key),
-                 ['jenny:nuova', 'jenny:vecchia']);
+                 ['jafta:nuova', 'jafta:vecchia']);
 console.log(JSON.stringify({{ok: true}}));
 """
     )
@@ -242,9 +242,9 @@ def test_never_used_entries_stay_in_the_list_in_alphabetical_order() -> None:
     out = _run_js(
         f"""
 const entries = {_entries_js([
-    {"key": "jenny:c", "name": "Zebra", "description": ""},
-    {"key": "jenny:a", "name": "ananas", "description": ""},
-    {"key": "jenny:b", "name": "Órso", "description": ""},
+    {"key": "jafta:c", "name": "Zebra", "description": ""},
+    {"key": "jafta:a", "name": "ananas", "description": ""},
+    {"key": "jafta:b", "name": "Órso", "description": ""},
 ])};
 const usage = new UsageRanking(null);
 const first = rankEntries(entries, '', usage, 'it').map(e => e.name);
@@ -264,17 +264,17 @@ def test_a_broken_or_missing_storage_degrades_to_alphabetical() -> None:
     out = _run_js(
         f"""
 const entries = {_entries_js([
-    {"key": "jenny:b", "name": "Beta", "description": ""},
-    {"key": "jenny:a", "name": "Alfa", "description": ""},
+    {"key": "jafta:b", "name": "Beta", "description": ""},
+    {"key": "jafta:a", "name": "Alfa", "description": ""},
 ])};
 const exploding = {{
   getItem() {{ throw new Error('SecurityError'); }},
   setItem() {{ throw new Error('QuotaExceeded'); }},
 }};
 for (const storage of [null, exploding, fakeStorage({{'launcher-usage': 'non-json'}}),
-                       fakeStorage({{'launcher-usage': '{{"jenny:a": "boh"}}'}})]) {{
+                       fakeStorage({{'launcher-usage': '{{"jafta:a": "boh"}}'}})]) {{
   const usage = new UsageRanking(storage);
-  usage.record('jenny:b', 1);   // non deve propagare l'eccezione
+  usage.record('jafta:b', 1);   // non deve propagare l'eccezione
   const order = rankEntries(entries, '', usage, 'it').map(e => e.key);
   assert.equal(order.length, 2, 'voci perse con storage ' + String(storage));
 }}

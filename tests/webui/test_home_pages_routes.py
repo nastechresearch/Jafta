@@ -38,9 +38,9 @@ import pytest
 from websockets.http11 import Headers
 from websockets.http11 import Request as WsRequest
 
-from jenny.config.schema import MAX_PAGES
-from jenny.webui.commands import CommandError, dispatch_command
-from jenny.webui.ws_http import GatewayHTTPHandler
+from jafta.config.schema import MAX_PAGES
+from jafta.webui.commands import CommandError, dispatch_command
+from jafta.webui.ws_http import GatewayHTTPHandler
 
 _AUTH_SECRET = "test-secret"
 
@@ -88,10 +88,10 @@ def env(tmp_path: Path, monkeypatch):
     workspace.mkdir(parents=True)
     path = workspace / "config.json"
 
-    from jenny.config import paths as paths_mod
-    from jenny.config.loader import save_config
-    from jenny.config.schema import Config
-    from jenny.runtime.context import get_runtime_context
+    from jafta.config import paths as paths_mod
+    from jafta.config.loader import save_config
+    from jafta.config.schema import Config
+    from jafta.runtime.context import get_runtime_context
 
     save_config(Config(), path)
     monkeypatch.setattr(paths_mod, "get_workspace_path", lambda: workspace)
@@ -152,7 +152,7 @@ async def test_the_old_write_route_is_gone(env) -> None:
 
 
 def test_the_write_is_a_registered_command() -> None:
-    from jenny.webui.commands import COMMANDS, home_pages_set
+    from jafta.webui.commands import COMMANDS, home_pages_set
 
     assert COMMANDS["home.pages.set"] is home_pages_set
 
@@ -211,7 +211,7 @@ async def test_the_write_goes_through_the_funnel(env, monkeypatch) -> None:
     altro scrittore ha appena messo. Nessun test se ne accorgerebbe da solo,
     quindi se ne accorge questo.
     """
-    from jenny.config import store as store_mod
+    from jafta.config import store as store_mod
 
     steps: list[str] = []
     real = store_mod.mutate
@@ -372,8 +372,8 @@ async def test_a_failed_app_delete_leaves_the_pages_alone(env) -> None:
 
 
 async def test_deleting_a_notebook_takes_its_page(env, monkeypatch) -> None:
-    from jenny.webui import commands
-    from jenny.webui import project_delete as module
+    from jafta.webui import commands
+    from jafta.webui import project_delete as module
 
     monkeypatch.setattr(module, "delete_project", lambda **kw: {"name": kw["name"]})
     await _with_pages(env, [
@@ -391,9 +391,9 @@ async def test_deleting_a_notebook_takes_its_page(env, monkeypatch) -> None:
 
 
 async def test_a_refused_notebook_delete_leaves_the_pages_alone(env, monkeypatch) -> None:
-    from jenny.webui import commands
-    from jenny.webui import project_delete as module
-    from jenny.webui.commands import CommandError
+    from jafta.webui import commands
+    from jafta.webui import project_delete as module
+    from jafta.webui.commands import CommandError
 
     def _refuses(**kw):
         raise module.ProjectDeleteError("no project named piante")
@@ -414,7 +414,7 @@ async def test_a_refused_notebook_delete_leaves_the_pages_alone(env, monkeypatch
 async def test_nothing_to_take_means_no_write(env) -> None:
     """Se la cosa non aveva pagine il file non si riscrive: niente backup
     ruotato per un'operazione che in casa non ha cambiato niente."""
-    from jenny.webui.home_pages import detach_pages_of
+    from jafta.webui.home_pages import detach_pages_of
 
     await _with_pages(env, [{"id": "p1", "kind": "app", "ref": "lampo"}])
     before = env.config_path.stat().st_mtime_ns
@@ -425,7 +425,7 @@ async def test_nothing_to_take_means_no_write(env) -> None:
 async def test_a_page_that_cannot_be_taken_does_not_undo_the_delete(env, monkeypatch) -> None:
     """La cancellazione e' gia' avvenuta e non si disfa: un guaio con la
     pagina non deve diventare un 500 su un'operazione riuscita."""
-    from jenny.webui import home_pages
+    from jafta.webui import home_pages
 
     async def _broken(kind, ref):
         raise RuntimeError("disco pieno")
@@ -441,7 +441,7 @@ async def test_a_delete_does_not_reach_across_kinds(env) -> None:
     """E' la specie, non il nome, a dire di chi e' una pagina: un'app che si
     chiama come il quaderno resta. Fino al 25/09/2026 lo schema lasciava a una
     pagina app anche un `ref` a forma di quaderno; ora non piu' (v. sotto)."""
-    from jenny.webui.home_pages import detach_pages_of
+    from jafta.webui.home_pages import detach_pages_of
 
     await _with_pages(env, [
         {"id": "p1", "kind": "conversation", "ref": "project:piante"},
@@ -537,7 +537,7 @@ async def test_an_object_without_pages_is_refused(env) -> None:
 
 
 async def test_deleting_an_app_takes_its_id_out_of_the_order(env) -> None:
-    from jenny.webui.home_pages import detach_pages_of
+    from jafta.webui.home_pages import detach_pages_of
 
     todo = {"id": "p1", "kind": "app", "ref": "todo"}
     await _save(env, [todo], ["p1", "app", "chat", "notebooks", "settings"])

@@ -15,14 +15,14 @@ from types import SimpleNamespace
 
 import pytest
 
-from jenny.config.schema import SnapshotConfig
-from jenny.snapshot.backup import BackupError, BackupManager
-from jenny.snapshot.engine import SnapshotEngine
-from jenny.snapshot.locations import (
+from jafta.config.schema import SnapshotConfig
+from jafta.snapshot.backup import BackupError, BackupManager
+from jafta.snapshot.engine import SnapshotEngine
+from jafta.snapshot.locations import (
     STAGED_SNAPSHOTS_DIR_NAME,
     STAGED_WORKSPACE_DIR_NAME,
 )
-from jenny.snapshot.service import SnapshotService
+from jafta.snapshot.service import SnapshotService
 
 _METADATA = json.dumps({"format_version": 1}).encode("utf-8")
 
@@ -128,22 +128,22 @@ def test_extract_happy_path_ignores_stray_entries(tmp_path: Path) -> None:
 
 
 def test_build_zip_metadata_and_tree(tmp_path: Path) -> None:
-    import jenny
+    import jafta
 
     env = _make_env(tmp_path)
     env.manager._build_zip(tmp_path / "export.zip")
     with zipfile.ZipFile(tmp_path / "export.zip") as archive:
         metadata = json.loads(archive.read("metadata.json").decode("utf-8"))
         assert metadata["format_version"] == 1
-        assert metadata["jenny_version"] == jenny.__version__
+        assert metadata["jenny_version"] == jafta.__version__
         assert isinstance(metadata["exported_at_ms"], int)
         assert archive.read("tree/SOUL.md") == b"anima"
 
 
 def test_jenny_version_fallback(monkeypatch: pytest.MonkeyPatch) -> None:
-    from jenny.snapshot.backup import _jenny_version
+    from jafta.snapshot.backup import _jenny_version
 
-    monkeypatch.delattr("jenny.__version__")
+    monkeypatch.delattr("jafta.__version__")
     assert _jenny_version() == "unknown"
 
 
@@ -155,7 +155,7 @@ async def test_export_replaces_previous_staged_file(tmp_path: Path) -> None:
     (env.workspace / "SOUL.md").write_text("anima 2", encoding="utf-8")
     second = await env.manager.export_backup("passphrase")
 
-    staged = sorted(env.staging.glob("jenny-backup-*.jbk"))
+    staged = sorted(env.staging.glob("jafta-backup-*.jbk"))
     assert [str(p) for p in staged] == [second["staged_path"]]
     assert not Path(first["staged_path"]).exists() or first["staged_path"] == second[
         "staged_path"

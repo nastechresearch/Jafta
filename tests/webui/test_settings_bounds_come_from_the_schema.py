@@ -23,10 +23,10 @@ from pathlib import Path
 
 import pytest
 
-from jenny.config.schema import AgentDefaults, DreamConfig, FloatingConfig, GardenerConfig
-from jenny.webui.settings_api import WebUISettingsError, _bounds, _parse_int
+from jafta.config.schema import AgentDefaults, DreamConfig, FloatingConfig, GardenerConfig
+from jafta.webui.settings_api import WebUISettingsError, _bounds, _parse_int
 
-SETTINGS_API = Path(__file__).resolve().parents[2] / "jenny" / "webui" / "settings_api.py"
+SETTINGS_API = Path(__file__).resolve().parents[2] / "jafta" / "webui" / "settings_api.py"
 
 # I campi interi che le rotte scrivono e che lo schema limita.
 _BOUNDED = [

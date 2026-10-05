@@ -9,15 +9,15 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from jenny.config.schema import AgentDefaults
-from jenny.session.keys import UNIFIED_SESSION_KEY
+from jafta.config.schema import AgentDefaults
+from jafta.session.keys import UNIFIED_SESSION_KEY
 
 _MAX_TOOL_RESULT_CHARS = AgentDefaults().max_tool_result_chars
 
 
 def _sub_spec(task: str = "do task", label: str = "label", **kw):
     """Spec minimale per invocare ``_run_subagent`` direttamente."""
-    from jenny.agent.subagent import SubagentSpec
+    from jafta.agent.subagent import SubagentSpec
 
     defaults = dict(origin_channel="test", origin_chat_id="c1")
     defaults.update(kw)
@@ -26,8 +26,8 @@ def _sub_spec(task: str = "do task", label: str = "label", **kw):
 
 def _make_loop(*, tools_config=None):
     """Create a minimal AgentLoop with mocked dependencies."""
-    from jenny.agent.loop import AgentLoop
-    from jenny.bus.queue import MessageBus
+    from jafta.agent.loop import AgentLoop
+    from jafta.bus.queue import MessageBus
 
     bus = MessageBus()
     provider = MagicMock()
@@ -35,9 +35,9 @@ def _make_loop(*, tools_config=None):
     workspace = MagicMock()
     workspace.__truediv__ = MagicMock(return_value=MagicMock())
 
-    with patch("jenny.agent.loop.ContextBuilder"), \
-         patch("jenny.agent.loop.SessionManager"), \
-         patch("jenny.agent.loop.SubagentManager") as mock_sub_mgr:
+    with patch("jafta.agent.loop.ContextBuilder"), \
+         patch("jafta.agent.loop.SessionManager"), \
+         patch("jafta.agent.loop.SubagentManager") as mock_sub_mgr:
         mock_sub_mgr.return_value.cancel_by_session = AsyncMock(return_value=0)
         loop = AgentLoop(bus=bus, provider=provider, workspace=workspace, tools_config=tools_config)
     return loop, bus
@@ -46,9 +46,9 @@ def _make_loop(*, tools_config=None):
 class TestHandleStop:
     @pytest.mark.asyncio
     async def test_stop_no_active_task(self):
-        from jenny.bus.events import InboundMessage
-        from jenny.command.builtin import cmd_stop
-        from jenny.command.router import CommandContext
+        from jafta.bus.events import InboundMessage
+        from jafta.command.builtin import cmd_stop
+        from jafta.command.router import CommandContext
 
         loop, bus = _make_loop()
         msg = InboundMessage(channel="test", sender_id="u1", chat_id="c1", content="/stop")
@@ -58,9 +58,9 @@ class TestHandleStop:
 
     @pytest.mark.asyncio
     async def test_stop_cancels_active_task(self):
-        from jenny.bus.events import InboundMessage
-        from jenny.command.builtin import cmd_stop
-        from jenny.command.router import CommandContext
+        from jafta.bus.events import InboundMessage
+        from jafta.command.builtin import cmd_stop
+        from jafta.command.router import CommandContext
 
         loop, bus = _make_loop()
         cancelled = asyncio.Event()
@@ -85,9 +85,9 @@ class TestHandleStop:
 
     @pytest.mark.asyncio
     async def test_stop_cancels_multiple_tasks(self):
-        from jenny.bus.events import InboundMessage
-        from jenny.command.builtin import cmd_stop
-        from jenny.command.router import CommandContext
+        from jafta.bus.events import InboundMessage
+        from jafta.command.builtin import cmd_stop
+        from jafta.command.router import CommandContext
 
         loop, bus = _make_loop()
         events = [asyncio.Event(), asyncio.Event()]
@@ -113,12 +113,12 @@ class TestHandleStop:
 
 class TestStopClearsStuckGoalState:
     """A ``/stop`` on a cancelled goal turn must not permanently disable the LLM
-    wall-clock timeout for the session (see jenny.session.goal_state)."""
+    wall-clock timeout for the session (see jafta.session.goal_state)."""
 
     def _make_loop_with_real_sessions(self, tmp_path):
-        from jenny.agent.loop import AgentLoop
-        from jenny.bus.queue import MessageBus
-        from jenny.session.manager import SessionManager
+        from jafta.agent.loop import AgentLoop
+        from jafta.bus.queue import MessageBus
+        from jafta.session.manager import SessionManager
 
         bus = MessageBus()
         provider = MagicMock()
@@ -127,8 +127,8 @@ class TestStopClearsStuckGoalState:
         workspace.__truediv__ = MagicMock(return_value=MagicMock())
         sessions = SessionManager(tmp_path)
 
-        with patch("jenny.agent.loop.ContextBuilder"), \
-             patch("jenny.agent.loop.SubagentManager") as mock_sub_mgr:
+        with patch("jafta.agent.loop.ContextBuilder"), \
+             patch("jafta.agent.loop.SubagentManager") as mock_sub_mgr:
             mock_sub_mgr.return_value.cancel_by_session = AsyncMock(return_value=0)
             loop = AgentLoop(
                 bus=bus, provider=provider, workspace=workspace, session_manager=sessions,
@@ -137,10 +137,10 @@ class TestStopClearsStuckGoalState:
 
     @pytest.mark.asyncio
     async def test_stop_resets_stuck_active_goal_and_reenables_timeout(self, tmp_path):
-        from jenny.bus.events import InboundMessage
-        from jenny.command.builtin import cmd_stop
-        from jenny.command.router import CommandContext
-        from jenny.session.goal_state import (
+        from jafta.bus.events import InboundMessage
+        from jafta.command.builtin import cmd_stop
+        from jafta.command.router import CommandContext
+        from jafta.session.goal_state import (
             GOAL_STATE_KEY,
             runner_wall_llm_timeout_s,
             sustained_goal_active,
@@ -200,10 +200,10 @@ class TestStopClearsStuckGoalState:
 
         from loguru import logger as loguru_logger
 
-        from jenny.bus.events import InboundMessage
-        from jenny.command.builtin import cmd_stop
-        from jenny.command.router import CommandContext
-        from jenny.session.goal_state import GOAL_STATE_KEY
+        from jafta.bus.events import InboundMessage
+        from jafta.command.builtin import cmd_stop
+        from jafta.command.router import CommandContext
+        from jafta.session.goal_state import GOAL_STATE_KEY
 
         loop, _bus = self._make_loop_with_real_sessions(tmp_path)
         key = "test:c1"
@@ -231,10 +231,10 @@ class TestStopClearsStuckGoalState:
     @pytest.mark.asyncio
     async def test_stop_leaves_non_goal_session_untouched(self, tmp_path):
         """No active goal: /stop must not fabricate goal_state metadata."""
-        from jenny.bus.events import InboundMessage
-        from jenny.command.builtin import cmd_stop
-        from jenny.command.router import CommandContext
-        from jenny.session.goal_state import GOAL_STATE_KEY
+        from jafta.bus.events import InboundMessage
+        from jafta.command.builtin import cmd_stop
+        from jafta.command.router import CommandContext
+        from jafta.session.goal_state import GOAL_STATE_KEY
 
         loop, bus = self._make_loop_with_real_sessions(tmp_path)
         key = "test:c1"
@@ -249,8 +249,8 @@ class TestStopClearsStuckGoalState:
 
 class TestDispatch:
     def test_exec_tool_not_registered_when_disabled(self):
-        from jenny.agent.tools.python_exec import PythonExecConfig
-        from jenny.config.schema import ToolsConfig
+        from jafta.agent.tools.python_exec import PythonExecConfig
+        from jafta.config.schema import ToolsConfig
 
         loop, _bus = _make_loop(tools_config=ToolsConfig(python_exec=PythonExecConfig(enable=False)))
 
@@ -258,11 +258,11 @@ class TestDispatch:
 
     @pytest.mark.asyncio
     async def test_dispatch_processes_and_publishes(self):
-        from jenny.bus.events import InboundMessage, OutboundMessage
+        from jafta.bus.events import InboundMessage, OutboundMessage
 
         loop, bus = _make_loop()
         msg = InboundMessage(channel="test", sender_id="u1", chat_id="c1", content="hello")
-        from jenny.agent.turn_types import TurnOutcome
+        from jafta.agent.turn_types import TurnOutcome
 
         loop._process_message = AsyncMock(
             return_value=TurnOutcome.delivered(
@@ -275,7 +275,7 @@ class TestDispatch:
 
     @pytest.mark.asyncio
     async def test_dispatch_streaming_preserves_message_metadata(self):
-        from jenny.bus.events import InboundMessage
+        from jafta.bus.events import InboundMessage
 
         loop, bus = _make_loop()
         msg = InboundMessage(
@@ -312,7 +312,7 @@ class TestDispatch:
 
     @pytest.mark.asyncio
     async def test_processing_lock_serializes(self):
-        from jenny.bus.events import InboundMessage, OutboundMessage
+        from jafta.bus.events import InboundMessage, OutboundMessage
 
         loop, bus = _make_loop()
         order = []
@@ -345,8 +345,8 @@ class TestDispatch:
 class TestSubagentCancellation:
     @pytest.mark.asyncio
     async def test_cancel_by_session(self):
-        from jenny.agent.subagent import SubagentManager
-        from jenny.bus.queue import MessageBus
+        from jafta.agent.subagent import SubagentManager
+        from jafta.bus.queue import MessageBus
 
         bus = MessageBus()
         provider = MagicMock()
@@ -378,8 +378,8 @@ class TestSubagentCancellation:
 
     @pytest.mark.asyncio
     async def test_cancel_by_session_no_tasks(self):
-        from jenny.agent.subagent import SubagentManager
-        from jenny.bus.queue import MessageBus
+        from jafta.agent.subagent import SubagentManager
+        from jafta.bus.queue import MessageBus
 
         bus = MessageBus()
         provider = MagicMock()
@@ -394,9 +394,9 @@ class TestSubagentCancellation:
 
     @pytest.mark.asyncio
     async def test_subagent_preserves_reasoning_fields_in_tool_turn(self, monkeypatch, tmp_path):
-        from jenny.agent.subagent import SubagentManager
-        from jenny.bus.queue import MessageBus
-        from jenny.providers.base import LLMResponse, ToolCallRequest
+        from jafta.agent.subagent import SubagentManager
+        from jafta.bus.queue import MessageBus
+        from jafta.providers.base import LLMResponse, ToolCallRequest
 
         bus = MessageBus()
         provider = MagicMock()
@@ -435,9 +435,9 @@ class TestSubagentCancellation:
         async def fake_execute(self, **kwargs):
             return "tool result"
 
-        monkeypatch.setattr("jenny.agent.tools.filesystem.ListDirTool.execute", fake_execute)
+        monkeypatch.setattr("jafta.agent.tools.filesystem.ListDirTool.execute", fake_execute)
 
-        from jenny.agent.subagent import SubagentStatus
+        from jafta.agent.subagent import SubagentStatus
         status = SubagentStatus(task_id="sub-1", label="label", task_description="do task", started_at=time.monotonic())
         await mgr._run_subagent("sub-1", _sub_spec(), status)
 
@@ -451,10 +451,10 @@ class TestSubagentCancellation:
 
     @pytest.mark.asyncio
     async def test_subagent_exec_tool_not_registered_when_disabled(self, tmp_path):
-        from jenny.agent.subagent import SubagentManager
-        from jenny.agent.tools.python_exec import PythonExecConfig
-        from jenny.bus.queue import MessageBus
-        from jenny.config.schema import ToolsConfig
+        from jafta.agent.subagent import SubagentManager
+        from jafta.agent.tools.python_exec import PythonExecConfig
+        from jafta.bus.queue import MessageBus
+        from jafta.config.schema import ToolsConfig
 
         bus = MessageBus()
         provider = MagicMock()
@@ -479,7 +479,7 @@ class TestSubagentCancellation:
 
         mgr.runner.run = AsyncMock(side_effect=fake_run)
 
-        from jenny.agent.subagent import SubagentStatus
+        from jafta.agent.subagent import SubagentStatus
         status = SubagentStatus(task_id="sub-1", label="label", task_description="do task", started_at=time.monotonic())
         await mgr._run_subagent("sub-1", _sub_spec(), status)
 
@@ -488,9 +488,9 @@ class TestSubagentCancellation:
 
     @pytest.mark.asyncio
     async def test_subagent_announces_error_when_tool_execution_fails(self, monkeypatch, tmp_path):
-        from jenny.agent.subagent import SubagentManager
-        from jenny.bus.queue import MessageBus
-        from jenny.providers.base import LLMResponse, ToolCallRequest
+        from jafta.agent.subagent import SubagentManager
+        from jafta.bus.queue import MessageBus
+        from jafta.providers.base import LLMResponse, ToolCallRequest
 
         bus = MessageBus()
         provider = MagicMock()
@@ -517,9 +517,9 @@ class TestSubagentCancellation:
                 return "first result"
             raise RuntimeError("boom")
 
-        monkeypatch.setattr("jenny.agent.tools.filesystem.ListDirTool.execute", fake_execute)
+        monkeypatch.setattr("jafta.agent.tools.filesystem.ListDirTool.execute", fake_execute)
 
-        from jenny.agent.subagent import SubagentStatus
+        from jafta.agent.subagent import SubagentStatus
         status = SubagentStatus(task_id="sub-1", label="label", task_description="do task", started_at=time.monotonic())
         await mgr._run_subagent("sub-1", _sub_spec(), status)
 
@@ -533,9 +533,9 @@ class TestSubagentCancellation:
 
     @pytest.mark.asyncio
     async def test_cancel_by_session_cancels_running_subagent_tool(self, monkeypatch, tmp_path):
-        from jenny.agent.subagent import SubagentManager, SubagentStatus
-        from jenny.bus.queue import MessageBus
-        from jenny.providers.base import LLMResponse, ToolCallRequest
+        from jafta.agent.subagent import SubagentManager, SubagentStatus
+        from jafta.bus.queue import MessageBus
+        from jafta.providers.base import LLMResponse, ToolCallRequest
 
         bus = MessageBus()
         provider = MagicMock()
@@ -565,7 +565,7 @@ class TestSubagentCancellation:
                 cancelled.set()
                 raise
 
-        monkeypatch.setattr("jenny.agent.tools.filesystem.ListDirTool.execute", fake_execute)
+        monkeypatch.setattr("jafta.agent.tools.filesystem.ListDirTool.execute", fake_execute)
 
         task = asyncio.create_task(
             mgr._run_subagent(
@@ -591,8 +591,8 @@ class TestSubagentAnnounceSessionKey:
 
     def _make_mgr(self):
         """Create a SubagentManager with mocked deps and its bus."""
-        from jenny.agent.subagent import SubagentManager
-        from jenny.bus.queue import MessageBus
+        from jafta.agent.subagent import SubagentManager
+        from jafta.bus.queue import MessageBus
 
         bus = MessageBus()
         provider = MagicMock()
@@ -646,7 +646,7 @@ class TestSubagentAnnounceSessionKey:
     @pytest.mark.asyncio
     async def test_session_key_flows_through_run_subagent(self):
         """Verify session_key in origin propagates from _run_subagent to _announce_result."""
-        from jenny.agent.subagent import SubagentStatus
+        from jafta.agent.subagent import SubagentStatus
 
         mgr, bus = self._make_mgr()
 
@@ -773,7 +773,7 @@ class TestStopAbandonsStuckTasks:
 
     @pytest.mark.asyncio
     async def test_stop_drains_zombie_pending_queue(self):
-        from jenny.bus.events import InboundMessage
+        from jafta.bus.events import InboundMessage
 
         loop, bus = _make_loop()
         loop.bus.publish_inbound = AsyncMock()
@@ -817,9 +817,9 @@ class TestStopAbandonsStuckTasks:
     async def test_stop_restores_checkpoint_and_emits_turn_end(self):
         """cmd_stop materializza il checkpoint e chiude il turno verso la UI
         (turn_completed + idle) al posto dello zombie ripudiato."""
-        from jenny.bus.events import InboundMessage
-        from jenny.command.builtin import cmd_stop
-        from jenny.command.router import CommandContext
+        from jafta.bus.events import InboundMessage
+        from jafta.command.builtin import cmd_stop
+        from jafta.command.router import CommandContext
 
         loop, bus = _make_loop()
         session = SimpleNamespace(
@@ -880,8 +880,8 @@ class TestStopAbandonsStuckTasks:
 
     @pytest.mark.asyncio
     async def test_cancel_by_session_abandons_stuck_subagent_and_suppresses_announce(self):
-        from jenny.agent.subagent import SubagentManager
-        from jenny.bus.queue import MessageBus
+        from jafta.agent.subagent import SubagentManager
+        from jafta.bus.queue import MessageBus
 
         bus = MessageBus()
         bus.publish_inbound = AsyncMock()

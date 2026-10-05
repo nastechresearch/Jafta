@@ -32,9 +32,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.agent.loop import PROJECT_TIDY_COMMAND, AgentLoop
-from jenny.bus.events import InboundMessage
-from jenny.bus.queue import MessageBus
+from jafta.agent.loop import PROJECT_TIDY_COMMAND, AgentLoop
+from jafta.bus.events import InboundMessage
+from jafta.bus.queue import MessageBus
 
 
 def _loop(tmp_path: Path) -> AgentLoop:
@@ -114,13 +114,13 @@ async def test_outside_a_project_it_says_where_to_go(tmp_path: Path) -> None:
     sceglie dal chip sopra il campo del messaggio, e chi non lo sa non lo indovina
     da «non funziona qui».
 
-    Dal 31/08/2026 la frase **è** quella di :mod:`jenny.command.scope`, la stessa
+    Dal 31/08/2026 la frase **è** quella di :mod:`jafta.command.scope`, la stessa
     che il router dà a un comando fuori dal suo scope: era scritta a mano qui, un
     secondo rifiuto a mano in ``cmd_gardener``, e una terza copia della regola nel
     client. Il test confronta con quella funzione invece di ricopiarne il testo —
     così cambiarla non richiede di ricordarsi di questo file.
     """
-    from jenny.command.scope import refusal, spec_for_line
+    from jafta.command.scope import refusal, spec_for_line
 
     loop = _loop(tmp_path)
     published: list = []
@@ -215,7 +215,7 @@ async def test_the_numbers_come_from_the_readers_that_charge_them(tmp_path: Path
     mentre l'iniettore ne applica un'altra: la stessa forma del difetto che T3.14
     ha chiuso fra la regola SPLIT e l'inventario della passata.
     """
-    from jenny.agent.gardener import MAP_TARGET_CHARS, page_ceiling
+    from jafta.agent.gardener import MAP_TARGET_CHARS, page_ceiling
 
     loop = _loop(tmp_path)
     _wiki(tmp_path)
@@ -238,7 +238,7 @@ async def test_it_sends_the_turn_to_the_recipe_that_exists(tmp_path: Path) -> No
     """
     skill = (
         Path(__file__).resolve().parents[2]
-        / "jenny" / "skills" / "llm-wiki" / "SKILL.md"
+        / "jafta" / "skills" / "llm-wiki" / "SKILL.md"
     )
     loop = _loop(tmp_path)
     _wiki(tmp_path)
@@ -307,13 +307,13 @@ def test_the_prompt_is_a_system_template_so_a_correction_arrives() -> None:
     telefono aggiornato da mesi — e il modo peggiore di sbagliare, perché un file
     *nuovo* arriva e uno *corretto* no.
     """
-    from jenny.utils.android_assets import _SYSTEM_PROMPT_TEMPLATES
+    from jafta.utils.android_assets import _SYSTEM_PROMPT_TEMPLATES
 
     assert "agent/tidy.md" in _SYSTEM_PROMPT_TEMPLATES
 
 
 def test_help_lists_it() -> None:
-    from jenny.command.builtin import build_help_text
+    from jafta.command.builtin import build_help_text
 
     assert PROJECT_TIDY_COMMAND in build_help_text()
 
@@ -332,7 +332,7 @@ def test_the_expansion_is_wired_into_the_consume_loop() -> None:
     """
     from pathlib import Path as _Path
 
-    source = (_Path(__file__).resolve().parents[2] / "jenny" / "agent" / "loop.py").read_text(
+    source = (_Path(__file__).resolve().parents[2] / "jafta" / "agent" / "loop.py").read_text(
         encoding="utf-8"
     )
 
@@ -439,7 +439,7 @@ async def test_no_heading_or_bullet_is_glued_to_the_line_before_it(
     Il 26/08 il prompt è arrivato al modello con ``2,000. It fits.- **The pages**``
     e ``thing to do here.## What you have``. L'avevo guardato renderizzato e mi
     sembrava a posto: l'avevo renderizzato con un ``Environment`` costruito a
-    mano, **senza i flag della produzione** — ``jenny/utils/prompt_templates.py``
+    mano, **senza i flag della produzione** — ``jafta/utils/prompt_templates.py``
     monta ``trim_blocks=True``, che mangia il newline subito dopo un tag di
     blocco. È la stessa forma del difetto del 25/08 (``capture=True`` mancante):
     un prompt misurato con argomenti — qui con un *ambiente* — diverso da quello

@@ -1,6 +1,6 @@
 """``docs/reference/configuration.md`` promette «ogni chiave»: qui la promessa si tiene.
 
-La pagina dichiara alla riga 3 di elencare *ogni* chiave che Jenny legge da
+La pagina dichiara alla riga 3 di elencare *ogni* chiave che Jafta legge da
 ``config.json``. Una sezione intera le era sfuggita — ``updates``, cioè le
 quattro chiavi del controllo aggiornamenti, che il README presenta come una
 connessione in uscita: documentate solo su una pagina per chi contribuisce.
@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from jenny.config.schema import Config
+from jafta.config.schema import Config
 
 DOC = Path(__file__).resolve().parents[2] / "docs" / "reference" / "configuration.md"
 
@@ -38,5 +38,5 @@ def test_every_top_level_config_section_is_documented() -> None:
 
     assert not missing, (
         f"sezioni di config.json assenti da {DOC.name}: {missing}. "
-        "La pagina dichiara di elencare ogni chiave che Jenny legge."
+        "La pagina dichiara di elencare ogni chiave che Jafta legge."
     )

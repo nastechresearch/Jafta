@@ -14,8 +14,8 @@ import json
 import httpx
 import pytest
 
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
-from jenny.providers.retry_policy import is_transient_response
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.retry_policy import is_transient_response
 
 MESSAGES = [{"role": "user", "content": "x"}]
 
@@ -52,7 +52,7 @@ def _no_sleep(monkeypatch):
     async def _sleep(_delay: float) -> None:
         return None
 
-    monkeypatch.setattr("jenny.providers.base.asyncio.sleep", _sleep)
+    monkeypatch.setattr("jafta.providers.base.asyncio.sleep", _sleep)
 
 
 async def _delta(_text: str) -> None:

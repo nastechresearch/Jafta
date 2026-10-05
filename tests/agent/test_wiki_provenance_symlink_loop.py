@@ -17,7 +17,7 @@ import pathlib
 
 import pytest
 
-from jenny.agent.wiki_provenance import _provenance_guard, wiki_page_provenance_guard
+from jafta.agent.wiki_provenance import _provenance_guard, wiki_page_provenance_guard
 
 JOURNAL = "# 2026-09-26\n\n- 10:00 — [said] Si parte il 12.\n"
 DECIDED = "---\ntitle: X\nstate: decided\nsource: {source}\n---\n\n# X\n\nIl contenuto.\n"

@@ -11,10 +11,10 @@ import unicodedata
 
 import pytest
 
-from jenny.cron.session_turns import CRON_HISTORY_META
-from jenny.session import mascot_mood as mm
-from jenny.session.history_meta import INJECTED_EVENT_META, SUBAGENT_RESULT_EVENT
-from jenny.session.manager import Session
+from jafta.cron.session_turns import CRON_HISTORY_META
+from jafta.session import mascot_mood as mm
+from jafta.session.history_meta import INJECTED_EVENT_META, SUBAGENT_RESULT_EVENT
+from jafta.session.manager import Session
 
 REPLY = "Fatto: ho spostato la riunione alle 16 e avvisato tutti 😊"
 

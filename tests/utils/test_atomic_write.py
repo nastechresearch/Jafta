@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 
-from jenny.utils.path import atomic_write
+from jafta.utils.path import atomic_write
 
 
 class TestAtomicWrite:
@@ -67,7 +67,7 @@ class TestAtomicWrite:
     def test_disable_fsync_file(self, tmp_path: Path) -> None:
         path = tmp_path / "nofsync.txt"
         with patch("os.fsync") as mock_fsync, patch(
-            "jenny.utils.path._fsync_dir"
+            "jafta.utils.path._fsync_dir"
         ) as mock_fsync_dir:
             atomic_write(path, "data", fsync_file=False, fsync_dir=False)
         mock_fsync.assert_not_called()
@@ -76,7 +76,7 @@ class TestAtomicWrite:
 
     def test_disable_fsync_dir(self, tmp_path: Path) -> None:
         path = tmp_path / "nodirsync.txt"
-        with patch("jenny.utils.path._fsync_dir") as mock_fsync_dir:
+        with patch("jafta.utils.path._fsync_dir") as mock_fsync_dir:
             atomic_write(path, "data", fsync_dir=False)
         mock_fsync_dir.assert_not_called()
         assert path.read_text(encoding="utf-8") == "data"
@@ -114,7 +114,7 @@ def _modes_of_temps_while_written(tmp_path: Path, **kwargs) -> list[int]:
     import os
     import stat
 
-    import jenny.utils.path as path_mod
+    import jafta.utils.path as path_mod
 
     seen: list[int] = []
     real_fsync = os.fsync

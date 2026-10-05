@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.utils.file_edit_streaming import (
+from jafta.utils.file_edit_streaming import (
     _extract_complete_json_string,
     _extract_json_string_prefix,
 )

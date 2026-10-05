@@ -1,4 +1,4 @@
-"""Test per jenny/runtime/location.py (posizione del dispositivo, solo Android).
+"""Test per jafta/runtime/location.py (posizione del dispositivo, solo Android).
 
 Il bridge Chaquopy non esiste nei test desktop: si verificano la logica pura
 (parsing del fix, formattazione della riga, età leggibile), la selezione
@@ -13,8 +13,8 @@ from typing import Any
 
 import pytest
 
-from jenny.config.tool_schemas import LocationConfig
-from jenny.runtime import location
+from jafta.config.tool_schemas import LocationConfig
+from jafta.runtime import location
 
 
 @pytest.fixture(autouse=True)

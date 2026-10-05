@@ -1,11 +1,41 @@
 # Changelog
 
-What changed in each release of Jenny, written for the person holding the phone. The
+What changed in each release of Jafta, written for the person holding the phone. The
 version numbers follow [Semantic Versioning](https://semver.org/): from 1.0 on, a change that
 breaks something you rely on gets a new major number.
 
 Releases before 1.0 are described only on their
-[GitHub release pages](https://github.com/flagdizero/jenny-android-ai-agent/releases).
+[GitHub release pages](https://github.com/nastechresearch/Jafta/releases).
+
+> **Jafta note:** Jafta is a rebrand and continuation of [Jenny 1.0.0](https://github.com/flagdizero/jenny-android-ai-agent)
+> (released 2026-10-02). All Jenny 1.0.0 entries below describe behavior that ships
+> unmodified in Jafta. New Jafta-specific entries appear at the top of each version block.
+
+## [0.1.0] — 2026-10-05
+
+The first Jafta release. Mechanical rebrand of Jenny 1.0.0 — no behavior changes.
+
+### Rebrand
+- Package renamed: `jenny` → `jafta` (Python module + WebUI)
+- WebUI files renamed: `home-jenny.js` → `home-jafta.js`, `jenny-sdk.js` → `jafta-sdk.js`, etc.
+- Repository URL updated to `nastechresearch/Jafta`
+- Build and release infrastructure added (see below)
+- Brand audit script (`scripts/brand_audit.py`) added for CI
+- Android package id, Kotlin namespace, and asset strings still carry the original
+  `com.flagdizero.jenny` values — this is intentional, those land in the next PR cluster
+  so this PR stays mechanical and reviewable.
+
+### Build
+- New: `.github/workflows/android.yml` — Android build + signed release APK on `main`
+- New: `.github/workflows/release.yml` — tag-triggered release with verified signature + SHA-256 manifest
+- New: `.github/workflows/pages.yml` — GitHub Pages deployment for docs
+- New: `keystore/jafta-release.keystore` — permanent RSA-4096 release key, alias `jafta`,
+  30-year validity, signed by `CN=Nsamba (NasTech Research), O=NasTech Research, C=ZA`.
+  Keystore is gitignored; stored as `JAFTA_KEYSTORE_BASE64` + `JAFTA_KEYSTORE_PASSWORD`
+  GitHub secrets. See `keystore/README.md`.
+- New: `scripts/brand_audit.py` — fails CI on any `jenny` / `flagdizero` / `nanobot` /
+  `HKUDS` reference in source. Will be wired into CI in a follow-up PR after the rest
+  of the rebrand lands.
 
 ## [1.0.0] — 2026-10-02
 

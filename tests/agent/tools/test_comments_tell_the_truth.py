@@ -8,10 +8,10 @@ from __future__ import annotations
 
 import re
 
-from jenny.agent.tools import loader
-from jenny.agent.tools import self as self_module
-from jenny.config.loader import RETIRED_KEY_PATHS
-from jenny.webui.wiki_routes import WikiRoutes
+from jafta.agent.tools import loader
+from jafta.agent.tools import self as self_module
+from jafta.config.loader import RETIRED_KEY_PATHS
+from jafta.webui.wiki_routes import WikiRoutes
 
 
 def test_the_wiki_routes_docstring_names_the_routes_it_serves() -> None:

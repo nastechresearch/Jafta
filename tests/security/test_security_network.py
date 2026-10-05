@@ -1,4 +1,4 @@
-"""Tests for jenny.security.network — SSRF protection and internal URL detection."""
+"""Tests for jafta.security.network — SSRF protection and internal URL detection."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import pytest
 
-from jenny.security.network import (
+from jafta.security.network import (
     configure_ssrf_whitelist,
     validate_app_server_target,
     validate_url_target,
@@ -52,7 +52,7 @@ def test_rejects_missing_domain():
     ("0.0.0.0", "zero"),
 ])
 def test_blocks_private_ipv4(ip: str, label: str):
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("evil.com", [ip])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("evil.com", [ip])):
         ok, err = validate_url_target("http://evil.com/path")
         assert not ok, f"Should block {label} ({ip})"
         assert "private" in err.lower() or "blocked" in err.lower()
@@ -61,7 +61,7 @@ def test_blocks_private_ipv4(ip: str, label: str):
 def test_blocks_ipv6_loopback():
     def _resolver(hostname, port, family=0, type_=0):
         return [(socket.AF_INET6, socket.SOCK_STREAM, 0, "", ("::1", 0, 0, 0))]
-    with patch("jenny.security.network.socket.getaddrinfo", _resolver):
+    with patch("jafta.security.network.socket.getaddrinfo", _resolver):
         ok, err = validate_url_target("http://evil.com/")
         assert not ok
 
@@ -87,7 +87,7 @@ def _fake_resolve_v6(host: str, results: list[str]):
 
 def test_blocks_ipv6_mapped_loopback():
     """::ffff:127.0.0.1 must be blocked just like 127.0.0.1."""
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve_v6("evil.com", ["::ffff:127.0.0.1"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve_v6("evil.com", ["::ffff:127.0.0.1"])):
         ok, err = validate_url_target("http://evil.com/")
         assert not ok
         assert "blocked" in err.lower()
@@ -95,21 +95,21 @@ def test_blocks_ipv6_mapped_loopback():
 
 def test_blocks_ipv6_mapped_metadata():
     """::ffff:169.254.169.254 must be blocked just like 169.254.169.254."""
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve_v6("evil.com", ["::ffff:169.254.169.254"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve_v6("evil.com", ["::ffff:169.254.169.254"])):
         ok, err = validate_url_target("http://evil.com/")
         assert not ok
 
 
 def test_blocks_ipv6_mapped_rfc1918():
     """::ffff:10.0.0.1 must be blocked just like 10.0.0.1."""
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve_v6("evil.com", ["::ffff:10.0.0.1"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve_v6("evil.com", ["::ffff:10.0.0.1"])):
         ok, err = validate_url_target("http://evil.com/")
         assert not ok
 
 
 def test_allows_public_ipv6():
     """Public IPv6 addresses must still be allowed."""
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve_v6("example.com", ["2606:4700::6810:84e5"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve_v6("example.com", ["2606:4700::6810:84e5"])):
         ok, err = validate_url_target("http://example.com/")
         assert ok, f"Should allow public IPv6, got: {err}"
 
@@ -119,14 +119,14 @@ def test_allows_public_ipv6():
 # ---------------------------------------------------------------------------
 
 def test_allows_public_ip():
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("example.com", ["93.184.216.34"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("example.com", ["93.184.216.34"])):
         ok, err = validate_url_target("http://example.com/page")
         assert ok, f"Should allow public IP, got: {err}"
 
 
 def test_allows_normal_https():
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("github.com", ["140.82.121.3"])):
-        ok, err = validate_url_target("https://github.com/flagdizero/jenny")
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("github.com", ["140.82.121.3"])):
+        ok, err = validate_url_target("https://github.com/flagdizero/jafta")
         assert ok
 
 
@@ -135,19 +135,19 @@ def test_allows_normal_https():
 # ---------------------------------------------------------------------------
 
 def test_loopback_exception_allows_literal_localhost_only():
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("localhost", ["127.0.0.1"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("localhost", ["127.0.0.1"])):
         ok, _ = validate_url_target("http://localhost:8765/", allow_loopback=True)
         assert ok
 
 
 def test_loopback_exception_rejects_public_name_resolving_to_loopback():
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("example.com", ["127.0.0.1"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("example.com", ["127.0.0.1"])):
         ok, _ = validate_url_target("http://example.com:8765/", allow_loopback=True)
         assert not ok
 
 
 def test_loopback_exception_rejects_metadata():
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("169.254.169.254", ["169.254.169.254"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("169.254.169.254", ["169.254.169.254"])):
         ok, _ = validate_url_target("http://169.254.169.254/latest/meta-data/", allow_loopback=True)
         assert not ok
 
@@ -158,7 +158,7 @@ def test_loopback_exception_rejects_metadata():
 
 def test_blocks_cgnat_by_default():
     """100.64.0.0/10 (CGNAT / Tailscale) is blocked by default."""
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("ts.local", ["100.100.1.1"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("ts.local", ["100.100.1.1"])):
         ok, _ = validate_url_target("http://ts.local/api")
         assert not ok
 
@@ -167,7 +167,7 @@ def test_whitelist_allows_cgnat():
     """Whitelisting 100.64.0.0/10 lets Tailscale addresses through."""
     configure_ssrf_whitelist(["100.64.0.0/10"])
     try:
-        with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("ts.local", ["100.100.1.1"])):
+        with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("ts.local", ["100.100.1.1"])):
             ok, err = validate_url_target("http://ts.local/api")
             assert ok, f"Whitelisted CGNAT should be allowed, got: {err}"
     finally:
@@ -178,7 +178,7 @@ def test_whitelist_does_not_affect_other_blocked():
     """Whitelisting CGNAT must not unblock other private ranges."""
     configure_ssrf_whitelist(["100.64.0.0/10"])
     try:
-        with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("evil.com", ["10.0.0.1"])):
+        with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("evil.com", ["10.0.0.1"])):
             ok, _ = validate_url_target("http://evil.com/secret")
             assert not ok
     finally:
@@ -189,7 +189,7 @@ def test_whitelist_invalid_cidr_ignored():
     """Invalid CIDR entries are silently skipped."""
     configure_ssrf_whitelist(["not-a-cidr", "100.64.0.0/10"])
     try:
-        with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("ts.local", ["100.100.1.1"])):
+        with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("ts.local", ["100.100.1.1"])):
             ok, _ = validate_url_target("http://ts.local/api")
             assert ok
     finally:
@@ -200,7 +200,7 @@ def test_whitelist_allows_ipv6_mapped_cgnat():
     """Whitelist must work when DNS returns IPv6-mapped CGNAT address."""
     configure_ssrf_whitelist(["100.64.0.0/10"])
     try:
-        with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve_v6("ts.local", ["::ffff:100.100.1.1"])):
+        with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve_v6("ts.local", ["::ffff:100.100.1.1"])):
             ok, err = validate_url_target("http://ts.local/api")
             assert ok, f"Whitelisted IPv6-mapped CGNAT should be allowed, got: {err}"
     finally:
@@ -208,14 +208,14 @@ def test_whitelist_allows_ipv6_mapped_cgnat():
 
 
 # ---------------------------------------------------------------------------
-# validate_app_server_target — Jenny App server policy (LAN allowed)
+# validate_app_server_target — Jafta App server policy (LAN allowed)
 # ---------------------------------------------------------------------------
 
 
 @pytest.mark.parametrize("ip", ["192.168.1.50", "10.0.0.7", "172.16.3.4"])
 def test_app_server_allows_private_lan(ip):
     """App servers are user-declared LAN devices: RFC1918 must be allowed."""
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("piante.lan", [ip])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("piante.lan", [ip])):
         ok, err = validate_app_server_target("http://piante.lan:8080/plants")
         assert ok, f"App policy should allow {ip}, got: {err}"
 
@@ -230,7 +230,7 @@ def test_app_server_allows_tailscale_without_the_global_whitelist():
     """
     configure_ssrf_whitelist([])
     with patch(
-        "jenny.security.network.socket.getaddrinfo",
+        "jafta.security.network.socket.getaddrinfo",
         _fake_resolve("pibox", ["100.100.7.7"]),
     ):
         ok, err = validate_app_server_target("http://pibox:8091/")
@@ -246,13 +246,13 @@ def test_app_server_allows_tailscale_without_the_global_whitelist():
     ],
 )
 def test_app_server_still_blocks_dangerous_ranges(ip, label):
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("srv.lan", [ip])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("srv.lan", [ip])):
         ok, _ = validate_app_server_target("http://srv.lan/x")
         assert not ok, f"App policy must block {label} ({ip})"
 
 
 def test_app_server_blocks_ipv6_loopback():
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve_v6("srv.lan", ["::1"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve_v6("srv.lan", ["::1"])):
         ok, _ = validate_app_server_target("http://srv.lan/x")
         assert not ok
 
@@ -266,7 +266,7 @@ def test_app_server_whitelist_still_honored():
     """
     configure_ssrf_whitelist(["169.254.0.0/16"])
     try:
-        with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("ll.lan", ["169.254.10.1"])):
+        with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("ll.lan", ["169.254.10.1"])):
             ok, err = validate_app_server_target("http://ll.lan/x")
             assert ok, f"Whitelisted range should be allowed, got: {err}"
     finally:
@@ -280,6 +280,6 @@ def test_app_server_scheme_check():
 
 def test_url_target_policy_unchanged_by_app_policy():
     """validate_url_target must keep blocking RFC1918 (regression guard)."""
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("evil.com", ["192.168.1.50"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("evil.com", ["192.168.1.50"])):
         ok, _ = validate_url_target("http://evil.com/x")
         assert not ok

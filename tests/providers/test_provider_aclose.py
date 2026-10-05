@@ -15,8 +15,8 @@ import inspect
 import httpx
 import pytest
 
-from jenny.providers.anthropic_provider import AnthropicProvider
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.anthropic_provider import AnthropicProvider
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 MESSAGES = [{"role": "user", "content": "x"}]
 OK_CHAT = {"choices": [{"message": {"content": "ok"}, "finish_reason": "stop"}]}

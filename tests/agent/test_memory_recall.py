@@ -1,7 +1,7 @@
 """Il recupero dal tier freddo: cosa deve valere perché "non è perso" sia vero.
 
 La fase 2 ha mantenuto la sua promessa sul disco. Questi test tengono ferma la
-parte che riguarda ciò che Jenny *sa*: che l'archivio si possa interrogare senza
+parte che riguarda ciò che Jafta *sa*: che l'archivio si possa interrogare senza
 corrispondenze testuali, e che quando l'elenco non ci sta tutto lo dica invece di
 accorciarsi in silenzio — che è il modo in cui ``grep`` falliva.
 """
@@ -11,14 +11,14 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
-from jenny.agent.memory import MemoryStore
-from jenny.agent.memory_archive import (
+from jafta.agent.memory import MemoryStore
+from jafta.agent.memory_archive import (
     ArchivedEntry,
     archive_entry,
     list_archived,
     read_archived,
 )
-from jenny.agent.tools.memory_recall import MemoryRecallTool
+from jafta.agent.tools.memory_recall import MemoryRecallTool
 
 
 def _store(tmp_path: Path) -> MemoryStore:
@@ -121,7 +121,7 @@ class TestOpeningEntries:
 
 class TestTruncationIsNeverSilent:
     async def test_a_cut_list_says_how_many_it_did_not_show(self, tmp_path, monkeypatch):
-        import jenny.agent.tools.memory_recall as mod
+        import jafta.agent.tools.memory_recall as mod
 
         monkeypatch.setattr(mod, "_INDEX_MAX_CHARS", 120)
         store = _store(tmp_path)
@@ -137,7 +137,7 @@ class TestTruncationIsNeverSilent:
 
     async def test_the_index_logs_when_it_starts_to_crowd_its_cap(self, tmp_path, monkeypatch):
         """Il momento di costruire la 7.2 va misurato, non indovinato."""
-        import jenny.agent.tools.memory_recall as mod
+        import jafta.agent.tools.memory_recall as mod
 
         lines: list[str] = []
         from loguru import logger
@@ -159,7 +159,7 @@ class TestTruncationIsNeverSilent:
 
 class TestWhereItIsMounted:
     def test_the_main_agent_gets_it(self):
-        from jenny.agent.tools.loader import _HARDCODED_TOOL_MODULES
+        from jafta.agent.tools.loader import _HARDCODED_TOOL_MODULES
 
         assert "memory_recall" in _HARDCODED_TOOL_MODULES
         assert "orchestrator" in MemoryRecallTool._scopes

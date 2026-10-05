@@ -22,7 +22,7 @@ from pathlib import Path
 from support.js_harness import function, member, requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 ROOM_JS = ASSETS / "home-updates.js"
 FLOW_JS = ASSETS / "shared" / "update-flow.js"
 WHEN_JS = ASSETS / "shared" / "when.js"

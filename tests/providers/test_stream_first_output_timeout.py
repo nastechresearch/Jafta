@@ -11,12 +11,12 @@ import asyncio
 from typing import Any
 from unittest.mock import AsyncMock, patch
 
-from jenny.providers.openai_compat_helpers import (
+from jafta.providers.openai_compat_helpers import (
     _LOCAL_REQUEST_TIMEOUT_S,
     _OPENAI_COMPAT_REQUEST_TIMEOUT_S,
     _openai_compat_timeout_s,
 )
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 CONTENT_CHUNK = {"choices": [{"delta": {"content": "hi"}}]}
 

@@ -14,9 +14,9 @@ from typing import Literal
 import pytest
 from loguru import logger as loguru_logger
 
-from jenny.config.loader import load_config
-from jenny.pydantic_compat import BaseModel, ValidationError, lenient_literals
-from jenny.runtime.context import get_runtime_context
+from jafta.config.loader import load_config
+from jafta.pydantic_compat import BaseModel, ValidationError, lenient_literals
+from jafta.runtime.context import get_runtime_context
 
 
 @pytest.fixture(autouse=True)

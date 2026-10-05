@@ -70,24 +70,24 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.agent.tools.app_update import InstallUpdateTool
-from jenny.agent.tools.context import RequestContext
-from jenny.agent.tools.cron import CronTool
-from jenny.agent.tools.download import DownloadFileTool
-from jenny.agent.tools.journal import JournalAppendTool
-from jenny.agent.tools.long_task import LongTaskTool
-from jenny.agent.tools.python_exec import PythonNamespace
-from jenny.apps.manifest import STORAGE_OPS, AppAction
-from jenny.apps.storage import _MUTATING_OPS, execute_storage_action
-from jenny.security.workspace_access import (
+from jafta.agent.tools.app_update import InstallUpdateTool
+from jafta.agent.tools.context import RequestContext
+from jafta.agent.tools.cron import CronTool
+from jafta.agent.tools.download import DownloadFileTool
+from jafta.agent.tools.journal import JournalAppendTool
+from jafta.agent.tools.long_task import LongTaskTool
+from jafta.agent.tools.python_exec import PythonNamespace
+from jafta.apps.manifest import STORAGE_OPS, AppAction
+from jafta.apps.storage import _MUTATING_OPS, execute_storage_action
+from jafta.security.workspace_access import (
     READONLY_TOOL_REFUSAL,
     build_workspace_scope,
     enter_workspace_scope,
 )
-from jenny.security.workspace_policy import ReadOnlyTurnError
-from jenny.session.manager import SessionManager
+from jafta.security.workspace_policy import ReadOnlyTurnError
+from jafta.session.manager import SessionManager
 
-ROOT = Path(__file__).resolve().parents[2] / "jenny"
+ROOT = Path(__file__).resolve().parents[2] / "jafta"
 TOOLS_DIR = ROOT / "agent" / "tools"
 
 # Oltre ai tool, i moduli che scrivono e che vale la pena **dichiarare** fuori
@@ -275,7 +275,7 @@ def _strip_prose(src: str) -> str:
 
 
 def _sources() -> dict[str, str]:
-    """Nome relativo a ``jenny/`` → sorgente ripulito dalla prosa.
+    """Nome relativo a ``jafta/`` → sorgente ripulito dalla prosa.
 
     Le chiavi sono path e non basename: da T4.7 l'inventario guarda anche fuori
     da ``agent/tools/``, e lì un ``store.py`` o un ``manager.py`` da soli non
@@ -488,7 +488,7 @@ async def _probe_journal(root: Path, readonly: bool) -> str:
 
 
 async def _probe_long_task(root: Path, readonly: bool) -> str:
-    from jenny.session.goal_state import GOAL_STATE_KEY
+    from jafta.session.goal_state import GOAL_STATE_KEY
 
     sessions = SessionManager(root)
     tool = LongTaskTool(sessions=sessions)
@@ -511,8 +511,8 @@ class _NoNetworkTransfer:
 
     @staticmethod
     def build(root: Path) -> Any:
-        from jenny.agent.tools.ssh import SshTransferTool
-        from jenny.agent.tools.ssh_backends.base import SshError
+        from jafta.agent.tools.ssh import SshTransferTool
+        from jafta.agent.tools.ssh_backends.base import SshError
 
         class _Tool(SshTransferTool):
             def _resolve(self, alias: str) -> Any:

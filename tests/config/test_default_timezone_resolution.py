@@ -10,10 +10,10 @@ import json
 
 import pytest
 
-from jenny.config.loader import load_config, save_config
-from jenny.config.schema import Config
-from jenny.config.store import mutate
-from jenny.runtime.context import get_runtime_context
+from jafta.config.loader import load_config, save_config
+from jafta.config.schema import Config
+from jafta.config.store import mutate
+from jafta.runtime.context import get_runtime_context
 
 
 @pytest.fixture

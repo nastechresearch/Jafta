@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from support.runner import make_spec
 
-from jenny.agent.runner import AgentRunner
-from jenny.providers.base import LLMResponse, ToolCallRequest
+from jafta.agent.runner import AgentRunner
+from jafta.providers.base import LLMResponse, ToolCallRequest
 
 
 @pytest.mark.asyncio

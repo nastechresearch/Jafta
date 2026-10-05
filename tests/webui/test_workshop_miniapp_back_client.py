@@ -69,7 +69,7 @@ class Shell {{
 
 const shell = new Shell();
 shell.controllers = {{}};
-shell.jenny = null;
+shell.jafta = null;
 shell.launcher = {{ isOpen: () => false }};
 shell.drawer = {{ activeDrawer: null }};
 const miniapp = () => shell._overlayLayers().find((l) => l.name === 'miniapp');
@@ -103,7 +103,7 @@ def test_back_inside_the_miniapp_goes_back_one_screen() -> None:
 shell._appsActions = new Actions();
 const posted = openApp(shell._appsActions, 2);
 assert.equal(miniapp().dismiss(), true);
-assert.deepEqual(posted, [{ type: 'jenny:go-back' }]);
+assert.deepEqual(posted, [{ type: 'jafta:go-back' }]);
 assert.deepEqual(removed, []);
 """
         )

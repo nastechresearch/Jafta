@@ -25,8 +25,8 @@ from pathlib import Path
 from support.js_harness import member, requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-WORKSPACE_JS = ROOT / "jenny" / "templates" / "ui" / "assets" / "mobile-workspace.js"
-I18N_DIR = ROOT / "jenny" / "templates" / "ui" / "assets" / "i18n"
+WORKSPACE_JS = ROOT / "jafta" / "templates" / "ui" / "assets" / "mobile-workspace.js"
+I18N_DIR = ROOT / "jafta" / "templates" / "ui" / "assets" / "i18n"
 
 pytestmark = requires_node
 

@@ -11,9 +11,9 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.tools import ssh_transport
-from jenny.agent.tools.ssh_backends.base import SshHostKeyError
-from jenny.agent.tools.ssh_transport import (
+from jafta.agent.tools import ssh_transport
+from jafta.agent.tools.ssh_backends.base import SshHostKeyError
+from jafta.agent.tools.ssh_transport import (
     SshHostBlockedError,
     SshHostUnknownError,
     SshKeyMissingError,
@@ -26,8 +26,8 @@ from jenny.agent.tools.ssh_transport import (
     resolve_target,
     ssh_key_path,
 )
-from jenny.config.schema import Config
-from jenny.config.tool_schemas import SshHostConfig
+from jafta.config.schema import Config
+from jafta.config.tool_schemas import SshHostConfig
 
 KEY_LINE = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFAKEFAKEFAKEFAKEFAKEFAKEFAKEFAKEFAKE"
 OTHER_KEY_LINE = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDIFFERENTDIFFERENTDIFFERENTXX"
@@ -36,8 +36,8 @@ OTHER_KEY_LINE = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDIFFERENTDIFFERENTDIFFERE
 @pytest.fixture
 def ssh_home(tmp_path: Path):
     """Workspace isolato per test, così ``get_ssh_dir()`` non è condiviso."""
-    from jenny.config import paths as paths_mod
-    from jenny.runtime.context import get_runtime_context
+    from jafta.config import paths as paths_mod
+    from jafta.runtime.context import get_runtime_context
 
     previous = get_runtime_context().workspace_dir
     workspace = tmp_path / "workspace"
@@ -251,7 +251,7 @@ def test_malformed_known_hosts_line_is_rejected(ssh_home):
 
 def test_key_path_is_derived_and_cannot_escape_the_ssh_dir(ssh_home):
     """L'alias arriva dalla config: non deve poter diventare un path."""
-    from jenny.config.paths import get_ssh_dir
+    from jafta.config.paths import get_ssh_dir
 
     nasty = ssh_key_path("../../etc/passwd")
     assert nasty.parent == get_ssh_dir()
@@ -267,7 +267,7 @@ def test_key_path_is_stable_per_alias(ssh_home):
 
 
 def test_dev_backend_is_selected_off_device():
-    from jenny.agent.tools.ssh_backends.dev import DevSshBackend
+    from jafta.agent.tools.ssh_backends.dev import DevSshBackend
 
     ssh_transport.reset_ssh_backend()
     try:

@@ -14,7 +14,7 @@ from pathlib import Path
 
 from support.js_harness import member, requires_node, run_js
 
-CHAT_JS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets" / "mobile-chat.js"
+CHAT_JS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets" / "mobile-chat.js"
 
 pytestmark = requires_node
 

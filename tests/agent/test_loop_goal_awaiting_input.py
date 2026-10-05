@@ -19,12 +19,12 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.loop import AgentLoop
-from jenny.agent.runner import AgentRunResult
-from jenny.bus.queue import MessageBus
-from jenny.providers.base import LLMResponse
-from jenny.session.goal_state import GOAL_STATE_KEY, goal_awaiting_input
-from jenny.session.turn_visibility import TURN_VISIBILITY_META, TurnVisibility
+from jafta.agent.loop import AgentLoop
+from jafta.agent.runner import AgentRunResult
+from jafta.bus.queue import MessageBus
+from jafta.providers.base import LLMResponse
+from jafta.session.goal_state import GOAL_STATE_KEY, goal_awaiting_input
+from jafta.session.turn_visibility import TURN_VISIBILITY_META, TurnVisibility
 
 
 def _make_loop(tmp_path: Path) -> AgentLoop:

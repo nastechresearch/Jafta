@@ -7,7 +7,7 @@ e' modellata sulla deriva misurata sul telefono tra `main/` e `palestra-schede/`
 la seconda non ha il file di istruzioni, ne' `audit/`, ne' `outputs/`, ma ha contenuto vero
 in `wiki/index.md` e nel log di oggi.
 
-Gli script della skill non fanno parte del package `jenny` importabile, quindi la
+Gli script della skill non fanno parte del package `jafta` importabile, quindi la
 dir `scripts/` viene aggiunta a `sys.path`.
 """
 
@@ -21,7 +21,7 @@ from pathlib import Path
 import pytest
 
 _SCRIPTS_DIR = (
-    Path(__file__).resolve().parents[3] / "jenny" / "skills" / "llm-wiki" / "scripts"
+    Path(__file__).resolve().parents[3] / "jafta" / "skills" / "llm-wiki" / "scripts"
 )
 
 
@@ -430,10 +430,10 @@ def test_the_research_tree_has_the_journal_too(scaffold, tmp_path: Path, capsys)
 
 def test_the_two_scaffolders_cannot_diverge(scaffold):
     """La definizione unica di com'e' fatto un progetto vive nel package —
-    ``jenny/webui/project_scaffold.py::PROJECT_DIRS`` — e questa e' la copia che
+    ``jafta/webui/project_scaffold.py::PROJECT_DIRS`` — e questa e' la copia che
     il checkout della skill non puo' importare. Il confronto sta qui perche' due
     liste che devono restare uguali vivono in due file."""
-    from jenny.webui.project_scaffold import PROJECT_DIRS
+    from jafta.webui.project_scaffold import PROJECT_DIRS
 
     assert set(scaffold._NOTEBOOK_DIRS) == set(PROJECT_DIRS)
     # E il comune e' comune: l'albero di ricerca lo contiene tutto.

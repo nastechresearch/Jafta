@@ -1,4 +1,4 @@
-"""Tests for jenny.agent.skills.SkillsLoader."""
+"""Tests for jafta.agent.skills.SkillsLoader."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.skills import SkillsLoader
+from jafta.agent.skills import SkillsLoader
 
 
 def _write_skill(
@@ -17,12 +17,12 @@ def _write_skill(
     metadata_json: dict | None = None,
     body: str = "# Skill\n",
 ) -> Path:
-    """Create ``base / name / SKILL.md`` with optional jenny metadata JSON."""
+    """Create ``base / name / SKILL.md`` with optional jafta metadata JSON."""
     skill_dir = base / name
     skill_dir.mkdir(parents=True)
     lines = ["---"]
     if metadata_json is not None:
-        payload = json.dumps({"jenny": metadata_json}, separators=(",", ":"))
+        payload = json.dumps({"jafta": metadata_json}, separators=(",", ":"))
         lines.append(f'metadata: {payload}')
     lines.extend(["---", "", body])
     path = skill_dir / "SKILL.md"
@@ -183,7 +183,7 @@ def test_list_skills_openclaw_metadata_parsed_for_requirements(
     skill_dir = skills_root / "openclaw_skill"
     skill_dir.mkdir(parents=True)
     skill_path = skill_dir / "SKILL.md"
-    oc_payload = json.dumps({"jenny": {"requires": {"bins": ["jenny_oc_bin"]}}}, separators=(",", ":"))
+    oc_payload = json.dumps({"jafta": {"requires": {"bins": ["jenny_oc_bin"]}}}, separators=(",", ":"))
     skill_path.write_text(
         "\n".join(["---", f"metadata: {oc_payload}", "---", "", "# OC"]),
         encoding="utf-8",
@@ -193,7 +193,7 @@ def test_list_skills_openclaw_metadata_parsed_for_requirements(
     assert loader.list_skills(filter_unavailable=True) == []
 
     available_payload = json.dumps(
-        {"jenny": {"requires": {"bins": ["python3"]}}, "always": True},
+        {"jafta": {"requires": {"bins": ["python3"]}}, "always": True},
         separators=(",", ":"),
     )
     skill_path.write_text(
@@ -222,7 +222,7 @@ def test_disabled_skills_excluded_from_list(tmp_path: Path) -> None:
 def _write_disabled_skill(base: Path, name: str, *, body: str = "# Skill\n") -> Path:
     """Write a skill with `disabled: true` at the top level of its frontmatter,
     matching the shape SkillsLoader.update_skill() actually persists (a
-    top-level key, not nested under `metadata.jenny`)."""
+    top-level key, not nested under `metadata.jafta`)."""
     skill_dir = base / name
     skill_dir.mkdir(parents=True)
     path = skill_dir / "SKILL.md"
@@ -351,7 +351,7 @@ def test_get_skill_metadata_handles_yaml_types(tmp_path: Path) -> None:
     ws_skills.mkdir(parents=True)
     skill_dir = ws_skills / "typed"
     skill_dir.mkdir(parents=True)
-    payload = json.dumps({"jenny": {"requires": {"bins": ["gh"]}, "always": True}}, separators=(",", ":"))
+    payload = json.dumps({"jafta": {"requires": {"bins": ["gh"]}, "always": True}}, separators=(",", ":"))
     skill_path = skill_dir / "SKILL.md"
     skill_path.write_text(
         "---\n"
@@ -388,7 +388,7 @@ def test_update_skill_failed_write_leaves_the_skill_intact(tmp_path: Path) -> No
 
     loader = SkillsLoader(workspace)
     with pytest.MonkeyPatch.context() as mp:
-        mp.setattr("jenny.agent.skills.atomic_write", boom)
+        mp.setattr("jafta.agent.skills.atomic_write", boom)
         with pytest.raises(OSError):
             loader.update_skill("alpha", description="new description")
 

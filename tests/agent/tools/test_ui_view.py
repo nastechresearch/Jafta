@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from jenny.agent.tools.context import RequestContext, ToolContext
-from jenny.agent.tools.result import ToolResult
-from jenny.agent.tools.ui_view import UiViewTool
-from jenny.channels.ui_query import UiQueryTimeoutError, UiQueryUnavailableError
+from jafta.agent.tools.context import RequestContext, ToolContext
+from jafta.agent.tools.result import ToolResult
+from jafta.agent.tools.ui_view import UiViewTool
+from jafta.channels.ui_query import UiQueryTimeoutError, UiQueryUnavailableError
 
 
 class _FakeService:

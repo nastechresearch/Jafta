@@ -8,9 +8,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.security import fetch
-from jenny.webui import media_ingest
-from jenny.webui.media_ingest import ingest_remote_image
+from jafta.security import fetch
+from jafta.webui import media_ingest
+from jafta.webui.media_ingest import ingest_remote_image
 
 _PNG = b"\x89PNG\r\n\x1a\n" + b"\x00" * 64
 _HTML = b"<!doctype html><html><body>not an image</body></html>"

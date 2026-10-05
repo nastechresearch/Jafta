@@ -26,9 +26,9 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from loguru import logger
 
-from jenny.agent.context import ContextBuilder
-from jenny.agent.memory import Consolidator, MemoryStore
-from jenny.session.keys import (
+from jafta.agent.context import ContextBuilder
+from jafta.agent.memory import Consolidator, MemoryStore
+from jafta.session.keys import (
     is_internal_session_key,
     is_personal_session_key,
     is_project_session_key,
@@ -36,7 +36,7 @@ from jenny.session.keys import (
     project_session_key,
     session_kind,
 )
-from jenny.session.manager import Session
+from jafta.session.manager import Session
 
 PERSONAL = "unified:default"
 PROJECT = "project:palestra"
@@ -139,7 +139,7 @@ class TestTheClassificationIsTernary:
         versioni precedenti e modificabili a mano, e un'eccezione la' farebbe
         cadere Dream e l'autocompaction su una riga vecchia. Resta il log.
         """
-        from jenny.session import keys as keys_mod
+        from jafta.session import keys as keys_mod
 
         keys_mod._UNCLASSIFIED_WARNED.discard("zzsconosciuto")
         messages: list[str] = []

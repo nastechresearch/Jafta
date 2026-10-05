@@ -26,10 +26,10 @@ from pathlib import Path
 import pytest
 from loguru import logger as loguru_logger
 
-from jenny.config import loader
-from jenny.config.loader import RETIRED_KEY_PATHS, load_config_with_raw
-from jenny.config.schema import CURRENT_CONFIG_VERSION
-from jenny.config.store import persist_schema_migrations
+from jafta.config import loader
+from jafta.config.loader import RETIRED_KEY_PATHS, load_config_with_raw
+from jafta.config.schema import CURRENT_CONFIG_VERSION
+from jafta.config.store import persist_schema_migrations
 
 # Dentro sezioni **conosciute**: una chiave ritirata sotto un genitore sconosciuto
 # non e' un caso reale (il genitore stesso sarebbe l'ignoto da segnalare).
@@ -134,7 +134,7 @@ async def test_the_mood_model_preset_is_retired_for_real(tmp_path) -> None:
     che la porta ancora si carica senza avvisi, e alla prima scrittura
     ordinaria la chiave cade mentre le vicine restano.
     """
-    from jenny.config.store import mutate
+    from jafta.config.store import mutate
 
     path = tmp_path / "config.json"
     _write(path, {
@@ -164,7 +164,7 @@ async def test_the_wiki_extensions_are_retired(tmp_path) -> None:
     Il dump scriveva anche i default, quindi ogni ``config.json`` sul telefono
     la porta. Si carica senza avvisi e cade alla prima scrittura.
     """
-    from jenny.config.store import mutate
+    from jafta.config.store import mutate
 
     path = tmp_path / "config.json"
     _write(path, {

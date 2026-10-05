@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.snapshot.crypto import (
+from jafta.snapshot.crypto import (
     DEFAULT_KDF_ITERATIONS,
     HEADER_LEN,
     decrypt_container,
@@ -16,11 +16,11 @@ from jenny.snapshot.crypto import (
     encrypt_container,
     parse_header,
 )
-from jenny.snapshot.crypto_backends.base import CryptoAuthError
+from jafta.snapshot.crypto_backends.base import CryptoAuthError
 
 pytest.importorskip("cryptography")
 
-from jenny.snapshot.crypto_backends.dev import DevAesGcmBackend  # noqa: E402
+from jafta.snapshot.crypto_backends.dev import DevAesGcmBackend  # noqa: E402
 
 # --- Known-answer test vectors (riferimento cross-implementazione) ---------
 KAT_PASSPHRASE = "passphrase-di-prova"
@@ -50,7 +50,7 @@ def test_derive_key_known_answer() -> None:
 
 
 async def test_backend_encrypt_known_answer() -> None:
-    from jenny.snapshot.crypto import build_header
+    from jafta.snapshot.crypto import build_header
 
     aad = build_header(KAT_ITERATIONS, KAT_SALT, KAT_NONCE)
     out = await DevAesGcmBackend().encrypt(KAT_RAW_KEY, KAT_NONCE, KAT_PLAINTEXT, aad)

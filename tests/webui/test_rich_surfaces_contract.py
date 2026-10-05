@@ -1,7 +1,7 @@
 """Quattro superfici, un patto solo: chi disegna contenuto scritto lo disegna intero.
 
 La chat dell'officina, la chat di casa, il lettore delle pagine e il fumetto
-della minichat mostrano tutti testo che Jenny ha scritto, e in tutti quel testo
+della minichat mostrano tutti testo che Jafta ha scritto, e in tutti quel testo
 puo' contenere una
 formula o un diagramma — la skill `llm-wiki` glieli **impone**: «ogni flusso,
 gerarchia o stato deve essere mermaid», «ogni formula deve essere KaTeX».
@@ -26,7 +26,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 
 # Le superfici, e come si riconosce in ognuna «ho appena scritto del contenuto».
 SURFACES = {
@@ -35,7 +35,7 @@ SURFACES = {
     "home-reader.js": r"\.innerHTML = this\._safeHtml\(",
     # Il fumetto della minichat, dal 28/09/2026: contiene tutta la risposta,
     # formattata come in chat, e quindi anche le sue formule e i suoi diagrammi.
-    "shared/jenny-minichat.js": r"\.innerHTML = renderMarkdown\(",
+    "shared/jafta-minichat.js": r"\.innerHTML = renderMarkdown\(",
 }
 
 # La chiamata che disegna il resto, comunque si chiami localmente.
@@ -112,7 +112,7 @@ def test_the_inline_dollar_is_on_only_where_the_skill_mandates_it() -> None:
     reader = (ASSETS / "home-reader.js").read_text(encoding="utf-8")
     assert "inlineDollar: true" in reader, (
         "il lettore non accende il dollaro in riga: le formule che la skill "
-        "impone a Jenny resterebbero `$f(x)$` in chiaro"
+        "impone a Jafta resterebbero `$f(x)$` in chiaro"
     )
     for chat in ("mobile-chat.js", "home-chat.js"):
         src = (ASSETS / chat).read_text(encoding="utf-8")

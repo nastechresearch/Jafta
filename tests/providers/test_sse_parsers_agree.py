@@ -16,8 +16,8 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
-from jenny.providers.openai_responses.parsing import iter_sse
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.openai_responses.parsing import iter_sse
 
 
 class _Lines:

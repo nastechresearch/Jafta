@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.config.schema import HomePageConfig
+from jafta.config.schema import HomePageConfig
 
 
 @pytest.mark.parametrize(

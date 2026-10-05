@@ -13,8 +13,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.config.schema import AgentDefaults
-from jenny.providers.base import LLMProvider, LLMResponse
+from jafta.config.schema import AgentDefaults
+from jafta.providers.base import LLMProvider, LLMResponse
 
 _MAX_TOOL_RESULT_CHARS = AgentDefaults().max_tool_result_chars
 
@@ -34,7 +34,7 @@ def _tools():
 
 
 def _spec(**overrides):
-    from jenny.agent.runner import AgentRunSpec
+    from jafta.agent.runner import AgentRunSpec
 
     kwargs = dict(
         initial_messages=[{"role": "user", "content": "hi"}],
@@ -54,7 +54,7 @@ async def test_no_declared_window_gives_up_without_crashing():
     Prima: ``TypeError`` dentro il recovery. Ora: si arrende e lascia emergere
     l'errore del provider, che almeno dice cos'è successo.
     """
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     calls = {"n": 0}
@@ -78,7 +78,7 @@ async def test_no_declared_window_gives_up_without_crashing():
 async def test_no_declared_window_uses_the_limit_from_the_error():
     """Con la finestra ignota, un limite dichiarato dal provider è la sola
     informazione utile disponibile: va usato invece di arrendersi."""
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     calls = {"n": 0}
@@ -101,7 +101,7 @@ async def test_no_declared_window_uses_the_limit_from_the_error():
 @pytest.mark.asyncio
 async def test_declared_window_is_still_halved():
     """Non-regressione: col campo valorizzato l'euristica resta quella."""
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     calls = {"n": 0}

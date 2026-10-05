@@ -17,17 +17,17 @@ import pytest
 from support.gateway_http import make_request
 from websockets.http11 import Request as WsRequest
 
-from jenny.channels.http_utils import check_api_secret, http_error, http_json_response, parse_query
-from jenny.config.loader import load_config, save_config
-from jenny.config.schema import KEEP_AWAKE_MODES, Config
-from jenny.runtime.context import get_runtime_context
-from jenny.webui import settings_api
-from jenny.webui.settings_api import (
+from jafta.channels.http_utils import check_api_secret, http_error, http_json_response, parse_query
+from jafta.config.loader import load_config, save_config
+from jafta.config.schema import KEEP_AWAKE_MODES, Config
+from jafta.runtime.context import get_runtime_context
+from jafta.webui import settings_api
+from jafta.webui.settings_api import (
     WebUISettingsError,
     settings_payload,
     update_power_settings,
 )
-from jenny.webui.settings_routes import WebUISettingsRouter
+from jafta.webui.settings_routes import WebUISettingsRouter
 
 _SECRET = "s3cr3t-power"
 
@@ -136,7 +136,7 @@ def test_module_never_calls_save_config_directly() -> None:
 
 
 async def test_the_write_goes_through_store_mutate(config_path, monkeypatch) -> None:
-    from jenny.config import store
+    from jafta.config import store
 
     calls: list[str] = []
     real_mutate = store.mutate
@@ -155,7 +155,7 @@ async def test_the_write_goes_through_store_mutate(config_path, monkeypatch) -> 
 # -- copy della UI -----------------------------------------------------------
 
 
-_UI_ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+_UI_ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 
 
 @pytest.mark.parametrize("locale", ["it", "en"])
@@ -176,7 +176,7 @@ def test_every_mode_has_its_own_line_of_copy(locale: str) -> None:
 
 def test_the_control_lives_in_the_background_activity_section() -> None:
     """Stesso argomento, stessa sezione: l'esenzione dice ad Android di non
-    strozzare Jenny, keepAwake se Jenny tiene sveglia la CPU da sé."""
+    strozzare Jafta, keepAwake se Jafta tiene sveglia la CPU da sé."""
     source = (_UI_ASSETS / "mobile-settings.js").read_text("utf-8")
 
     assert "_renderKeepAwake" in source

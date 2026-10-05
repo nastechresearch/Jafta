@@ -128,3 +128,7 @@ temp/
 exp/
 .playwright-mcp/
 /roadmap
+
+# Permanent signing key + password (stored as GitHub secrets, see keystore/README.md)
+keystore/*.keystore
+keystore/.storepass

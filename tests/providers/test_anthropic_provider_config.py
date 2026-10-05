@@ -18,14 +18,14 @@ import httpx
 import pytest
 from loguru import logger as loguru_logger
 
-from jenny.config.schema import Config
-from jenny.providers.anthropic_provider import AnthropicProvider
-from jenny.providers.endpoint_budget import (
+from jafta.config.schema import Config
+from jafta.providers.anthropic_provider import AnthropicProvider
+from jafta.providers.endpoint_budget import (
     DEFAULT_REQUEST_TIMEOUT_S,
     LOCAL_REQUEST_TIMEOUT_S,
     read_timeout_s,
 )
-from jenny.providers.factory import make_provider
+from jafta.providers.factory import make_provider
 
 MESSAGES = [{"role": "user", "content": "ciao"}]
 TOOLS = [{"function": {"name": "read_file", "parameters": {"type": "object"}}}]
@@ -44,14 +44,14 @@ def _kwargs(provider: AnthropicProvider, *, tools=None, tool_choice=None, effort
 # ── extra_headers: negli header, non nel body ─────────────────────────────
 
 def test_extra_headers_reach_the_headers() -> None:
-    provider = _provider(extra_headers={"x-team": "jenny"})
+    provider = _provider(extra_headers={"x-team": "jafta"})
 
-    assert provider._http_client.headers["x-team"] == "jenny"
+    assert provider._http_client.headers["x-team"] == "jafta"
 
 
 def test_extra_headers_stay_out_of_the_request_body() -> None:
     """Un campo di body sconosciuto è un 400, non un header."""
-    provider = _provider(extra_headers={"x-team": "jenny"})
+    provider = _provider(extra_headers={"x-team": "jafta"})
 
     assert "extra_headers" not in _kwargs(provider)
 

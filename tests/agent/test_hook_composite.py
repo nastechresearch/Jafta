@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from support.agent import DEFAULT_PATCHES, make_loop, make_provider
 
-from jenny.agent.hook import AgentHook, AgentHookContext, AgentRunHookContext, CompositeHook
+from jafta.agent.hook import AgentHook, AgentHookContext, AgentRunHookContext, CompositeHook
 
 
 def _ctx() -> AgentHookContext:
@@ -354,14 +354,14 @@ def _make_loop(tmp_path, hooks=None):
     provider.generation.max_tokens = 4096
     return make_loop(
         tmp_path, provider=provider, model=None, context_window_tokens=None, hooks=hooks,
-        patches=DEFAULT_PATCHES + ("jenny.agent.loop.Consolidator",),
+        patches=DEFAULT_PATCHES + ("jafta.agent.loop.Consolidator",),
     )
 
 
 @pytest.mark.asyncio
 async def test_agent_loop_extra_hook_receives_calls(tmp_path):
     """Extra hook passed to AgentLoop is called alongside core LoopHook."""
-    from jenny.providers.base import LLMResponse
+    from jafta.providers.base import LLMResponse
 
     events: list[str] = []
 
@@ -398,7 +398,7 @@ async def test_agent_loop_extra_hook_receives_calls(tmp_path):
 @pytest.mark.asyncio
 async def test_agent_loop_extra_hook_error_isolation(tmp_path):
     """A faulty extra hook does not crash the agent loop."""
-    from jenny.providers.base import LLMResponse
+    from jafta.providers.base import LLMResponse
 
     class BadHook(AgentHook):
         async def before_iteration(self, context):
@@ -420,7 +420,7 @@ async def test_agent_loop_extra_hook_error_isolation(tmp_path):
 @pytest.mark.asyncio
 async def test_agent_loop_extra_hooks_do_not_swallow_loop_hook_errors(tmp_path):
     """Extra hooks must not change the core LoopHook failure behavior."""
-    from jenny.providers.base import LLMResponse, ToolCallRequest
+    from jafta.providers.base import LLMResponse, ToolCallRequest
 
     loop = _make_loop(tmp_path, hooks=[AgentHook()])
     loop.provider.chat_with_retry = AsyncMock(return_value=LLMResponse(
@@ -441,7 +441,7 @@ async def test_agent_loop_extra_hooks_do_not_swallow_loop_hook_errors(tmp_path):
 @pytest.mark.asyncio
 async def test_agent_loop_no_hooks_backward_compat(tmp_path):
     """Without hooks param, behavior is identical to before."""
-    from jenny.providers.base import LLMResponse, ToolCallRequest
+    from jafta.providers.base import LLMResponse, ToolCallRequest
 
     loop = _make_loop(tmp_path)
     loop.provider.chat_with_retry = AsyncMock(return_value=LLMResponse(

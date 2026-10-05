@@ -12,16 +12,16 @@ from types import SimpleNamespace
 
 import pytest
 
-from jenny.agent.tools.android_web import AndroidWebFetchTool, AndroidWebSearchTool
-from jenny.agent.tools.browser import (
+from jafta.agent.tools.android_web import AndroidWebFetchTool, AndroidWebSearchTool
+from jafta.agent.tools.browser import (
     BrowserCloseTool,
     BrowserDoTool,
     BrowserOpenTool,
     BrowserReadTool,
     BrowserSnapshotTool,
 )
-from jenny.agent.tools.exec_session import ListExecSessionsTool, WriteStdinTool
-from jenny.agent.tools.python_exec import PythonExecTool
+from jafta.agent.tools.exec_session import ListExecSessionsTool, WriteStdinTool
+from jafta.agent.tools.python_exec import PythonExecTool
 
 WEB_TOOLS = [
     AndroidWebSearchTool, AndroidWebFetchTool, BrowserOpenTool, BrowserSnapshotTool,

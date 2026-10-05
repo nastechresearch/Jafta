@@ -1,7 +1,7 @@
 """Test per safe_zoneinfo, tzdata_available e validate_timezone_name.
 
 Il caso "tzdata assente" (Android senza il wheel ``tzdata``) è simulato
-monkeypatchando ``jenny.utils.helpers.ZoneInfo``, l'unico punto di lookup.
+monkeypatchando ``jafta.utils.helpers.ZoneInfo``, l'unico punto di lookup.
 """
 
 from datetime import datetime, tzinfo
@@ -9,8 +9,8 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import pytest
 
-import jenny.utils.helpers as helpers
-from jenny.utils.helpers import safe_zoneinfo, tzdata_available, validate_timezone_name
+import jafta.utils.helpers as helpers
+from jafta.utils.helpers import safe_zoneinfo, tzdata_available, validate_timezone_name
 
 
 @pytest.fixture

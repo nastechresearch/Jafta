@@ -24,9 +24,9 @@ from pathlib import Path
 
 from support.js_harness import locale, member, requires_node, run_js
 
-from jenny.command.specs import BUILTIN_COMMAND_SPECS
+from jafta.command.specs import BUILTIN_COMMAND_SPECS
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 CHIP_JS = ASSETS / "shared" / "commands-chip.js"
 I18N_JS = ASSETS / "shared" / "i18n.js"
 
@@ -290,7 +290,7 @@ def test_the_chip_draws_what_it_is_served_and_filters_nothing() -> None:
     Prima queste due righe vivevano nel `_renderMenu`, e c'era un motivo per
     toglierle: **non c'è autocomplete sullo `/`**, quindi un filtro nel client
     nasconde una voce a chi guarda il menu e non dice niente a chi digita. La
-    regola vera è il cancello del dispatch (`jenny/command/scope.py`); questa era
+    regola vera è il cancello del dispatch (`jafta/command/scope.py`); questa era
     cosmetica, e una copia della regola in più da tenere allineata.
     """
     _run_js("""

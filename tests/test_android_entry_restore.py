@@ -11,19 +11,19 @@ from pathlib import Path
 
 import pytest
 
-from jenny import android_entry
-from jenny.snapshot.locations import (
+from jafta import android_entry
+from jafta.snapshot.locations import (
     SAFETY_DIR_PREFIX,
     STAGED_WORKSPACE_DIR_NAME,
 )
-from jenny.snapshot.restore_marker import write_marker, write_staging_sanity
+from jafta.snapshot.restore_marker import write_marker, write_staging_sanity
 
 
 @pytest.fixture()
 def _boot_env(monkeypatch):
     """Neutralizza il gateway vero e ripristina il workspace globale a fine test."""
-    import jenny.gateway_runtime as gateway_runtime
-    from jenny.config import paths as paths_mod
+    import jafta.gateway_runtime as gateway_runtime
+    from jafta.config import paths as paths_mod
 
     async def fake_run_gateway(**_kwargs) -> None:
         return None
@@ -38,7 +38,7 @@ def test_restore_applied_before_workspace_setup(
     tmp_path: Path, monkeypatch, _boot_env
 ) -> None:
     """Il restore pendente viene valutato a workspace ancora freddo."""
-    import jenny.snapshot.restore_marker as marker_mod
+    import jafta.snapshot.restore_marker as marker_mod
 
     data_dir = tmp_path / "data"
     calls: list[Path] = []

@@ -11,8 +11,8 @@ import asyncio
 
 import pytest
 
-from jenny.agent import dream_cycle
-from jenny.agent.dream_cycle import claim_dream_cycle, release_dream_cycle
+from jafta.agent import dream_cycle
+from jafta.agent.dream_cycle import claim_dream_cycle, release_dream_cycle
 
 
 @pytest.fixture(autouse=True)

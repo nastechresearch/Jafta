@@ -29,7 +29,7 @@ import pytest
 from support.js_harness import NODE, requires_node
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 
 
 pytestmark = requires_node
@@ -94,7 +94,7 @@ export class Try {
   }
 }
 """
-    fake = Path("/tmp/jenny-parse-rotto.js")
+    fake = Path("/tmp/jafta-parse-rotto.js")
     fake.write_text(broken, encoding="utf-8")
     try:
         proc = subprocess.run(
@@ -121,7 +121,7 @@ def test_node_check_would_not_have_caught_it() -> None:
     lo vede il banco si salta dicendolo, invece di fallire: il controllo che
     conta e' ``test_the_check_catches_the_one_that_shipped``, e resta obbligatorio.
     """
-    fake = Path("/tmp/jenny-parse-rotto2.js")
+    fake = Path("/tmp/jafta-parse-rotto2.js")
     fake.write_text(
         "export class P {\n  a() {\n    document.body.x();\n  }\n\n"
         "    document.body.x();\n  }\n}\n",

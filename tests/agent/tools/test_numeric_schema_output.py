@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.agent.tools.schema import IntegerSchema, NumberSchema
+from jafta.agent.tools.schema import IntegerSchema, NumberSchema
 
 CASES = [
     (IntegerSchema(), {"type": "integer"}),

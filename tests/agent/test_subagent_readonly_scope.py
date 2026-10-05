@@ -30,17 +30,17 @@ import asyncio
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from jenny.agent.runner import AgentRunResult, AgentRunSpec
-from jenny.agent.subagent import SubagentManager
-from jenny.bus.queue import MessageBus
-from jenny.providers.base import LLMProvider
-from jenny.security.workspace_access import (
+from jafta.agent.runner import AgentRunResult, AgentRunSpec
+from jafta.agent.subagent import SubagentManager
+from jafta.bus.queue import MessageBus
+from jafta.providers.base import LLMProvider
+from jafta.security.workspace_access import (
     WorkspaceScope,
     build_workspace_scope,
     current_workspace_scope,
     enter_workspace_scope,
 )
-from jenny.session.manager import SessionManager
+from jafta.session.manager import SessionManager
 
 _READONLY_BLOCK = "# Read-Only Turn"
 

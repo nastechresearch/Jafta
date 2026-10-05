@@ -15,20 +15,20 @@ from typing import Any
 
 import pytest
 
-from jenny.agent import dream_review as dream_review_module
-from jenny.agent.dream_review import (
+from jafta.agent import dream_review as dream_review_module
+from jafta.agent.dream_review import (
     STATUS_COMPLETED,
     STATUS_FAILED,
     STATUS_NO_CHANGE,
     review_session_key,
     run_dream_review,
 )
-from jenny.agent.memory import MemoryStore
-from jenny.agent.memory_budget import FileBudget, budget_report
-from jenny.session.keys import is_internal_session_key
-from jenny.session.manager import SessionManager
-from jenny.utils import prompt_templates
-from jenny.utils.helpers import sync_workspace_templates
+from jafta.agent.memory import MemoryStore
+from jafta.agent.memory_budget import FileBudget, budget_report
+from jafta.session.keys import is_internal_session_key
+from jafta.session.manager import SessionManager
+from jafta.utils import prompt_templates
+from jafta.utils.helpers import sync_workspace_templates
 
 # Testo iniziale dei tre file misurati. Deve essere abbastanza lungo da poter
 # essere accorciato in modo visibile dai test che simulano una potatura.
@@ -49,7 +49,7 @@ def store(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     (``lru_cache``): va invalidato prima **e** dopo, o la prima chiamata della
     suite fissa la root per tutte le altre.
     """
-    from jenny.runtime.context import get_runtime_context
+    from jafta.runtime.context import get_runtime_context
 
     workspace = tmp_path / "workspace"
     workspace.mkdir(parents=True)
@@ -178,8 +178,8 @@ class TestTheThreeThingsItMustNotDo:
         ``internal_run_completed`` resta l'unico helper consentito.
 
         Le ``setattr`` da sole non bastano più. Da quando la regola vive in
-        ``jenny/agent/internal_run.py`` la si raggiunge anche con
-        ``from jenny.agent.internal_run import internal_run_should_commit``, che
+        ``jafta/agent/internal_run.py`` la si raggiunge anche con
+        ``from jafta.agent.internal_run import internal_run_should_commit``, che
         lega il nome all'import e ignora qualunque patch — ed è proprio la forma
         scritta in ``gardener.py``, cioè quella che un lettore
         copierebbe per prima. Da qui la seconda metà del test, che guarda il
@@ -710,7 +710,7 @@ class TestTokenAccounting:
         """
         import ast
 
-        import jenny.agent.dream_review as module
+        import jafta.agent.dream_review as module
 
         tree = ast.parse(Path(module.__file__).read_text(encoding="utf-8"))
         called = {
@@ -766,7 +766,7 @@ class TestTheUserFileIsNotPrunedLikeTheOthers:
 
         La riga della posizione in ``USER.md`` e' un duplicato, ma di una copia
         canonica che non e' un altro file: e' una riga costruita a runtime
-        (``Device location``, v. ``jenny/runtime/location.py``). La regola
+        (``Device location``, v. ``jafta/runtime/location.py``). La regola
         ``Always delete: same fact at multiple locations`` in teoria la copre,
         ma un modello che cerca il duplicato *fra i file* non lo trova mai —
         percio' il prompt la nomina esplicitamente.
@@ -973,8 +973,8 @@ class TestTheFloorIsNowNeverLose:
 
     def test_the_review_prompt_names_the_cost_of_over_pruning(self):
         """Una voce archiviata è fuori dal prompt: l'effetto osservabile non è "ho
-        perso un fatto" ma "Jenny non se lo ricorda più"."""
-        assert "made Jenny stop knowing things" in self._review()
+        perso un fatto" ma "Jafta non se lo ricorda più"."""
+        assert "made Jafta stop knowing things" in self._review()
 
     def test_the_permission_did_not_replace_the_route_down(self):
         """Il percorso di discesa resta il modo normale di far spazio: se sparisse,
@@ -995,7 +995,7 @@ class TestADestructivePassSaysSo:
     """
 
     def test_the_threshold_is_about_a_quarter_of_a_real_file(self):
-        from jenny.agent.dream_review import DEMOTION_IS_NOTABLE
+        from jafta.agent.dream_review import DEMOTION_IS_NOTABLE
 
         assert DEMOTION_IS_NOTABLE == 5
 
@@ -1010,7 +1010,7 @@ class TestADestructivePassSaysSo:
         return lines, lambda: logger.remove(sink)
 
     def test_a_quiet_pass_says_nothing_loud(self, store):
-        from jenny.agent.dream_review import _report_demotions
+        from jafta.agent.dream_review import _report_demotions
 
         lines, done = self._captured()
         try:
@@ -1026,8 +1026,8 @@ class TestADestructivePassSaysSo:
         può decidere se andare a guardare."""
         from datetime import date
 
-        from jenny.agent.dream_review import DEMOTION_IS_NOTABLE, _report_demotions
-        from jenny.agent.memory_archive import ArchivedEntry, archive_entry
+        from jafta.agent.dream_review import DEMOTION_IS_NOTABLE, _report_demotions
+        from jafta.agent.memory_archive import ArchivedEntry, archive_entry
 
         for i in range(DEMOTION_IS_NOTABLE + 1):
             archive_entry(
@@ -1049,8 +1049,8 @@ class TestADestructivePassSaysSo:
     def test_only_what_this_pass_moved_is_reported(self, store, caplog):
         from datetime import date
 
-        from jenny.agent.dream_review import _report_demotions
-        from jenny.agent.memory_archive import ArchivedEntry, archive_entry, archived_ids
+        from jafta.agent.dream_review import _report_demotions
+        from jafta.agent.memory_archive import ArchivedEntry, archive_entry, archived_ids
 
         archive_entry(
             store.memory_dir,
@@ -1247,7 +1247,7 @@ class TestTheOutcomeSaysWhatItTookAway:
         import inspect
         import re
 
-        from jenny.agent import dream_review
+        from jafta.agent import dream_review
 
         source = inspect.getsource(dream_review.run_dream_review)
         constructions = re.findall(r"ReviewOutcome\((?:[^()]|\([^()]*\))*\)", source)
@@ -1258,7 +1258,7 @@ class TestTheOutcomeSaysWhatItTookAway:
 
     async def test_the_ids_are_what_recall_accepts(self, store: MemoryStore) -> None:
         """Un numero non è azionabile: ``recall`` prende id, non nomi di file."""
-        from jenny.agent.tools.memory_recall import MemoryRecallTool
+        from jafta.agent.tools.memory_recall import MemoryRecallTool
 
         outcome = await _run(store, _FakeAgent(effect=self._drops_a_fact(store)))
 

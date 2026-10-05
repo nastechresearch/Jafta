@@ -26,8 +26,8 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.tools.apply_patch import ApplyPatchTool
-from jenny.agent.tools.filesystem import EditFileTool, WriteFileTool
+from jafta.agent.tools.apply_patch import ApplyPatchTool
+from jafta.agent.tools.filesystem import EditFileTool, WriteFileTool
 
 # Le tre parole che distinguono i due rifiuti. Meno di una frase intera, così la
 # frase si può riscrivere; abbastanza da non confondere una forma con uno stato.

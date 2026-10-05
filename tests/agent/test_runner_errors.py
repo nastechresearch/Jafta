@@ -8,8 +8,8 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from support.runner import make_spec
 
-from jenny.providers.anthropic_provider import AnthropicProvider
-from jenny.providers.base import LLMProvider, LLMResponse, ToolCallRequest
+from jafta.providers.anthropic_provider import AnthropicProvider
+from jafta.providers.base import LLMProvider, LLMResponse, ToolCallRequest
 
 
 class _FakeAPIError(Exception):
@@ -27,7 +27,7 @@ class _FakeAPIError(Exception):
 
 @pytest.mark.asyncio
 async def test_runner_returns_structured_tool_error():
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     provider.chat_with_retry = AsyncMock(return_value=LLMResponse(
@@ -58,7 +58,7 @@ async def test_runner_returns_structured_tool_error():
 async def test_llm_error_not_appended_to_session_messages():
     """When LLM returns finish_reason='error', the error content must NOT be
     appended to the messages list (prevents polluting session history)."""
-    from jenny.agent.runner import (
+    from jafta.agent.runner import (
         _PERSISTED_MODEL_ERROR_PLACEHOLDER,
         AgentRunner,
     )
@@ -90,7 +90,7 @@ async def test_llm_error_with_partial_content_persists_partial_and_marker():
     """A genuine mid-stream exception that already streamed text to the user
     must persist that text + an interruption marker instead of discarding it
     for the generic placeholder (#audit mid-stream-exception loss)."""
-    from jenny.agent.runner import (
+    from jafta.agent.runner import (
         _PARTIAL_CONTENT_INTERRUPTED_MARKER,
         _PERSISTED_MODEL_ERROR_PLACEHOLDER,
         AgentRunner,
@@ -125,7 +125,7 @@ async def test_llm_error_with_partial_content_persists_partial_and_marker():
 @pytest.mark.asyncio
 async def test_llm_arrearage_error_surfaces_clear_message():
     """Arrearage errors yield a clear user-facing message, not a raw dump (#3006)."""
-    from jenny.agent.runner import _ARREARAGE_ERROR_MESSAGE, AgentRunner
+    from jafta.agent.runner import _ARREARAGE_ERROR_MESSAGE, AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     provider.chat_with_retry = AsyncMock(return_value=LLMResponse(
@@ -147,7 +147,7 @@ async def test_llm_arrearage_error_surfaces_clear_message():
 
 @pytest.mark.asyncio
 async def test_runner_tool_error_sets_final_content():
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
 
@@ -179,7 +179,7 @@ async def test_runner_tool_error_sets_final_content():
 async def test_runner_tool_error_preserves_tool_results_in_messages():
     """When a tool raises a fatal error, its results must still be appended
     to messages so the session never contains orphan tool_calls (#2943)."""
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
 
@@ -242,7 +242,7 @@ def test_anthropic_context_overflow_error_is_detected_as_context_length_error():
     automatic shrink-and-retry recovery kicks in for Anthropic, not just OpenAI's
     ``context_length_exceeded`` error code shape.
     """
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     payload = {
         "type": "error",
@@ -270,7 +270,7 @@ def test_anthropic_unrelated_invalid_request_error_is_not_misdetected():
     ``invalid_request_error`` alone would be far too broad, since Anthropic uses
     that error type for many unrelated validation failures.
     """
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     payload = {
         "type": "error",
@@ -288,7 +288,7 @@ def test_anthropic_unrelated_invalid_request_error_is_not_misdetected():
 def test_openai_context_length_exceeded_still_detected():
     """Guard against regressions in the pre-existing OpenAI-shaped detection
     while extending the matcher for Anthropic."""
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     response = LLMResponse(
         content=(

@@ -13,8 +13,8 @@ import sys
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
 
-from jenny.agent.memory import Consolidator, MemoryStore
-from jenny.session.manager import SessionManager
+from jafta.agent.memory import Consolidator, MemoryStore
+from jafta.session.manager import SessionManager
 
 
 def _fd_path(fd: int) -> str:
@@ -67,7 +67,7 @@ async def test_a_project_copy_that_cannot_be_synced_keeps_the_session(tmp_path: 
 
 
 def test_the_transcript_tolerates_an_fsync_failure(tmp_path: Path, monkeypatch) -> None:
-    from jenny.webui import transcript_store
+    from jafta.webui import transcript_store
 
     monkeypatch.setattr(transcript_store, "webui_transcript_path",
                         lambda key: tmp_path / "transcripts" / f"{key}.jsonl")

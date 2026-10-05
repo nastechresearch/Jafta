@@ -37,15 +37,15 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.agent.loop import AgentLoop
-from jenny.bus.events import InboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.session.project_rename import (
+from jafta.agent.loop import AgentLoop
+from jafta.bus.events import InboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.session.project_rename import (
     follow_renamed_project,
     pending_project_renames,
     repair_pending_project_renames,
 )
-from jenny.session.project_traces import PROJECT_WIKI_ID_KEY, project_trace_paths
+from jafta.session.project_traces import PROJECT_WIKI_ID_KEY, project_trace_paths
 
 WIKI_ID = "3f9a2c1b7e04"
 
@@ -53,7 +53,7 @@ WIKI_ID = "3f9a2c1b7e04"
 @pytest.fixture
 def loop(tmp_path: Path, monkeypatch) -> AgentLoop:
     monkeypatch.setattr(
-        "jenny.config.paths.get_webui_dir", lambda: _ensure(tmp_path / ".jenny" / "webui")
+        "jafta.config.paths.get_webui_dir", lambda: _ensure(tmp_path / ".jafta" / "webui")
     )
     provider = MagicMock()
     provider.get_default_model.return_value = "test-model"
@@ -157,7 +157,7 @@ async def test_a_renamed_folder_takes_its_chat_with_it(
     _wiki(tmp_path, "vecchio")
     loop._remember_project_id("project:vecchio")
     made = _traces(loop, "project:vecchio")
-    # Il rinomino, fatto fuori da Jenny: è il caso reale.
+    # Il rinomino, fatto fuori da Jafta: è il caso reale.
     (tmp_path / "wikis" / "vecchio").rename(tmp_path / "wikis" / "nuovo")
 
     refused = await loop._refuse_missing_project(_msg(), "project:vecchio")
@@ -595,7 +595,7 @@ async def test_a_refusal_with_nothing_moved_still_says_nothing_is_lost(
 def test_the_trace_list_covers_the_three_that_move(loop: AgentLoop) -> None:
     """La quarta traccia vive **dentro** la cartella, quindi si è già spostata da sé.
 
-    ``<progetto>/.jenny/tool-results/project_<nome>/`` viaggia col rinomino; il
+    ``<progetto>/.jafta/tool-results/project_<nome>/`` viaggia col rinomino; il
     suo nome resta quello vecchio e ``_cleanup_tool_result_buckets`` lo rimuove
     al primo turno. Se un giorno nascesse una quinta traccia *fuori* dalla
     cartella, va aggiunta qui — ed è questo il test che se ne accorge.
@@ -610,7 +610,7 @@ def test_the_trace_list_covers_the_three_that_move(loop: AgentLoop) -> None:
 
 # ── T4.15 — non si insegue dentro un nome che nessuno puo' riaprire ──────
 #
-# La cartella la rinomina l'utente **fuori** da Jenny, quindi il nome nuovo non
+# La cartella la rinomina l'utente **fuori** da Jafta, quindi il nome nuovo non
 # e' passato da nessun controllo. ``wikis/Ricerca ETNA`` non supera
 # ``is_valid_project_name``, e la chat portata su ``project:Ricerca ETNA`` non la
 # apre ne' il canale (``session_key_for_channel``) ne' il chip (non la elenca):

@@ -2,7 +2,7 @@
 
 import pytest
 
-from jenny.config.schema import Config, ProviderConfig, ProvidersConfig
+from jafta.config.schema import Config, ProviderConfig, ProvidersConfig
 
 
 class TestProviderConfig:

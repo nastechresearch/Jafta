@@ -23,9 +23,9 @@ from typing import Any
 import pytest
 from support.android import fake_java_module
 
-import jenny.agent.tools.ssh_backends.android as android_mod
-from jenny.agent.tools.ssh_backends.android import AndroidSshBackend
-from jenny.agent.tools.ssh_backends.base import (
+import jafta.agent.tools.ssh_backends.android as android_mod
+from jafta.agent.tools.ssh_backends.android import AndroidSshBackend
+from jafta.agent.tools.ssh_backends.base import (
     SshAuthError,
     SshHostKeyError,
     SshTarget,
@@ -37,7 +37,7 @@ _METHODS = ("exec", "put", "get", "generateKeyPair", "probeHostKey", "closeAll")
 
 
 class FakeSshBridge:
-    """Sosia di ``com.flagdizero.jenny.SshBridge``: JSON in, JSON out."""
+    """Sosia di ``com.flagdizero.jafta.SshBridge``: JSON in, JSON out."""
 
     def __init__(self) -> None:
         #: (metodo, payload decodificato) di ogni chiamata, in ordine.
@@ -69,7 +69,7 @@ def _install(monkeypatch: pytest.MonkeyPatch) -> FakeSshBridge:
     bridge = FakeSshBridge()
     for name in _METHODS:
         setattr(bridge, name, lambda request, _n=name: bridge._handle(_n, request))
-    fake_java_module(monkeypatch, {"com.flagdizero.jenny.SshBridge": bridge})
+    fake_java_module(monkeypatch, {"com.flagdizero.jafta.SshBridge": bridge})
     # La classe risolta è cachata in un globale di modulo: va azzerata fra un
     # test e l'altro o il secondo test parlerebbe col bridge del primo.
     monkeypatch.setattr(android_mod, "_bridge", None)
@@ -85,7 +85,7 @@ def _target(tmp_path: Path, **overrides: Any) -> SshTarget:
     params: dict[str, Any] = {
         "host": "nas.example.com",
         "port": 2222,
-        "username": "jenny",
+        "username": "jafta",
         "key_path": tmp_path / "nas_ed25519",
         "known_hosts_path": tmp_path / "known_hosts",
         "connect_timeout_s": 5.0,
@@ -111,7 +111,7 @@ async def test_exec_passes_connection_and_command_params(bridge, tmp_path):
         "poolKey": target.pool_key,
         "host": "nas.example.com",
         "port": 2222,
-        "username": "jenny",
+        "username": "jafta",
         "keyPath": str(target.key_path),
         "knownHostsPath": str(target.known_hosts_path),
         "connectTimeoutS": 5.0,
@@ -359,11 +359,11 @@ async def test_get_over_cap_raises_and_leaves_nothing_behind(bridge, tmp_path):
 
 async def test_generate_key_pair_returns_only_the_public_key(bridge, tmp_path):
     key_path = tmp_path / "generated" / "id_ed25519"
-    bridge.responses["generateKeyPair"] = {"publicKey": "ssh-ed25519 AAAAC3Nz jenny\n"}
+    bridge.responses["generateKeyPair"] = {"publicKey": "ssh-ed25519 AAAAC3Nz jafta\n"}
 
     public = await AndroidSshBackend().generate_key_pair(key_path)
 
-    assert public == "ssh-ed25519 AAAAC3Nz jenny"
+    assert public == "ssh-ed25519 AAAAC3Nz jafta"
     assert "PRIVATE" not in public
     assert bridge.payload_for("generateKeyPair") == {"keyPath": str(key_path)}
 
@@ -411,7 +411,7 @@ async def test_close_all_surfaces_a_failing_bridge(bridge):
 
 def test_bridge_class_name_matches_the_kotlin_object():
     """Il nome è l'unico contratto con Kotlin che nessun test può verificare a runtime."""
-    assert android_mod._BRIDGE_CLASS == "com.flagdizero.jenny.SshBridge"
+    assert android_mod._BRIDGE_CLASS == "com.flagdizero.jafta.SshBridge"
 
 
 async def test_concurrent_calls_do_not_block_the_event_loop(bridge, tmp_path):

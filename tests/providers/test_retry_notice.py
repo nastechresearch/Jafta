@@ -10,8 +10,8 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.providers import retry_notice
-from jenny.providers.base import LLMProvider, LLMResponse
+from jafta.providers import retry_notice
+from jafta.providers.base import LLMProvider, LLMResponse
 
 
 @pytest.mark.parametrize("text, expected", [
@@ -46,7 +46,7 @@ async def test_the_lines_the_provider_writes_are_all_translated(monkeypatch) -> 
     async def _no_sleep(_delay: float) -> None:
         return None
 
-    monkeypatch.setattr("jenny.providers.base.asyncio.sleep", _no_sleep)
+    monkeypatch.setattr("jafta.providers.base.asyncio.sleep", _no_sleep)
     lines: list[str] = []
 
     async def _collect(text: str) -> None:

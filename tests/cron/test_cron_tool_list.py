@@ -5,10 +5,10 @@ from datetime import datetime, timezone
 import pytest
 from support.cron import disable_job
 
-from jenny.agent.tools.context import RequestContext
-from jenny.agent.tools.cron import CronTool
-from jenny.cron.service import CronService
-from jenny.cron.types import (
+from jafta.agent.tools.context import RequestContext
+from jafta.agent.tools.cron import CronTool
+from jafta.cron.service import CronService
+from jafta.cron.types import (
     CronJob,
     CronJobState,
     CronPayload,
@@ -452,7 +452,7 @@ def test_list_excludes_disabled_jobs(tmp_path) -> None:
 
 
 async def test_list_shows_a_job_paused_from_the_workshop(tmp_path) -> None:
-    """Un job in pausa non e' sparito: se Jenny non lo vedesse ne creerebbe un
+    """Un job in pausa non e' sparito: se Jafta non lo vedesse ne creerebbe un
     doppione, credendo di doverlo rifare. La riga le dice dove si riprende."""
     service = CronService(tmp_path / "cron" / "jobs.json")
     service._running = True

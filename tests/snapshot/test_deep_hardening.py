@@ -17,25 +17,25 @@ from pathlib import Path
 
 import pytest
 
-from jenny.config.schema import SnapshotConfig
-from jenny.snapshot.backup import BackupError, BackupManager
-from jenny.snapshot.crypto import (
+from jafta.config.schema import SnapshotConfig
+from jafta.snapshot.backup import BackupError, BackupManager
+from jafta.snapshot.crypto import (
     HEADER_LEN,
     MAGIC,
     MAX_KDF_ITERATIONS,
     decrypt_container,
     encrypt_container,
 )
-from jenny.snapshot.crypto_backends.base import CryptoAuthError
-from jenny.snapshot.crypto_backends.dev import DevAesGcmBackend
-from jenny.snapshot.engine import SnapshotEngine
-from jenny.snapshot.locations import (
+from jafta.snapshot.crypto_backends.base import CryptoAuthError
+from jafta.snapshot.crypto_backends.dev import DevAesGcmBackend
+from jafta.snapshot.engine import SnapshotEngine
+from jafta.snapshot.locations import (
     MARKER_FILE_NAME,
     STAGED_SNAPSHOTS_DIR_NAME,
     STAGED_WORKSPACE_DIR_NAME,
 )
-from jenny.snapshot.restore_marker import apply_pending_restore
-from jenny.snapshot.service import SnapshotService
+from jafta.snapshot.restore_marker import apply_pending_restore
+from jafta.snapshot.service import SnapshotService
 
 pytest.importorskip("cryptography")
 
@@ -131,7 +131,7 @@ async def test_header_only_container_rejected() -> None:
 
 async def test_zip_slip_relative_traversal_blocked(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setattr(
-        "jenny.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
+        "jafta.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
     )
     manager = _make_manager(tmp_path / "data")
     container = await _container_with_zip(
@@ -151,7 +151,7 @@ async def test_zip_slip_relative_traversal_blocked(tmp_path: Path, monkeypatch) 
 
 async def test_zip_slip_absolute_path_blocked(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setattr(
-        "jenny.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
+        "jafta.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
     )
     manager = _make_manager(tmp_path / "data")
     container = await _container_with_zip(
@@ -170,7 +170,7 @@ async def test_archive_without_tree_rejected_and_staging_cleaned(
     tmp_path: Path, monkeypatch
 ) -> None:
     monkeypatch.setattr(
-        "jenny.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
+        "jafta.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
     )
     manager = _make_manager(tmp_path / "data")
     container = await _container_with_zip({"metadata.json": b"{}"})
@@ -182,7 +182,7 @@ async def test_archive_without_tree_rejected_and_staging_cleaned(
 
 async def test_archive_missing_metadata_rejected(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setattr(
-        "jenny.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
+        "jafta.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
     )
     manager = _make_manager(tmp_path / "data")
     container = await _container_with_zip({"tree/file.txt": b"x"})
@@ -193,7 +193,7 @@ async def test_archive_missing_metadata_rejected(tmp_path: Path, monkeypatch) ->
 async def test_decrypted_garbage_rejected(tmp_path: Path, monkeypatch) -> None:
     """Passphrase giusta ma payload che non è uno zip: BackupError, non crash."""
     monkeypatch.setattr(
-        "jenny.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
+        "jafta.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
     )
     manager = _make_manager(tmp_path / "data")
     container = await encrypt_container(
@@ -206,7 +206,7 @@ async def test_decrypted_garbage_rejected(tmp_path: Path, monkeypatch) -> None:
 async def test_extraneous_zip_entries_ignored(tmp_path: Path, monkeypatch) -> None:
     """Voci fuori da tree/ e snapshots/ vengono ignorate, non estratte."""
     monkeypatch.setattr(
-        "jenny.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
+        "jafta.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
     )
     manager = _make_manager(tmp_path / "data")
     container = await _container_with_zip(
@@ -236,7 +236,7 @@ async def test_full_lifecycle_byte_fidelity(tmp_path: Path, monkeypatch) -> None
     sanity file, safety copy dello stato pre-restore.
     """
     monkeypatch.setattr(
-        "jenny.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
+        "jafta.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
     )
     runtime_root = tmp_path / "data"
     workspace = runtime_root / "workspace"
@@ -319,7 +319,7 @@ async def test_full_lifecycle_byte_fidelity(tmp_path: Path, monkeypatch) -> None
 async def test_snapshot_restore_full_cycle(tmp_path: Path, monkeypatch) -> None:
     """Restore da storia locale: staging dallo snapshot + swap, storia intatta."""
     monkeypatch.setattr(
-        "jenny.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
+        "jafta.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
     )
     runtime_root = tmp_path / "data"
     workspace = runtime_root / "workspace"
@@ -356,7 +356,7 @@ async def test_concurrent_exports_serialize(tmp_path: Path, monkeypatch) -> None
     import asyncio
 
     monkeypatch.setattr(
-        "jenny.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
+        "jafta.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
     )
     runtime_root = tmp_path / "data"
     workspace = runtime_root / "workspace"
@@ -368,7 +368,7 @@ async def test_concurrent_exports_serialize(tmp_path: Path, monkeypatch) -> None
         manager.export_backup(_PASSPHRASE), manager.export_backup(_PASSPHRASE)
     )
     staging = manager.import_staged_path.parent
-    exports = list(staging.glob("jenny-backup-*.jbk"))
+    exports = list(staging.glob("jafta-backup-*.jbk"))
     assert len(exports) == 1
     # Il file superstite è uno dei due dichiarati e decifrabile.
     assert str(exports[0]) in {r["staged_path"] for r in results}
@@ -379,7 +379,7 @@ async def test_concurrent_exports_serialize(tmp_path: Path, monkeypatch) -> None
 async def test_export_survives_vanishing_file(tmp_path: Path, monkeypatch) -> None:
     """Un file che sparisce tra scan e zip non fa fallire l'export."""
     monkeypatch.setattr(
-        "jenny.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
+        "jafta.snapshot.crypto.get_crypto_backend", lambda: _BACKEND
     )
     runtime_root = tmp_path / "data"
     workspace = runtime_root / "workspace"

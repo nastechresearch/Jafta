@@ -2,12 +2,12 @@ from unittest.mock import patch, sentinel
 
 import pytest
 
-from jenny.providers.endpoint_budget import read_timeout_s
-from jenny.providers.openai_compat_helpers import (
+from jafta.providers.endpoint_budget import read_timeout_s
+from jafta.providers.openai_compat_helpers import (
     _LOCAL_REQUEST_TIMEOUT_S,
     _OPENAI_COMPAT_REQUEST_TIMEOUT_S,
 )
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 
 async def test_openai_compat_provider_defers_http_client_until_first_use() -> None:

@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.autocompact import AutoCompact
-from jenny.session.manager import Session, SessionManager
+from jafta.agent.autocompact import AutoCompact
+from jafta.session.manager import Session, SessionManager
 
 
 def _make_session(
@@ -224,7 +224,7 @@ class TestCheckExpired:
         Senza un'attesa la compattazione riproverebbe a ogni giro, una chiamata al
         minuto per tutta la durata del guasto.
         """
-        from jenny.agent import autocompact as module
+        from jafta.agent import autocompact as module
 
         clock = {"now": 1000.0}
         monkeypatch.setattr(module.time, "monotonic", lambda: clock["now"])

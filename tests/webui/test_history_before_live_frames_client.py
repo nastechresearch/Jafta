@@ -1,7 +1,7 @@
 """La storia di una conversazione va sopra la risposta che arriva mentre si carica.
 
 Lo stesso difetto che la casa aveva nel suo filo: aprire una
-conversazione mentre Jenny ci sta rispondendo — un cambio di chat, una
+conversazione mentre Jafta ci sta rispondendo — un cambio di chat, una
 riconnessione, un /new — svuota la chat e poi *aspetta* bootstrap e thread. In
 quell'attesa i delta del turno in corso disegnano la loro bolla nella chat
 vuota, e la storia arrivata dopo veniva accodata **sotto**: la risposta in cima,
@@ -18,7 +18,7 @@ from pathlib import Path
 
 from support.js_harness import member, requires_node, run_js
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 CHAT_JS = ASSETS / "mobile-chat.js"
 
 pytestmark = requires_node

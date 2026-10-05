@@ -1,7 +1,7 @@
 """«Scollega» di Telegram chiede conferma prima di scollegare.
 
 Era l'unica azione distruttiva dell'officina senza conferma (audit sul Titan 2,
-26/09/2026). Scollegare non butta il token, ma da quel momento Jenny non risponde
+26/09/2026). Scollegare non butta il token, ma da quel momento Jafta non risponde
 su Telegram e non ci manda avvisi, finche' qualcuno non manda al bot il codice
 nuovo: nessun segnale lo dice. Un tocco sbagliato in Mani bastava.
 """

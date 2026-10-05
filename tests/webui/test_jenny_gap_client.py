@@ -1,6 +1,6 @@
-"""Il margine che i messaggi lasciano a Jenny, eseguito davvero sotto node.
+"""Il margine che i messaggi lasciano a Jafta, eseguito davvero sotto node.
 
-`shared/jenny-gap.js` esiste per una misura: i messaggi avevano
+`shared/jafta-gap.js` esiste per una misura: i messaggi avevano
 `max-width: 88%`, e quel tetto serviva a non finire dietro la mascotte. Solo
 che lei sta **in un angolo** — 87,6 px CSS in fondo a destra sul Titan 2 — e il
 tetto lo pagavano *tutti* i messaggi, anche quelli in cima dove non c'e'
@@ -12,7 +12,7 @@ figura dentro il suo quadrato, e quali messaggi la toccano. Il resto —
 leggere i rettangoli, mettere una classe — e' DOM e non si prova qui.
 
 **Il numero da non confondere**, ed e' un errore gia' fatto una volta in questo
-progetto (v. il commento su `.jenny-duo`): il personaggio occupa il **45% in
+progetto (v. il commento su `.jafta-duo`): il personaggio occupa il **45% in
 larghezza** e il **73% in altezza** del canvas quadrato. Scansare il *quadrato*
 invece della *figura* vorrebbe dire lasciare 33 px di buco dove non c'e'
 nessuno — cioe' rifare, piu' piccolo, il difetto che si stava correggendo.
@@ -25,8 +25,8 @@ from pathlib import Path
 
 from support.js_harness import requires_node, run_js
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
-GAP_JS = ASSETS / "shared" / "jenny-gap.js"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
+GAP_JS = ASSETS / "shared" / "jafta-gap.js"
 MASCOT_JS = ASSETS / "shared" / "mascot.js"
 
 
@@ -34,7 +34,7 @@ pytestmark = requires_node
 
 
 def _run_js(script: str) -> str:
-    """`jenny-gap.js` importa da `mascot.js`, che al caricamento tocca
+    """`jafta-gap.js` importa da `mascot.js`, che al caricamento tocca
     `localStorage`: sotto node non esiste. Si stura con un finto prima
     dell'import, che e' meno invasivo che spezzare il modulo in due."""
     source = (
@@ -59,7 +59,7 @@ def test_the_ratios_still_say_what_this_module_assumes() -> None:
     """
     mascot = MASCOT_JS.read_text(encoding="utf-8")
     assert "export const ART_HEIGHT_RATIO = 0.73;" in mascot, (
-        "il rapporto in altezza e' cambiato: rivedere la banda di jenny-gap.js"
+        "il rapporto in altezza e' cambiato: rivedere la banda di jafta-gap.js"
     )
     assert "il 45% centrale del canvas quadrato" in mascot, (
         "il rapporto in larghezza e' cambiato: rivedere SIDE_MARGIN"
@@ -77,7 +77,7 @@ def test_the_figure_is_not_the_square_it_sits_in() -> None:
     nulla.
     """
     out = _run_js("""
-// --jenny-size 120, OUT_RATIO 0.25, viewport 574.4:
+// --jafta-size 120, OUT_RATIO 0.25, viewport 574.4:
 // il quadrato sborda di 30 a destra, quindi left = 574.4 + 30 - 120.
 const side = 120;
 const square = { left: 484.4, right: 604.4, top: 100, bottom: 220 };
@@ -139,12 +139,12 @@ console.log('ok');
 def test_the_thread_keeps_no_blanket_cap_any_more() -> None:
     """L'altra meta' della correzione: il tetto se n'e' andato davvero.
 
-    Senza questa riga si potrebbe rimettere `max-width` su `.home-msg-jenny` e
+    Senza questa riga si potrebbe rimettere `max-width` su `.home-msg-jafta` e
     tutti i banchi qui sopra resterebbero verdi — misurerebbero un margine
     giusto sopra una larghezza sbagliata.
     """
     css = (ASSETS / "home-style.css").read_text(encoding="utf-8")
-    block = css.split(".home-msg-jenny {")[1].split("}")[0]
+    block = css.split(".home-msg-jafta {")[1].split("}")[0]
     # `max-width: 100%` e' la colonna, non un tetto: serve perche' un `<pre>`
     # lungo non allarghi il messaggio oltre il filo (09f43fc). Un tetto e'
     # qualunque valore piu' stretto della colonna.
@@ -155,7 +155,7 @@ def test_the_thread_keeps_no_blanket_cap_any_more() -> None:
     assert not caps, (
         f"il tetto e' tornato ({caps}): il margine condizionale non serve piu' a niente"
     )
-    assert ".home-msg-jenny.is-under-jenny" in css, "manca la regola del margine"
+    assert ".home-msg-jafta.is-under-jafta" in css, "manca la regola del margine"
 
 
 # ── Chi si scansa: tutti e due i lati della conversazione ──────────────────
@@ -204,13 +204,13 @@ def test_a_bubble_of_ours_in_her_corner_dodges_too() -> None:
     """Il difetto vero: si scansavano solo le risposte.
 
     Le bolle di chi scrive sono `align-self: flex-end` — incollate al bordo
-    destro, che e' la colonna di Jenny — e la piu' recente e' anche la piu' in
+    destro, che e' la colonna di Jafta — e la piu' recente e' anche la piu' in
     basso. Cioe' l'unica cosa che lei copriva sempre era **quello che hai
-    appena scritto tu**. Con il selettore vecchio (`.home-msg-jenny`) questo
+    appena scritto tu**. Con il selettore vecchio (`.home-msg-jafta`) questo
     banco e' rosso.
     """
     out = _con_dom("""
-const reply = node('home-msg home-msg-jenny', { right: 540, bottom: 200 });
+const reply = node('home-msg home-msg-jafta', { right: 540, bottom: 200 });
 const mine      = node('home-msg home-msg-user',  { right: 556.4, bottom: 300 });
 const old  = node('home-msg home-msg-user',  { right: 556.4, bottom: 90 });
 const thread = threadWith([old, reply, mine]);
@@ -218,7 +218,7 @@ new JennyGap(thread, mascot).refresh();
 assert.ok(mine.classes.has(CLASS), 'la bolla nel suo angolo non si e scansata');
 assert.ok(reply.classes.has(CLASS), 'la risposta nel suo angolo non si e scansata');
 assert.ok(!old.classes.has(CLASS), 'una bolla sopra di lei non deve scansarsi');
-assert.deepEqual(threadWith.written, ['--jenny-gap', '39px']);
+assert.deepEqual(threadWith.written, ['--jafta-gap', '39px']);
 console.log('ok');
 """)
     assert "ok" in out
@@ -232,7 +232,7 @@ def test_a_bubble_that_stops_dodging_gets_cleaned_up() -> None:
     c'e' nessuno da scansare.
     """
     out = _con_dom("""
-const mine = node('home-msg home-msg-user is-under-jenny', { right: 556.4, bottom: 90 });
+const mine = node('home-msg home-msg-user is-under-jafta', { right: 556.4, bottom: 90 });
 new JennyGap(threadWith([mine]), mascot).refresh();
 assert.ok(!mine.classes.has(CLASS), 'il margine e rimasto attaccato');
 console.log('ok');
@@ -243,15 +243,15 @@ console.log('ok');
 def test_our_bubble_moves_aside_it_does_not_hollow_out() -> None:
     """Le due forme si scansano in modo diverso, e non e' un dettaglio.
 
-    La risposta di Jenny non ha sfondo: stringerle il testo con `padding` non
+    La risposta di Jafta non ha sfondo: stringerle il testo con `padding` non
     si vede. La bolla ce l'ha — con `padding` si allungherebbe fin sotto di
     lei con dentro il vuoto, cioe' il testo si sposta e la pelle della bolla
     resta coperta lo stesso. Deve muoversi tutta intera: `margin`.
     """
     css = (ASSETS / "home-style.css").read_text(encoding="utf-8")
-    assert ".home-msg-user.is-under-jenny" in css, "le bolle non si scansano affatto"
-    block = css.split(".home-msg-user.is-under-jenny {")[1].split("}")[0]
-    assert "margin-right: var(--jenny-gap" in block, block
+    assert ".home-msg-user.is-under-jafta" in css, "le bolle non si scansano affatto"
+    block = css.split(".home-msg-user.is-under-jafta {")[1].split("}")[0]
+    assert "margin-right: var(--jafta-gap" in block, block
     assert "padding-right" not in block, (
         "con padding la bolla si svuota a destra invece di spostarsi"
     )
@@ -267,13 +267,13 @@ def test_a_thread_off_its_page_is_not_measured() -> None:
     mentre lei resta ferma sullo schermo. Misurato li', il margine veniva la
     larghezza di una pagina piu' 39, gli ultimi messaggi prendevano la classe,
     e il `padding-right` li stringeva a una colonna larga una lettera. Fuori
-    posto non si tocca niente: ne' la classe, ne' `--jenny-gap`.
+    posto non si tocca niente: ne' la classe, ne' `--jafta-gap`.
     """
     out = _con_dom("""
 for (const shift of [574.4, 300, -574.4, -2]) {
   threadWith.written = null;
-  const reply = node('home-msg home-msg-jenny', { right: 540 + shift, bottom: 200 });
-  const kept = node('home-msg home-msg-user is-under-jenny', { right: 556.4 + shift, bottom: 300 });
+  const reply = node('home-msg home-msg-jafta', { right: 540 + shift, bottom: 200 });
+  const kept = node('home-msg home-msg-user is-under-jafta', { right: 556.4 + shift, bottom: 300 });
   new JennyGap(threadWith([reply, kept], shift), mascot).refresh();
   assert.equal(threadWith.written, null, `shift ${shift}: gap written off-page`);
   assert.ok(!reply.classes.has(CLASS), `shift ${shift}: marked off-page`);
@@ -309,7 +309,7 @@ def _scrolling_thread(script: str) -> str:
     return _con_dom(
         """
 const LINE = 22;
-const last = node('home-msg home-msg-jenny is-under-jenny', { right: 540, bottom: 300 });
+const last = node('home-msg home-msg-jafta is-under-jafta', { right: 540, bottom: 300 });
 const clamp = (t) => { t._top = Math.min(t._top, t.scrollHeight - t.clientHeight); };
 const thread = {
   ...threadWith([last]),

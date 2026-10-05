@@ -35,11 +35,11 @@ from pathlib import Path
 
 from support.js_harness import requires_node, run_js
 
-from jenny.session.mascot_mood import MOODS, NEUTRAL_MOOD
-from jenny.utils.android_assets import _UI_MANIFEST
+from jafta.session.mascot_mood import MOODS, NEUTRAL_MOOD
+from jafta.utils.android_assets import _UI_MANIFEST
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
-JENNY_JS = ASSETS / "shared" / "jenny-mascot.js"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
+JENNY_JS = ASSETS / "shared" / "jafta-mascot.js"
 
 node = requires_node
 
@@ -97,9 +97,9 @@ def _dict_const(source: str, name: str) -> dict[str, str]:
 
 
 def _harness() -> str:
-    jenny = JENNY_JS.read_text(encoding="utf-8")
-    consts = "\n".join(f"const {name} = {_const(jenny, name)};" for name in _CONSTS)
-    methods = "\n".join(_method(jenny, name) + "," for name in _METHODS)
+    jafta = JENNY_JS.read_text(encoding="utf-8")
+    consts = "\n".join(f"const {name} = {_const(jafta, name)};" for name in _CONSTS)
+    methods = "\n".join(_method(jafta, name) + "," for name in _METHODS)
     return f"""
 import assert from 'node:assert/strict';
 
@@ -412,7 +412,7 @@ def test_a_frame_while_another_turn_is_in_flight_is_dropped() -> None:
 @node
 def test_a_mood_shows_at_the_edge_too_with_the_side_faces() -> None:
     """Fino al 28/09/2026 al bordo l'umore non si vedeva, e l'utente lo cercava:
-    «quando Jenny e' nascosta non si agganciano le espressioni?». Adesso al
+    «quando Jafta e' nascosta non si agganciano le espressioni?». Adesso al
     bordo e' il corpo di lato senza faccia con la faccia dell'umore sopra, e
     fuori la faccia davanti; decaduto l'umore torna la posa cotta."""
     _run_js("""
@@ -479,7 +479,7 @@ def test_every_mood_has_a_drawn_face() -> None:
 
 
 def test_every_layer_the_client_names_exists_and_ships() -> None:
-    """Corpo senza faccia è una Jenny senza volto: qui si controlla file per file."""
+    """Corpo senza faccia è una Jafta senza volto: qui si controlla file per file."""
     source = JENNY_JS.read_text(encoding="utf-8")
     urls = {
         **_dict_const(source, "BODY"),

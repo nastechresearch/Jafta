@@ -23,7 +23,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-UI = ROOT / "jenny" / "templates" / "ui"
+UI = ROOT / "jafta" / "templates" / "ui"
 ASSETS = UI / "assets"
 APP_JS = (ASSETS / "mobile-app.js").read_text(encoding="utf-8")
 CHAT_JS = (ASSETS / "mobile-chat.js").read_text(encoding="utf-8")
@@ -33,7 +33,7 @@ SELECTION_JS = (ASSETS / "shared" / "selection.js").read_text(encoding="utf-8")
 # due i gusci (v. test_horizontal_swipe_contract.py).
 SWIPE_JS = (ASSETS / "shared" / "horizontal-swipe.js").read_text(encoding="utf-8")
 WORKSHOP_HTML = (UI / "workshop.html").read_text(encoding="utf-8")
-ANDROID_ASSETS = (ROOT / "jenny" / "utils" / "android_assets.py").read_text(encoding="utf-8")
+ANDROID_ASSETS = (ROOT / "jafta" / "utils" / "android_assets.py").read_text(encoding="utf-8")
 
 # Elementi HTML senza tag di chiusura: senza questo elenco lo stack del parser
 # non tornerebbe mai indietro e ogni dialog sembrerebbe annidato in un `<meta>`.

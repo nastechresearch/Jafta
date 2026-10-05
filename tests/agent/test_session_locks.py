@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 
-from jenny.agent.session_locks import ReentrantSessionLock, SessionLocks
+from jafta.agent.session_locks import ReentrantSessionLock, SessionLocks
 
 
 def test_registry_returns_same_lock_per_key() -> None:

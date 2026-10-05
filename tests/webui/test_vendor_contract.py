@@ -28,7 +28,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 VENDOR = ASSETS / "vendor"
 NOTICES = ROOT / "THIRD_PARTY_NOTICES.md"
 
@@ -90,7 +90,7 @@ def test_a_library_with_callers_is_actually_shipped() -> None:
     estratto dall'APK, e sul telefono e' un 404 silenzioso che in locale non si
     vede mai (stessa trappola, altro verso).
     """
-    from jenny.utils.android_assets import _UI_MANIFEST
+    from jafta.utils.android_assets import _UI_MANIFEST
 
     for name, data in LIBRARIES.items():
         callers = _callers(data["marks"])

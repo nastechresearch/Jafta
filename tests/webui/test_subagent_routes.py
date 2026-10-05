@@ -4,7 +4,7 @@ Stesso pattern di ``tests/webui/test_skills_routes.py``: un ``GatewayHTTPHandler
 reale con dipendenze finte, e il dispatch su ``handler.subagent_routes`` con il
 path già ripulito dalla query (la query viene letta da ``request.path``).
 
-Il manager è un doppio: queste route non devono conoscere ``jenny/agent``, e i
+Il manager è un doppio: queste route non devono conoscere ``jafta/agent``, e i
 suoi errori sono riconosciuti per nome di classe — quindi il doppio solleva
 eccezioni con quei nomi, senza importare nulla dall'agente.
 """
@@ -20,7 +20,7 @@ import pytest
 from support.gateway_http import AUTH_SECRET, make_handler, make_request
 from websockets.http11 import Request as WsRequest
 
-from jenny.webui.ws_http import GatewayHTTPHandler
+from jafta.webui.ws_http import GatewayHTTPHandler
 
 _SNAPSHOT = {
     "running": [{
@@ -57,7 +57,7 @@ _SNAPSHOT = {
 }
 
 
-# Nomi identici a quelli di jenny/agent/subagent.py: la mappa nome→status di
+# Nomi identici a quelli di jafta/agent/subagent.py: la mappa nome→status di
 # SubagentRoutes è il contratto, e questi doppi lo esercitano senza importare
 # l'agente (che è esattamente il vincolo di layering della route).
 class SubagentRestartError(RuntimeError):
@@ -173,7 +173,7 @@ async def test_snapshot_defaults_to_no_session_filter(env) -> None:
 
 
 async def test_snapshot_translates_webui_session_key(env) -> None:
-    from jenny.session.keys import UNIFIED_SESSION_KEY
+    from jafta.session.keys import UNIFIED_SESSION_KEY
 
     await _dispatch(env.handler, "/api/subagents?session_key=websocket%3Adefault")
     assert env.manager.snapshot_calls == [UNIFIED_SESSION_KEY]

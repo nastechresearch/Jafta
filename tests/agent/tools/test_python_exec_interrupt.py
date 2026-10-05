@@ -14,7 +14,7 @@ import asyncio
 
 import pytest
 
-from jenny.agent.tools.python_exec import (
+from jafta.agent.tools.python_exec import (
     PythonNamespace,
     _interrupt_thread,
     run_python_async,

@@ -5,26 +5,26 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.context import ContextBuilder
-from jenny.agent.loop import AgentLoop
-from jenny.agent.turn_persistence import FollowupState
-from jenny.bus.events import InboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.cron.session_turns import CRON_HISTORY_META, CRON_TRIGGER_META
-from jenny.providers.base import LLMResponse
-from jenny.session.goal_state import GOAL_STATE_KEY
-from jenny.session.history_meta import (
+from jafta.agent.context import ContextBuilder
+from jafta.agent.loop import AgentLoop
+from jafta.agent.turn_persistence import FollowupState
+from jafta.bus.events import InboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.cron.session_turns import CRON_HISTORY_META, CRON_TRIGGER_META
+from jafta.providers.base import LLMResponse
+from jafta.session.goal_state import GOAL_STATE_KEY
+from jafta.session.history_meta import (
     INJECTED_EVENT_META,
     SUBAGENT_RESULT_EVENT,
     is_synthetic_history_row,
 )
-from jenny.session.keys import UNIFIED_SESSION_KEY
-from jenny.session.manager import Session
-from jenny.session.turn_continuation import (
+from jafta.session.keys import UNIFIED_SESSION_KEY
+from jafta.session.manager import Session
+from jafta.session.turn_continuation import (
     INTERNAL_CONTINUATION_META,
     INTERNAL_CONTINUATION_RUN_STARTED_AT_META,
 )
-from jenny.session.webui_turns import WebuiTurnCoordinator
+from jafta.session.webui_turns import WebuiTurnCoordinator
 
 # La chiave esplicita del turno, diversa da quella della chat: serve a un solo
 # test, che controlla che il goal di una chat non finisca nel contesto di
@@ -38,7 +38,7 @@ _OTHER_KEY = "websocket:system"
 
 def _mk_loop() -> AgentLoop:
     loop = AgentLoop.__new__(AgentLoop)
-    from jenny.config.schema import AgentDefaults
+    from jafta.config.schema import AgentDefaults
 
     loop.max_tool_result_chars = AgentDefaults().max_tool_result_chars
     return loop
@@ -119,7 +119,7 @@ async def test_injected_subagent_result_is_marked_in_history(tmp_path: Path) -> 
     deve vedere — e il turno si persiste con quella forma. Senza riportare la
     metadata, il rientro di un subagent finiva in storia indistinguibile da una
     frase digitata: bolla in chat, titolo della conversazione, riarmo
-    dell'heartbeat (v. ``jenny.session.history_meta``).
+    dell'heartbeat (v. ``jafta.session.history_meta``).
     """
     loop = _make_full_loop(tmp_path)
     loop.consolidator.maybe_consolidate_by_tokens = AsyncMock(return_value=False)  # type: ignore[method-assign]
@@ -887,7 +887,7 @@ async def test_process_message_uses_explicit_session_metadata_for_goal_context(
 async def test_run_agent_loop_goal_continue_message_reads_latest_metadata(
     tmp_path: Path,
 ) -> None:
-    from jenny.agent.runner import AgentRunResult
+    from jafta.agent.runner import AgentRunResult
 
     loop = _make_full_loop(tmp_path)
     session = loop.sessions.get_or_create("websocket:late-goal")
@@ -954,7 +954,7 @@ async def test_process_direct_appends_notice_when_images_stripped(tmp_path: Path
         return_value=LLMResponse(content="Ecco la risposta", images_stripped=True)
     )
 
-    # Chiave nel vocabolario di ``jenny.session.keys``: con un prefisso non
+    # Chiave nel vocabolario di ``jafta.session.keys``: con un prefisso non
     # registrato (era ``api:``, un canale che non esiste) da T4.10 il turno cade
     # su ``internal`` e ``resolve_turn_visibility`` lo rende SILENT su un canale
     # utente, cioe' ``process_direct`` non torna niente. Qui il soggetto e'
@@ -1061,8 +1061,8 @@ async def test_stop_preserves_runtime_checkpoint_for_next_turn(tmp_path: Path) -
     """/stop materializza SUBITO il checkpoint del turno interrotto nella
     history (restore sincrono in cmd_stop, deterministico anche con task
     abbandonati); il turno successivo riparte dal contesto già ripristinato."""
-    from jenny.command.builtin import cmd_stop
-    from jenny.command.router import CommandContext
+    from jafta.command.builtin import cmd_stop
+    from jafta.command.router import CommandContext
 
     loop = _make_full_loop(tmp_path)
     loop.consolidator.maybe_consolidate_by_tokens = AsyncMock(return_value=False)  # type: ignore[method-assign]

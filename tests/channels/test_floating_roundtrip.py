@@ -20,14 +20,14 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.loop import AgentLoop
-from jenny.bus.events import FLOATING_CHANNEL, InboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.channels import floating as fc
-from jenny.channels.floating import FloatingChannel
-from jenny.providers.base import LLMResponse
-from jenny.runtime.native_input import NATIVE_SOURCE_KEY, SOURCE_FLOATING
-from jenny.session.keys import UNIFIED_SESSION_KEY
+from jafta.agent.loop import AgentLoop
+from jafta.bus.events import FLOATING_CHANNEL, InboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.channels import floating as fc
+from jafta.channels.floating import FloatingChannel
+from jafta.providers.base import LLMResponse
+from jafta.runtime.native_input import NATIVE_SOURCE_KEY, SOURCE_FLOATING
+from jafta.session.keys import UNIFIED_SESSION_KEY
 
 
 class _Bubbles:
@@ -84,7 +84,7 @@ def test_the_question_enters_the_personal_conversation(tmp_path) -> None:
     """La riga che l'utente ha scritto: «la chat è identica a come sarebbe
     dentro l'app». Il ``chat_id`` della superficie non apre una sessione sua —
     ``session_key_for_channel`` manda ogni canale utente su ``unified:default``,
-    ed è per questo che Jenny ricorda quello che le si è chiesto dal fumetto."""
+    ed è per questo che Jafta ricorda quello che le si è chiesto dal fumetto."""
     loop = _loop(tmp_path)
     inbound = _from_the_mascot()
     outbound = loop._assemble_outbound(inbound, "ok", [], "stop", False, None)
@@ -113,8 +113,8 @@ def test_the_mascot_and_the_dropdown_do_not_swap_answers(tmp_path) -> None:
     condividessero il canale, chi ha scritto nel fumetto si vedrebbe la risposta
     squillare in tendina — e viceversa.
     """
-    from jenny.bus.events import NOTIFICATION_CHANNEL
-    from jenny.runtime.native_input import _CHANNEL_BY_SOURCE, SOURCE_NOTIFICATION
+    from jafta.bus.events import NOTIFICATION_CHANNEL
+    from jafta.runtime.native_input import _CHANNEL_BY_SOURCE, SOURCE_NOTIFICATION
 
     assert _CHANNEL_BY_SOURCE[SOURCE_FLOATING] == FLOATING_CHANNEL
     assert _CHANNEL_BY_SOURCE[SOURCE_NOTIFICATION] == NOTIFICATION_CHANNEL

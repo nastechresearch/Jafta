@@ -6,10 +6,10 @@ import asyncio
 from contextlib import suppress
 from typing import Any
 
-from jenny.bus.events import OutboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.channels.dispatcher import WebSocketDispatcher
-from jenny.config.schema import Config
+from jafta.bus.events import OutboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.channels.dispatcher import WebSocketDispatcher
+from jafta.config.schema import Config
 
 
 class MockChannel:
@@ -193,9 +193,9 @@ def test_coordination_flags_are_single_source_for_both_lists() -> None:
     Il dispatcher aggiunge solo ``_mirror``; Telegram usa il core così com'è.
     Un drift fra le liste rompe questo test.
     """
-    from jenny.bus.events import COORDINATION_FLAGS
-    from jenny.channels.dispatcher import _NON_FINAL_METADATA_FLAGS
-    from jenny.channels.telegram import TelegramChannel
+    from jafta.bus.events import COORDINATION_FLAGS
+    from jafta.channels.dispatcher import _NON_FINAL_METADATA_FLAGS
+    from jafta.channels.telegram import TelegramChannel
 
     assert set(_NON_FINAL_METADATA_FLAGS) == set(COORDINATION_FLAGS) | {"_mirror"}
     # Telegram deriva letteralmente dal core, senza ``_mirror``.

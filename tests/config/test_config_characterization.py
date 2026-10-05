@@ -20,7 +20,7 @@ from __future__ import annotations
 # Le manopole di streaming stanno nel layer ``config/runtime_env.py`` insieme a
 # tutti gli altri knob ``JENNY_*``: ``providers/base.py`` ne ri-implementava il
 # parsing, e il posto in cui si viene a sapere quali knob esistono è uno solo.
-from jenny.config.runtime_env import (
+from jafta.config.runtime_env import (
     DEFAULT_FIRST_OUTPUT_TIMEOUT_S,
     DEFAULT_LOCAL_FIRST_OUTPUT_TIMEOUT_S,
     DEFAULT_STREAM_IDLE_TIMEOUT_S,
@@ -66,7 +66,7 @@ def test_first_output_budget_is_longer_than_the_inter_chunk_idle() -> None:
 
 def test_config_schema_resolves_tool_subconfigs() -> None:
     """La dance model_rebuild produce un Config con i sub-config dei tool risolti."""
-    from jenny.config.schema import Config
+    from jafta.config.schema import Config
 
     cfg = Config()
     assert cfg.tools is not None

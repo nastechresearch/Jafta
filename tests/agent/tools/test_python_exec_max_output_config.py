@@ -10,8 +10,8 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
-from jenny.agent.tools.python_exec import PythonExecTool
-from jenny.config.schema import PythonExecConfig
+from jafta.agent.tools.python_exec import PythonExecTool
+from jafta.config.schema import PythonExecConfig
 
 
 def _tool(ws, limit: int) -> PythonExecTool:
@@ -36,7 +36,7 @@ async def test_an_explicit_argument_still_wins(tmp_path) -> None:
 
 async def test_write_stdin_defaults_to_the_configured_ceiling(tmp_path) -> None:
     """Un poll senza ``max_output_chars`` usa il tetto di config, come ``python_exec``."""
-    from jenny.agent.tools.exec_session import ExecSessionManager, WriteStdinTool
+    from jafta.agent.tools.exec_session import ExecSessionManager, WriteStdinTool
 
     cfg = PythonExecConfig(max_output_chars=50_000)
     ctx = SimpleNamespace(

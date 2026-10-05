@@ -1,4 +1,4 @@
-"""Copertura complementare per ``jenny.session.turn_continuation``.
+"""Copertura complementare per ``jafta.session.turn_continuation``.
 
 ``test_turn_continuation.py`` copre gia' il percorso felice di ``maybe_continue_turn``,
 il round limit e le combinazioni principali di ``should_stream_budget_response`` /
@@ -13,9 +13,9 @@ from __future__ import annotations
 import asyncio
 from types import SimpleNamespace
 
-from jenny.bus.events import InboundMessage
-from jenny.session.goal_state import GOAL_STATE_KEY
-from jenny.session.turn_continuation import (
+from jafta.bus.events import InboundMessage
+from jafta.session.goal_state import GOAL_STATE_KEY
+from jafta.session.turn_continuation import (
     INTERNAL_CONTINUATION_META,
     INTERNAL_CONTINUATION_PENDING_META,
     SKIP_USER_PERSIST_META,

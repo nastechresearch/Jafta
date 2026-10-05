@@ -1,9 +1,9 @@
 """La coda di una risposta in casa: il Copia e i secondi, su una riga sola.
 
 Il 21/09/2026, guardando la casa sul telefono: «non c'è separazione tra i vari
-messaggi di jenny, sembra un messaggione unico». È vero, e non è un difetto di
-spaziatura. In casa Jenny non ha una bolla attorno al testo — è una scelta, sta
-scritta in `home-style.css`: «quello che risponde Jenny non è in una scatola,
+messaggi di jafta, sembra un messaggione unico». È vero, e non è un difetto di
+spaziatura. In casa Jafta non ha una bolla attorno al testo — è una scelta, sta
+scritta in `home-style.css`: «quello che risponde Jafta non è in una scatola,
 è testo sulla pagina, come una lettera». Quattro risposte di fila sono quindi
 quattro gruppi di paragrafi separati da 10 px, e l'occhio le legge come una.
 
@@ -25,7 +25,7 @@ from pathlib import Path
 
 from support.js_harness import member, requires_node, run_js
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 HOME_CHAT_JS = ASSETS / "home-chat.js"
 HOME_CSS = ASSETS / "home-style.css"
 
@@ -149,7 +149,7 @@ def test_without_a_measured_turn_only_copy_remains() -> None:
 
 
 def test_a_silent_turn_gets_no_tail() -> None:
-    """Un turno in cui Jenny ha solo lavorato non ha testo da copiare — e una
+    """Un turno in cui Jafta ha solo lavorato non ha testo da copiare — e una
     coda sotto il nulla sarebbe un confine attorno a niente."""
     _run_js("""
       const c = makeChat();

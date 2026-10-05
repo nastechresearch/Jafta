@@ -21,12 +21,12 @@ import os
 
 import pytest
 
-from jenny.security.workspace_policy import (
+from jafta.security.workspace_policy import (
     UNRESTRICTED,
     WorkspaceBoundaryError,
     resolve_allowed_path,
 )
-from jenny.webui.workspace_files import validate_path
+from jafta.webui.workspace_files import validate_path
 
 
 @pytest.fixture

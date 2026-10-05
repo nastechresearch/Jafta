@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Jafta</title>
+
+<!-- Il primo avvio. Un documento suo e di nessun altro: non e' una pagina della
+     casa ne' un modo dell'officina. Ci si arriva quando `/api/settings` dice
+     `first_run` (v. `shared/first-run.js`), e se ne esce solo finendo il
+     wizard, verso la casa. Non c'e' un dock ne' una fila di pagine, quindi
+     non c'e' niente da bloccare mentre lo si compila.
+
+     Stessa CSP dei due gusci (`_SHELL_DOCUMENTS` in jafta/webui/ws_http.py):
+     nessuno script inline. -->
+
+<!-- Pre-render: tema e lingua prima del primo paint, come nei due gusci. -->
+<script src="/html-mobile/assets/bootstrap.js"></script>
+<!-- Il ponte col guscio Android, ricomposto in window.JennyNative prima che
+     giri qualunque modulo: la carta della batteria e il ripristino da backup lo
+     usano. -->
+<script src="/html-mobile/assets/shared/native-bridge.js"></script>
+
+<link href="/html-mobile/assets/vendor/fonts/google-fonts.css" rel="stylesheet">
+<link href="/html-mobile/assets/vendor/fonts/theme-fonts.css" rel="stylesheet">
+<link rel="stylesheet" href="/html-mobile/assets/vendor/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+
+<!-- I token dei temi e gli stili del wizard stanno in mobile-style.css, lo
+     stesso foglio che carica anche la casa. -->
+<link rel="stylesheet" href="/html-mobile/assets/mobile-style.css">
+</head>
+<body class="onboarding">
+
+<main id="view-onboarding">
+  <div class="onboarding-content" id="onboarding-content"></div>
+</main>
+
+<script type="module" src="/html-mobile/assets/onboarding-app.js"></script>
+</body>
+</html>

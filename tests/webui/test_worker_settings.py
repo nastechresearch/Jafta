@@ -27,14 +27,14 @@ import pytest
 from support.gateway_http import make_request
 from websockets.http11 import Request as WsRequest
 
-from jenny.channels.http_utils import check_api_secret, http_error, http_json_response, parse_query
-from jenny.config.loader import load_config, save_config
-from jenny.config.schema import Config, DreamConfig, GardenerConfig
-from jenny.runtime.context import get_runtime_context
-from jenny.webui import worker_settings
-from jenny.webui.settings_api import WebUISettingsError, settings_payload
-from jenny.webui.settings_routes import WebUISettingsRouter
-from jenny.webui.worker_settings import (
+from jafta.channels.http_utils import check_api_secret, http_error, http_json_response, parse_query
+from jafta.config.loader import load_config, save_config
+from jafta.config.schema import Config, DreamConfig, GardenerConfig
+from jafta.runtime.context import get_runtime_context
+from jafta.webui import worker_settings
+from jafta.webui.settings_api import WebUISettingsError, settings_payload
+from jafta.webui.settings_routes import WebUISettingsRouter
+from jafta.webui.worker_settings import (
     REVIEW_CADENCE_FLOOR,
     update_memory_settings,
     update_worker_settings,
@@ -168,7 +168,7 @@ def test_a_file_that_cannot_be_measured_does_not_close_the_screen(
     config_path, monkeypatch
 ) -> None:
     """La misura salta, il resto no: qui si spengono i lavoratori."""
-    import jenny.agent.memory_budget as memory_budget
+    import jafta.agent.memory_budget as memory_budget
 
     def _boom(*_args, **_kwargs):
         raise OSError("disco andato")
@@ -222,7 +222,7 @@ async def test_a_value_that_did_not_change_does_not_rewrite_the_file(
     config_path, monkeypatch
 ) -> None:
     """Il ``.bak`` non deve ruotare per nulla: era il comportamento del comando."""
-    from jenny.config import store
+    from jafta.config import store
 
     writes: list[str] = []
     real_save = store.save_config
@@ -407,7 +407,7 @@ async def test_a_read_only_request_rotates_no_backup(config_path) -> None:
     """Una richiesta che non cambia niente non deve far ruotare il ``.bak``: il
     backup è la rete di salvataggio di ``config.json``, e riempirlo con copie
     identiche vuol dire perdere la sola versione che serviva."""
-    from jenny.config.loader import _backup_path
+    from jafta.config.loader import _backup_path
 
     before = config_path.read_bytes()
 

@@ -1,4 +1,4 @@
-"""Test per ``jenny.agent.cron_turns.CronTurnCoordinator``.
+"""Test per ``jafta.agent.cron_turns.CronTurnCoordinator``.
 
 Copre la costruzione/gestione dei turni cron: submit (publish vs dispatch a
 seconda dello stato del loop), completamento della future in attesa, il
@@ -12,10 +12,10 @@ import asyncio
 
 import pytest
 
-from jenny.agent.cron_turns import CronTurnCoordinator
-from jenny.agent.turn_types import TurnOutcome
-from jenny.bus.events import InboundMessage, OutboundMessage
-from jenny.cron.session_turns import CRON_DEFER_UNTIL_IDLE_META, CRON_TRIGGER_META
+from jafta.agent.cron_turns import CronTurnCoordinator
+from jafta.agent.turn_types import TurnOutcome
+from jafta.bus.events import InboundMessage, OutboundMessage
+from jafta.cron.session_turns import CRON_DEFER_UNTIL_IDLE_META, CRON_TRIGGER_META
 
 
 def _cron_msg(

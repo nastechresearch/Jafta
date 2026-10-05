@@ -22,7 +22,7 @@ from support.js_harness import requires_node, run_js
 
 VIEW_JS = (
     Path(__file__).resolve().parents[2]
-    / "jenny" / "templates" / "ui" / "assets" / "shared" / "cron-view.js"
+    / "jafta" / "templates" / "ui" / "assets" / "shared" / "cron-view.js"
 )
 
 
@@ -519,7 +519,7 @@ def _predicate_of_hands() -> str:
 
     src = (
         Path(__file__).resolve().parents[2]
-        / "jenny" / "templates" / "ui" / "assets" / "mobile-settings.js"
+        / "jafta" / "templates" / "ui" / "assets" / "mobile-settings.js"
     ).read_text(encoding="utf-8")
     m = re.search(r"^export const HANDS_JOBS = (.+);$", src, re.M)
     assert m, "HANDS_JOBS non si trova piu' in mobile-settings.js"
@@ -529,7 +529,7 @@ def _predicate_of_hands() -> str:
 def test_the_hands_drawer_keeps_what_she_does_for_you() -> None:
     """I quattro lavori di sistema vanno in tre posti diversi.
 
-    In Mani resta cio' che Jenny fa **per te** quando non glielo stai
+    In Mani resta cio' che Jafta fa **per te** quando non glielo stai
     chiedendo: i tuoi promemoria, e l'heartbeat — che legge le cose che le hai
     lasciato in `HEARTBEAT.md`. `dream` e `gardener` riempiono la memoria e
     stanno accanto a quel che riempiono; `update_check` e' dell'app, e il suo

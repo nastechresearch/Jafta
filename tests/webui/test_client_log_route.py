@@ -9,7 +9,7 @@ from loguru import logger
 from support.gateway_http import AUTH_SECRET, make_handler, make_request
 from websockets.http11 import Request as WsRequest
 
-from jenny.webui.ws_http import GatewayHTTPHandler
+from jafta.webui.ws_http import GatewayHTTPHandler
 
 
 def _make_request(path: str, token: str | None = AUTH_SECRET) -> WsRequest:

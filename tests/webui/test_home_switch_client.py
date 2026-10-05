@@ -25,7 +25,7 @@ from pathlib import Path
 from support.js_harness import function, member, requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 APP_JS = ASSETS / "home-app.js"
 WHO_JS = ASSETS / "home-who.js"
 LIST_JS = ASSETS / "shared" / "conversation-list.js"
@@ -50,7 +50,7 @@ const { projectKey, projectNameOf, isOpenableProjectName } = await import('__LIS
 
 const TRANSLATIONS = __TRANSLATIONS__;
 /* Il nome di lei (`shared/bot-name.js`): qui quello di partenza. */
-const botName = { get: () => 'Jenny', set() {}, onChange() { return () => {}; } };
+const botName = { get: () => 'Jafta', set() {}, onChange() { return () => {}; } };
 const i18n = {
   locale: 'it',
   translations: TRANSLATIONS,
@@ -89,7 +89,7 @@ const document = {
     if (!perId.has(id)) perId.set(id, makeEl('button'));
     return perId.get(id);
   },
-  /* `_setView` dichiara il pavimento di Jenny quando non c'è un composer: la
+  /* `_setView` dichiara il pavimento di Jafta quando non c'è un composer: la
      radice serve solo a ricevere quella proprietà, e il banco la legge. */
   documentElement: {
     style: {
@@ -213,12 +213,12 @@ class App {
       sayJenny: (v) => { this.jennyValue = v; },
       sayModel: (v) => { this.modelValue = v; },
     };
-    /* Il nome di Jenny viaggia con lo stesso payload della finestra
+    /* Il nome di Jafta viaggia con lo stesso payload della finestra
        flottante: una lettura sola per due campi della stessa stanza. */
     this.names = [];
     this.jennyRoom = {
       applyTranslations: () => {},
-      open: () => this.actions.push('jenny aperta'),
+      open: () => this.actions.push('jafta aperta'),
       setFloating: (v) => this.floating.push(v),
       setName: (v) => this.names.push(v),
       value: () => 'piccola',
@@ -255,7 +255,7 @@ class App {
       load: (name) => { this.actions.push('pagine:' + name); return Promise.resolve(); },
     };
     this.files = { count: 0 };
-    this._personalName = 'Jenny';
+    this._personalName = 'Jafta';
     this._settingsGen = 0;
     this._drafts = new Map();
     this._threadFailed = false;
@@ -273,7 +273,7 @@ class App {
       keepBottom: () => {},
     };
     this.activity = { stop: () => this.actions.push('riga ferma') };
-    this.jenny = {
+    this.jafta = {
       el: { classList: { contains: () => this._jennyOut } },
       setOut: (v) => { this._jennyOut = v; this.actions.push('fuori:' + v); },
       setChatOnScreen: (v) => { this.jennyChat = v; },
@@ -540,7 +540,7 @@ def test_the_draft_stays_with_the_conversation_it_was_written_in() -> None:
 
 # ── Il nome nella fila ──────────────────────────────────────────────────────
 #
-# Dal 23/09/2026 il titolo «Jenny ⌄» non c'e' piu': la pagina chat ha il suo
+# Dal 23/09/2026 il titolo «Jafta ⌄» non c'e' piu': la pagina chat ha il suo
 # nome nella fila in alto. Fino al
 # 26/09/2026 era il nome della conversazione che mostrava; ora e' sempre il
 # nome di lei, perche' un quaderno si apre nei Quaderni.
@@ -548,13 +548,13 @@ def test_the_draft_stays_with_the_conversation_it_was_written_in() -> None:
 
 def test_the_chat_page_keeps_her_name_inside_a_notebook() -> None:
     """Una pagina non cambia nome a seconda di cosa ci guardi dentro: la
-    pagina chat si chiamava come il quaderno aperto, e «Jenny» spariva dal
+    pagina chat si chiamava come il quaderno aperto, e «Jafta» spariva dal
     menu. Il resto della chat dice ancora in che quaderno sei."""
     _run_js("""
       const app = home();
       await app.switchConversation(projectKey('piante'));
-      assert.deepEqual(app._chatName(), { name: 'Jenny', color: null });
-      assert.equal(app.input.placeholder, 'Scrivi a Jenny, nel quaderno');
+      assert.deepEqual(app._chatName(), { name: 'Jafta', color: null });
+      assert.equal(app.input.placeholder, 'Scrivi a Jafta, nel quaderno');
       assert.ok(app.emptyText.textContent.includes('resta qui'), app.emptyText.textContent);
     """)
 
@@ -567,9 +567,9 @@ def test_the_house_takes_its_own_name_back() -> None:
       const app = home();
       await app.switchConversation(projectKey('piante'));
       await app.switchConversation(null);
-      assert.deepEqual(app._chatName(), { name: 'Jenny', color: null },
+      assert.deepEqual(app._chatName(), { name: 'Jafta', color: null },
                        'la casa non è un quaderno fra i quaderni');
-      assert.equal(app.input.placeholder, 'Scrivi a Jenny');
+      assert.equal(app.input.placeholder, 'Scrivi a Jafta');
     """)
 
 
@@ -581,7 +581,7 @@ def test_the_chat_page_keeps_its_own_name_while_it_is_lent_to_a_notebook_page() 
       const app = home();
       app.homePages.homeConversation = 'websocket:default';
       sessionManager.currentKey = projectKey('piante');
-      assert.equal(app._chatName().name, 'Jenny');
+      assert.equal(app._chatName().name, 'Jafta');
     """)
 
 
@@ -593,8 +593,8 @@ def test_leaving_closes_the_turn_that_was_running() -> None:
     guardiamo più e verrà scartato: la riga di lavoro resterebbe a girare, e il
     bottone a dire «ferma» senza niente da fermare.
 
-    Jenny non e' in questo elenco perche' il turno lo lascia da se': ascolta lo
-    stesso `chat:switch` (`_releaseTrackedTurn` in `shared/jenny-mascot.js`,
+    Jafta non e' in questo elenco perche' il turno lo lascia da se': ascolta lo
+    stesso `chat:switch` (`_releaseTrackedTurn` in `shared/jafta-mascot.js`,
     provato in `test_chat_scope_client.py`)."""
     _run_js("""
       const app = home();
@@ -848,7 +848,7 @@ def test_leaving_the_chat_puts_jenny_away_and_coming_back_restores_her() -> None
 
 
 def test_a_room_without_a_composer_declares_its_own_floor() -> None:
-    """Il pavimento di Jenny e' il composer, e nelle pagine il composer non
+    """Il pavimento di Jafta e' il composer, e nelle pagine il composer non
     c'e': il suo `offsetHeight` la' e' zero, quindi il token va dichiarato o
     lei appoggia i piedi sul bordo dello schermo. Al ritorno si rimisura."""
     _run_js("""
@@ -976,11 +976,11 @@ def test_switching_conversation_from_the_pages_comes_back_to_the_chat() -> None:
     """)
 
 
-# ── La pagina Impostazioni: «Tu e Jenny» ────────────────────────────────────
+# ── La pagina Impostazioni: «Tu e Jafta» ────────────────────────────────────
 
 
 def test_settings_is_a_page_and_back_from_it_is_the_chat() -> None:
-    """«Tu e Jenny» non e' piu' una stanza sopra le pagine: e' la pagina
+    """«Tu e Jafta» non e' piu' una stanza sopra le pagine: e' la pagina
     Impostazioni (23/09/2026). Aprirla ci porta la pista, e Indietro riporta
     alla chat — **senza uscire dal quaderno**: tornare da una pagina di
     impostazioni non e' un modo di cambiare conversazione."""
@@ -1013,7 +1013,7 @@ def test_the_back_arrow_names_where_you_land() -> None:
       const dice = (room) => { app._setView(room); return app.backBtn.attrs['aria-label']; };
       assert.equal(dice('pages'), i18n.t('home.back.chat'));
       assert.equal(dice('reader'), i18n.t('home.back.pages'), 'dal lettore si torna alle pagine');
-      assert.equal(dice('jenny'), i18n.t('home.back.settings'), 'da lei si torna alle impostazioni');
+      assert.equal(dice('jafta'), i18n.t('home.back.settings'), 'da lei si torna alle impostazioni');
       assert.notEqual(i18n.t('home.back.pages'), i18n.t('home.back.chat'),
                       'le due frasi sono diventate la stessa, e il banco non misura piu\u2019 niente');
     """)
@@ -1100,9 +1100,9 @@ def test_the_way_back_to_the_chat_belongs_to_a_notebook() -> None:
       assert.equal(app.viewSwitch.hidden, false, 'dalle pagine non si torna alla chat');
       app._setView('reader');
       assert.equal(app.viewSwitch.hidden, true, 'nel lettore c\\u2019e\\u2019 l\\u2019interruttore: li\\u2019 il comando e\\u2019 «Modifica»');
-      app._setView('jenny');
+      app._setView('jafta');
       assert.equal(app.viewSwitch.hidden, true, 'l\\u2019interruttore in mezzo alle impostazioni');
-      assert.equal(app.nameEl.textContent, i18n.t('home.jenny.title', { name: 'Jenny' }), 'la testa non dice dove sei');
+      assert.equal(app.nameEl.textContent, i18n.t('home.jafta.title', { name: 'Jafta' }), 'la testa non dice dove sei');
     """)
 
 
@@ -1161,9 +1161,9 @@ def test_her_room_hangs_off_you_and_jenny() -> None:
     _run_js("""
       const app = home();
       app.openJenny();
-      assert.equal(app.view, 'jenny');
-      assert.ok(app.actions.includes('jenny aperta'));
-      assert.equal(app.nameEl.textContent, i18n.t('home.jenny.title', { name: 'Jenny' }), 'la testa non dice dove sei');
+      assert.equal(app.view, 'jafta');
+      assert.ok(app.actions.includes('jafta aperta'));
+      assert.equal(app.nameEl.textContent, i18n.t('home.jafta.title', { name: 'Jafta' }), 'la testa non dice dove sei');
       app.handleHardwareBack();
       assert.equal(app.view, 'chat');
       assert.equal(app.homePages.current, 'settings');
@@ -1197,7 +1197,7 @@ def test_leaving_the_updates_room_stops_its_polling() -> None:
     """)
 
 
-# ── Dove appoggia Jenny, pagina per pagina (23/09/2026) ─────────────────────
+# ── Dove appoggia Jafta, pagina per pagina (23/09/2026) ─────────────────────
 
 
 def test_a_page_without_a_composer_puts_jenny_on_the_floor() -> None:
@@ -1343,7 +1343,7 @@ def test_back_peels_the_layers_of_the_app_page_one_at_a_time() -> None:
       let openApp = true;
       app._appActions = { handleBack: () => { if (!openApp) return false; openApp = false; return true; } };
       app.launcher = { search: { value: 'tel' }, dismiss() { this.search.value = ''; } };
-      for (const id of ['jenny-app-sheet', 'android-app-sheet']) {
+      for (const id of ['jafta-app-sheet', 'android-app-sheet']) {
         const sheet = document.getElementById(id);
         sheet.open = true;
         sheet.close = function () { this.open = false; };
@@ -1374,7 +1374,7 @@ def test_back_leaves_the_moving_mode_without_saving() -> None:
 
 def test_the_row_asks_for_the_app_names_once_and_only_the_light_list() -> None:
     """Lo slug non e' il nome: «todo» invece di «Todo» (telefono, 23/09/2026).
-    Si chiede l'elenco delle Jenny App e basta — non quello delle app Android,
+    Si chiede l'elenco delle Jafta App e basta — non quello delle app Android,
     che porta le icone — una volta, e solo se c'e' un'app appesa."""
     _run_js("""
       const app = home();
@@ -1383,7 +1383,7 @@ def test_the_row_asks_for_the_app_names_once_and_only_the_light_list() -> None:
       app.strip.draw = () => { draws += 1; };
       app.appsSource = () => ({
         jennyApps: [],
-        loadJennyApps: () => { requested.push('jenny'); return Promise.resolve(); },
+        loadJennyApps: () => { requested.push('jafta'); return Promise.resolve(); },
         ensureLoaded: () => requested.push('tutto'),
       });
       app.homePages.pages = [{ id: 'q1', kind: 'conversation', ref: 'project:piante' }];
@@ -1393,7 +1393,7 @@ def test_the_row_asks_for_the_app_names_once_and_only_the_light_list() -> None:
       app._askAppNames();
       app._askAppNames();
       await new Promise((r) => setTimeout(r, 0));
-      assert.deepEqual(requested, ['jenny']);
+      assert.deepEqual(requested, ['jafta']);
       assert.equal(draws, 1, 'la fila non si e ridisegnata coi nomi');
     """)
 
@@ -1457,7 +1457,7 @@ def test_a_room_over_the_chat_hides_it_and_coming_back_clears() -> None:
     _run_js(f"""
       const app = home();
       app.onPageChanged(1, {CHAT});
-      app._setView('jenny');
+      app._setView('jafta');
       window.JennyNative.opened = 0;
       assert.equal(app.isChatOnScreen(), false);
       app._setView('chat');
@@ -1655,7 +1655,7 @@ def test_a_deletion_that_did_not_happen_moves_nothing() -> None:
 
 
 def test_the_personal_conversation_is_named_after_her() -> None:
-    """La fila e i Quaderni dicevano «Jenny» comunque si chiamasse: il nome
+    """La fila e i Quaderni dicevano «Jafta» comunque si chiamasse: il nome
     era il testo fisso dell'intestazione. Ora e' `bot_name`, e i due che lo
     scrivono si ridisegnano quando arriva."""
     _run_js("""
@@ -1844,7 +1844,7 @@ def test_a_title_from_a_save_after_leaving_the_reader_is_dropped() -> None:
 def test_jenny_stands_on_the_real_composer_not_on_a_photo() -> None:
     """Le foto del trasloco sono copie della chat, composer compreso: una
     ricerca per classe poteva trovare quella di una foto prima nel documento,
-    e il pavimento di Jenny si misurava su una copia."""
+    e il pavimento di Jafta si misurava su una copia."""
     _run_js("""
       const app = home();
       const listens = { addEventListener() {} };
@@ -1882,7 +1882,7 @@ def test_every_sheet_that_back_closes_counts_as_something_above() -> None:
     """)
 
 
-# ── Jenny e la sua minichat, fra pagine e stanze ────────────────────────────
+# ── Jafta e la sua minichat, fra pagine e stanze ────────────────────────────
 
 
 def test_a_page_without_composer_sends_her_to_the_edge_with_the_minichat() -> None:
@@ -1924,7 +1924,7 @@ def test_a_room_counts_as_away_even_on_the_chat_page() -> None:
     _run_js("""
       const app = home();
       app._entry = { id: 'chat', kind: 'chat' };
-      app._setView('jenny');
+      app._setView('jafta');
       assert.equal(app.jennyChat, false);
       app._setView('chat');
       assert.equal(app.jennyChat, true);
@@ -1937,7 +1937,7 @@ def test_back_closes_the_minichat_before_an_app_under_it() -> None:
       let closedApp = false;
       app._appActions = { handleBack: () => { closedApp = true; return true; }, isAppOpen: () => true };
       let open = true;
-      app.jenny.handleBack = () => { const was = open; open = false; return was; };
+      app.jafta.handleBack = () => { const was = open; open = false; return was; };
       assert.equal(app._closeOverlays(), true);
       assert.equal(closedApp, false, 'Indietro ha chiuso l\\'app sotto la minichat');
       assert.equal(app._closeOverlays(), true);

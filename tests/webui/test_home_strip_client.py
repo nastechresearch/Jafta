@@ -20,7 +20,7 @@ from pathlib import Path
 from support.js_harness import requires_node, run_module
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 
 pytestmark = requires_node
 
@@ -139,7 +139,7 @@ def _run(body: str) -> None:
                 return this.refuses ? false : { pages: s, order: o };
               },
             };
-            let chatName = { name: 'Jenny', color: null };
+            let chatName = { name: 'Jafta', color: null };
             const changes = [];
             const el = createEl('div');
             let pageCount = null;
@@ -179,7 +179,7 @@ def test_every_page_has_its_name_in_order() -> None:
     le aggiunte col loro."""
     _run("""
       assert.deepEqual(names(), [
-        'home.strip.app', 'Jenny', 'todo', 'piante', 'home.strip.notebooks', 'home.strip.settings',
+        'home.strip.app', 'Jafta', 'todo', 'piante', 'home.strip.notebooks', 'home.strip.settings',
       ]);
     """)
 
@@ -201,7 +201,7 @@ def test_the_page_you_are_on_is_the_big_one_and_says_so() -> None:
 def test_a_notebook_open_in_the_notebooks_turns_the_row_into_its_path() -> None:
     """`‹ QUADERNI › ● piante`, come nelle stanze: un quaderno aperto e' un
     posto dentro i Quaderni. Fino al 26/09/2026 la pagina chat prendeva il nome
-    del quaderno al posto di «Jenny» (deciso il 23/09, poi rivisto)."""
+    del quaderno al posto di «Jafta» (deciso il 23/09, poi rivisto)."""
     _run("""
       homePages.notebooksConversation = 'project:piante';
       homePages.index = 4;
@@ -262,7 +262,7 @@ def test_on_another_page_the_row_is_the_row_even_with_a_notebook_open() -> None:
       homePages.index = 1;
       strip.draw();
       assert.equal(el.children[0].className, 'home-strip-names');
-      assert.equal(names()[1], 'Jenny');
+      assert.equal(names()[1], 'Jafta');
       assert.equal(entries()[4].style['--strip-line'], dotColor('piante'),
                    'la riga dei Quaderni non ha il colore del quaderno aperto');
     """)
@@ -473,7 +473,7 @@ def test_the_lifted_page_sits_under_the_finger() -> None:
 
 
 def test_the_row_is_shipped() -> None:
-    manifest = (ROOT / "jenny" / "utils" / "android_assets.py").read_text(encoding="utf-8")
+    manifest = (ROOT / "jafta" / "utils" / "android_assets.py").read_text(encoding="utf-8")
     assert '"assets/home-strip.js"' in manifest
 
 

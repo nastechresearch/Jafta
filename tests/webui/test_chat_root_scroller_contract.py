@@ -22,7 +22,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-UI = ROOT / "jenny" / "templates" / "ui"
+UI = ROOT / "jafta" / "templates" / "ui"
 ASSETS = UI / "assets"
 APP_JS = (ASSETS / "mobile-app.js").read_text(encoding="utf-8")
 CHAT_JS = (ASSETS / "mobile-chat.js").read_text(encoding="utf-8")
@@ -151,7 +151,7 @@ def test_the_fab_follows_the_composer_without_measuring() -> None:
 
 def test_viewport_anchored_surfaces_become_fixed_in_chat_mode() -> None:
     rule = _rule(
-        ":root.mode-chat .jenny-duo,\n:root.mode-chat .drawer,\n"
+        ":root.mode-chat .jafta-duo,\n:root.mode-chat .drawer,\n"
         ":root.mode-chat .drawer-backdrop,\n:root.mode-chat .swipe-scrim"
     )
     assert "position: fixed" in rule
@@ -163,7 +163,7 @@ def test_viewport_anchored_surfaces_become_fixed_in_chat_mode() -> None:
 def test_chrome_is_hit_transparent_while_selecting() -> None:
     rule = _rule(
         ":root.has-selection .chat-bottom,\n:root.has-selection .dock,\n"
-        ":root.has-selection .jenny-duo"
+        ":root.has-selection .jafta-duo"
     )
     assert "pointer-events: none" in rule
 

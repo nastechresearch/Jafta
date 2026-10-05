@@ -1,10 +1,10 @@
-"""Test per jenny.utils.prompt_templates — rendering Jinja2 dei prompt di sistema.
+"""Test per jafta.utils.prompt_templates — rendering Jinja2 dei prompt di sistema.
 
-I template sotto ``jenny/templates/`` cambiano il comportamento dell'agente
+I template sotto ``jafta/templates/`` cambiano il comportamento dell'agente
 esattamente come codice: qui copriamo il rendering (variabili sostituite,
 ``strip``, ``{% include %}``, template mancante -> errore chiaro) e un guard
 che ogni nome di template referenziato via ``render_template(...)`` nel
-pacchetto ``jenny`` esista davvero su disco (un refuso nel nome sarebbe un
+pacchetto ``jafta`` esista davvero su disco (un refuso nel nome sarebbe un
 ``TemplateNotFound`` silenzioso solo a runtime).
 """
 
@@ -16,10 +16,10 @@ from pathlib import Path
 import jinja2
 import pytest
 
-from jenny.utils import prompt_templates
-from jenny.utils.prompt_templates import render_template
+from jafta.utils import prompt_templates
+from jafta.utils.prompt_templates import render_template
 
-_JENNY_PACKAGE_ROOT = Path(__file__).resolve().parents[2] / "jenny"
+_JENNY_PACKAGE_ROOT = Path(__file__).resolve().parents[2] / "jafta"
 _BUNDLED_TEMPLATES_ROOT = _JENNY_PACKAGE_ROOT / "templates"
 
 
@@ -32,7 +32,7 @@ def _isolated_template_root(tmp_path, monkeypatch):
     sempre la root del ``FileSystemLoader``. Puliamo prima e dopo ogni test
     per isolare completamente ciascun caso.
     """
-    from jenny.runtime.context import get_runtime_context
+    from jafta.runtime.context import get_runtime_context
 
     monkeypatch.setattr(get_runtime_context(), "workspace_dir", tmp_path)
     prompt_templates._environment.cache_clear()
@@ -64,7 +64,7 @@ def test_substitutes_single_variable(tmp_path):
     # NB: il kwarg si chiama "person", non "name" — "name" è già il primo
     # parametro posizionale di render_template() (il nome del template).
     _write_template(tmp_path, "greet.md", "Hello, {{ person }}!\n")
-    assert render_template("greet.md", person="Jenny") == "Hello, Jenny!"
+    assert render_template("greet.md", person="Jafta") == "Hello, Jafta!"
 
 
 def test_substitutes_multiple_variables(tmp_path):
@@ -186,14 +186,14 @@ def test_missing_template_error_names_the_template_not_a_generic_message(tmp_pat
 
 # ---------------------------------------------------------------------------
 # Guard: ogni nome di template referenziato via render_template() nel codice
-# esiste realmente nel pacchetto bundled jenny/templates/ (non nella tmp_path
+# esiste realmente nel pacchetto bundled jafta/templates/ (non nella tmp_path
 # di isolamento di questo test: qui vogliamo verificare i file reali del repo).
 # ---------------------------------------------------------------------------
 
 
 def _literal_template_names_referenced_in_source() -> set[str]:
     """Estrae, via regex, tutti i letterali passati come primo argomento a
-    ``render_template(...)`` nel sorgente del pacchetto ``jenny``.
+    ``render_template(...)`` nel sorgente del pacchetto ``jafta``.
 
     Deliberatamente semplice (nessun parsing AST): cattura sia la forma
     single-line (``render_template("x.md", ...)``) sia quella multi-linea con

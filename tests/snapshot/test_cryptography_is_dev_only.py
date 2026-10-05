@@ -3,7 +3,7 @@
 Su Android il backend crypto è ``javax.crypto`` (Chaquopy); pyca/``cryptography``
 ha binding nativi e non deve MAI entrare nei requirements Android. L'unico uso
 consentito è l'import lazy (dentro funzione) in ``crypto_backends/dev.py``:
-un import a livello modulo in un punto qualunque di ``jenny/`` farebbe
+un import a livello modulo in un punto qualunque di ``jafta/`` farebbe
 esplodere l'app al primo import sul device.
 """
 
@@ -12,7 +12,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-JENNY_DIR = Path(__file__).resolve().parents[2] / "jenny"
+JENNY_DIR = Path(__file__).resolve().parents[2] / "jafta"
 
 # Import a colonna zero = import a livello modulo (quelli lazy sono indentati).
 _TOP_LEVEL_IMPORT = re.compile(r"^(import cryptography|from cryptography[. ])")

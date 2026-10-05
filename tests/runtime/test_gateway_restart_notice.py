@@ -11,7 +11,7 @@ registra ogni ``PendingIntent`` di una notifica con
 ``TEMPORARY_ALLOWLIST_TYPE_FOREGROUND_SERVICE_ALLOWED`` (AOSP
 ``android14-release`` e ``main``), e ``PendingIntentRecord.sendInner`` applica
 l'allowlist prima di ``startServiceInPackage``. Quindi, quando l'avvio viene
-rifiutato e nessuna sveglia esatta lo riproverà, Jenny posta «Jenny è ferma —
+rifiutato e nessuna sveglia esatta lo riproverà, Jafta posta «Jafta è ferma —
 tocca per riavviarla», e la toglie quando il service torna in foreground.
 
 Il Kotlin in CI non gira: si leggono i sorgenti col solo codice

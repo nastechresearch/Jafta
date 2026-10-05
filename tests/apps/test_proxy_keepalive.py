@@ -16,8 +16,8 @@ import asyncio
 
 import pytest
 
-from jenny.apps import proxy as proxy_mod
-from jenny.apps.proxy import COOKIE_NAME, AppViewProxy
+from jafta.apps import proxy as proxy_mod
+from jafta.apps.proxy import COOKIE_NAME, AppViewProxy
 
 
 class _KeepAliveUpstream:

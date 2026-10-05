@@ -1,6 +1,6 @@
 """Test delle route ``/api/workspace/*`` (file-manager del workspace).
 
-``jenny/webui/workspace_routes.py`` non aveva ancora test dedicati: qui si
+``jafta/webui/workspace_routes.py`` non aveva ancora test dedicati: qui si
 copre auth 401, il gate ``workspace.enabled`` (503), il rispetto di
 ``allow_write``, i path felici di ogni operazione e il rifiuto del path
 traversal (delegato a ``workspace_files.validate_path``).
@@ -20,11 +20,11 @@ import pytest
 from support.gateway_http import make_request
 from websockets.http11 import Request as WsRequest
 
-from jenny.channels.http_utils import check_api_secret
-from jenny.config.loader import load_config, save_config
-from jenny.config.schema import Config
-from jenny.runtime.context import get_runtime_context
-from jenny.webui.workspace_routes import WorkspaceRoutes
+from jafta.channels.http_utils import check_api_secret
+from jafta.config.loader import load_config, save_config
+from jafta.config.schema import Config
+from jafta.runtime.context import get_runtime_context
+from jafta.webui.workspace_routes import WorkspaceRoutes
 
 _SECRET = "s3cr3t-workspace"
 
@@ -273,8 +273,8 @@ async def test_list_keeps_user_content_visible_with_default_patterns(
 async def test_list_uses_internal_manifest_patterns(
     routes: WorkspaceRoutes, workspace_root: Path, config_path: Path
 ) -> None:
-    (workspace_root / ".jenny").mkdir()
-    (workspace_root / ".jenny" / "internal.json").write_text(
+    (workspace_root / ".jafta").mkdir()
+    (workspace_root / ".jafta" / "internal.json").write_text(
         json.dumps({"patterns": ["secret.txt"]}), encoding="utf-8"
     )
     (workspace_root / "secret.txt").write_text("shh", encoding="utf-8")
@@ -319,8 +319,8 @@ async def test_list_works_when_workspace_root_is_a_symlink(
 async def test_list_falls_back_to_default_on_malformed_manifest(
     routes: WorkspaceRoutes, workspace_root: Path, config_path: Path
 ) -> None:
-    (workspace_root / ".jenny").mkdir()
-    (workspace_root / ".jenny" / "internal.json").write_text("{not json", encoding="utf-8")
+    (workspace_root / ".jafta").mkdir()
+    (workspace_root / ".jafta" / "internal.json").write_text("{not json", encoding="utf-8")
     (workspace_root / "normal.txt").write_text("hi", encoding="utf-8")
     response = await routes.dispatch(_request("/api/workspace/list"), "/api/workspace/list")
     assert response.status_code == 200
@@ -568,7 +568,7 @@ def test_a_name_that_is_not_utf8_still_gets_a_header() -> None:
     ``quote`` li rifiutava con ``UnicodeEncodeError`` — 500 invece del file. Il
     byte che non si decodifica diventa U+FFFD nel ``filename*`` e ``_`` nel
     ripiego. Diretto sulla funzione: macOS un nome cosi' non lo crea."""
-    from jenny.webui.workspace_routes import content_disposition
+    from jafta.webui.workspace_routes import content_disposition
 
     name = b"foto-\xe9t\xe9.jpg".decode("utf-8", "surrogateescape")
     disposition = content_disposition(name)
@@ -622,7 +622,7 @@ async def test_the_disk_work_runs_off_the_event_loop(
     grande sul loop fermava il gateway per tutti."""
     import threading
 
-    from jenny.webui import workspace_files
+    from jafta.webui import workspace_files
 
     (workspace_root / "a.txt").write_text("ciao", encoding="utf-8")
     loop_thread = threading.get_ident()

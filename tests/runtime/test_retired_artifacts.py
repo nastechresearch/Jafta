@@ -10,7 +10,7 @@ from pathlib import Path
 
 from loguru import logger as loguru_logger
 
-from jenny.runtime.retired_artifacts import sweep_retired_artifacts
+from jafta.runtime.retired_artifacts import sweep_retired_artifacts
 
 
 def _legacy_workspace(tmp_path: Path) -> Path:

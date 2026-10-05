@@ -24,7 +24,7 @@ from typing import Any
 
 import pytest
 
-from jenny.webui.transcript_replay import replay_transcript_to_ui_messages
+from jafta.webui.transcript_replay import replay_transcript_to_ui_messages
 
 GOLDEN = Path(__file__).parent / "data" / "transcript_replay_golden.json"
 

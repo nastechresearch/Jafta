@@ -27,7 +27,7 @@ import ast
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-CHANNELS = ROOT / "jenny" / "channels"
+CHANNELS = ROOT / "jafta" / "channels"
 
 # ``snake_case``: niente spazi, niente maiuscole, niente punteggiatura. È ciò che
 # distingue una parola per la macchina da una frase per una persona.

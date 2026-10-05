@@ -25,9 +25,9 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.memory import Consolidator, MemoryStore
-from jenny.session.keys import UNIFIED_SESSION_KEY
-from jenny.session.manager import SessionManager
+from jafta.agent.memory import Consolidator, MemoryStore
+from jafta.session.keys import UNIFIED_SESSION_KEY
+from jafta.session.manager import SessionManager
 
 PROJECT_NAME = "palestra"
 PROJECT_KEY = f"project:{PROJECT_NAME}"
@@ -272,7 +272,7 @@ class TestTheProjectsSubdirIsInjected:
         il test sopra resta verde e il difetto torna in produzione."""
         import inspect
 
-        from jenny.agent.loop import AgentLoop
+        from jafta.agent.loop import AgentLoop
 
         source = inspect.getsource(AgentLoop.__init__)
         consolidator_call = source.split("self.consolidator = Consolidator(")[1]
@@ -291,7 +291,7 @@ def test_the_loop_passes_the_configured_subdir_to_autocompact():
     """
     import inspect
 
-    from jenny.agent.loop import AgentLoop
+    from jafta.agent.loop import AgentLoop
 
     source = inspect.getsource(AgentLoop.__init__)
     call = source.split("self.auto_compact = AutoCompact(")[1].split(")")[0]

@@ -1,4 +1,4 @@
-"""``<workspace>/.jenny/media`` e la cassetta di lettura di Dream (T9.10).
+"""``<workspace>/.jafta/media`` e la cassetta di lettura di Dream (T9.10).
 
 T9.2 ha spento la media dir nella cassetta del **giardiniere**, e il passo dopo
 chiedeva di guardare quella che ha «la forma identica». Non l'ha: la radice
@@ -34,9 +34,9 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.memory import MemoryStore
-from jenny.config.paths import get_media_dir, get_workspace_path
-from jenny.security.workspace_access import (
+from jafta.agent.memory import MemoryStore
+from jafta.config.paths import get_media_dir, get_workspace_path
+from jafta.security.workspace_access import (
     bind_workspace_scope,
     default_workspace_scope,
     reset_workspace_scope,
@@ -49,7 +49,7 @@ _SECRET = "appunto personale di un'altra conversazione"
 
 @pytest.fixture
 def media_note() -> Iterator[Path]:
-    """Un file dentro ``<workspace>/.jenny/media``, con lo scope di default legato.
+    """Un file dentro ``<workspace>/.jafta/media``, con lo scope di default legato.
 
     Lo scope legato è la forma di produzione: una passata interna gira con lo
     scope di default (l'installazione), non con quello di un progetto.
@@ -80,7 +80,7 @@ async def test_dreams_read_box_reaches_the_media_dir(media_note: Path) -> None:
     """La cassetta vera di Dream, non una ricostruita a mano."""
     tools = MemoryStore(get_workspace_path()).build_dream_tools()
 
-    out = await tools.get("read_file").execute(path=".jenny/media/segreto-t910.md")
+    out = await tools.get("read_file").execute(path=".jafta/media/segreto-t910.md")
 
     assert _SECRET in out, out
 
@@ -105,7 +105,7 @@ async def test_the_flag_is_inert_in_dreams_box(media_note: Path) -> None:
     tools = MemoryStore(get_workspace_path()).build_dream_tools()
 
     out = await _with_the_flag_off(tools.get("read_file")).execute(
-        path=".jenny/media/segreto-t910.md"
+        path=".jafta/media/segreto-t910.md"
     )
 
     assert _SECRET in out, out

@@ -17,7 +17,7 @@ from pathlib import Path
 
 from support.js_harness import member, requires_node, run_js
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 APP_JS = ASSETS / "home-app.js"
 
 pytestmark = requires_node
@@ -100,7 +100,7 @@ const api = {{
     reads += 1;
     if (hold) await hold;
     if (failNext) {{ failNext = false; throw new Error('rete'); }}
-    return {{ version: {{ current: version }}, agent: {{ bot_name: 'Jenny' }} }};
+    return {{ version: {{ current: version }}, agent: {{ bot_name: 'Jafta' }} }};
   }},
 }};
 console.warn = () => {{}};

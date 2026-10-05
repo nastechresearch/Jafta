@@ -13,7 +13,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-CHAT = ROOT / "jenny" / "templates" / "ui" / "assets" / "mobile-chat.js"
+CHAT = ROOT / "jafta" / "templates" / "ui" / "assets" / "mobile-chat.js"
 
 
 def _calls(source: str) -> list[str]:

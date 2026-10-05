@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.tools.apply_patch import ApplyPatchTool
+from jafta.agent.tools.apply_patch import ApplyPatchTool
 
 
 def _stats(result: str, path: str) -> tuple[int, int]:

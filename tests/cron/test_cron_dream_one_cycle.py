@@ -17,10 +17,10 @@ from unittest.mock import MagicMock
 import pytest
 from support.aio import wait_until
 
-from jenny.agent import dream_cycle
-from jenny.agent.tools.file_state import FileStates
-from jenny.config.schema import Config
-from jenny.runtime.cron_dispatch import CronDispatcher
+from jafta.agent import dream_cycle
+from jafta.agent.tools.file_state import FileStates
+from jafta.config.schema import Config
+from jafta.runtime.cron_dispatch import CronDispatcher
 
 _DREAM_JOB = SimpleNamespace(
     name="dream", id="dream", payload=SimpleNamespace(kind="system_event")

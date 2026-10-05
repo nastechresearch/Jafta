@@ -1,6 +1,6 @@
-"""``jenny.cron.cronexpr``: le espressioni cron senza ``croniter``.
+"""``jafta.cron.cronexpr``: le espressioni cron senza ``croniter``.
 
-``croniter`` è uscita da Jenny perché, appena importata, chiamava
+``croniter`` è uscita da Jafta perché, appena importata, chiamava
 ``platform.architecture()``, che su Linux lancia ``file`` come sottoprocesso:
 sotto Android il figlio nato con ``vfork`` resettava il gestore di SIGSEGV di
 ART, e a ogni avvio del gateway il log si prendeva novanta righe d'errore
@@ -44,7 +44,7 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
-from jenny.cron.cronexpr import next_after, parse
+from jafta.cron.cronexpr import next_after, parse
 
 ROOT = Path(__file__).resolve().parents[2]
 SAMPLES = Path(__file__).parent / "fixtures" / "cronexpr_croniter_samples.json"
@@ -359,8 +359,8 @@ def test_computing_a_run_launches_no_process_and_imports_no_croniter() -> None:
         "events = []\n"
         "sys.addaudithook(lambda ev, args: events.append(ev) if ev in "
         "('subprocess.Popen', 'os.posix_spawn', 'os.fork', 'os.exec', 'os.system') else None)\n"
-        "from jenny.cron.service import _compute_next_run\n"
-        "from jenny.cron.types import CronSchedule\n"
+        "from jafta.cron.service import _compute_next_run\n"
+        "from jafta.cron.types import CronSchedule\n"
         "nxt = _compute_next_run(CronSchedule(kind='cron', expr='0 9 * * 1', tz='Europe/Rome'), "
         "1790000000000)\n"
         "assert nxt and nxt > 1790000000000, nxt\n"

@@ -12,9 +12,9 @@ from __future__ import annotations
 
 import asyncio
 
-from jenny.bus.events import InboundMessage
-from jenny.providers.base import LLMResponse, ToolCallRequest
-from jenny.session.manager import SessionManager
+from jafta.bus.events import InboundMessage
+from jafta.providers.base import LLMResponse, ToolCallRequest
+from jafta.session.manager import SessionManager
 from tests.support.agent import make_loop, make_provider
 from tests.support.aio import wait_until
 

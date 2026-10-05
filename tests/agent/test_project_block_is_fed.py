@@ -41,11 +41,11 @@ import importlib
 import pathlib
 from unittest.mock import MagicMock
 
-from jenny.agent.context import ContextBuilder
-from jenny.agent.subagent import SubagentManager
-from jenny.bus.queue import MessageBus
-from jenny.providers.base import LLMProvider
-from jenny.session.manager import SessionManager
+from jafta.agent.context import ContextBuilder
+from jafta.agent.subagent import SubagentManager
+from jafta.bus.queue import MessageBus
+from jafta.providers.base import LLMProvider
+from jafta.session.manager import SessionManager
 
 _MAP = "# casa\n\n## Pagine\n\n- [[furgone]] — il Ducato\n"
 _PAGES = {"furgone.md": "---\nstate: open\n---\n\n# Furgone\n\nDucato 2011, turbo da cambiare."}
@@ -147,7 +147,7 @@ def _declared_vars(name: str) -> set[str]:
     """
     from jinja2 import meta
 
-    from jenny.utils.prompt_templates import _environment
+    from jafta.utils.prompt_templates import _environment
 
     env = _environment()
     pending, seen, names = [name], set(), set()
@@ -186,8 +186,8 @@ def test_every_variable_the_two_templates_declare_is_fed(tmp_path, monkeypatch) 
     percorso del subagent.
     """
     project = _wiki(tmp_path)
-    context_fed = _fed_vars(monkeypatch, "jenny.agent.context")
-    subagent_fed = _fed_vars(monkeypatch, "jenny.agent.subagent")
+    context_fed = _fed_vars(monkeypatch, "jafta.agent.context")
+    subagent_fed = _fed_vars(monkeypatch, "jafta.agent.subagent")
 
     ContextBuilder(tmp_path).build_system_prompt(
         workspace=project, session_key="project:casa"
@@ -215,7 +215,7 @@ def test_the_gate_would_notice_a_renamed_variable(tmp_path, monkeypatch) -> None
     alimenta. Senza questo, un ``_declared_vars`` che tornasse vuoto per una
     ragione qualunque farebbe passare il test qui sopra per sempre."""
     project = _wiki(tmp_path)
-    context_fed = _fed_vars(monkeypatch, "jenny.agent.context")
+    context_fed = _fed_vars(monkeypatch, "jafta.agent.context")
 
     ContextBuilder(tmp_path).build_system_prompt(
         workspace=project, session_key="project:casa"

@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.agent.tools.self import MyTool
+from jafta.agent.tools.self import MyTool
 
 
 @pytest.mark.asyncio

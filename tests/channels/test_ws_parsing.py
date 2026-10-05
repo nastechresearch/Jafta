@@ -10,7 +10,7 @@ import pytest
 from websockets.http11 import Headers
 from websockets.http11 import Request as WsRequest
 
-from jenny.channels.ws_parsing import (
+from jafta.channels.ws_parsing import (
     _extract_data_url_mime,
     _is_websocket_upgrade,
     _parse_envelope,

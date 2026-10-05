@@ -11,9 +11,9 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.agent.tools.context import RequestContext
-from jenny.agent.tools.cron import CronTool
-from jenny.agent.tools.registry import ToolRegistry
+from jafta.agent.tools.context import RequestContext
+from jafta.agent.tools.cron import CronTool
+from jafta.agent.tools.registry import ToolRegistry
 
 
 class _SvcStub:

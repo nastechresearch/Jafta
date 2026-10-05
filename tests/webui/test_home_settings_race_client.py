@@ -23,7 +23,7 @@ _HEAD = """
 import assert from 'node:assert/strict';
 import { boot, tick, routes, hooks, ok, $ } from './boot.mjs';
 const before = {
-  agent: { bot_name: 'Jenny', model: 'old-model' }, default_provider: 'anthropic',
+  agent: { bot_name: 'Jafta', model: 'old-model' }, default_provider: 'anthropic',
   providers: [{ name: 'anthropic', api_key_hint: 'sk-1' }, { name: 'openai', api_key_hint: 'sk-2' }],
   version: {}, backup: {},
 };

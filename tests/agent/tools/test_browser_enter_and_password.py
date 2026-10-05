@@ -20,8 +20,8 @@ import pathlib
 import pytest
 from support.js_harness import member, requires_node, run_js
 
-from jenny.agent.tools import browser
-from jenny.agent.tools.browser import BrowserDoTool
+from jafta.agent.tools import browser
+from jafta.agent.tools.browser import BrowserDoTool
 from tests.agent.tools.test_browser import _install, _tool
 
 _JS = pathlib.Path(__file__).resolve().parents[3] / "android/app/src/main/res/raw/browser_agent.js"

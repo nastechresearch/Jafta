@@ -25,9 +25,9 @@ from typing import Any
 import pytest
 from support.gateway_http import make_handler, make_request
 
-from jenny.session import webui_turns
-from jenny.session.keys import UNIFIED_SESSION_KEY, webui_chat_id, webui_transcript_key
-from jenny.webui.transcript_store import append_transcript_object
+from jafta.session import webui_turns
+from jafta.session.keys import UNIFIED_SESSION_KEY, webui_chat_id, webui_transcript_key
+from jafta.webui.transcript_store import append_transcript_object
 
 _ANNOUNCE = (
     "[Subagent 'wiki-fix' completed successfully]\n\n"
@@ -77,7 +77,7 @@ def _seed_transcript() -> None:
 
 @pytest.fixture
 def handler(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     read_keys: list[str] = []
 
     def read_session_file(key: str) -> dict[str, Any]:
@@ -177,9 +177,9 @@ def test_the_reconstructed_history_drops_old_subagent_returns_too(handler) -> No
 def test_a_user_quoting_a_subagent_line_keeps_the_bubble(tmp_path, monkeypatch) -> None:
     """Il riconoscimento guarda la testa del template, non una parola: chi cita
     una riga d'annuncio in mezzo a un messaggio scrive ancora lui."""
-    from jenny.webui.transcript import build_webui_thread_response
+    from jafta.webui.transcript import build_webui_thread_response
 
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     quoted = "perche' dice [Subagent 'x' failed]?\n\nTask: niente"
     out = build_webui_thread_response(
         "websocket:project:demo",

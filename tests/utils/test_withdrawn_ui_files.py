@@ -11,8 +11,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from jenny.utils.android_assets import _UI_MANIFEST, retire_withdrawn_ui_files
-from jenny.utils.helpers import sync_workspace_templates
+from jafta.utils.android_assets import _UI_MANIFEST, retire_withdrawn_ui_files
+from jafta.utils.helpers import sync_workspace_templates
 
 
 def _write(path: Path, text: str = "x") -> Path:

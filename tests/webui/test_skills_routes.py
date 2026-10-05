@@ -19,7 +19,7 @@ import pytest
 from support.gateway_http import AUTH_SECRET, make_handler, make_request
 from websockets.http11 import Request as WsRequest
 
-from jenny.webui.ws_http import GatewayHTTPHandler
+from jafta.webui.ws_http import GatewayHTTPHandler
 
 
 def _make_request(path_with_query: str, *, token: str | None = AUTH_SECRET) -> WsRequest:
@@ -59,7 +59,7 @@ def _write_skill(
 
 
 def _make_handler(workspace: Path, *, disabled_skills: set[str] | None = None) -> GatewayHTTPHandler:
-    # NB: SkillsLoader (jenny/agent/skills.py) fa workspace_path / "skills"
+    # NB: SkillsLoader (jafta/agent/skills.py) fa workspace_path / "skills"
     # internamente: qui va passata la root del workspace, NON la cartella
     # skills già risolta (a differenza del valore fittizio usato in
     # test_backup_routes.py, dove questo parametro non viene mai usato).
@@ -73,7 +73,7 @@ def env(tmp_path: Path, monkeypatch):
     skills_dir = workspace / "skills"
     skills_dir.mkdir(parents=True)
 
-    from jenny.config import paths as paths_mod
+    from jafta.config import paths as paths_mod
 
     monkeypatch.setattr(paths_mod, "get_workspace_path", lambda: workspace)
 
@@ -154,7 +154,7 @@ def test_list_respects_disabled_skills_configured_on_handler(tmp_path: Path, mon
     _write_skill(skills_dir, "foo")
     _write_skill(skills_dir, "bar")
 
-    from jenny.config import paths as paths_mod
+    from jafta.config import paths as paths_mod
 
     monkeypatch.setattr(paths_mod, "get_workspace_path", lambda: workspace)
 
@@ -170,7 +170,7 @@ def test_list_unexpected_error_maps_to_500_generic(env, monkeypatch) -> None:
     def boom(*_args, **_kwargs):
         raise RuntimeError("boom")
 
-    monkeypatch.setattr("jenny.webui.skills_routes.webui_skills_payload", boom)
+    monkeypatch.setattr("jafta.webui.skills_routes.webui_skills_payload", boom)
 
     response = _dispatch(env.handler, "/api/webui/skills")
     assert response.status_code == 500
@@ -296,7 +296,7 @@ def test_update_unexpected_error_maps_to_500_generic(env, monkeypatch) -> None:
     def boom(*_args, **_kwargs):
         raise RuntimeError("guasto interno inatteso")
 
-    monkeypatch.setattr("jenny.webui.skills_routes.update_workspace_skill", boom)
+    monkeypatch.setattr("jafta.webui.skills_routes.update_workspace_skill", boom)
     response = _dispatch(env.handler, _update_path("foo", disabled="1"))
     assert response.status_code == 500
     assert b"guasto interno inatteso" not in response.body

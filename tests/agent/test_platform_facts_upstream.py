@@ -30,10 +30,10 @@ from pathlib import Path
 
 import pytest
 
-from jenny.utils.android_assets import _SKILLS_MANIFEST, _SYSTEM_PROMPT_TEMPLATES
-from jenny.utils.helpers import load_bundled_template
+from jafta.utils.android_assets import _SKILLS_MANIFEST, _SYSTEM_PROMPT_TEMPLATES
+from jafta.utils.helpers import load_bundled_template
 
-_JENNY = Path(__file__).resolve().parents[2] / "jenny"
+_JENNY = Path(__file__).resolve().parents[2] / "jafta"
 
 
 def _template(name: str) -> str:
@@ -139,7 +139,7 @@ _PLATFORM_FACTS: list[tuple[str, str, str]] = [
     ),
     (
         "agent/tool_contract.md",
-        "il sorgente di jenny si legge con get_source a path puntato",
+        "il sorgente di jafta si legge con get_source a path puntato",
         r"`get_source` by dotted path",
     ),
     # --- types/operator.md: consiglio PER il subagent operator ---
@@ -193,7 +193,7 @@ def test_untrusted_httpx_claim_is_not_reintroduced() -> None:
     ``PythonExecConfig.allowed_modules`` (httpx e urllib sono deliberatamente
     fuori dall'allowlist per SSRF/LFI) e mandava il modello a sbattere.
     """
-    from jenny.config.tool_schemas import PythonExecConfig
+    from jafta.config.tool_schemas import PythonExecConfig
 
     allowed = set(PythonExecConfig().allowed_modules)
     assert "httpx" not in allowed and "urllib" not in allowed
@@ -211,7 +211,7 @@ _PLATFORM_NOTES = "platform-notes"
 def test_platform_notes_is_not_a_bundled_skill() -> None:
     """La destinazione del review pass deve sopravvivere al riavvio.
 
-    ``sync_workspace_templates`` chiama ``extract_package_dir("jenny.skills",
+    ``sync_workspace_templates`` chiama ``extract_package_dir("jafta.skills",
     …)`` **senza** ``skip_existing``: ogni file di una skill bundlata viene
     riscritto dal package a ogni boot. È voluto (le skill bundlate sono
     contenuto di sistema) e non va cambiato — ma significa che tutto ciò che
@@ -226,7 +226,7 @@ def test_platform_notes_is_not_a_bundled_skill() -> None:
     )
     on_disk = (_JENNY / "skills" / _PLATFORM_NOTES)
     assert not on_disk.exists(), (
-        f"jenny/skills/{_PLATFORM_NOTES}/ esiste nel package: la destinazione del "
+        f"jafta/skills/{_PLATFORM_NOTES}/ esiste nel package: la destinazione del "
         "review pass non può essere contenuto di sistema."
     )
 
@@ -284,7 +284,7 @@ def test_soul_routing_row_is_about_jenny_not_the_app() -> None:
 def test_dream_routes_runtime_constraints_away_from_soul() -> None:
     dream = _template("agent/dream.md")
     assert "A runtime constraint is not a behavior rule" in dream
-    assert "does this describe Jenny, or the app?" in dream
+    assert "does this describe Jafta, or the app?" in dream
     assert f"skills/{_PLATFORM_NOTES}/SKILL.md" in dream
 
 
@@ -305,7 +305,7 @@ def test_never_delete_no_longer_protects_platform_text() -> None:
 def test_review_pass_has_the_two_population_test() -> None:
     review = _template("agent/dream_review.md")
     # Il test che il modello può davvero eseguire...
-    assert "does this describe Jenny, or does it describe the app?" in review
+    assert "does this describe Jafta, or does it describe the app?" in review
     # ...e la verifica controllabile contro il prompt stesso.
     assert "is this fact already stated above, in this prompt?" in review
     assert "Always delete" in review
@@ -321,7 +321,7 @@ def test_review_pass_rejects_re_verified_as_a_reason_to_keep() -> None:
 
 def test_review_pass_carries_the_soul_drift_detector() -> None:
     """Nessun ``soul_budget_chars``: un numero in prosa, e solo come sintomo."""
-    from jenny.config.schema import DreamConfig
+    from jafta.config.schema import DreamConfig
 
     assert DreamConfig().soul_budget_chars == 0, (
         "soul_budget_chars deve restare 0: il residuo dopo lo split è identità, "

@@ -9,7 +9,7 @@ cose che la tengono in piedi e che si rompono in silenzio:
   (il composer della casa si chiamava «Allega» per TalkBack);
 - una `<label>` senza testo toglie al campo il nome che il segnaposto gli dava;
 - un'icona Tabler e' un glifo nell'area privata di Unicode: se non e' nascosta,
-  entra nel nome del bottone (« Jenny») o *e'* il nome (`#btn-send`);
+  entra nel nome del bottone (« Jafta») o *e'* il nome (`#btn-send`);
 - le voci del dock erano `<div>`: la tastiera del Titan 2 non ci arrivava.
 """
 
@@ -21,7 +21,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-UI = ROOT / "jenny" / "templates" / "ui"
+UI = ROOT / "jafta" / "templates" / "ui"
 ASSETS = UI / "assets"
 SHELLS = ("index.html", "workshop.html", "onboarding.html")
 
@@ -195,8 +195,8 @@ def test_the_workshop_icon_buttons_carry_a_translated_name() -> None:
 
 _HOME_LABELLED = {
     "home-name": "home-name-label",
-    "home-jenny-visible": "home-jenny-visible-label",
-    "home-jenny-floating": "home-jenny-floating-label",
+    "home-jafta-visible": "home-jafta-visible-label",
+    "home-jafta-floating": "home-jafta-floating-label",
 }
 
 

@@ -26,7 +26,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
-UI = ROOT / "jenny" / "templates" / "ui"
+UI = ROOT / "jafta" / "templates" / "ui"
 ASSETS = UI / "assets"
 
 HEADER = (ASSETS / "mobile-header.js").read_text(encoding="utf-8")
@@ -213,7 +213,7 @@ def test_returning_home_lives_in_one_place_only() -> None:
 
 
 def test_the_pill_carries_a_word_and_not_just_an_icon() -> None:
-    """Una casetta puo' voler dire home, casa o indietro. «Jenny» no."""
+    """Una casetta puo' voler dire home, casa o indietro. «Jafta» no."""
     assert "ibtn-pill" in HEADER, "l'azione verso la casa non e' un pill"
     assert ".ibtn-pill {" in CSS, "ibtn-pill senza stile: sarebbe un quadrato da 36px"
 
@@ -346,7 +346,7 @@ def test_the_fine_cut_has_arrived() -> None:
     `personalization`, e non e' un pezzo di ritaglio andato perso: non stava in
     nessuna tavola, era uno dei due parcheggi dichiarati, e delle sue quattro
     voci tre vivevano gia' in casa (temi, mascotte, finestra flottante). Il
-    nome di Jenny e' andato nella stanza «Jenny» con loro, e la lingua se n'e'
+    nome di Jafta e' andato nella stanza «Jafta» con loro, e la lingua se n'e'
     andata con l'ultimo interruttore che la cambiava. Quindi il conto sceso di
     uno **e'** il taglio, non un suo cedimento — e il controllo qui sotto dice
     proprio quello: personalizzazione in officina non deve tornare.
@@ -372,7 +372,7 @@ def test_the_fine_cut_has_arrived() -> None:
 # bordo dello schermo: nessun titolo, e — visto che il tasto per tornare in
 # casa vive nell'intestazione — nessuna porta verso casa. Adesso ha la stessa
 # intestazione della casa, con due differenze volute: nessuna soprascritta, e
-# il nome e' «Console» invece di «Jenny».
+# il nome e' «Console» invece di «Jafta».
 
 
 def test_the_console_has_its_mount() -> None:
@@ -427,7 +427,7 @@ def test_the_console_has_no_overline() -> None:
 
 
 def test_from_the_console_you_go_back_home() -> None:
-    """Il pill «Jenny», come negli altri tre cassetti.
+    """Il pill «Jafta», come negli altri tre cassetti.
 
     E' la porta che a questa vista mancava del tutto: l'unica per la casa sta
     nell'intestazione, e la chat non ne aveva una.

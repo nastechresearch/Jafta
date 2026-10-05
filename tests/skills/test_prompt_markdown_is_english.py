@@ -1,7 +1,7 @@
 """I Markdown che il modello legge sono in inglese, esempi compresi.
 
 Perché esiste. Il 30/09/2026, sull'emulatore con il telefono in en-US, la
-richiesta «Make me a Jenny App called Miso's Bowl…» ha prodotto un'app tutta in
+richiesta «Make me a Jafta App called Miso's Bowl…» ha prodotto un'app tutta in
 italiano: descrizione, azioni (``registra_pasto``, ``leggi_oggi``), parametri
 (``tipo``, ``grammi``), etichette (``Caricamento…``, ``Salva``). E le risposte in
 chat hanno cominciato a mescolare l'italiano, perché i risultati dei tool
@@ -10,7 +10,7 @@ assenza: ``app-creator`` non diceva quale lingua usare, e ogni esempio che
 mostrava (``Piante``, ``lista_piante``, ``<html lang="it">``) era italiano. Il
 modello imita gli esempi.
 
-Jenny parla inglese di default, quindi nessun ``.md`` sotto ``jenny/`` — skill,
+Jafta parla inglese di default, quindi nessun ``.md`` sotto ``jafta/`` — skill,
 riferimenti, template del prompt — deve portare italiano: nemmeno nel
 frontmatter, che il modello legge per intero con ``read_file``, e nemmeno nei
 commenti Jinja. I riassunti per l'utente delle skill integrate stanno per
@@ -29,9 +29,9 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-JENNY = ROOT / "jenny"
-APP_CREATOR = JENNY / "skills" / "app-creator"
-I18N = JENNY / "templates" / "ui" / "assets" / "i18n"
+JAFTA = ROOT / "jafta"
+APP_CREATOR = JAFTA / "skills" / "app-creator"
+I18N = JAFTA / "templates" / "ui" / "assets" / "i18n"
 
 # Due liste. Le parole «forti» non hanno omografi inglesi e ne basta una; le
 # «deboli» esistono anche in inglese o in un identificatore («con», «nota»,
@@ -63,7 +63,7 @@ def _looks_italian(line: str) -> bool:
 
 
 def _prompt_markdown() -> list[Path]:
-    return sorted(p for p in JENNY.rglob("*.md") if "node_modules" not in p.parts)
+    return sorted(p for p in JAFTA.rglob("*.md") if "node_modules" not in p.parts)
 
 
 def _italian_lines(path: Path) -> list[str]:
@@ -120,12 +120,12 @@ def test_bundled_skill_summaries_live_in_i18n_in_both_languages() -> None:
     — un rename lascerebbe il riassunto orfano e la riga vuota in Mani — e
     nessun ``SKILL.md`` integrato deve riportare ``user_summary``.
     """
-    names = {p.parent.name for p in (JENNY / "skills").glob("*/SKILL.md")}
+    names = {p.parent.name for p in (JAFTA / "skills").glob("*/SKILL.md")}
     for locale in ("it", "en"):
         summaries = json.loads((I18N / f"{locale}.json").read_text(encoding="utf-8"))[
             "skills"
         ]["userSummary"]
         assert set(summaries) <= names, (locale, set(summaries) - names)
         assert all(isinstance(v, str) and v.strip() for v in summaries.values()), locale
-    for path in (JENNY / "skills").glob("*/SKILL.md"):
+    for path in (JAFTA / "skills").glob("*/SKILL.md"):
         assert "user_summary:" not in path.read_text(encoding="utf-8"), path

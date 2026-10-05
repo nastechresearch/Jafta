@@ -1,4 +1,4 @@
-"""Test degli helper media firmati della WebUI (jenny/webui/media_api.py).
+"""Test degli helper media firmati della WebUI (jafta/webui/media_api.py).
 
 Copre firma/verifica HMAC dei path media, lo staging di file fuori dalla
 media root, l'inferenza del "kind" per gli allegati, il mapping degli
@@ -17,7 +17,7 @@ import pytest
 from websockets.http11 import Headers
 from websockets.http11 import Request as WsRequest
 
-from jenny.webui.media_api import (
+from jafta.webui.media_api import (
     b64url_decode,
     b64url_encode,
     media_attachment_kind,
@@ -176,7 +176,7 @@ def test_sign_or_stage_keeps_the_staging_dir_within_its_budget(
     import os
     import time
 
-    monkeypatch.setattr("jenny.webui.media_api.STAGED_MEDIA_BUDGET_BYTES", 250)
+    monkeypatch.setattr("jafta.webui.media_api.STAGED_MEDIA_BUDGET_BYTES", 250)
     provider = _media_dir(media_root)
     staged_dir = media_root / "websocket"
     results = []
@@ -201,7 +201,7 @@ def test_sign_or_stage_keeps_the_staging_dir_within_its_budget(
 def test_sign_or_stage_never_evicts_the_copy_it_just_made(
     tmp_path: Path, media_root: Path, monkeypatch
 ) -> None:
-    monkeypatch.setattr("jenny.webui.media_api.STAGED_MEDIA_BUDGET_BYTES", 10)
+    monkeypatch.setattr("jafta.webui.media_api.STAGED_MEDIA_BUDGET_BYTES", 10)
     src = tmp_path / "big.png"
     src.write_bytes(b"x" * 100)
 
@@ -231,7 +231,7 @@ def test_sign_or_stage_returns_none_and_logs_on_copy_failure(
     def boom(*args, **kwargs):
         raise OSError("disco pieno")
 
-    monkeypatch.setattr("jenny.webui.media_api.shutil.copyfile", boom)
+    monkeypatch.setattr("jafta.webui.media_api.shutil.copyfile", boom)
 
     result = sign_or_stage_media_path(
         outside, secret=_SECRET, media_dir=_media_dir(media_root), logger=logger

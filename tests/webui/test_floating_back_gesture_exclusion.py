@@ -1,6 +1,6 @@
 """L'esclusione dal gesto «indietro» della mascotte flottante sta sulla maniglia.
 
-Parcheggiata, Jenny sporge dal bordo destro per poco meno di metà quadrato:
+Parcheggiata, Jafta sporge dal bordo destro per poco meno di metà quadrato:
 quel che resta visibile sta nella fascia in cui Android legge uno swipe come
 *back*. L'esclusione era sulla finestra di lei, e non valeva niente:
 ``DisplayContent.calculateSystemGestureExclusion`` (AOSP, ``android14-release``)

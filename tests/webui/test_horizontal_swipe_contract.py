@@ -30,10 +30,10 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 MODULE = ASSETS / "shared" / "horizontal-swipe.js"
 
-# `apps/` e' nell'elenco dal 22/09/2026: da quel giorno il kit che ogni Jenny
+# `apps/` e' nell'elenco dal 22/09/2026: da quel giorno il kit che ogni Jafta
 # App carica e' anche lui un consumatore del gesto — dentro una app il dito non
 # arriva al guscio, e il riconoscimento tocca farlo li'. E' il posto piu'
 # probabile in cui un domani comparirebbe una seconda copia.
@@ -43,7 +43,7 @@ SOURCES = sorted(
     + [p for p in (ASSETS / "apps").glob("*.js")]
 )
 
-SDK = ASSETS / "apps" / "jenny-sdk.js"
+SDK = ASSETS / "apps" / "jafta-sdk.js"
 
 
 def test_only_the_shared_module_listens_to_touchmove() -> None:
@@ -149,14 +149,14 @@ def test_the_app_kit_only_tells_what_the_finger_did() -> None:
     src = SDK.read_text(encoding="utf-8")
     for phase in ("'start'", "'move'", "'end'", "'cancel'"):
         assert f"phase: {phase}" in src, f"il kit non manda piu' la fase {phase}"
-    assert "jenny:swipe" in src
+    assert "jafta:swipe" in src
 
 
 def test_the_finger_is_read_off_the_screen_ruler() -> None:
     """Un righello solo, e non e' quello della finestra.
 
     `clientX` e' relativo alla finestra di chi ascolta. Officina e guscio della
-    casa non se ne accorgono — la loro finestra sta ferma — ma dentro una Jenny
+    casa non se ne accorgono — la loro finestra sta ferma — ma dentro una Jafta
     App la finestra **e'** la cornice che la pista trascina: il righello si
     muove insieme al dito e il gesto insegue se stesso. L'utente l'ha visto
     come la schermata che vibra; i due righelli fianco a fianco su Chrome del

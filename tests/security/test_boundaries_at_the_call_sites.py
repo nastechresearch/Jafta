@@ -14,9 +14,9 @@ from pathlib import Path
 import pytest
 from support.gateway_http import make_handler
 
-from jenny.agent import wiki_provenance
-from jenny.webui.wiki import create_audit
-from jenny.webui.ws_http import GatewayHTTPHandler
+from jafta.agent import wiki_provenance
+from jafta.webui.wiki import create_audit
+from jafta.webui.ws_http import GatewayHTTPHandler
 
 
 def _static_handler(tmp_path: Path) -> GatewayHTTPHandler:

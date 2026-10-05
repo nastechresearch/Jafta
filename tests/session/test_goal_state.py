@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 
-from jenny.session.goal_state import (
+from jafta.session.goal_state import (
     GOAL_STATE_KEY,
     cancel_active_goal,
     clear_goal_awaiting_input,
@@ -17,7 +17,7 @@ from jenny.session.goal_state import (
     runner_wall_llm_timeout_s,
     sustained_goal_active,
 )
-from jenny.session.manager import SessionManager
+from jafta.session.manager import SessionManager
 
 
 def test_runtime_lines_empty_when_no_metadata():

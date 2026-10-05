@@ -16,9 +16,9 @@ from pathlib import Path
 
 from support.aio import wait_until
 
-from jenny.config.schema import SnapshotConfig
-from jenny.snapshot.engine import SnapshotEngine
-from jenny.snapshot.service import SnapshotService
+from jafta.config.schema import SnapshotConfig
+from jafta.snapshot.engine import SnapshotEngine
+from jafta.snapshot.service import SnapshotService
 
 
 async def test_the_shutdown_snapshot_waits_for_the_cancelled_one(tmp_path: Path) -> None:

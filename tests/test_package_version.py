@@ -19,9 +19,9 @@ def test_source_checkout_import_uses_pyproject_version_without_metadata() -> Non
 
         sys.path.insert(0, {str(repo_root)!r})
 
-        import jenny
+        import jafta
 
-        print(jenny.__version__)
+        print(jafta.__version__)
         """
     )
 
@@ -46,10 +46,10 @@ def test_hardcoded_fallback_matches_pyproject() -> None:
     expected = tomllib.loads((repo_root / "pyproject.toml").read_text(encoding="utf-8"))["project"][
         "version"
     ]
-    source = (repo_root / "jenny" / "__init__.py").read_text(encoding="utf-8")
+    source = (repo_root / "jafta" / "__init__.py").read_text(encoding="utf-8")
 
     assert f'_read_pyproject_version() or "{expected}"' in source, (
-        f"il fallback in jenny/__init__.py non è {expected}: allinealo al bump di versione"
+        f"il fallback in jafta/__init__.py non è {expected}: allinealo al bump di versione"
     )
 
 

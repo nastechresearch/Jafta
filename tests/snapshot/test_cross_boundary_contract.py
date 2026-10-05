@@ -14,13 +14,13 @@ from pathlib import Path
 import pytest
 from support.kotlin_source import read_source
 
-from jenny.snapshot.backup import IMPORT_STAGED_FILENAME
-from jenny.snapshot.locations import backup_staging_dir_for
-from jenny.webui.backup_routes import BACKUP_DATA_HEADER
+from jafta.snapshot.backup import IMPORT_STAGED_FILENAME
+from jafta.snapshot.locations import backup_staging_dir_for
+from jafta.webui.backup_routes import BACKUP_DATA_HEADER
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-KOTLIN_MAIN = REPO_ROOT / "android/app/src/main/java/com/flagdizero/jenny/MainActivity.kt"
-UI_ASSETS = REPO_ROOT / "jenny/templates/ui/assets"
+KOTLIN_MAIN = REPO_ROOT / "android/app/src/main/java/com/flagdizero/jafta/MainActivity.kt"
+UI_ASSETS = REPO_ROOT / "jafta/templates/ui/assets"
 BACKUP_FLOW_JS = UI_ASSETS / "shared/backup-flow.js"
 API_CLIENT_JS = UI_ASSETS / "shared/api-client.js"
 
@@ -110,6 +110,6 @@ def test_i18n_backup_keys_exist_in_both_locales() -> None:
 
 def test_backup_flow_js_in_ui_manifest() -> None:
     """Un asset fuori manifest non arriva sul device e la SPA maschera il 404."""
-    from jenny.utils.android_assets import _UI_MANIFEST
+    from jafta.utils.android_assets import _UI_MANIFEST
 
     assert "assets/shared/backup-flow.js" in _UI_MANIFEST

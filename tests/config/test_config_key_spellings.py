@@ -13,9 +13,9 @@ from pathlib import Path
 
 from loguru import logger as loguru_logger
 
-from jenny.config.loader import load_config, load_config_with_raw
-from jenny.config.schema import CURRENT_CONFIG_VERSION, AgentDefaults
-from jenny.config.store import mutate
+from jafta.config.loader import load_config, load_config_with_raw
+from jafta.config.schema import CURRENT_CONFIG_VERSION, AgentDefaults
+from jafta.config.store import mutate
 
 
 def _write(path: Path, data: dict) -> None:

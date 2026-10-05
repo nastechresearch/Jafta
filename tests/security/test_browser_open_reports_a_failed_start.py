@@ -22,7 +22,7 @@ from support.kotlin_source import read_source
 
 BRIDGE = (
     Path(__file__).resolve().parents[2]
-    / "android/app/src/main/java/com/flagdizero/jenny/JennyBrowserBridge.kt"
+    / "android/app/src/main/java/com/flagdizero/jafta/JennyBrowserBridge.kt"
 )
 
 

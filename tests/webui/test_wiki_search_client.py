@@ -20,12 +20,12 @@ from pathlib import Path
 
 from support.js_harness import requires_node, run_js
 
-from jenny.webui.wiki import build_graph, read_pages
-from jenny.webui.wiki_search import SearchIndex, pack_index, tokenize
+from jafta.webui.wiki import build_graph, read_pages
+from jafta.webui.wiki_search import SearchIndex, pack_index, tokenize
 
 SEARCH_JS = (
     Path(__file__).resolve().parents[2]
-    / "jenny" / "templates" / "ui" / "assets" / "shared" / "wiki-search.js"
+    / "jafta" / "templates" / "ui" / "assets" / "shared" / "wiki-search.js"
 )
 
 
@@ -95,7 +95,7 @@ def test_the_two_tokenizers_agree() -> None:
 
 
 def test_folding_matches_the_server() -> None:
-    from jenny.webui.wiki_search import fold
+    from jafta.webui.wiki_search import fold
 
     samples = ["Perché", "CITTÀ", "Straße", "ÅNGSTRÖM", "naïve"]
     expected = [fold(s) for s in samples]

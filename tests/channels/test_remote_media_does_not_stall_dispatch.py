@@ -21,18 +21,18 @@ from unittest.mock import AsyncMock
 import pytest
 from port_alloc import free_port
 
-from jenny.bus.events import OutboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.channels.websocket import WebSocketChannel, WebSocketConfig
-from jenny.webui import media_ingest
-from jenny.webui.gateway_services import build_gateway_services
+from jafta.bus.events import OutboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.channels.websocket import WebSocketChannel, WebSocketConfig
+from jafta.webui import media_ingest
+from jafta.webui.gateway_services import build_gateway_services
 
 URLS = [f"https://img.example.com/{i}.png" for i in range(3)]
 
 
 @pytest.fixture(autouse=True)
 def isolate_webui_workspace_state(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
 
 
 def _channel(bus: MessageBus) -> WebSocketChannel:
@@ -53,7 +53,7 @@ async def test_slow_remote_images_are_bounded_by_a_total_budget(monkeypatch) -> 
         await asyncio.sleep(1.0)
         return None
 
-    monkeypatch.setattr("jenny.webui.media_gateway.ingest_remote_image", _slow_ingest)
+    monkeypatch.setattr("jafta.webui.media_gateway.ingest_remote_image", _slow_ingest)
     monkeypatch.setattr(media_ingest, "LOCALIZE_TOTAL_TIMEOUT_S", 0.3, raising=False)
 
     channel = _channel(MessageBus())

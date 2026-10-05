@@ -18,9 +18,9 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.runner import AgentRunResult
-from jenny.agent.subagent import SubagentManager
-from jenny.agent.subagent_records import (
+from jafta.agent.runner import AgentRunResult
+from jafta.agent.subagent import SubagentManager
+from jafta.agent.subagent_records import (
     CANCEL_REASON_SHUTDOWN,
     CANCEL_REASON_SUPERSEDED,
     CANCEL_REASON_USER,
@@ -28,8 +28,8 @@ from jenny.agent.subagent_records import (
     SubagentRecordStore,
     SubagentSpec,
 )
-from jenny.bus.queue import MessageBus
-from jenny.providers.base import LLMProvider
+from jafta.bus.queue import MessageBus
+from jafta.providers.base import LLMProvider
 
 
 def _manager(tmp_path: Path, **kw) -> SubagentManager:

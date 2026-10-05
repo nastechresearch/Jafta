@@ -30,7 +30,7 @@ def _inner(code: str, start: int) -> str | None:
 
 MAIN_HOP = (
     Path(__file__).resolve().parents[2]
-    / "android/app/src/main/java/com/flagdizero/jenny/MainHop.kt"
+    / "android/app/src/main/java/com/flagdizero/jafta/MainHop.kt"
 )
 
 # ``block()`` dentro un ``try``, con un ``catch (e: Throwable)`` subito dopo: un

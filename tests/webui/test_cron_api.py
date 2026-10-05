@@ -17,9 +17,9 @@ from types import SimpleNamespace
 import pytest
 from support.cron import disable_job
 
-from jenny.cron.service import CronService
-from jenny.cron.types import CronJob, CronPayload, CronSchedule, CronTaskCheckState
-from jenny.webui.cron_api import webui_cron_payload
+from jafta.cron.service import CronService
+from jafta.cron.types import CronJob, CronPayload, CronSchedule, CronTaskCheckState
+from jafta.webui.cron_api import webui_cron_payload
 
 _RAIN = "- Ogni ciclo guarda la pioggia in citta' e avvisami solo sopra il 70%."
 _PILLS = "- Alle 9 ricordami le gocce."
@@ -208,7 +208,7 @@ def test_healthy_tasks_are_listed_with_no_check_entries(cron, tmp_path):
 
 def test_the_join_marks_broken_and_pending_and_leaves_the_rest_ok(cron, tmp_path):
     """Le tre specie in una volta: il file dice quali esistono, lo store quali no."""
-    from jenny.cron.heartbeat_tasks import parse_heartbeat_tasks
+    from jafta.cron.heartbeat_tasks import parse_heartbeat_tasks
 
     content = _heartbeat_file(_RAIN, _PILLS)
     (tmp_path / "HEARTBEAT.md").write_text(content, encoding="utf-8")
@@ -348,7 +348,7 @@ def test_the_job_level_health_has_no_invented_escalated_at(cron, tmp_path):
 
 
 def test_the_run_history_comes_back_newest_first(cron, tmp_path):
-    from jenny.cron.types import CronRunRecord
+    from jafta.cron.types import CronRunRecord
 
     cron.register_system_job(_system("dream"))
     job = cron.get_job("dream")
@@ -398,7 +398,7 @@ def test_the_panel_says_the_list_was_rebuilt_at_startup(cron, tmp_path, monkeypa
     ctx = SimpleNamespace(
         cron_recovered_from="empty", cron_quarantine_path=tmp_path / "jobs.json.corrupt-1"
     )
-    import jenny.runtime.context as context_mod
+    import jafta.runtime.context as context_mod
 
     monkeypatch.setattr(context_mod, "get_runtime_context", lambda: ctx)
 
@@ -421,7 +421,7 @@ def test_without_a_config_it_reads_from_disk(cron, tmp_path, monkeypatch):
     quello del container e' fotografato alla costruzione. Un pannello che
     guardasse la fotografia direbbe «attivo» di un worker appena spento.
     """
-    import jenny.config.loader as loader
+    import jafta.config.loader as loader
 
     calls: list[int] = []
 

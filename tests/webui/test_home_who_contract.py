@@ -15,7 +15,7 @@ from pathlib import Path
 from support.js_harness import member
 
 ROOT = Path(__file__).resolve().parents[2]
-UI = ROOT / "jenny" / "templates" / "ui"
+UI = ROOT / "jafta" / "templates" / "ui"
 INDEX = UI / "index.html"
 WHO_JS = UI / "assets" / "home-who.js"
 APP_JS = UI / "assets" / "home-app.js"
@@ -93,7 +93,7 @@ def test_back_leaves_the_notebook_only_after_the_overlays() -> None:
 
 def test_a_switch_releases_the_turn_that_was_running() -> None:
     """Il legame che il banco dello scambio non può esercitare: lo fa `init()`,
-    e senza, tutto quel che aspetta un `turn_end` — la faccia di Jenny, la riga
+    e senza, tutto quel che aspetta un `turn_end` — la faccia di Jafta, la riga
     di lavoro, il bottone Ferma — resta ad aspettarne uno che è già stato
     scartato."""
     body = _member(APP_JS.read_text(encoding="utf-8"), "init")
@@ -135,7 +135,7 @@ def test_every_word_on_screen_comes_from_the_translations() -> None:
     è codice nuovo. Un `textContent` può ricevere solo una traduzione o un
     dato (il nome di un quaderno, la sua data).
 
-    L'unica eccezione è un **segno**, non una parola: il fiore di Jenny, che non
+    L'unica eccezione è un **segno**, non una parola: il fiore di Jafta, che non
     si traduce e che l'officina disegna identico (`chat-identity-flower`,
     `dock-flower`). Tradurlo non vorrebbe dire niente; metterlo nei file di
     lingua vorrebbe dire due posti da cui può divergere.

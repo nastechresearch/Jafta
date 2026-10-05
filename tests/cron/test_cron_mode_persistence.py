@@ -14,8 +14,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from jenny.cron.service import CronService
-from jenny.cron.types import CronSchedule
+from jafta.cron.service import CronService
+from jafta.cron.types import CronSchedule
 
 # Job scritto dalla versione precedente: struttura identica a quella emessa da
 # ``_save_store``, tranne che per ``payload.mode``, che allora non esisteva.

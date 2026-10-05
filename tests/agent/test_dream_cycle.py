@@ -1,6 +1,6 @@
 """Il ciclo condiviso di Dream, e la prova che i suoi due chiamanti restano allineati.
 
-``jenny/agent/dream_cycle.py`` esiste perché un run di Dream era implementato due
+``jafta/agent/dream_cycle.py`` esiste perché un run di Dream era implementato due
 volte — il job cron e lo slash command ``/dream`` — e le due copie divergevano una
 divergenza alla volta: il guard del budget montato solo di là, il gauge assente di
 qua, i contatori del review che non avanzavano lanciando Dream a mano. Ognuna è
@@ -38,7 +38,7 @@ from unittest.mock import MagicMock
 import pytest
 from loguru import logger
 
-from jenny.agent.dream_cycle import (
+from jafta.agent.dream_cycle import (
     REVIEW_RETRY_AFTER_RUNS,
     STUCK_FORCES_REVIEW,
     STUCK_IS_ALARMING,
@@ -48,17 +48,17 @@ from jenny.agent.dream_cycle import (
     format_stuck_alarm,
     take_dream_snapshot,
 )
-from jenny.agent.dream_review import STATUS_COMPLETED, STATUS_FAILED
-from jenny.agent.tools.file_state import FileStates
-from jenny.bus.events import InboundMessage
-from jenny.command.builtin import register_builtin_commands
-from jenny.command.router import CommandContext, CommandRouter
-from jenny.config.schema import Config
-from jenny.runtime.cron_dispatch import CronDispatcher
-from jenny.runtime.notifier import alert_fields
-from jenny.webui.metadata import WEBUI_MESSAGE_SOURCE_METADATA_KEY
+from jafta.agent.dream_review import STATUS_COMPLETED, STATUS_FAILED
+from jafta.agent.tools.file_state import FileStates
+from jafta.bus.events import InboundMessage
+from jafta.command.builtin import register_builtin_commands
+from jafta.command.router import CommandContext, CommandRouter
+from jafta.config.schema import Config
+from jafta.runtime.cron_dispatch import CronDispatcher
+from jafta.runtime.notifier import alert_fields
+from jafta.webui.metadata import WEBUI_MESSAGE_SOURCE_METADATA_KEY
 
-_REVIEW_TARGET = "jenny.agent.dream_review.run_dream_review"
+_REVIEW_TARGET = "jafta.agent.dream_review.run_dream_review"
 
 _DREAM_JOB = SimpleNamespace(
     name="dream", id="dream", payload=SimpleNamespace(kind="system_event")
@@ -301,7 +301,7 @@ def _cycle_logs() -> Iterator[list[str]]:
     handler = logger.add(
         lambda m: messages.append(f"{m.record['level'].name}: {m.record['message']}"),
         level="DEBUG",
-        filter=lambda record: record["name"] == "jenny.agent.dream_cycle",
+        filter=lambda record: record["name"] == "jafta.agent.dream_cycle",
     )
     try:
         yield messages
@@ -839,7 +839,7 @@ def _install_scenario(
         memory_budget=scenario.memory_budget,
         review_every_runs=scenario.review_every_runs,
     )
-    monkeypatch.setattr("jenny.config.loader.load_config", lambda *a, **k: config)
+    monkeypatch.setattr("jafta.config.loader.load_config", lambda *a, **k: config)
 
 
 def _build(scenario: _Scenario, root: Path) -> tuple[_FakeMemory, _FakeAgent]:
@@ -1131,7 +1131,7 @@ class TestTheAlarmLeavesTheLog:
     def _spy(monkeypatch: pytest.MonkeyPatch) -> list[tuple[str, Any]]:
         sent: list[tuple[str, Any]] = []
         monkeypatch.setattr(
-            "jenny.runtime.notifier.notify_delivery",
+            "jafta.runtime.notifier.notify_delivery",
             lambda content, metadata: sent.append((content, metadata)),
         )
         return sent

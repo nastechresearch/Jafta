@@ -1,4 +1,4 @@
-"""Copertura per ``jenny.session.webui_turns``.
+"""Copertura per ``jafta.session.webui_turns``.
 
 ``tests/webui/test_webui_turn_helpers.py`` copre solo ``publish_turn_run_status``
 (strip di timing). Qui si copre il resto del modulo: marcatura sessione WebUI e
@@ -12,9 +12,9 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.bus.events import InboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.bus.runtime_events import (
+from jafta.bus.events import InboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.bus.runtime_events import (
     RuntimeEventBus,
     RuntimeEventContext,
     RuntimeModelChanged,
@@ -22,12 +22,12 @@ from jenny.bus.runtime_events import (
     TurnCompleted,
     TurnRunStatusChanged,
 )
-from jenny.config.schema import Config
-from jenny.session import webui_turns as wt
-from jenny.session.keys import HEARTBEAT_SESSION_KEY
-from jenny.session.manager import Session, SessionManager
-from jenny.session.turn_visibility import silent_turn_metadata
-from jenny.utils.llm_runtime import LLMRuntime
+from jafta.config.schema import Config
+from jafta.session import webui_turns as wt
+from jafta.session.keys import HEARTBEAT_SESSION_KEY
+from jafta.session.manager import Session, SessionManager
+from jafta.session.turn_visibility import silent_turn_metadata
+from jafta.utils.llm_runtime import LLMRuntime
 
 # --- mark_webui_session --------------------------------------------------------
 
@@ -243,12 +243,12 @@ async def test_no_token_usage_is_recorded(tmp_path):
     """La fonte ``mascot`` resta per lo storico, ma nessuno ci scrive piu'.
 
     Si guarda il file dei token, non una funzione sostituita: un
-    ``monkeypatch`` su ``jenny.agent.token_usage.record_token_usage`` non vede
+    ``monkeypatch`` su ``jafta.agent.token_usage.record_token_usage`` non vede
     chi l'ha importata per nome (``from … import record_token_usage``), e il
     test restava verde con il file scritto.
     """
-    from jenny.agent.token_usage import token_usage_state_path
-    from jenny.config.paths import set_workspace_dir
+    from jafta.agent.token_usage import token_usage_state_path
+    from jafta.config.paths import set_workspace_dir
 
     workspace = tmp_path / "workspace"
     workspace.mkdir()

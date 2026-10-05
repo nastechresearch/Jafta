@@ -5,7 +5,7 @@ Passo **4.4** del piano dei progetti.
 Al passo 3 abbiamo deciso di **non** mettere niente nel prompt per il rifiuto dei
 promemoria, e il criterio era: una riga nel blocco se la guadagna la regola che
 sbatteresti addosso di continuo e che ti costringe a ripianificare. Un promemoria
-è raro e sta in piedi da solo; **scrivere è quel che Jenny fa a ogni turno**, e
+è raro e sta in piedi da solo; **scrivere è quel che Jafta fa a ogni turno**, e
 scoprire a metà lavoro che non può le fa buttare la chiamata *e* rifare il piano.
 
 Applicato a due casi, lo stesso criterio decide al contrario. È la prova che non
@@ -26,9 +26,9 @@ from pathlib import Path
 
 import pytest
 
-from jenny.utils.prompt_templates import render_template
+from jafta.utils.prompt_templates import render_template
 
-SRC = Path(__file__).resolve().parents[2] / "jenny"
+SRC = Path(__file__).resolve().parents[2] / "jafta"
 TEMPLATES = SRC / "templates" / "agent"
 
 
@@ -36,10 +36,10 @@ TEMPLATES = SRC / "templates" / "agent"
 def _templates(monkeypatch):
     """Rende i template leggibili senza un workspace configurato."""
     monkeypatch.setattr(
-        "jenny.utils.prompt_templates._get_templates_root",
+        "jafta.utils.prompt_templates._get_templates_root",
         lambda: TEMPLATES.parent,
     )
-    from jenny.utils import prompt_templates
+    from jafta.utils import prompt_templates
 
     prompt_templates._environment.cache_clear()
     yield
@@ -161,7 +161,7 @@ def test_the_block_stays_small() -> None:
 
 def test_it_is_a_system_template_so_a_correction_arrives() -> None:
     """``agent/**`` si riscrive a ogni avvio; un file dell'utente una volta sola."""
-    from jenny.utils.android_assets import _SYSTEM_PROMPT_TEMPLATES
+    from jafta.utils.android_assets import _SYSTEM_PROMPT_TEMPLATES
 
     assert "agent/readonly.md" in _SYSTEM_PROMPT_TEMPLATES
 
@@ -192,7 +192,7 @@ def test_a_turn_with_no_bound_scope_is_writable() -> None:
     contrario: un default chiuso avrebbe messo il blocco nel prompt di cron,
     Dream e heartbeat.
     """
-    from jenny.agent.context import _turn_is_writable
+    from jafta.agent.context import _turn_is_writable
 
     assert _turn_is_writable() is True
 
@@ -212,8 +212,8 @@ def test_read_only_removes_the_capture_rule(tmp_path) -> None:
     ``AGENTS.md`` di progetto che dica di scrivere): quello che cambia è che in
     sola lettura non c'è più niente da far vincere.
     """
-    from jenny.agent.context import ContextBuilder
-    from jenny.security.workspace_access import (
+    from jafta.agent.context import ContextBuilder
+    from jafta.security.workspace_access import (
         WorkspaceScope,
         bind_workspace_scope,
         reset_workspace_scope,

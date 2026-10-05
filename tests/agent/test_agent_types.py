@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.agent_types import (
+from jafta.agent.agent_types import (
     AGENT_TYPE_NAMES,
     AGENT_TYPES,
     DEFAULT_AGENT_TYPE,
@@ -15,12 +15,12 @@ from jenny.agent.agent_types import (
     get_agent_type,
     validate_agent_type,
 )
-from jenny.agent.subagent_records import SubagentRecord, SubagentSpec
-from jenny.agent.tools.context import ToolContext
-from jenny.agent.tools.file_state import FileStates
-from jenny.agent.tools.loader import ToolLoader, ToolLoadError
-from jenny.agent.tools.registry import ToolRegistry
-from jenny.config.schema import ToolsConfig
+from jafta.agent.subagent_records import SubagentRecord, SubagentSpec
+from jafta.agent.tools.context import ToolContext
+from jafta.agent.tools.file_state import FileStates
+from jafta.agent.tools.loader import ToolLoader, ToolLoadError
+from jafta.agent.tools.registry import ToolRegistry
+from jafta.config.schema import ToolsConfig
 
 # Insieme atteso per tipo: e la definizione del contratto, quindi va scritto per
 # esteso invece di essere derivato dal codice sotto test.
@@ -56,7 +56,7 @@ def _tools_config(*, ssh: bool = False) -> ToolsConfig:
     d'ambiente, indipendenti dal cablaggio scope/allowlist verificato qui, e
     senza soddisfarli i quattro tool non entrerebbero in nessun registry.
     """
-    from jenny.config.tool_schemas import SshHostConfig
+    from jafta.config.tool_schemas import SshHostConfig
 
     cfg = ToolsConfig()
     if ssh:
@@ -88,7 +88,7 @@ def _load(allow, tmp_path: Path) -> set[str]:
 
 def _load_type(name: str, tmp_path: Path) -> set[str]:
     """Carica un tipo su TUTTI i suoi scope, come fa ``_build_tools``."""
-    from jenny.agent.subagent import split_allow_by_scope
+    from jafta.agent.subagent import split_allow_by_scope
 
     agent_type = AGENT_TYPES[name]
     loader = ToolLoader()
@@ -198,7 +198,7 @@ def test_multi_scope_allowlist_is_split_per_scope() -> None:
     passargli l'allowlist intera di ``sysadmin`` farebbe abortire lo startup
     perche ``ssh_exec`` nello scope ``subagent`` non esiste.
     """
-    from jenny.agent.subagent import split_allow_by_scope
+    from jafta.agent.subagent import split_allow_by_scope
 
     by_scope = split_allow_by_scope(ToolLoader(), AGENT_TYPES["sysadmin"])
     assert by_scope["remote"] == frozenset(_SSH)
@@ -206,7 +206,7 @@ def test_multi_scope_allowlist_is_split_per_scope() -> None:
 
 
 def test_operator_keeps_allow_none_on_every_scope() -> None:
-    from jenny.agent.subagent import split_allow_by_scope
+    from jafta.agent.subagent import split_allow_by_scope
 
     assert split_allow_by_scope(ToolLoader(), AGENT_TYPES["operator"]) == {"subagent": None}
 
@@ -224,7 +224,7 @@ def test_a_name_missing_from_every_scope_is_still_fatal() -> None:
     NESSUNO degli scope del tipo resta un ``ToolLoadError`` che aborta il boot."""
     from dataclasses import replace
 
-    from jenny.agent.subagent import split_allow_by_scope
+    from jafta.agent.subagent import split_allow_by_scope
 
     broken = replace(
         AGENT_TYPES["sysadmin"],
@@ -244,7 +244,7 @@ def test_a_name_from_another_scope_is_not_a_typo(tmp_path: Path) -> None:
     registry = ToolRegistry()
     loader = ToolLoader()
     ctx = _ctx(tmp_path, ssh=True)
-    from jenny.agent.subagent import split_allow_by_scope
+    from jafta.agent.subagent import split_allow_by_scope
 
     for scope, allow in split_allow_by_scope(loader, AGENT_TYPES["sysadmin"]).items():
         loader.load(ctx, registry, scope=scope, allow=allow)  # non deve sollevare
@@ -295,8 +295,8 @@ def test_spec_rejects_unknown_agent_type() -> None:
 async def test_spawn_rejects_unknown_agent_type(tmp_path: Path) -> None:
     from unittest.mock import MagicMock
 
-    from jenny.agent.subagent import SubagentManager
-    from jenny.bus.queue import MessageBus
+    from jafta.agent.subagent import SubagentManager
+    from jafta.bus.queue import MessageBus
 
     provider = MagicMock()
     provider.get_default_model.return_value = "test-model"
@@ -333,8 +333,8 @@ def test_coerce_agent_type_passes_known_names() -> None:
 def test_type_max_iterations_can_only_narrow_the_configured_cap(tmp_path: Path) -> None:
     from unittest.mock import MagicMock
 
-    from jenny.agent.subagent import SubagentManager
-    from jenny.bus.queue import MessageBus
+    from jafta.agent.subagent import SubagentManager
+    from jafta.bus.queue import MessageBus
 
     provider = MagicMock()
     provider.get_default_model.return_value = "test-model"
@@ -354,8 +354,8 @@ async def test_run_subagent_uses_type_defaults_and_prompt(tmp_path: Path) -> Non
     from types import SimpleNamespace
     from unittest.mock import AsyncMock, MagicMock
 
-    from jenny.agent.subagent import SubagentManager, SubagentStatus
-    from jenny.bus.queue import MessageBus
+    from jafta.agent.subagent import SubagentManager, SubagentStatus
+    from jafta.bus.queue import MessageBus
 
     provider = MagicMock()
     provider.get_default_model.return_value = "test-model"
@@ -394,8 +394,8 @@ async def test_explicit_temperature_beats_type_default(tmp_path: Path) -> None:
     from types import SimpleNamespace
     from unittest.mock import AsyncMock, MagicMock
 
-    from jenny.agent.subagent import SubagentManager, SubagentStatus
-    from jenny.bus.queue import MessageBus
+    from jafta.agent.subagent import SubagentManager, SubagentStatus
+    from jafta.bus.queue import MessageBus
 
     provider = MagicMock()
     provider.get_default_model.return_value = "test-model"
@@ -423,7 +423,7 @@ async def test_explicit_temperature_beats_type_default(tmp_path: Path) -> None:
 
 
 def test_every_type_has_a_prompt_template() -> None:
-    from jenny.utils.prompt_templates import render_template
+    from jafta.utils.prompt_templates import render_template
 
     for name, atype in AGENT_TYPES.items():
         rendered = render_template(atype.prompt_template, strip=True)

@@ -18,7 +18,7 @@ from pathlib import Path
 
 from support import css_levels
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 CSS = (ASSETS / "mobile-style.css").read_text(encoding="utf-8")
 
 # I riempimenti accesi: l'accento, e la bolla dell'utente (rosa pieno in Synthwave).
@@ -32,7 +32,7 @@ def _one(selector: str) -> str:
 
 
 def test_the_bubble_is_dark_and_reads_like_the_chat() -> None:
-    bubble = _one(".jenny-mc-bubble")
+    bubble = _one(".jafta-mc-bubble")
     assert "background: var(--surface)" in bubble
     assert "color: var(--text)" in bubble
     assert "var(--border-strong)" in bubble, "senza bordo, scuro su scrim scuro non si stacca"
@@ -43,25 +43,25 @@ def test_the_bubble_is_dark_and_reads_like_the_chat() -> None:
 
 
 def test_the_tail_matches_the_bubble() -> None:
-    tail = _one(".jenny-mc-bubble::after")
+    tail = _one(".jafta-mc-bubble::after")
     assert "background: var(--surface)" in tail
     assert "var(--border-strong)" in tail, "la coda senza il bordo della bolla"
     assert "border-top" not in tail
 
 
 def test_the_markdown_inside_uses_the_chat_colours() -> None:
-    inside = [(sel, body) for sel, body, _ in css_levels.rules(CSS) if ".jenny-mc-text " in sel]
+    inside = [(sel, body) for sel, body, _ in css_levels.rules(CSS) if ".jafta-mc-text " in sel]
     assert inside, "il markdown del fumetto non ha stili suoi"
     for sel, body in inside:
         for bright in _BRIGHT:
             assert bright not in body, f"{sel} usa {bright}"
-    assert "color: var(--text-accent)" in _one(".jenny-mc-text a")
+    assert "color: var(--text-accent)" in _one(".jafta-mc-text a")
 
 
 def test_the_words_scroll_inside_and_the_tail_is_not_cut() -> None:
-    text = _one(".jenny-mc-text")
+    text = _one(".jafta-mc-text")
     assert "overflow-y: auto" in text
-    bubble = _one(".jenny-mc-bubble")
+    bubble = _one(".jafta-mc-bubble")
     assert "overflow" not in bubble, "un overflow sul fumetto taglierebbe la coda"
     assert "max-height" in bubble
     assert "pointer-events: auto" in bubble, "senza, non si scorre e i link non si toccano"

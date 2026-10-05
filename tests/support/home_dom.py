@@ -29,7 +29,7 @@ import pytest
 
 from support.js_harness import NODE, ROOT
 
-UI = ROOT / "jenny" / "templates" / "ui"
+UI = ROOT / "jafta" / "templates" / "ui"
 
 
 def _has_jsdom() -> bool:
@@ -98,7 +98,7 @@ export const routes = {
   '/webui/bootstrap': { ok: true },
   '/api/home/pages': { pages: [], order: ['app', 'chat', 'notebooks', 'settings'],
     fixed: ['app', 'chat', 'notebooks', 'settings'], max: 8 },
-  '/api/settings': { agent: { bot_name: 'Jenny', model: 'm1' }, providers: [],
+  '/api/settings': { agent: { bot_name: 'Jafta', model: 'm1' }, providers: [],
     default_provider: null, version: {}, backup: {} },
   '/api/projects': { projects: [{ name: 'orto', modified: 1, pages: 3 }], unopenable: [] },
 };
@@ -179,7 +179,7 @@ export function thread() {
     .filter((n) => n.classList.contains('home-msg') || n.classList.contains('home-note'))
     .map((n) => {
       if (n.classList.contains('home-note')) return 'note: ' + n.textContent.trim();
-      const who = n.classList.contains('home-msg-user') ? 'you' : 'jenny';
+      const who = n.classList.contains('home-msg-user') ? 'you' : 'jafta';
       const text = [...n.querySelectorAll('.home-block')].map((b) => b.textContent.trim()).join(' ');
       return `${who}: ${text}`;
     });

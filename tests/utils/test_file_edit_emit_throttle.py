@@ -12,8 +12,8 @@ from pathlib import Path
 
 import pytest
 
-from jenny.utils import file_edit_streaming as fes
-from jenny.utils.file_edit_events import FileEditTracker, read_file_snapshot
+from jafta.utils import file_edit_streaming as fes
+from jafta.utils.file_edit_events import FileEditTracker, read_file_snapshot
 
 STEP = fes._LIVE_EMIT_LINE_STEP
 INTERVAL = fes._LIVE_EMIT_INTERVAL_S

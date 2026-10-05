@@ -13,14 +13,14 @@ import json
 from pathlib import Path
 from typing import Any
 
-from jenny.bus.events import OutboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.channels.websocket import WebSocketChannel, WebSocketConfig
-from jenny.config.paths import set_workspace_dir
-from jenny.runtime.context import get_runtime_context
-from jenny.webui.gateway_services import build_gateway_services
-from jenny.webui.transcript import build_webui_thread_response
-from jenny.webui.transcript_store import read_transcript_lines
+from jafta.bus.events import OutboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.channels.websocket import WebSocketChannel, WebSocketConfig
+from jafta.config.paths import set_workspace_dir
+from jafta.runtime.context import get_runtime_context
+from jafta.webui.gateway_services import build_gateway_services
+from jafta.webui.transcript import build_webui_thread_response
+from jafta.webui.transcript_store import read_transcript_lines
 
 
 def _ws_channel(bus: MessageBus) -> WebSocketChannel:
@@ -45,7 +45,7 @@ def _ws_channel(bus: MessageBus) -> WebSocketChannel:
 
 
 async def test_telegram_turn_projected_into_webui_thread(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     bus = MessageBus()
     ws = _ws_channel(bus)
     meta = {"webui_turn_id": "turn-tg-1"}
@@ -93,7 +93,7 @@ async def test_telegram_turn_projected_into_webui_thread(tmp_path, monkeypatch) 
 
 
 async def test_user_echo_without_content_is_dropped(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     bus = MessageBus()
     ws = _ws_channel(bus)
     await ws.send(
@@ -115,7 +115,7 @@ async def test_user_echo_media_is_paths_on_disk_and_signed_on_the_wire(
     firmata: un path del filesystem il client non sa caricarlo, ed è così che
     la prima foto da Telegram è arrivata in chat come bolla senza immagine.
     """
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     previous = get_runtime_context().workspace_dir
     set_workspace_dir(tmp_path)
     try:
@@ -150,7 +150,7 @@ async def test_user_echo_with_media_and_no_text_is_not_dropped(
     tmp_path, monkeypatch
 ) -> None:
     # Una foto senza didascalia è un messaggio: la bolla è l'immagine.
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     bus = MessageBus()
     ws = _ws_channel(bus)
     await ws.send(

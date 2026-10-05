@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.security.network import (
+from jafta.security.network import (
     validate_app_server_target,
     validate_ssh_target,
     validate_url_target,
@@ -54,7 +54,7 @@ def test_ssh_refuses_it(host: str) -> None:
 
 def test_the_unspecified_address_is_the_phone_itself_for_ssh_even_whitelisted() -> None:
     """Come il loopback: il pavimento dell'SSH non cede alla whitelist globale."""
-    from jenny.security import network
+    from jafta.security import network
 
     network.configure_ssrf_whitelist(["::/0", "0.0.0.0/0"])
     try:
@@ -108,7 +108,7 @@ def test_app_servers_and_ssh_refuse_the_phone_and_metadata_embedded(host: str) -
 
 @pytest.mark.parametrize("host", _EMBEDDED_PHONE)
 def test_the_ssh_floor_sees_the_embedded_loopback_even_whitelisted(host: str) -> None:
-    from jenny.security import network
+    from jafta.security import network
 
     network.configure_ssrf_whitelist(["::/0", "0.0.0.0/0"])
     try:

@@ -19,7 +19,7 @@ from pathlib import Path
 
 from support.js_harness import function, member, requires_node, run_js
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 SHARED_MAP_LAYOUT_JS = ASSETS / "shared" / "map-layout.js"
 MAP_JS = ASSETS / "home-map.js"
 
@@ -971,7 +971,7 @@ assert.deepEqual(JSON.parse(writes[0][1]), { piante: { a: [5, 5] } });
 
 
 def test_a_workspace_without_the_folder_gets_it_made_once() -> None:
-    """`.jenny/` può non esserci su un workspace appena nato, e questa può
+    """`.jafta/` può non esserci su un workspace appena nato, e questa può
     essere la prima a scriverci. Un solo secondo tentativo: la mappa a schermo è
     già come l'utente l'ha messa, e insistere non la cambierebbe."""
     _run_swipes("""
@@ -988,7 +988,7 @@ const t = m._drag([d]);
 t.handlers.start({ active: 0 }, d);
 t.handlers.end({ active: 0 }, d);
 await new Promise((r) => setTimeout(r, 0));
-assert.deepEqual(folders, ['.jenny'], 'la cartella non viene creata al primo inciampo');
+assert.deepEqual(folders, ['.jafta'], 'la cartella non viene creata al primo inciampo');
 assert.equal(writes.length, 1, 'il secondo tentativo non ha scritto');
 """)
 

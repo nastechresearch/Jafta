@@ -7,8 +7,8 @@ from pathlib import Path
 import httpx
 import pytest
 
-from jenny.agent.tools import download as download_mod
-from jenny.agent.tools.download import (
+from jafta.agent.tools import download as download_mod
+from jafta.agent.tools.download import (
     DownloadFileTool,
     _filename_from_disposition,
     _filename_from_url,

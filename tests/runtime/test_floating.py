@@ -1,4 +1,4 @@
-"""Test per ``jenny/runtime/floating.py`` (la volontà, non la finestra).
+"""Test per ``jafta/runtime/floating.py`` (la volontà, non la finestra).
 
 Il bridge Chaquopy non esiste fuori dal telefono: si sostituisce il seam
 ``_resolve_bridge_class`` — lo stesso che sostituiscono i test del notifier — e
@@ -18,11 +18,11 @@ from pathlib import Path
 import pytest
 from support.kotlin_source import read_source
 
-from jenny.runtime import floating as fl
+from jafta.runtime import floating as fl
 
 REPO = Path(__file__).resolve().parents[2]
-CONTROLLER = REPO / "android/app/src/main/java/com/flagdizero/jenny/FloatingOverlayController.kt"
-BRIDGE_KT = REPO / "android/app/src/main/java/com/flagdizero/jenny/FloatingBridge.kt"
+CONTROLLER = REPO / "android/app/src/main/java/com/flagdizero/jafta/FloatingOverlayController.kt"
+BRIDGE_KT = REPO / "android/app/src/main/java/com/flagdizero/jafta/FloatingBridge.kt"
 
 
 class _FakeBridge:
@@ -105,12 +105,12 @@ class TestShowReply:
 
 class TestApplyConfig:
     async def test_pushes_config_and_dwell_time(self, bridge: _FakeBridge, monkeypatch):
-        from jenny.config.schema import Config
+        from jafta.config.schema import Config
 
         config = Config()
         config.floating.enabled = True
         config.floating.reply_hold_s = 45
-        monkeypatch.setattr("jenny.config.loader.load_config", lambda *a, **k: config)
+        monkeypatch.setattr("jafta.config.loader.load_config", lambda *a, **k: config)
 
         assert await fl.apply_floating_config() is True
         assert bridge.calls == [("setEnabled", (True, 45))]
@@ -119,9 +119,9 @@ class TestApplyConfig:
         """Non è ridondanza: la finestra vive nel processo del service e
         sopravvive a un riavvio del gateway. Un ``False`` esplicito è l'unica
         cosa che smonta una mascotte rimasta a schermo da un giro precedente."""
-        from jenny.config.schema import Config
+        from jafta.config.schema import Config
 
-        monkeypatch.setattr("jenny.config.loader.load_config", lambda *a, **k: Config())
+        monkeypatch.setattr("jafta.config.loader.load_config", lambda *a, **k: Config())
 
         await fl.apply_floating_config()
         assert bridge.calls == [("setEnabled", (False, 20))]
@@ -134,7 +134,7 @@ class TestApplyConfig:
         def boom(*_a, **_k):
             raise OSError("config illeggibile")
 
-        monkeypatch.setattr("jenny.config.loader.load_config", boom)
+        monkeypatch.setattr("jafta.config.loader.load_config", boom)
         assert await fl.apply_floating_config() is False
         assert bridge.calls == []
 
@@ -158,7 +158,7 @@ class TestBoundaryWithKotlin:
     """
 
     def test_the_kotlin_class_name_exists(self):
-        assert fl._BRIDGE.java_class == "com.flagdizero.jenny.FloatingBridge"
+        assert fl._BRIDGE.java_class == "com.flagdizero.jafta.FloatingBridge"
         assert BRIDGE_KT.is_file()
         assert "class FloatingBridge(" in read_source(BRIDGE_KT)
 
@@ -178,13 +178,13 @@ class TestBoundaryWithKotlin:
         import re
 
         source = read_source(CONTROLLER)
-        assets = REPO / "jenny/templates/ui/assets"
-        names = set(re.findall(r'"(jenny-[a-z0-9-]+)"', source))
+        assets = REPO / "jafta/templates/ui/assets"
+        names = set(re.findall(r'"(jafta-[a-z0-9-]+)"', source))
         assert names, "nessuno sprite nominato nel controller: il parsing è da rivedere"
         # Le pose del bordo e del volo, non solo quelle frontali: una mascotte
-        # senza `jenny-hang` non penzola, e non lo dice a nessuno.
-        assert "jenny-side" in names
-        assert {"jenny-hang", "jenny-fall", "jenny-ground", "jenny-walk1", "jenny-walk2"} <= names
+        # senza `jafta-hang` non penzola, e non lo dice a nessuno.
+        assert "jafta-side" in names
+        assert {"jafta-hang", "jafta-fall", "jafta-ground", "jafta-walk1", "jafta-walk2"} <= names
         for name in sorted(names):
             assert (assets / f"{name}.webp").is_file(), f"sprite mancante: {name}.webp"
 
@@ -203,7 +203,7 @@ class TestThePhysicsDoesNotDiverge:
     oscillare in due modi diversi a seconda di dove la si guarda.
 
     **Il lato JS si è spostato** il 18/09/2026: la fisica stava in
-    `mobile-jenny.js`, ora è in `shared/mascot-drag.js` perché la usano in due
+    `mobile-jafta.js`, ora è in `shared/mascot-drag.js` perché la usano in due
     (la casa e l'officina). I consumatori di queste
     costanti sono quindi tre, e questo test è l'unico posto in cui due di loro
     si guardano in faccia.
@@ -212,8 +212,8 @@ class TestThePhysicsDoesNotDiverge:
     una costante nuova entra da sola nel confronto.
     """
 
-    FLIGHT_KT = REPO / "android/app/src/main/java/com/flagdizero/jenny/FloatingFlight.kt"
-    COMPANION_JS = REPO / "jenny/templates/ui/assets/shared/mascot-drag.js"
+    FLIGHT_KT = REPO / "android/app/src/main/java/com/flagdizero/jafta/FloatingFlight.kt"
+    COMPANION_JS = REPO / "jafta/templates/ui/assets/shared/mascot-drag.js"
 
     @staticmethod
     def _js_numbers(source: str) -> dict[str, float]:
@@ -272,7 +272,7 @@ class TestThePhysicsDoesNotDiverge:
         )
 
     def test_the_pivot_is_the_same(self):
-        """La punta della manica alzata di `jenny-hang`. Sbagliarlo non rompe
+        """La punta della manica alzata di `jafta-hang`. Sbagliarlo non rompe
         niente: la fa solo ruotare attorno al punto sbagliato."""
         kt = read_source(self.FLIGHT_KT)
         js = self.COMPANION_JS.read_text(encoding="utf-8")

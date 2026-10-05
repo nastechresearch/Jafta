@@ -1,4 +1,4 @@
-from jenny.utils.helpers import estimate_prompt_tokens_chain
+from jafta.utils.helpers import estimate_prompt_tokens_chain
 
 
 class _NoCounterProvider:

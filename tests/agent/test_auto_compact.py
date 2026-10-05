@@ -9,13 +9,13 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from support.aio import settle_tasks
 
-from jenny.agent.loop import AgentLoop
-from jenny.bus.events import InboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.command import CommandContext
-from jenny.config.schema import AgentDefaults
-from jenny.providers.base import LLMResponse
-from jenny.session.keys import UNIFIED_SESSION_KEY
+from jafta.agent.loop import AgentLoop
+from jafta.bus.events import InboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.command import CommandContext
+from jafta.config.schema import AgentDefaults
+from jafta.providers.base import LLMResponse
+from jafta.session.keys import UNIFIED_SESSION_KEY
 
 
 def _make_loop(
@@ -84,7 +84,7 @@ def _make_fake_compact(
     track_count: bool = False,
 ):
     """Return a fake compact_idle_session that mirrors the real method's session mutation."""
-    from jenny.session.manager import Session as _Session
+    from jafta.session.manager import Session as _Session
 
     state = {"count": 0}
 
@@ -186,7 +186,7 @@ class TestSessionTTLConfig:
 
     def test_session_file_cap_is_internal_constant(self):
         """Session file cap should remain an internal constant, not a config field."""
-        from jenny.session.manager import FILE_MAX_MESSAGES
+        from jafta.session.manager import FILE_MAX_MESSAGES
         assert FILE_MAX_MESSAGES == 2000
 
 
@@ -244,11 +244,11 @@ class TestAgentLoopTTLParam:
             await loop._process_message(msg)
 
         session = loop.sessions.get_or_create("internal:direct")
-        from jenny.session.manager import FILE_MAX_MESSAGES
+        from jafta.session.manager import FILE_MAX_MESSAGES
         assert len(session.messages) <= FILE_MAX_MESSAGES
 
     def test_session_enforce_file_cap_skips_archive_when_dropped_prefix_already_consolidated(self, tmp_path):
-        from jenny.session.manager import Session
+        from jafta.session.manager import Session
         archive_fn = MagicMock()
         session = Session(key="internal:direct")
         for i in range(8):
@@ -261,7 +261,7 @@ class TestAgentLoopTTLParam:
         archive_fn.assert_not_called()
 
     def test_session_enforce_file_cap_archives_only_unconsolidated_dropped_prefix(self, tmp_path):
-        from jenny.session.manager import Session
+        from jafta.session.manager import Session
         archive_fn = MagicMock()
         session = Session(key="internal:direct")
         for i in range(8):

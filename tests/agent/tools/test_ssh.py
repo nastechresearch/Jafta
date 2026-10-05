@@ -27,16 +27,16 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.tools import ssh_transport
-from jenny.agent.tools.ssh import (
+from jafta.agent.tools import ssh_transport
+from jafta.agent.tools.ssh import (
     SshExecTool,
     SshHostsTool,
     SshJobTool,
     SshTransferTool,
 )
-from jenny.agent.tools.ssh_jobs import reset_job_store
-from jenny.config.schema import Config
-from jenny.config.tool_schemas import SshHostConfig
+from jafta.agent.tools.ssh_jobs import reset_job_store
+from jafta.config.schema import Config
+from jafta.config.tool_schemas import SshHostConfig
 
 # ``asyncssh`` non e una dipendenza runtime: su Android il client SSH e jsch
 # via bridge nativo, e il pacchetto non entra mai nei requirements del device
@@ -45,7 +45,7 @@ from jenny.config.tool_schemas import SshHostConfig
 # *collection* su una macchina che non ce l'ha — come il runner della CI.
 asyncssh = pytest.importorskip("asyncssh")
 
-TEST_USER = "jenny"
+TEST_USER = "jafta"
 ALIAS = "lab"
 
 
@@ -95,9 +95,9 @@ class _Env:
 @asynccontextmanager
 async def tool_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     """Server SSH vero + workspace isolato + config fresca intercettata."""
-    from jenny.config import loader as loader_mod
-    from jenny.config import paths as paths_mod
-    from jenny.runtime.context import get_runtime_context
+    from jafta.config import loader as loader_mod
+    from jafta.config import paths as paths_mod
+    from jafta.runtime.context import get_runtime_context
 
     host_key = asyncssh.generate_private_key("ssh-ed25519")
     host_key_path = tmp_path / "host_key"
@@ -410,7 +410,7 @@ async def test_transfer_in_a_project_writes_only_in_the_project(tmp_path, monkey
     altro tool di scrittura è fuori confine. ``up`` legge, e la lettura resta
     aperta sull'installazione come per ``read_file``.
     """
-    from jenny.security.workspace_access import build_workspace_scope, enter_workspace_scope
+    from jafta.security.workspace_access import build_workspace_scope, enter_workspace_scope
 
     async with tool_env(tmp_path, monkeypatch) as env:
         (env.workspace / "SOUL.md").write_text("io\n")
@@ -525,8 +525,8 @@ def test_every_ssh_tool_is_remote_scope_only():
 def test_ssh_tools_are_absent_from_every_existing_scope():
     from unittest.mock import MagicMock
 
-    from jenny.agent.tools.loader import ToolLoader
-    from jenny.agent.tools.registry import ToolRegistry
+    from jafta.agent.tools.loader import ToolLoader
+    from jafta.agent.tools.registry import ToolRegistry
 
     names = {"ssh_hosts", "ssh_exec", "ssh_job", "ssh_transfer"}
     for scope in ("core", "orchestrator", "subagent"):
@@ -535,8 +535,8 @@ def test_ssh_tools_are_absent_from_every_existing_scope():
 
 
 def test_the_module_declares_its_tools_for_the_loader():
-    from jenny.agent.tools import ssh as ssh_module
-    from jenny.agent.tools.loader import _HARDCODED_TOOL_MODULES
+    from jafta.agent.tools import ssh as ssh_module
+    from jafta.agent.tools.loader import _HARDCODED_TOOL_MODULES
 
     assert set(ssh_module.TOOLS) == set(_SSH_TOOLS)
     assert "ssh" in _HARDCODED_TOOL_MODULES
@@ -616,7 +616,7 @@ def test_enabled_reads_the_shape_the_runtime_actually_passes():
     """
     from types import SimpleNamespace
 
-    from jenny.config.schema import ToolsConfig
+    from jafta.config.schema import ToolsConfig
 
     tools_config = ToolsConfig()
     tools_config.ssh.enable = True
@@ -633,7 +633,7 @@ def test_subagent_tools_config_carries_ssh_through():
     ``ssh`` non viene propagato arrivano i default (spento, zero host) e
     l'allowlist del tipo non ha nulla da filtrare.
     """
-    from jenny.config.schema import ToolsConfig
+    from jafta.config.schema import ToolsConfig
 
     source = ToolsConfig()
     source.ssh.enable = True
@@ -641,7 +641,7 @@ def test_subagent_tools_config_carries_ssh_through():
 
     from types import SimpleNamespace
 
-    from jenny.agent.subagent import SubagentManager
+    from jafta.agent.subagent import SubagentManager
 
     # ``_live_tools_config`` stubbata sulla stessa sorgente: qui interessa solo
     # che la sezione ``ssh`` sopravviva alla riduzione, non da dove arrivi (la

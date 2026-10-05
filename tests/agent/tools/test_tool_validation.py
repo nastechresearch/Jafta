@@ -1,6 +1,6 @@
 from typing import Any
 
-from jenny.agent.tools import (
+from jafta.agent.tools import (
     ArraySchema,
     IntegerSchema,
     ObjectSchema,
@@ -9,8 +9,8 @@ from jenny.agent.tools import (
     tool_parameters,
     tool_parameters_schema,
 )
-from jenny.agent.tools.base import Tool
-from jenny.agent.tools.registry import ToolRegistry
+from jafta.agent.tools.base import Tool
+from jafta.agent.tools.registry import ToolRegistry
 
 
 class SampleTool(Tool):

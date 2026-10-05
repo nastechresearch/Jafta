@@ -55,9 +55,9 @@ from __future__ import annotations
 
 import pathlib
 
-from jenny.agent.context import ContextBuilder
-from jenny.agent.gardener import GardenerStore
-from jenny.agent.memory import MemoryStore, is_gardener_session_key
+from jafta.agent.context import ContextBuilder
+from jafta.agent.gardener import GardenerStore
+from jafta.agent.memory import MemoryStore, is_gardener_session_key
 
 WIKIS = "## Wikis"
 RECENT_HISTORY = "# Recent History"
@@ -68,7 +68,7 @@ PERSONAL = "unified:default"
 def _install(root: pathlib.Path) -> None:
     """Un'installazione con i cinque posti da cui il personale può viaggiare."""
     (root / "memory").mkdir(parents=True, exist_ok=True)
-    (root / "SOUL.md").write_text("# Jenny\n\nTono asciutto. SOULMARK\n", encoding="utf-8")
+    (root / "SOUL.md").write_text("# Jafta\n\nTono asciutto. SOULMARK\n", encoding="utf-8")
     (root / "USER.md").write_text(
         "# Chi sei\n\n- Corso di nuoto: giovedì alle 18. USERMARK\n", encoding="utf-8"
     )

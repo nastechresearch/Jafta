@@ -26,10 +26,10 @@ from pathlib import Path
 from support.kotlin_source import read_source
 
 ROOT = Path(__file__).resolve().parents[2]
-CONTROLLER = ROOT / "android/app/src/main/java/com/flagdizero/jenny/FloatingOverlayController.kt"
+CONTROLLER = ROOT / "android/app/src/main/java/com/flagdizero/jafta/FloatingOverlayController.kt"
 GRADLE = ROOT / "android/app/build.gradle.kts"
-CHAT_JS = ROOT / "jenny/templates/ui/assets/mobile-chat.js"
-MARKDOWN_JS = ROOT / "jenny/templates/ui/assets/shared/markdown.js"
+CHAT_JS = ROOT / "jafta/templates/ui/assets/mobile-chat.js"
+MARKDOWN_JS = ROOT / "jafta/templates/ui/assets/shared/markdown.js"
 
 
 def _read() -> str:

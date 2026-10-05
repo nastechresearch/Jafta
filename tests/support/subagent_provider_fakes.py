@@ -17,7 +17,7 @@ from collections.abc import Awaitable, Callable, Sequence
 from typing import Any
 from unittest.mock import MagicMock
 
-from jenny.providers.base import LLMResponse
+from jafta.providers.base import LLMResponse
 
 
 def script_provider(

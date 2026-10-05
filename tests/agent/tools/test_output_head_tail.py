@@ -10,8 +10,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from jenny.agent.tools.exec_session import _PythonSession
-from jenny.agent.tools.python_exec import PythonNamespace, run_python_async
+from jafta.agent.tools.exec_session import _PythonSession
+from jafta.agent.tools.python_exec import PythonNamespace, run_python_async
 
 CODE = "print('A' * 60 + 'B' * 60)"
 

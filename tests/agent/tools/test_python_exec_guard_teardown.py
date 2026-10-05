@@ -27,14 +27,14 @@ import warnings
 
 import pytest
 
-from jenny.agent.tools import python_exec as px
-from jenny.agent.tools.python_exec import (
+from jafta.agent.tools import python_exec as px
+from jafta.agent.tools.python_exec import (
     PythonExecInterrupted,
     PythonNamespace,
     _import_guard_state,
     _path_guard_state,
 )
-from jenny.config.tool_schemas import PythonExecConfig
+from jafta.config.tool_schemas import PythonExecConfig
 
 _REFUSED = "outside allowed directory"
 

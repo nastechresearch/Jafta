@@ -27,7 +27,7 @@ import pytest
 from support.js_harness import function, member, requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 
 SETTINGS = (ASSETS / "mobile-settings.js").read_text(encoding="utf-8")
 CSS = (ASSETS / "mobile-style.css").read_text(encoding="utf-8")
@@ -154,7 +154,7 @@ def test_monospace_comes_from_the_token_not_from_a_font_name() -> None:
 # Il criterio della tavola, che questi banchi tengono fermo: **in cassetto quel
 # che si legge, l'amministrazione dietro un tocco.**
 
-WORKSHOP_HTML = (ROOT / "jenny" / "templates" / "ui" / "workshop.html").read_text(encoding="utf-8")
+WORKSHOP_HTML = (ROOT / "jafta" / "templates" / "ui" / "workshop.html").read_text(encoding="utf-8")
 
 
 def test_the_history_in_the_drawer_is_a_row() -> None:
@@ -581,7 +581,7 @@ def test_the_window_entries_come_from_the_server() -> None:
     """La rotta rifiuta qualunque altro valore: due copie dell'elenco
     divergerebbero in silenzio alla prima aggiunta. Stessa forma di
     `power.modes`, che era già così."""
-    api = (ROOT / "jenny" / "webui" / "settings_api.py").read_text(encoding="utf-8")
+    api = (ROOT / "jafta" / "webui" / "settings_api.py").read_text(encoding="utf-8")
     assert '"context_window_options": list(_CONTEXT_WINDOW_TOKEN_OPTIONS)' in api
     # Tupla e non `set`: la UI ne fa un menù, e l'ordine di un `set` non è
     # garantito fra due esecuzioni.
@@ -728,7 +728,7 @@ def test_the_switch_goes_through_the_rule_that_knows_who_survives_the_restart() 
 
 def test_the_choice_of_21_09_stays_a_choice() -> None:
     """Crearle, cambiarle e cancellarle non stanno nel pannello: si chiede a
-    Jenny. Chi le rimette lo fa sapendolo, non per inerzia."""
+    Jafta. Chi le rimette lo fa sapendolo, non per inerzia."""
     panel = "".join(
         _body(name) for name in ("_openSkill", "_skillRow", "_skillEmpty", "_wireSkill")
     )

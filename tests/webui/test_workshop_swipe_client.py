@@ -34,7 +34,7 @@ from pathlib import Path
 from support.js_harness import requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 APP_JS = ASSETS / "mobile-app.js"
 SETTINGS_JS = ASSETS / "mobile-settings.js"
 SWIPE_JS = ASSETS / "shared" / "horizontal-swipe.js"
@@ -205,7 +205,7 @@ const LEFT = -1; // dito verso sinistra → il vicino di destra (next)
    finestra di chi ascolta, `screen` allo schermo. Qui sono sfalsati di una
    costante apposta — se qualcuno tornasse a misurare col primo, o peggio
    mescolasse i due, lo scarto salterebbe fuori invece di nascondersi. Il
-   modulo condiviso legge **screen**, perche' dentro una Jenny App la finestra
+   modulo condiviso legge **screen**, perche' dentro una Jafta App la finestra
    e' la cornice che la pista sta trascinando (v. la sua testata). */
 const OFFSET_X = 1000;
 const OFFSET_Y = 500;

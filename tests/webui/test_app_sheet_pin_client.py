@@ -1,4 +1,4 @@
-"""La scheda di una Jenny App, aperta con una pressione lunga dal cassetto.
+"""La scheda di una Jafta App, aperta con una pressione lunga dal cassetto.
 
 In casa ha quattro righe — Apri · Metti come pagina · Modifica · Elimina — nello
 stesso ordine della scheda di un quaderno: **una cosa si appende dal posto dove
@@ -23,7 +23,7 @@ import pytest
 from support.js_harness import requires_node, run_module
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 
 pytestmark = requires_node
 
@@ -64,8 +64,8 @@ function createEl(id) {
   if (id) elements.set(id, el);
   return el;
 }
-for (const id of ['jenny-app-sheet', 'jenny-app-sheet-title',
-                  'jenny-app-sheet-actions', 'jenny-app-sheet-cancel']) createEl(id);
+for (const id of ['jafta-app-sheet', 'jafta-app-sheet-title',
+                  'jafta-app-sheet-actions', 'jafta-app-sheet-cancel']) createEl(id);
 globalThis.document = {
   getElementById: (id) => elements.get(id) || null,
   createElement: () => createEl(null),
@@ -77,7 +77,7 @@ globalThis.MutationObserver = class { observe() {} };
 
 /* Le righe della scheda, lette dal testo che scrive: azione, spenta, perche'. */
 function rows() {
-  const html = elements.get('jenny-app-sheet-actions').innerHTML;
+  const html = elements.get('jafta-app-sheet-actions').innerHTML;
   return [...html.matchAll(/<button[^>]*data-action="([^"]+)"([^>]*)>([\\s\\S]*?)<\\/button>/g)]
     .map(([, action, attr, inside]) => ({
       action,
@@ -160,7 +160,7 @@ def test_in_the_workshop_the_sheet_is_exactly_as_before() -> None:
     """
     _run(
         "assert.deepEqual(rows().map((r) => r.action), ['open', 'edit', 'delete']);\n"
-        "const html = document.getElementById('jenny-app-sheet-actions').innerHTML;\n"
+        "const html = document.getElementById('jafta-app-sheet-actions').innerHTML;\n"
         "assert.ok(!html.includes('oc-sheet-label'), 'le righe dell officina hanno cambiato forma');\n"
         "assert.ok(!html.includes('disabled'));\n",
         app=GARDEN,

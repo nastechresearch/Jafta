@@ -1,7 +1,7 @@
-"""Test per GetSourceTool: introspezione del sorgente di jenny, sola lettura.
+"""Test per GetSourceTool: introspezione del sorgente di jafta, sola lettura.
 
 Copre: risoluzione di target validi (modulo/classe/funzione), rifiuto di
-target fuori dal perimetro ``jenny.*`` (incluso traversal via path
+target fuori dal perimetro ``jafta.*`` (incluso traversal via path
 separator), target inesistenti, troncamento oltre ``_MAX_SOURCE_CHARS``, il
 fallback su sorgente estratta quando ``inspect.getsource`` fallisce, e il
 contratto dello schema del tool.
@@ -13,9 +13,9 @@ import inspect
 
 import pytest
 
-import jenny.agent.tools.diagnostics as diagnostics_module
-from jenny.agent.tools import introspect
-from jenny.agent.tools.introspect import GetSourceTool
+import jafta.agent.tools.diagnostics as diagnostics_module
+from jafta.agent.tools import introspect
+from jafta.agent.tools.introspect import GetSourceTool
 
 
 def _tool() -> GetSourceTool:
@@ -28,7 +28,7 @@ def _tool() -> GetSourceTool:
 
 
 async def test_reads_source_of_a_module():
-    result = await _tool().execute(target="jenny.agent.tools.diagnostics")
+    result = await _tool().execute(target="jafta.agent.tools.diagnostics")
 
     assert result.startswith("# ")
     assert "diagnostics.py" in result.splitlines()[0]
@@ -36,26 +36,26 @@ async def test_reads_source_of_a_module():
 
 
 async def test_reads_source_of_a_class():
-    result = await _tool().execute(target="jenny.agent.tools.introspect.GetSourceTool")
+    result = await _tool().execute(target="jafta.agent.tools.introspect.GetSourceTool")
 
     assert "class GetSourceTool(Tool):" in result
 
 
 async def test_reads_source_of_a_function():
-    result = await _tool().execute(target="jenny.agent.tools.introspect._resolve_target")
+    result = await _tool().execute(target="jafta.agent.tools.introspect._resolve_target")
 
     assert "def _resolve_target(target: str) -> Any:" in result
 
 
 async def test_target_is_stripped_of_whitespace():
-    result = await _tool().execute(target="  jenny.agent.tools.introspect._resolve_target  ")
+    result = await _tool().execute(target="  jafta.agent.tools.introspect._resolve_target  ")
 
     assert "def _resolve_target" in result
 
 
 async def test_target_equal_to_bare_jenny_resolves_package():
-    # "jenny" (senza punto) è l'unico caso speciale ammesso oltre a "jenny.*".
-    result = await _tool().execute(target="jenny")
+    # "jafta" (senza punto) è l'unico caso speciale ammesso oltre a "jafta.*".
+    result = await _tool().execute(target="jafta")
 
     assert result.startswith("# ")
 
@@ -72,8 +72,8 @@ async def test_target_equal_to_bare_jenny_resolves_package():
         "os.path",
         "builtins",
         "../etc/passwd",
-        "jenny/../../etc/passwd",
-        "jennywrong",  # prefisso stringa ma non un vero sotto-pacchetto jenny.*
+        "jafta/../../etc/passwd",
+        "jennywrong",  # prefisso stringa ma non un vero sotto-pacchetto jafta.*
         "",
     ],
 )
@@ -81,7 +81,7 @@ async def test_rejects_targets_outside_jenny_package(target):
     result = await _tool().execute(target=target)
 
     assert result.startswith("Error:")
-    assert "only exposes the jenny package" in result
+    assert "only exposes the jafta package" in result
 
 
 # ---------------------------------------------------------------------------
@@ -90,21 +90,21 @@ async def test_rejects_targets_outside_jenny_package(target):
 
 
 async def test_nonexistent_module_returns_error():
-    result = await _tool().execute(target="jenny.agent.tools.does_not_exist_xyz")
+    result = await _tool().execute(target="jafta.agent.tools.does_not_exist_xyz")
 
     assert result.startswith("Error: cannot resolve")
 
 
 async def test_nonexistent_attribute_on_real_module_returns_error():
     result = await _tool().execute(
-        target="jenny.agent.tools.introspect.NoSuchClassHere"
+        target="jafta.agent.tools.introspect.NoSuchClassHere"
     )
 
     assert result.startswith("Error: cannot resolve")
 
 
 async def test_trailing_dot_target_returns_error():
-    result = await _tool().execute(target="jenny.")
+    result = await _tool().execute(target="jafta.")
 
     assert result.startswith("Error: cannot resolve")
 
@@ -117,7 +117,7 @@ async def test_trailing_dot_target_returns_error():
 async def test_source_is_truncated_beyond_max_chars(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(introspect, "_MAX_SOURCE_CHARS", 40)
 
-    result = await _tool().execute(target="jenny.agent.tools.diagnostics")
+    result = await _tool().execute(target="jafta.agent.tools.diagnostics")
 
     assert "... [truncated]" in result
     # La parte di sorgente (dopo l'header "# path\n") non supera il limite.
@@ -136,7 +136,7 @@ async def test_falls_back_to_extracted_source_when_getsource_fails(
     """Simula una build pacchettizzata (.imy) senza .py accanto al bytecode.
 
     In dev ``get_package_source_root`` ritorna la vera directory del
-    pacchetto ``jenny``, quindi il fallback legge il file reale da disco.
+    pacchetto ``jafta``, quindi il fallback legge il file reale da disco.
     """
 
     def boom(_obj):
@@ -144,7 +144,7 @@ async def test_falls_back_to_extracted_source_when_getsource_fails(
 
     monkeypatch.setattr(introspect.inspect, "getsource", boom)
 
-    result = await _tool().execute(target="jenny.agent.tools.diagnostics")
+    result = await _tool().execute(target="jafta.agent.tools.diagnostics")
 
     assert result.startswith("# ")
     assert result.splitlines()[0].endswith("diagnostics.py")
@@ -158,9 +158,9 @@ async def test_fallback_reports_error_when_no_source_root_available(
         raise OSError("no source available (simulated packaged build)")
 
     monkeypatch.setattr(introspect.inspect, "getsource", boom)
-    monkeypatch.setattr("jenny.utils.android_assets.get_package_source_root", lambda: None)
+    monkeypatch.setattr("jafta.utils.android_assets.get_package_source_root", lambda: None)
 
-    result = await _tool().execute(target="jenny.agent.tools.diagnostics")
+    result = await _tool().execute(target="jafta.agent.tools.diagnostics")
 
     assert result.startswith("Error: source not available")
     assert "packaged build" in result
@@ -173,10 +173,10 @@ def test_read_from_source_root_package_dir_layout(monkeypatch: pytest.MonkeyPatc
     probe = target_dir / "diagnostics.py"
     probe.write_text("# fake dev source\n", encoding="utf-8")
 
-    monkeypatch.setattr("jenny.utils.android_assets.get_package_source_root", lambda: tmp_path)
+    monkeypatch.setattr("jafta.utils.android_assets.get_package_source_root", lambda: tmp_path)
 
     result = introspect._read_from_source_root(
-        "jenny.agent.tools.diagnostics", diagnostics_module
+        "jafta.agent.tools.diagnostics", diagnostics_module
     )
 
     assert result is not None
@@ -188,16 +188,16 @@ def test_read_from_source_root_package_dir_layout(monkeypatch: pytest.MonkeyPatc
 def test_read_from_source_root_extracted_assets_layout(
     monkeypatch: pytest.MonkeyPatch, tmp_path
 ):
-    """Layout asset estratti: root contiene una sotto-cartella jenny/ (APK)."""
-    target_dir = tmp_path / "jenny" / "agent" / "tools"
+    """Layout asset estratti: root contiene una sotto-cartella jafta/ (APK)."""
+    target_dir = tmp_path / "jafta" / "agent" / "tools"
     target_dir.mkdir(parents=True)
     probe = target_dir / "diagnostics.py"
     probe.write_text("# fake extracted source\n", encoding="utf-8")
 
-    monkeypatch.setattr("jenny.utils.android_assets.get_package_source_root", lambda: tmp_path)
+    monkeypatch.setattr("jafta.utils.android_assets.get_package_source_root", lambda: tmp_path)
 
     result = introspect._read_from_source_root(
-        "jenny.agent.tools.diagnostics", diagnostics_module
+        "jafta.agent.tools.diagnostics", diagnostics_module
     )
 
     assert result is not None
@@ -209,10 +209,10 @@ def test_read_from_source_root_extracted_assets_layout(
 def test_read_from_source_root_returns_none_without_source_root(
     monkeypatch: pytest.MonkeyPatch,
 ):
-    monkeypatch.setattr("jenny.utils.android_assets.get_package_source_root", lambda: None)
+    monkeypatch.setattr("jafta.utils.android_assets.get_package_source_root", lambda: None)
 
     result = introspect._read_from_source_root(
-        "jenny.agent.tools.diagnostics", diagnostics_module
+        "jafta.agent.tools.diagnostics", diagnostics_module
     )
 
     assert result is None
@@ -222,10 +222,10 @@ def test_read_from_source_root_returns_none_when_files_missing(
     monkeypatch: pytest.MonkeyPatch, tmp_path
 ):
     # root esiste ma non contiene il file atteso in nessun layout candidato.
-    monkeypatch.setattr("jenny.utils.android_assets.get_package_source_root", lambda: tmp_path)
+    monkeypatch.setattr("jafta.utils.android_assets.get_package_source_root", lambda: tmp_path)
 
     result = introspect._read_from_source_root(
-        "jenny.agent.tools.diagnostics", diagnostics_module
+        "jafta.agent.tools.diagnostics", diagnostics_module
     )
 
     assert result is None
@@ -237,7 +237,7 @@ def test_read_from_source_root_returns_none_when_files_missing(
 
 
 def test_resolve_target_walks_attributes():
-    obj = introspect._resolve_target("jenny.agent.tools.introspect.GetSourceTool")
+    obj = introspect._resolve_target("jafta.agent.tools.introspect.GetSourceTool")
 
     assert obj is GetSourceTool
 

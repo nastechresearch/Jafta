@@ -1,4 +1,4 @@
-"""Test per jenny.config.bootstrap.ensure_minimal_config.
+"""Test per jafta.config.bootstrap.ensure_minimal_config.
 
 Copre: creazione del config minimale quando assente, idempotenza quando già
 presente, mancata sovrascrittura di un config esistente (incluso il caso in
@@ -11,8 +11,8 @@ from __future__ import annotations
 import json
 import stat
 
-from jenny.config.bootstrap import ensure_minimal_config
-from jenny.config.loader import load_config
+from jafta.config.bootstrap import ensure_minimal_config
+from jafta.config.loader import load_config
 
 
 def test_creates_minimal_config_when_absent(tmp_path):

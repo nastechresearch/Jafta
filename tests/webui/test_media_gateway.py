@@ -7,8 +7,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.webui import media_gateway
-from jenny.webui.media_gateway import WebUIMediaGateway
+from jafta.webui import media_gateway
+from jafta.webui.media_gateway import WebUIMediaGateway
 
 
 def _media_dir(root: Path):

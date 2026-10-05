@@ -23,7 +23,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-UI_DIR = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui"
+UI_DIR = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui"
 CSS = UI_DIR / "assets" / "mobile-style.css"
 CHIP_JS = UI_DIR / "assets" / "shared" / "scope-chip.js"
 LIST_JS = UI_DIR / "assets" / "shared" / "conversation-list.js"

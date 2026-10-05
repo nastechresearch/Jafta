@@ -2,13 +2,13 @@
 
 import pytest
 
-from jenny.agent.tools.filesystem import (
+from jafta.agent.tools.filesystem import (
     EditFileTool,
     ListDirTool,
     ReadFileTool,
     WriteFileTool,
 )
-from jenny.agent.tools.filesystem_edit_match import _find_matches
+from jafta.agent.tools.filesystem_edit_match import _find_matches
 
 
 def _find_match(content: str, old_text: str) -> tuple[str | None, int]:
@@ -338,7 +338,7 @@ class TestWorkspaceRestriction:
         media_file = media_dir / "photo.txt"
         media_file.write_text("shared media", encoding="utf-8")
 
-        monkeypatch.setattr("jenny.agent.tools.path_utils.get_media_dir", lambda: media_dir)
+        monkeypatch.setattr("jafta.agent.tools.path_utils.get_media_dir", lambda: media_dir)
 
         tool = ReadFileTool(workspace=workspace, allowed_dir=workspace)
         result = await tool.execute(path=str(media_file))
@@ -352,7 +352,7 @@ class TestWorkspaceRestriction:
         media_dir = tmp_path / "media"
         media_dir.mkdir()
 
-        monkeypatch.setattr("jenny.agent.tools.path_utils.get_media_dir", lambda: media_dir)
+        monkeypatch.setattr("jafta.agent.tools.path_utils.get_media_dir", lambda: media_dir)
 
         tool = WriteFileTool(workspace=workspace, allowed_dir=workspace)
         result = await tool.execute(path=str(media_dir / "hack.txt"), content="pwned")

@@ -20,11 +20,11 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.agent.loop import AgentLoop
-from jenny.agent.tools.base import Tool
-from jenny.agent.tools.registry import ToolRegistry
-from jenny.bus.queue import MessageBus
-from jenny.providers.base import LLMResponse
+from jafta.agent.loop import AgentLoop
+from jafta.agent.tools.base import Tool
+from jafta.agent.tools.registry import ToolRegistry
+from jafta.bus.queue import MessageBus
+from jafta.providers.base import LLMResponse
 
 _INVENTORY_HEADING = "# The tools you actually have"
 
@@ -71,9 +71,9 @@ def _inventory_names(system_prompt: str) -> set[str]:
 
 @pytest.fixture
 def workspace(tmp_path: Path):
-    from jenny.config import paths as paths_mod
-    from jenny.runtime.context import get_runtime_context
-    from jenny.utils.helpers import sync_workspace_templates
+    from jafta.config import paths as paths_mod
+    from jafta.runtime.context import get_runtime_context
+    from jafta.utils.helpers import sync_workspace_templates
 
     previous = get_runtime_context().workspace_dir
     root = tmp_path / "workspace"
@@ -169,7 +169,7 @@ async def test_the_invariant_holds_for_the_default_registry_too(workspace):
 
 async def test_a_dream_turn_is_described_as_dream(workspace):
     """Il caso osservato sul telefono: Dream chiamo ``grep``, che non ha."""
-    from jenny.agent.memory import MemoryStore
+    from jafta.agent.memory import MemoryStore
 
     loop, captured = _loop_with_capture(workspace)
     dream_tools = MemoryStore(workspace).build_dream_tools()

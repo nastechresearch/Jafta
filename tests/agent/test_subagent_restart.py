@@ -8,14 +8,14 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.runner import AgentRunResult
-from jenny.agent.subagent import (
+from jafta.agent.runner import AgentRunResult
+from jafta.agent.subagent import (
     MAX_AUTO_ATTEMPTS,
     SubagentManager,
     SubagentRestartError,
 )
-from jenny.bus.queue import MessageBus
-from jenny.providers.base import LLMProvider
+from jafta.bus.queue import MessageBus
+from jafta.providers.base import LLMProvider
 
 # ---------------------------------------------------------------------------
 # Helpers

@@ -29,9 +29,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.agent.loop import PROJECT_INIT_COMMAND, AgentLoop
-from jenny.bus.events import InboundMessage
-from jenny.bus.queue import MessageBus
+from jafta.agent.loop import PROJECT_INIT_COMMAND, AgentLoop
+from jafta.bus.events import InboundMessage
+from jafta.bus.queue import MessageBus
 
 
 def _loop(tmp_path: Path) -> AgentLoop:
@@ -165,12 +165,12 @@ def test_the_prompt_is_a_system_template_so_a_correction_arrives() -> None:
     sola. Fuori da quella lista, una correzione al prompt di ``/init`` non
     arriverebbe mai su un telefono aggiornato da mesi.
     """
-    from jenny.utils.android_assets import _SYSTEM_PROMPT_TEMPLATES
+    from jafta.utils.android_assets import _SYSTEM_PROMPT_TEMPLATES
 
     assert "agent/project_init.md" in _SYSTEM_PROMPT_TEMPLATES
 
 
 def test_help_lists_it() -> None:
-    from jenny.command.builtin import build_help_text
+    from jafta.command.builtin import build_help_text
 
     assert PROJECT_INIT_COMMAND in build_help_text()

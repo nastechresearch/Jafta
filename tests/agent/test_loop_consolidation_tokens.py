@@ -2,13 +2,13 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.loop import AgentLoop
-from jenny.bus.queue import MessageBus
-from jenny.providers.base import LLMResponse
+from jafta.agent.loop import AgentLoop
+from jafta.bus.queue import MessageBus
+from jafta.providers.base import LLMResponse
 
 
 def _make_loop(tmp_path, *, estimated_tokens: int, context_window_tokens: int) -> AgentLoop:
-    from jenny.providers.base import GenerationSettings
+    from jafta.providers.base import GenerationSettings
     provider = MagicMock()
     provider.get_default_model.return_value = "test-model"
     provider.generation = GenerationSettings(max_tokens=0)
@@ -50,7 +50,7 @@ async def test_prompt_above_threshold_triggers_consolidation(tmp_path, monkeypat
         {"role": "user", "content": "u2", "timestamp": "2026-01-01T00:00:02"},
     ]
     loop.sessions.save(session)
-    monkeypatch.setattr("jenny.agent.consolidator.estimate_message_tokens", lambda _message: 500)
+    monkeypatch.setattr("jafta.agent.consolidator.estimate_message_tokens", lambda _message: 500)
 
     await loop.process_direct("hello", session_key="internal:test")
 
@@ -73,7 +73,7 @@ async def test_prompt_above_threshold_archives_until_next_user_boundary(tmp_path
     loop.sessions.save(session)
 
     token_map = {"u1": 120, "a1": 120, "u2": 120, "a2": 120, "u3": 120}
-    monkeypatch.setattr("jenny.agent.consolidator.estimate_message_tokens", lambda message: token_map[message["content"]])
+    monkeypatch.setattr("jafta.agent.consolidator.estimate_message_tokens", lambda message: token_map[message["content"]])
 
     await loop.consolidator.maybe_consolidate_by_tokens(session)
 
@@ -110,7 +110,7 @@ async def test_consolidation_loops_until_target_met(tmp_path, monkeypatch) -> No
         return (80, "test")
 
     loop.consolidator.estimate_session_prompt_tokens = mock_estimate  # type: ignore[method-assign]
-    monkeypatch.setattr("jenny.agent.consolidator.estimate_message_tokens", lambda _m: 100)
+    monkeypatch.setattr("jafta.agent.consolidator.estimate_message_tokens", lambda _m: 100)
 
     await loop.consolidator.maybe_consolidate_by_tokens(session)
 
@@ -147,7 +147,7 @@ async def test_consolidation_continues_below_trigger_until_half_target(tmp_path,
         return (80, "test")
 
     loop.consolidator.estimate_session_prompt_tokens = mock_estimate  # type: ignore[method-assign]
-    monkeypatch.setattr("jenny.agent.consolidator.estimate_message_tokens", lambda _m: 100)
+    monkeypatch.setattr("jafta.agent.consolidator.estimate_message_tokens", lambda _m: 100)
 
     await loop.consolidator.maybe_consolidate_by_tokens(session)
 
@@ -177,7 +177,7 @@ async def test_consolidation_persists_summary_for_next_prepare_session(tmp_path,
         return (80, "test")
 
     loop.consolidator.estimate_session_prompt_tokens = mock_estimate  # type: ignore[method-assign]
-    monkeypatch.setattr("jenny.agent.consolidator.estimate_message_tokens", lambda _m: 150)
+    monkeypatch.setattr("jafta.agent.consolidator.estimate_message_tokens", lambda _m: 150)
 
     await loop.consolidator.maybe_consolidate_by_tokens(session)
 
@@ -240,7 +240,7 @@ async def test_preflight_consolidation_before_llm_call(tmp_path, monkeypatch) ->
         {"role": "user", "content": "u2", "timestamp": "2026-01-01T00:00:02"},
     ]
     loop.sessions.save(session)
-    monkeypatch.setattr("jenny.agent.consolidator.estimate_message_tokens", lambda _m: 500)
+    monkeypatch.setattr("jafta.agent.consolidator.estimate_message_tokens", lambda _m: 500)
 
     call_count = [0]
     def mock_estimate(_session, *, session_summary=None):

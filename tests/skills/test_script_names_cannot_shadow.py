@@ -17,7 +17,7 @@ Finché i nomi lì dentro sono distinti non succede niente, e oggi lo sono: la
 misura dice zero collisioni. La fragilità è per il futuro, e ha una forma
 precisa: il giorno che una skill si porta uno ``scripts/types.py`` o
 ``scripts/queue.py``, ogni ``import types`` **successivo** — in un test, in
-``jenny/``, dentro pytest — prende quel file. Il rosso che ne esce non nomina
+``jafta/``, dentro pytest — prende quel file. Il rosso che ne esce non nomina
 questo file e non nomina quella skill.
 
 Chiudere il buco per davvero vorrebbe dire caricare quegli script per posizione
@@ -36,7 +36,7 @@ from pathlib import Path
 import pytest
 
 REPO = Path(__file__).resolve().parents[2]
-SKILLS = REPO / "jenny" / "skills"
+SKILLS = REPO / "jafta" / "skills"
 
 # I nomi di primo livello del progetto: uno script che si chiamasse così
 # vincerebbe su di loro esattamente come su un modulo di stdlib.

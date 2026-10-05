@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.snapshot.crypto import (
+from jafta.snapshot.crypto import (
     FORMAT_VERSION,
     HEADER_LEN,
     MAGIC,
     build_header,
     parse_header,
 )
-from jenny.snapshot.crypto_backends.base import CryptoAuthError
+from jafta.snapshot.crypto_backends.base import CryptoAuthError
 
 SALT = bytes(16)
 NONCE = bytes(12)

@@ -6,15 +6,15 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from jenny.providers.base import StreamTimeout
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
-from jenny.providers.openai_responses.converters import (
+from jafta.providers.base import StreamTimeout
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.openai_responses.converters import (
     convert_messages,
     convert_tools,
     convert_user_message,
     split_tool_call_id,
 )
-from jenny.providers.openai_responses.parsing import (
+from jafta.providers.openai_responses.parsing import (
     consume_sse_with_reasoning,
     map_finish_reason,
     parse_response_output,
@@ -548,7 +548,7 @@ class TestParseResponseOutput:
             }],
             "status": "completed", "usage": {},
         }
-        with patch("jenny.providers.openai_responses.parsing.logger") as mock_logger:
+        with patch("jafta.providers.openai_responses.parsing.logger") as mock_logger:
             result = parse_response_output(resp)
         assert result.tool_calls[0].arguments == "{bad json"
         mock_logger.warning.assert_called_once()

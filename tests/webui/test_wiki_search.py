@@ -20,8 +20,8 @@ from support.gateway_http import make_handler
 from websockets.http11 import Headers
 from websockets.http11 import Request as WsRequest
 
-from jenny.webui.wiki import build_graph, read_pages
-from jenny.webui.wiki_search import (
+from jafta.webui.wiki import build_graph, read_pages
+from jafta.webui.wiki_search import (
     SearchIndex,
     WikiSearchService,
     fingerprint,
@@ -338,7 +338,7 @@ class TestWikiSearchService:
         def boom(*_args, **_kwargs):
             raise AssertionError("cache hit: nessuna pagina va riletta")
 
-        monkeypatch.setattr("jenny.webui.wiki_search.read_pages", boom)
+        monkeypatch.setattr("jafta.webui.wiki_search.read_pages", boom)
         assert service.bundle(pages_dir).search["docs"] == 1
 
     def test_changed_page_rebuilds(self, wikis_dir: Path):
@@ -403,7 +403,7 @@ _AUTH_SECRET = "test-secret"
 @pytest.fixture
 def handler(tmp_path: Path, monkeypatch):
     """GatewayHTTPHandler reale su un workspace di tmp_path (v. test_skills_routes)."""
-    from jenny.config import paths as paths_mod
+    from jafta.config import paths as paths_mod
 
     workspace = tmp_path / "data" / "workspace"
     workspace.mkdir(parents=True)

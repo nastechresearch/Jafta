@@ -11,9 +11,9 @@ import httpx
 import pytest
 from port_alloc import free_port
 
-from jenny.channels.websocket import WebSocketChannel, WebSocketConfig
-from jenny.session.manager import Session, SessionManager
-from jenny.webui.gateway_services import GatewayServices, build_gateway_services
+from jafta.channels.websocket import WebSocketChannel, WebSocketConfig
+from jafta.session.manager import Session, SessionManager
+from jafta.webui.gateway_services import GatewayServices, build_gateway_services
 
 _AUTH_SECRET = "test-secret"
 
@@ -86,7 +86,7 @@ async def _bootstrap(port: int) -> dict[str, Any]:
     """Call the bootstrap endpoint with the shared test secret."""
     resp = await _http_get(
         f"http://127.0.0.1:{port}/webui/bootstrap",
-        headers={"X-Jenny-Auth": _AUTH_SECRET},
+        headers={"X-Jafta-Auth": _AUTH_SECRET},
     )
     assert resp.status_code == 200, f"bootstrap failed: {resp.status_code}"
     return resp.json()
@@ -122,7 +122,7 @@ async def test_bootstrap_returns_metadata_for_localhost(
     try:
         resp = await _http_get(
             f"http://127.0.0.1:{port}/webui/bootstrap",
-            headers={"X-Jenny-Auth": _AUTH_SECRET},
+            headers={"X-Jafta-Auth": _AUTH_SECRET},
         )
         assert resp.status_code == 200
         body = resp.json()
@@ -155,10 +155,10 @@ async def test_webui_skills_route_requires_token_and_hides_paths(
             "name: zz-unavailable-skill",
             "description: Missing CLI skill.",
             "metadata:",
-            "  jenny:",
+            "  jafta:",
             "    requires:",
             "      bins:",
-            "        - definitely-missing-jenny-skill-cli",
+            "        - definitely-missing-jafta-skill-cli",
             "      env:",
             "        - DEFINITELY_MISSING_JENNY_SKILL_ENV",
             "---",
@@ -206,7 +206,7 @@ async def test_webui_skills_route_requires_token_and_hides_paths(
         unavailable = next(skill for skill in body["skills"] if skill["name"] == "zz-unavailable-skill")
         assert unavailable["available"] is False
         assert unavailable["unavailable_reason"] == (
-            "Missing: definitely-missing-jenny-skill-cli, "
+            "Missing: definitely-missing-jafta-skill-cli, "
             "ENV: DEFINITELY_MISSING_JENNY_SKILL_ENV"
         )
     finally:
@@ -223,9 +223,9 @@ async def test_webui_thread_resigns_assistant_media_urls(
     bus: MagicMock, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     port = free_port()
-    from jenny.webui.transcript import append_transcript_object
+    from jafta.webui.transcript import append_transcript_object
 
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     media_root = tmp_path / "media"
     websocket_media = media_root / "websocket"
     websocket_media.mkdir(parents=True)
@@ -235,7 +235,7 @@ async def test_webui_thread_resigns_assistant_media_urls(
     def fake_media_dir(channel: str | None = None) -> Path:
         return websocket_media if channel == "websocket" else media_root
 
-    monkeypatch.setattr("jenny.webui.media_gateway.get_media_dir", fake_media_dir)
+    monkeypatch.setattr("jafta.webui.media_gateway.get_media_dir", fake_media_dir)
 
     append_transcript_object(
         "websocket:video-replay",
@@ -361,7 +361,7 @@ async def test_static_serves_index_when_dist_present(
         # index.html, not the WS-upgrade handler's 401/426.
         root = await _http_get(f"http://127.0.0.1:{port}/")
         assert root.status_code == 200
-        assert "Jenny" in root.text
+        assert "Jafta" in root.text
         # Un asset vero deve arrivare **come asset**, non come la shell.
         #
         # Qui prima si scriveva un ``favicon.svg`` in una ``dist`` che non era
@@ -378,7 +378,7 @@ async def test_static_serves_index_when_dist_present(
         # Unknown SPA route falls back to index.html.
         spa = await _http_get(f"http://127.0.0.1:{port}/sessions/abc")
         assert spa.status_code == 200
-        assert "Jenny" in spa.text
+        assert "Jafta" in spa.text
     finally:
         await channel.stop()
         await server_task
@@ -447,7 +447,7 @@ _NO_HEADERS = _FakeReq()
 def test_wildcard_host_without_auth_raises_on_startup(bus: MagicMock) -> None:
     import pytest
 
-    from jenny.pydantic_compat import ValidationError
+    from jafta.pydantic_compat import ValidationError
 
     with pytest.raises(ValidationError, match="token"):
         _ch(bus, host="0.0.0.0", tokenIssueSecret="")
@@ -461,7 +461,7 @@ def test_wildcard_host_with_secret_is_valid(bus: MagicMock) -> None:
 def test_wildcard_ipv6_without_auth_raises(bus: MagicMock) -> None:
     import pytest
 
-    from jenny.pydantic_compat import ValidationError
+    from jafta.pydantic_compat import ValidationError
 
     with pytest.raises(ValidationError, match="token"):
         _ch(bus, host="::", tokenIssueSecret="")
@@ -470,7 +470,7 @@ def test_wildcard_ipv6_without_auth_raises(bus: MagicMock) -> None:
 def test_wildcard_ipv6_with_secret_is_valid(bus: MagicMock) -> None:
     channel = _ch(bus, host="::", tokenIssueSecret="s3cret")
     resp = channel.gateway.http._handle_bootstrap(
-        _REMOTE, _FakeReq({"X-Jenny-Auth": "s3cret"})
+        _REMOTE, _FakeReq({"X-Jafta-Auth": "s3cret"})
     )
     assert resp.status_code == 200
 
@@ -480,11 +480,11 @@ def test_bootstrap_ws_url_uses_forwarded_https_host(bus: MagicMock) -> None:
     channel = _ch(bus, host="127.0.0.1", port=port, tokenIssueSecret="")
     resp = channel.gateway.http._handle_bootstrap(
         _LOCAL,
-        _FakeReq({"Host": "jenny.example", "X-Forwarded-Proto": "https"}),
+        _FakeReq({"Host": "jafta.example", "X-Forwarded-Proto": "https"}),
     )
     assert resp.status_code == 200
     body = json.loads(resp.body)
-    assert body["ws_url"] == "wss://jenny.example/"
+    assert body["ws_url"] == "wss://jafta.example/"
 
 
 def test_localhost_without_auth_is_valid(bus: MagicMock) -> None:
@@ -495,7 +495,7 @@ def test_localhost_without_auth_is_valid(bus: MagicMock) -> None:
 
 def test_bootstrap_prefers_runtime_model_name(bus: MagicMock, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        "jenny.webui.ws_http._default_model_name_from_config",
+        "jafta.webui.ws_http._default_model_name_from_config",
         lambda: "from-disk",
     )
     channel = _ch(bus, host="127.0.0.1", runtime_model_name=lambda: "  live/model  ", tokenIssueSecret="")
@@ -507,7 +507,7 @@ def test_bootstrap_prefers_runtime_model_name(bus: MagicMock, monkeypatch: pytes
 
 def test_bootstrap_includes_provider_from_config(bus: MagicMock, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        "jenny.webui.ws_http._default_provider_name_from_config",
+        "jafta.webui.ws_http._default_provider_name_from_config",
         lambda: "deepseek",
     )
     channel = _ch(bus, host="127.0.0.1", tokenIssueSecret="")
@@ -519,7 +519,7 @@ def test_bootstrap_includes_provider_from_config(bus: MagicMock, monkeypatch: py
 
 def test_bootstrap_provider_empty_when_config_unreadable(bus: MagicMock, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        "jenny.webui.ws_http._default_provider_name_from_config",
+        "jafta.webui.ws_http._default_provider_name_from_config",
         lambda: None,
     )
     channel = _ch(bus, host="127.0.0.1", tokenIssueSecret="")
@@ -531,7 +531,7 @@ def test_bootstrap_provider_empty_when_config_unreadable(bus: MagicMock, monkeyp
 
 def test_bootstrap_falls_back_when_runtime_returns_empty(bus: MagicMock, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        "jenny.webui.ws_http._default_model_name_from_config",
+        "jafta.webui.ws_http._default_model_name_from_config",
         lambda: "from-disk",
     )
     channel = _ch(bus, host="127.0.0.1", runtime_model_name=lambda: "   ", tokenIssueSecret="")
@@ -543,7 +543,7 @@ def test_bootstrap_falls_back_when_runtime_returns_empty(bus: MagicMock, monkeyp
 
 def test_bootstrap_falls_back_when_runtime_raises(bus: MagicMock, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        "jenny.webui.ws_http._default_model_name_from_config",
+        "jafta.webui.ws_http._default_model_name_from_config",
         lambda: "from-disk",
     )
 
@@ -576,7 +576,7 @@ def test_bootstrap_accepts_remote_with_valid_secret(bus: MagicMock) -> None:
 def test_bootstrap_accepts_x_jenny_auth_header(bus: MagicMock) -> None:
     channel = _ch(bus, host="0.0.0.0", tokenIssueSecret="s3cret")
     resp = channel.gateway.http._handle_bootstrap(
-        _REMOTE, _FakeReq({"X-Jenny-Auth": "s3cret"})
+        _REMOTE, _FakeReq({"X-Jafta-Auth": "s3cret"})
     )
     assert resp.status_code == 200
 
@@ -607,7 +607,7 @@ def test_shipped_default_no_longer_grants_bootstrap_without_secret(
     out the bootstrap secret to anyone who could open a TCP connection
     to 127.0.0.1 — including another installed app.
     """
-    from jenny.config.bootstrap import ensure_minimal_config
+    from jafta.config.bootstrap import ensure_minimal_config
 
     workspace = tmp_path / "workspace"
     workspace.mkdir()
@@ -631,7 +631,7 @@ def test_shipped_default_bootstrap_succeeds_with_persisted_secret(
     """The legitimate WebUI — which can read the secret from the same private
     workspace config the app's own process already has filesystem access to —
     can still bootstrap successfully."""
-    from jenny.config.bootstrap import ensure_minimal_config
+    from jafta.config.bootstrap import ensure_minimal_config
 
     workspace = tmp_path / "workspace"
     workspace.mkdir()
@@ -643,7 +643,7 @@ def test_shipped_default_bootstrap_succeeds_with_persisted_secret(
     channel = _ch(bus, host="127.0.0.1", tokenIssueSecret=secret)
 
     resp = channel.gateway.http._handle_bootstrap(
-        _LOCAL, _FakeReq({"X-Jenny-Auth": secret})
+        _LOCAL, _FakeReq({"X-Jafta-Auth": secret})
     )
     assert resp.status_code == 200
 
@@ -651,7 +651,7 @@ def test_shipped_default_bootstrap_succeeds_with_persisted_secret(
 def test_ensure_minimal_config_backfills_secret_for_legacy_config(tmp_path: Path) -> None:
     """Configs written before this fix (empty/missing token_issue_secret) get
     a secret backfilled in place on the next gateway start."""
-    from jenny.config.bootstrap import ensure_minimal_config
+    from jafta.config.bootstrap import ensure_minimal_config
 
     workspace = tmp_path / "workspace"
     workspace.mkdir()
@@ -668,7 +668,7 @@ def test_ensure_minimal_config_backfills_secret_for_legacy_config(tmp_path: Path
 
 def test_ensure_minimal_config_does_not_overwrite_explicit_secret(tmp_path: Path) -> None:
     """An operator-configured secret (or static token) is never clobbered."""
-    from jenny.config.bootstrap import ensure_minimal_config
+    from jafta.config.bootstrap import ensure_minimal_config
 
     workspace = tmp_path / "workspace"
     workspace.mkdir()

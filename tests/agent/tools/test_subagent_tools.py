@@ -7,13 +7,13 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.config.schema import AgentDefaults
+from jafta.config.schema import AgentDefaults
 
 _MAX_TOOL_RESULT_CHARS = AgentDefaults().max_tool_result_chars
 
 
 def _spec(task: str = "do task", label: str = "label", **kw):
-    from jenny.agent.subagent import SubagentSpec
+    from jafta.agent.subagent import SubagentSpec
 
     defaults = dict(origin_channel="test", origin_chat_id="c1")
     defaults.update(kw)
@@ -23,10 +23,10 @@ def _spec(task: str = "do task", label: str = "label", **kw):
 @pytest.mark.asyncio
 async def test_subagent_exec_tool_receives_allowed_env_keys(tmp_path):
     """allowed_modules from PythonExecConfig must be forwarded to the subagent's PythonExecTool."""
-    from jenny.agent.subagent import SubagentManager, SubagentStatus
-    from jenny.agent.tools.python_exec import PythonExecConfig
-    from jenny.bus.queue import MessageBus
-    from jenny.config.schema import ToolsConfig
+    from jafta.agent.subagent import SubagentManager, SubagentStatus
+    from jafta.agent.tools.python_exec import PythonExecConfig
+    from jafta.bus.queue import MessageBus
+    from jafta.config.schema import ToolsConfig
 
     bus = MessageBus()
     provider = MagicMock()
@@ -64,8 +64,8 @@ async def test_subagent_exec_tool_receives_allowed_env_keys(tmp_path):
 @pytest.mark.asyncio
 async def test_subagent_uses_configured_max_iterations(tmp_path):
     """Subagents should honor the configured tool-iteration limit."""
-    from jenny.agent.subagent import SubagentManager, SubagentStatus
-    from jenny.bus.queue import MessageBus
+    from jafta.agent.subagent import SubagentManager, SubagentStatus
+    from jafta.bus.queue import MessageBus
 
     bus = MessageBus()
     provider = MagicMock()
@@ -101,8 +101,8 @@ async def test_subagent_uses_configured_max_iterations(tmp_path):
 @pytest.mark.asyncio
 async def test_spawn_forwards_temperature_to_run_spec(tmp_path):
     """A temperature passed to spawn() should reach the AgentRunSpec."""
-    from jenny.agent.subagent import SubagentManager
-    from jenny.bus.queue import MessageBus
+    from jafta.agent.subagent import SubagentManager
+    from jafta.bus.queue import MessageBus
 
     bus = MessageBus()
     provider = MagicMock()
@@ -134,9 +134,9 @@ async def test_spawn_forwards_temperature_to_run_spec(tmp_path):
 @pytest.mark.asyncio
 async def test_spawn_tool_rejects_when_at_concurrency_limit(tmp_path):
     """SpawnTool should return an error string when the concurrency limit is reached."""
-    from jenny.agent.subagent import SubagentManager
-    from jenny.agent.tools.spawn import SpawnTool
-    from jenny.bus.queue import MessageBus
+    from jafta.agent.subagent import SubagentManager
+    from jafta.agent.tools.spawn import SpawnTool
+    from jafta.bus.queue import MessageBus
 
     bus = MessageBus()
     provider = MagicMock()
@@ -166,7 +166,7 @@ async def test_spawn_tool_rejects_when_at_concurrency_limit(tmp_path):
 
     mgr.runner.run = AsyncMock(side_effect=fake_run)
 
-    from jenny.agent.tools.context import RequestContext
+    from jafta.agent.tools.context import RequestContext
 
     tool = SpawnTool(mgr)
     tool.set_context(RequestContext(channel="test", chat_id="c1", session_key="test:c1"))
@@ -188,8 +188,8 @@ async def test_spawn_tool_rejects_when_at_concurrency_limit(tmp_path):
 
 def test_subagent_default_max_concurrent_matches_agent_defaults(tmp_path):
     """Direct SubagentManager construction should use the agent default concurrency limit."""
-    from jenny.agent.subagent import SubagentManager
-    from jenny.bus.queue import MessageBus
+    from jafta.agent.subagent import SubagentManager
+    from jafta.bus.queue import MessageBus
 
     bus = MessageBus()
     provider = MagicMock()
@@ -207,8 +207,8 @@ def test_subagent_default_max_concurrent_matches_agent_defaults(tmp_path):
 
 def test_subagent_default_max_iterations_matches_agent_defaults(tmp_path):
     """Direct SubagentManager construction should use the agent default limit."""
-    from jenny.agent.subagent import SubagentManager
-    from jenny.bus.queue import MessageBus
+    from jafta.agent.subagent import SubagentManager
+    from jafta.bus.queue import MessageBus
 
     bus = MessageBus()
     provider = MagicMock()
@@ -226,8 +226,8 @@ def test_subagent_default_max_iterations_matches_agent_defaults(tmp_path):
 
 def test_agent_loop_passes_max_iterations_to_subagents(tmp_path):
     """AgentLoop's configured limit should be shared with spawned subagents."""
-    from jenny.agent.loop import AgentLoop
-    from jenny.bus.queue import MessageBus
+    from jafta.agent.loop import AgentLoop
+    from jafta.bus.queue import MessageBus
 
     bus = MessageBus()
     provider = MagicMock()
@@ -247,8 +247,8 @@ def test_agent_loop_passes_max_iterations_to_subagents(tmp_path):
 @pytest.mark.asyncio
 async def test_agent_loop_syncs_updated_max_iterations_before_run(tmp_path):
     """Runtime max_iterations changes should be reflected before tool execution."""
-    from jenny.agent.loop import AgentLoop
-    from jenny.bus.queue import MessageBus
+    from jafta.agent.loop import AgentLoop
+    from jafta.bus.queue import MessageBus
 
     bus = MessageBus()
     provider = MagicMock()
@@ -294,10 +294,10 @@ async def test_drain_pending_never_blocks_while_subagents_running(tmp_path):
     Fino al 02/10/2026 qui il turno restava fermo fino a 300 secondi: il risultato
     di un subagent che arriva a turno chiuso apre ora un turno suo.
     """
-    from jenny.agent.loop import AgentLoop
-    from jenny.bus.events import InboundMessage
-    from jenny.bus.queue import MessageBus
-    from jenny.session.manager import Session
+    from jafta.agent.loop import AgentLoop
+    from jafta.bus.events import InboundMessage
+    from jafta.bus.queue import MessageBus
+    from jafta.session.manager import Session
 
     bus = MessageBus()
     provider = MagicMock()
@@ -368,8 +368,8 @@ async def test_drain_pending_never_blocks_while_subagents_running(tmp_path):
 @pytest.mark.asyncio
 async def test_drain_pending_no_block_when_no_subagents(tmp_path):
     """_drain_pending should not block when no sub-agents are running."""
-    from jenny.agent.loop import AgentLoop
-    from jenny.bus.queue import MessageBus
+    from jafta.agent.loop import AgentLoop
+    from jafta.bus.queue import MessageBus
 
     bus = MessageBus()
     provider = MagicMock()

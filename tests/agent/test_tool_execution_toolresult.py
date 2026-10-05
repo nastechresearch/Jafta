@@ -11,12 +11,12 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from jenny.agent.runner import AgentRunner, AgentRunSpec
-from jenny.agent.tools.base import Tool, tool_parameters
-from jenny.agent.tools.registry import ToolRegistry
-from jenny.agent.tools.result import ToolResult
-from jenny.agent.tools.schema import tool_parameters_schema
-from jenny.providers.base import ToolCallRequest
+from jafta.agent.runner import AgentRunner, AgentRunSpec
+from jafta.agent.tools.base import Tool, tool_parameters
+from jafta.agent.tools.registry import ToolRegistry
+from jafta.agent.tools.result import ToolResult
+from jafta.agent.tools.schema import tool_parameters_schema
+from jafta.providers.base import ToolCallRequest
 
 
 @tool_parameters(tool_parameters_schema())

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-from jenny.command.router import CommandContext, CommandRouter
+from jafta.command.router import CommandContext, CommandRouter
 
 
 def _ctx(raw: str) -> CommandContext:

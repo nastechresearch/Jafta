@@ -28,9 +28,9 @@ import inspect
 
 import pytest
 
-from jenny.config.schema import Config, ProviderConfig, ProvidersConfig
-from jenny.providers.factory import provider_fingerprint
-from jenny.webui.settings_api import WebUISettingsError, _apply_agent_settings
+from jafta.config.schema import Config, ProviderConfig, ProvidersConfig
+from jafta.providers.factory import provider_fingerprint
+from jafta.webui.settings_api import WebUISettingsError, _apply_agent_settings
 
 # Un valore plausibile per ogni forma di campo che la funzione accetta: nome
 # IANA, finestra di contesto ammessa, temperatura, sforzo di ragionamento, un

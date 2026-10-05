@@ -1,10 +1,10 @@
 """La pagina pubblica dei comandi RPC dice il vero su codici e rifiuti.
 
-``docs/reference/websocket.md`` finisce anche sul sito (``jenny-site``): un
+``docs/reference/websocket.md`` finisce anche sul sito (``jafta-site``): un
 comando che manca dalla tabella, o un codice d'errore che il gateway manda e la
 pagina non nomina, e' un contratto sbagliato per chiunque scriva un client.
 Per esempio ``conflict`` era descritto solo come «il file e'
-cambiato sotto», mentre rinomino e cancellazione lo usano per «Jenny sta ancora
+cambiato sotto», mentre rinomino e cancellazione lo usano per «Jafta sta ancora
 lavorando li'».
 """
 
@@ -13,7 +13,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from jenny.webui import commands
+from jafta.webui import commands
 
 ROOT = Path(__file__).resolve().parents[2]
 DOC = (ROOT / "docs" / "reference" / "websocket.md").read_text(encoding="utf-8")
@@ -21,8 +21,8 @@ DOC = (ROOT / "docs" / "reference" / "websocket.md").read_text(encoding="utf-8")
 
 def _codes_raised() -> set[str]:
     sources = [
-        ROOT / "jenny" / "webui" / "commands.py",
-        ROOT / "jenny" / "webui" / "project_rename.py",
+        ROOT / "jafta" / "webui" / "commands.py",
+        ROOT / "jafta" / "webui" / "project_rename.py",
     ]
     found: set[str] = set()
     for path in sources:

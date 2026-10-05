@@ -15,8 +15,8 @@ from __future__ import annotations
 import httpx
 import pytest
 
-from jenny.providers.anthropic_provider import AnthropicProvider
-from jenny.providers.retry_policy import is_transient_response
+from jafta.providers.anthropic_provider import AnthropicProvider
+from jafta.providers.retry_policy import is_transient_response
 
 RATE_LIMIT_BODY = (
     '{"type":"error","error":{"type":"rate_limit_error",'

@@ -2,7 +2,7 @@
 
 ``UiQueryResponder._collect`` cercava ``getElementById('view-' + view)``: per
 ``brain``, ``hands`` e ``memory`` quell'id non esiste (sono tutti e tre
-``view-settings``), quindi Jenny riceveva un HTML vuoto proprio dove l'utente le
+``view-settings``), quindi Jafta riceveva un HTML vuoto proprio dove l'utente le
 chiede «cosa vedi?». E la mini-app aperta si cercava in ``controllers.apps`` con
 ``view === 'apps'``: la scheda «App» che non esiste piu', quindi l'app non le
 arrivava mai.

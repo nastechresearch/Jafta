@@ -6,7 +6,7 @@ import logging
 
 from websockets.exceptions import InvalidMessage
 
-from jenny.channels.ws_logging import (
+from jafta.channels.ws_logging import (
     OPENING_HANDSHAKE_FAILED_MESSAGE,
     WebSocketHandshakeNoiseFilter,
 )

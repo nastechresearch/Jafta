@@ -1,7 +1,7 @@
 """Il dettaglio di un job in officina: i gesti che offre e come li compie.
 
 Fino al 26/09/2026 il dettaglio era una scheda da leggere: per fermare un
-promemoria bisognava chiederlo a Jenny. Qui si prova la colla fra la scheda e
+promemoria bisognava chiederlo a Jafta. Qui si prova la colla fra la scheda e
 la route — quali bottoni per quale stato, la conferma prima di eliminare, e che
 cosa dice un rifiuto del server. I due metodi si ritagliano dal sorgente e
 girano in node con i collaboratori finti, come gli altri banchi dell'officina.

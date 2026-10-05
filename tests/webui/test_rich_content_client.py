@@ -19,7 +19,7 @@ from pathlib import Path
 from support.js_harness import requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-RICH = ROOT / "jenny" / "templates" / "ui" / "assets" / "shared" / "rich-content.js"
+RICH = ROOT / "jafta" / "templates" / "ui" / "assets" / "shared" / "rich-content.js"
 
 pytestmark = requires_node
 

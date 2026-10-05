@@ -30,12 +30,12 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.context import ContextBuilder
-from jenny.agent.memory import HISTORY_FLOOR_METADATA_KEY, MemoryStore
-from jenny.bus.events import InboundMessage
-from jenny.command.builtin import cmd_new
-from jenny.command.router import CommandContext
-from jenny.session.manager import Session
+from jafta.agent.context import ContextBuilder
+from jafta.agent.memory import HISTORY_FLOOR_METADATA_KEY, MemoryStore
+from jafta.bus.events import InboundMessage
+from jafta.command.builtin import cmd_new
+from jafta.command.router import CommandContext
+from jafta.session.manager import Session
 
 PERSONAL = "unified:default"
 

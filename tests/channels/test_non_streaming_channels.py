@@ -11,9 +11,9 @@ import inspect
 
 import pytest
 
-from jenny.channels.floating import FloatingChannel
-from jenny.channels.notification import NotificationChannel
-from jenny.channels.telegram import TelegramChannel
+from jafta.channels.floating import FloatingChannel
+from jafta.channels.notification import NotificationChannel
+from jafta.channels.telegram import TelegramChannel
 
 CHANNELS = [FloatingChannel, NotificationChannel, TelegramChannel]
 ASYNC_NOOPS = ["send_delta", "send_reasoning_delta", "send_reasoning_end", "send_file_edit_events"]

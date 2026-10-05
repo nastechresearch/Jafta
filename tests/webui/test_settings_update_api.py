@@ -1,7 +1,7 @@
 """L'aggiornamento dell'app visto dalla WebUI: payload versione e due rotte.
 
 Il calcolo di "esiste una versione più nuova" sta altrove
-(``jenny/runtime/update_check.py``, coperto da ``tests/runtime/test_update_check.py``):
+(``jafta/runtime/update_check.py``, coperto da ``tests/runtime/test_update_check.py``):
 qui si copre soltanto il tratto che porta quell'informazione in pagina e il
 bottone che avvia l'installazione.
 
@@ -26,14 +26,14 @@ import pytest
 from support.gateway_http import make_request
 from websockets.http11 import Request as WsRequest
 
-from jenny import __version__
-from jenny.channels.http_utils import check_api_secret, http_error, http_json_response, parse_query
-from jenny.config.loader import save_config
-from jenny.config.schema import Config
-from jenny.runtime import update_check
-from jenny.runtime.context import get_runtime_context
-from jenny.webui.settings_api import _version_payload, settings_payload
-from jenny.webui.settings_routes import WebUISettingsRouter
+from jafta import __version__
+from jafta.channels.http_utils import check_api_secret, http_error, http_json_response, parse_query
+from jafta.config.loader import save_config
+from jafta.config.schema import Config
+from jafta.runtime import update_check
+from jafta.runtime.context import get_runtime_context
+from jafta.webui.settings_api import _version_payload, settings_payload
+from jafta.webui.settings_routes import WebUISettingsRouter
 
 _SECRET = "s3cr3t-updates"
 _INSTALL_ID = "3f2a1b4c-0000-4000-8000-abcdefabcdef"
@@ -42,7 +42,7 @@ _MANIFEST: dict[str, Any] = {
     "schema": 1,
     "version_code": 9,
     "version_name": "0.7.0",
-    "apk_url": "https://example.invalid/jenny-0.7.0.apk",
+    "apk_url": "https://example.invalid/jafta-0.7.0.apk",
     "sha256": "a" * 64,
     "size": 48210944,
     "notes_url": "https://example.invalid/releases/0.7.0",
@@ -316,14 +316,14 @@ def _install_module(
     start: Any = None,
     status: Any = None,
 ) -> types.ModuleType:
-    """Installa un finto ``jenny.runtime.update_install`` per la durata del test.
+    """Installa un finto ``jafta.runtime.update_install`` per la durata del test.
 
     Il modulo vero è scritto in parallelo e tocca il PackageInstaller di
     Android: qui interessa solo il contratto che le rotte consumano.
     """
-    from jenny import runtime
+    from jafta import runtime
 
-    module = types.ModuleType("jenny.runtime.update_install")
+    module = types.ModuleType("jafta.runtime.update_install")
 
     async def default_start(info: Any = None) -> _Result:
         return _Result(True, "silent", "session committed")
@@ -332,16 +332,16 @@ def _install_module(
     module.install_status = status or (  # type: ignore[attr-defined]
         lambda: {"phase": "downloading", "progress": 42, "detail": "20 MB"}
     )
-    monkeypatch.setitem(sys.modules, "jenny.runtime.update_install", module)
+    monkeypatch.setitem(sys.modules, "jafta.runtime.update_install", module)
     monkeypatch.setattr(runtime, "update_install", module, raising=False)
     return module
 
 
 def _no_install_module(monkeypatch: pytest.MonkeyPatch) -> None:
     """Build senza il layer di installazione: l'import deve fallire pulito."""
-    from jenny import runtime
+    from jafta import runtime
 
-    monkeypatch.setitem(sys.modules, "jenny.runtime.update_install", None)
+    monkeypatch.setitem(sys.modules, "jafta.runtime.update_install", None)
     monkeypatch.delattr(runtime, "update_install", raising=False)
 
 
@@ -457,7 +457,7 @@ class TestTheInstallRoute:
 
 
 class TestAgainstTheRealInstaller:
-    """Un giro senza doppi, contro ``jenny/runtime/update_install.py`` vero.
+    """Un giro senza doppi, contro ``jafta/runtime/update_install.py`` vero.
 
     Tutto il resto di questo file lavora su un finto modulo, che è quello che
     serve per descrivere i casi: qui si verifica invece che il contratto
@@ -469,7 +469,7 @@ class TestAgainstTheRealInstaller:
 
     @pytest.fixture(autouse=True)
     def clean_installer(self):
-        from jenny.runtime import update_install
+        from jafta.runtime import update_install
 
         update_install.reset_install_state()
         yield
@@ -686,7 +686,7 @@ class TestTheStringsTheUIAsksFor:
     alle impostazioni. Questo è il posto dove quella dimenticanza si nota.
     """
 
-    _UI = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+    _UI = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 
     def _keys_used_by_the_settings_page(self) -> set[str]:
         """Ogni file della WebUI, non piu' solo la pagina delle impostazioni.
@@ -758,7 +758,7 @@ class TestThePromptOutcomeIsTerminal:
 
     _SOURCE = (
         Path(__file__).resolve().parents[2]
-        / "jenny" / "templates" / "ui" / "assets" / "shared" / "update-flow.js"
+        / "jafta" / "templates" / "ui" / "assets" / "shared" / "update-flow.js"
     ).read_text(encoding="utf-8")
 
     def _body_of(self, name: str) -> str:

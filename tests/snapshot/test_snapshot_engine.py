@@ -9,15 +9,15 @@ from pathlib import Path
 
 import pytest
 
-from jenny.snapshot.engine import SnapshotEngine
-from jenny.snapshot.store import (
+from jafta.snapshot.engine import SnapshotEngine
+from jafta.snapshot.store import (
     BlobCorruptError,
     get_blob,
     iter_blob_hashes,
     object_path,
     put_blob,
 )
-from jenny.snapshot.types import SnapshotManifest
+from jafta.snapshot.types import SnapshotManifest
 
 
 def _make_workspace(root: Path) -> None:
@@ -28,7 +28,7 @@ def _make_workspace(root: Path) -> None:
 
 
 def _engine(root: Path) -> SnapshotEngine:
-    return SnapshotEngine(root, root / ".jenny" / "snapshots")
+    return SnapshotEngine(root, root / ".jafta" / "snapshots")
 
 
 def test_create_list_and_head(tmp_path: Path) -> None:

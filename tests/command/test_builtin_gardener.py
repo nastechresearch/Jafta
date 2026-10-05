@@ -17,14 +17,14 @@ from types import SimpleNamespace
 
 import pytest
 
-from jenny.agent.gardener import GardenerOutcome
-from jenny.bus.events import InboundMessage
-from jenny.command.builtin import (
+from jafta.agent.gardener import GardenerOutcome
+from jafta.bus.events import InboundMessage
+from jafta.command.builtin import (
     _format_gardener_outcome,
     cmd_gardener,
     register_builtin_commands,
 )
-from jenny.command.router import CommandContext, CommandRouter
+from jafta.command.router import CommandContext, CommandRouter
 
 
 @pytest.fixture()
@@ -59,7 +59,7 @@ class TestRegistration:
         assert router.is_dispatchable_command("/gardener viaggio")
 
     def test_is_listed_among_builtin_commands(self):
-        from jenny.command.specs import BUILTIN_COMMAND_SPECS
+        from jafta.command.specs import BUILTIN_COMMAND_SPECS
 
         specs = {spec.command: spec for spec in BUILTIN_COMMAND_SPECS}
 

@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from jenny.session.manager import Session, SessionManager
+from jafta.session.manager import Session, SessionManager
 
 
 class TestAtomicSave:

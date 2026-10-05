@@ -1,10 +1,10 @@
-"""Dentro un progetto Jenny sa ancora chi è, e chi sei tu.
+"""Dentro un progetto Jafta sa ancora chi è, e chi sei tu.
 
 Il prompt di un turno viene costruito sulla radice dello *scope* — la cartella
 del progetto, quando la sessione ne ha una legata. Finché i file di bootstrap
 venivano tutti da lì, legare uno scope faceva cercare `SOUL.md` e `USER.md`
 dentro la wiki, dove non ci sono; e chi li carica salta i file assenti con un
-`continue`. Risultato: Jenny senza personalità e senza niente di quel che sa
+`continue`. Risultato: Jafta senza personalità e senza niente di quel che sa
 dell'utente, **senza un errore e senza una riga di log**.
 
 Il rimedio è spaccare una radice in due — identità dall'installazione,
@@ -18,11 +18,11 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.context import ContextBuilder
+from jafta.agent.context import ContextBuilder
 
 pytestmark = pytest.mark.usefixtures("_configure_jenny_workspace")
 
-_SOUL = "# Chi sono\n\nSono Jenny e parlo come parlo io.\n"
+_SOUL = "# Chi sono\n\nSono Jafta e parlo come parlo io.\n"
 _USER = "# Utente\n\n- Vive a Bologna\n- Preferisce l'italiano\n"
 _INSTALL_AGENTS = "# Istruzioni\n\nQueste sono le istruzioni della radice.\n"
 _PROJECT_AGENTS = "# Istruzioni\n\nQui si scrive una wiki su Palestra.\n"

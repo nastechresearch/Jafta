@@ -26,7 +26,7 @@ from pathlib import Path
 from support.kotlin_source import read_source
 
 ROOT = Path(__file__).resolve().parents[2]
-CONTROLLER = ROOT / "android/app/src/main/java/com/flagdizero/jenny/FloatingOverlayController.kt"
+CONTROLLER = ROOT / "android/app/src/main/java/com/flagdizero/jafta/FloatingOverlayController.kt"
 
 
 def _read() -> str:
@@ -128,7 +128,7 @@ class TestSheStandsOnTop:
         assert "slideTo(ctx, parkX(ctx, out = true), parkTop(ctx))" in body
 
     def test_the_sprite_fractions_are_the_measured_ones(self):
-        """0,87 e 0,52 vengono dai pixel opachi di `jenny-body-front-idle`:
+        """0,87 e 0,52 vengono dai pixel opachi di `jafta-body-front-idle`:
         piedi alla riga 668/768, corpo fra le colonne 229–572. Cambiare lo
         sprite senza rimisurarle la mette a galleggiare o a sprofondare."""
         source = _read()

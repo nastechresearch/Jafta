@@ -2,7 +2,7 @@
 
 import os
 
-from jenny.utils.path import abbreviate_path
+from jafta.utils.path import abbreviate_path
 
 
 class TestAbbreviatePathShort:
@@ -54,14 +54,14 @@ class TestAbbreviatePathLong:
 
 class TestAbbreviatePathWindows:
     def test_windows_drive_path(self):
-        path = "D:\\Documents\\GitHub\\jenny\\src\\utils\\helpers.py"
+        path = "D:\\Documents\\GitHub\\jafta\\src\\utils\\helpers.py"
         result = abbreviate_path(path, max_len=40)
         assert result.endswith("helpers.py")
-        assert "jenny" in result
+        assert "jafta" in result
 
     def test_windows_home(self):
         home = os.path.expanduser("~")
-        path = os.path.join(home, ".jenny", "workspace", "log.txt")
+        path = os.path.join(home, ".jafta", "workspace", "log.txt")
         result = abbreviate_path(path)
         assert result.startswith("~/")
         assert "log.txt" in result

@@ -11,8 +11,8 @@ from __future__ import annotations
 import httpx
 import pytest
 
-from jenny.security import fetch
-from jenny.security.fetch import MAX_REDIRECTS, open_validated_stream, read_capped
+from jafta.security import fetch
+from jafta.security.fetch import MAX_REDIRECTS, open_validated_stream, read_capped
 
 
 def _client(routes: dict[str, httpx.Response], seen: list[str]) -> httpx.AsyncClient:

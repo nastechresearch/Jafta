@@ -2,7 +2,7 @@
 
 Go chiede che il client si presenti con uno user agent proprio invece del nome
 della libreria HTTP, e la lista modelli è una richiesta come le altre: parte da
-Jenny e arriva a loro. Non porta invece ``x-opencode-session``, che vale per una
+Jafta e arriva a loro. Non porta invece ``x-opencode-session``, che vale per una
 *conversazione* — un catalogo non lo è, e inventargli un ID sporcherebbe proprio
 il routing che quell'header serve a guidare.
 
@@ -17,11 +17,11 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from jenny.config.loader import save_config
-from jenny.config.schema import Config, ProviderConfig
-from jenny.providers.opencode import SESSION_HEADER
-from jenny.runtime.context import get_runtime_context
-from jenny.webui.settings_api import provider_models_payload
+from jafta.config.loader import save_config
+from jafta.config.schema import Config, ProviderConfig
+from jafta.providers.opencode import SESSION_HEADER
+from jafta.runtime.context import get_runtime_context
+from jafta.webui.settings_api import provider_models_payload
 
 GO_BASE = "https://opencode.ai/zen/go/v1"
 
@@ -57,7 +57,7 @@ class TestTowardOpenCode:
 
     def test_the_probe_identifies_itself(self, config_path: Path) -> None:
         headers = _probe(config_path, api_base=GO_BASE)
-        assert headers["User-Agent"].startswith("jenny/")
+        assert headers["User-Agent"].startswith("jafta/")
 
     def test_does_not_invent_a_session(self, config_path: Path) -> None:
         headers = _probe(config_path, api_base=GO_BASE)
@@ -66,7 +66,7 @@ class TestTowardOpenCode:
     def test_also_applies_to_the_messages_format(self, config_path: Path) -> None:
         # Su Go la stessa base serve anche i modelli in formato Anthropic.
         headers = _probe(config_path, api_base=GO_BASE, fmt="anthropic")
-        assert headers["User-Agent"].startswith("jenny/")
+        assert headers["User-Agent"].startswith("jafta/")
         assert headers["x-api-key"] == "k"
 
     def test_the_usual_headers_remain(self, config_path: Path) -> None:

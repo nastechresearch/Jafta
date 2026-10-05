@@ -12,8 +12,8 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.channels.http_utils import parse_flag
-from jenny.webui import settings_api, ssh_api, worker_settings
+from jafta.channels.http_utils import parse_flag
+from jafta.webui import settings_api, ssh_api, worker_settings
 
 # Le forme che un client manda davvero: un checkbox HTML spedisce ``on``, il JS
 # della SPA manda ``true``, e un valore incollato a mano può portarsi gli spazi.

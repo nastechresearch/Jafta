@@ -1,4 +1,4 @@
-"""Test per jenny.config.runtime_env — layer unico dei knob operativi ``JENNY_*``.
+"""Test per jafta.config.runtime_env — layer unico dei knob operativi ``JENNY_*``.
 
 Copre, per ogni knob esposto: default (nessuna env), override valido via env,
 valori non parsabili (fallback silenzioso al default, loggato come warning) e
@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.config import runtime_env
+from jafta.config import runtime_env
 
 # ---------------------------------------------------------------------------
 # max_concurrent_requests — JENNY_MAX_CONCURRENT_REQUESTS (int, default 3)

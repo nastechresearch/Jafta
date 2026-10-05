@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from jenny.config.schema import Config, ToolsConfig
-from jenny.config.tool_schemas import LocationConfig
+from jafta.config.schema import Config, ToolsConfig
+from jafta.config.tool_schemas import LocationConfig
 
 
 def test_defaults():

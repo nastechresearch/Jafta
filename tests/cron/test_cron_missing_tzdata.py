@@ -3,7 +3,7 @@
 Regressione: su Android/Chaquopy senza il wheel ``tzdata`` persino
 ``ZoneInfo("UTC")`` solleva, e il tool rifiutava ogni job con
 "unknown timezone 'UTC'". Qui l'assenza di tzdata è simulata
-monkeypatchando ``jenny.utils.helpers.ZoneInfo``.
+monkeypatchando ``jafta.utils.helpers.ZoneInfo``.
 """
 
 import time
@@ -11,11 +11,11 @@ from zoneinfo import ZoneInfoNotFoundError
 
 import pytest
 
-import jenny.utils.helpers as helpers
-from jenny.agent.tools.context import RequestContext
-from jenny.agent.tools.cron import CronTool
-from jenny.cron.service import CronService, _compute_next_run, _validate_schedule_for_add
-from jenny.cron.types import CronSchedule
+import jafta.utils.helpers as helpers
+from jafta.agent.tools.context import RequestContext
+from jafta.agent.tools.cron import CronTool
+from jafta.cron.service import CronService, _compute_next_run, _validate_schedule_for_add
+from jafta.cron.types import CronSchedule
 
 
 def _make_tool_with_tz(tmp_path, tz: str) -> CronTool:

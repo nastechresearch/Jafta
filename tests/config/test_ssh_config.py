@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.config.schema import Config, ToolsConfig
-from jenny.config.tool_schemas import SshConfig, SshHostConfig
+from jafta.config.schema import Config, ToolsConfig
+from jafta.config.tool_schemas import SshConfig, SshHostConfig
 
 
 def test_defaults_are_closed():
@@ -33,7 +33,7 @@ def test_host_defaults():
     assert host.description == ""
     # L'enforcement e known_hosts: qui l'impronta e solo per la UI, e parte vuota.
     assert host.host_key_fingerprint is None
-    assert host.job_log_dir == "/tmp/jenny-jobs"
+    assert host.job_log_dir == "/tmp/jafta-jobs"
     # La chiave resta il default: e il modo che non lascia un segreto
     # riutilizzabile dentro config.json.
     assert host.auth == "key"
@@ -42,7 +42,7 @@ def test_host_defaults():
 
 def test_password_host_round_trips():
     host = SshHostConfig(
-        alias="nas", host="192.168.1.10", username="jenny", auth="password", password="hunter2"
+        alias="nas", host="192.168.1.10", username="jafta", auth="password", password="hunter2"
     )
     assert host.auth == "password"
     # La password deve restare in model_dump: e cosi che finisce in config.json.
@@ -106,7 +106,7 @@ def test_camel_case_aliases_load():
                 {
                     "alias": "nas",
                     "host": "192.168.1.10",
-                    "username": "jenny",
+                    "username": "jafta",
                     "hostKeyFingerprint": "SHA256:abc",
                     "jobLogDir": "/var/tmp/jobs",
                     "auth": "password",

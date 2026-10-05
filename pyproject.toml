@@ -1,7 +1,7 @@
 [project]
-name = "jenny"
+name = "jafta"
 version = "1.0.0"
-description = "Jenny - AI agent framework (fork of nanobot)"
+description = "Jafta - AI agent framework (fork of Jenny, originally a fork of nanobot)"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.11"
 license = {text = "AGPL-3.0-only"}
@@ -62,22 +62,22 @@ allow-direct-references = true
 
 [tool.hatch.build]
 include = [
-    "jenny/**/*.py",
-    "jenny/templates/**/*.md",
-    "jenny/skills/**/*.md",
-    "jenny/skills/**/*.py",
-    "jenny/templates/ui/**/*",
+    "jafta/**/*.py",
+    "jafta/templates/**/*.md",
+    "jafta/skills/**/*.md",
+    "jafta/skills/**/*.py",
+    "jafta/templates/ui/**/*",
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["jenny"]
+packages = ["jafta"]
 
 [tool.hatch.build.targets.wheel.sources]
-"jenny" = "jenny"
+"jafta" = "jafta"
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "jenny/",
+    "jafta/",
     "README.md",
     "LICENSE",
     "THIRD_PARTY_NOTICES.md",
@@ -107,7 +107,7 @@ testpaths = ["tests"]
 addopts = ["--strict-markers", "--strict-config"]
 
 [tool.coverage.run]
-source = ["jenny"]
+source = ["jafta"]
 omit = ["tests/*", "**/tests/*"]
 
 [tool.coverage.report]

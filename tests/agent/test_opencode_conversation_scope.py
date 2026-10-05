@@ -11,7 +11,7 @@ pre-analisi di un'immagine — che partono fuori dal contesto del turno e restan
 senza header. Il sintomo non è un errore: è un degrado silenzioso, cache mancata
 e nei casi peggiori un 400 che fa ripiegare la richiesta altrove.
 
-In Jenny i percorsi sono due: ``AgentRunner.run`` (il turno, e con lui cron,
+In Jafta i percorsi sono due: ``AgentRunner.run`` (il turno, e con lui cron,
 Dream e heartbeat) e ``Consolidator.archive`` (la compattazione). Il terzo era
 ``classify_mood``, l'umore della mascotte: dal 24/09/2026 l'umore si legge dagli
 emoji e non chiama piu' nessun provider.
@@ -23,10 +23,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.agent.memory import Consolidator, MemoryStore
-from jenny.config.schema import AgentDefaults
-from jenny.providers.base import LLMProvider, LLMResponse
-from jenny.providers.opencode import SESSION_HEADER, session_headers
+from jafta.agent.memory import Consolidator, MemoryStore
+from jafta.config.schema import AgentDefaults
+from jafta.providers.base import LLMProvider, LLMResponse
+from jafta.providers.opencode import SESSION_HEADER, session_headers
 
 GO_BASE = "https://opencode.ai/zen/go/v1"
 
@@ -55,7 +55,7 @@ def _spying_provider() -> tuple[MagicMock, list[str]]:
 class TestTheTurn:
 
     async def _run(self, session_key: str | None) -> list[str]:
-        from jenny.agent.runner import AgentRunner, AgentRunSpec
+        from jafta.agent.runner import AgentRunner, AgentRunSpec
 
         provider, seen = _spying_provider()
         tools = MagicMock()
@@ -132,7 +132,7 @@ class TestTheCompaction:
         await consolidator.archive(
             [{"role": "user", "content": "ciao"}], session_key="unified:default",
         )
-        from jenny.providers.opencode import conversation_scope
+        from jafta.providers.opencode import conversation_scope
 
         with conversation_scope("unified:default"):
             expected = _observed_id()

@@ -1,4 +1,4 @@
-"""Test per ``jenny.channels.telegram.TelegramChannel``: pairing, allow-list,
+"""Test per ``jafta.channels.telegram.TelegramChannel``: pairing, allow-list,
 media non gestiti, publish inbound e consegna outbound.
 
 Il canale è pura consegna: la proiezione dei turni sulla vista WebUI
@@ -11,12 +11,12 @@ from __future__ import annotations
 import asyncio
 from typing import Any
 
-from jenny.bus.events import OutboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.channels.telegram import TelegramChannel
-from jenny.channels.telegram_api import TelegramAPIError
-from jenny.config.schema import TelegramConfig
-from jenny.session.keys import UNIFIED_SESSION_KEY, session_key_for_channel
+from jafta.bus.events import OutboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.channels.telegram import TelegramChannel
+from jafta.channels.telegram_api import TelegramAPIError
+from jafta.config.schema import TelegramConfig
+from jafta.session.keys import UNIFIED_SESSION_KEY, session_key_for_channel
 
 
 class FakeAPI:
@@ -245,7 +245,7 @@ async def test_throttle_is_per_chat() -> None:
 
 
 async def test_tracked_chats_bound_fail_closed(monkeypatch) -> None:
-    monkeypatch.setattr("jenny.channels.telegram._MAX_TRACKED_CHATS", 1)
+    monkeypatch.setattr("jafta.channels.telegram._MAX_TRACKED_CHATS", 1)
     ch, api, bus = _channel(pairing_code="123456")
     await ch._handle_update(_update("666", text="000000"))  # occupa l'unico slot
     api.sent.clear()
@@ -293,11 +293,11 @@ async def test_owner_new_still_forwarded() -> None:
 async def test_owner_text_published_on_bus_unified_session() -> None:
     ch, api, bus = _channel(paired="42")
 
-    await ch._handle_update(_update("42", text="ciao jenny"))
+    await ch._handle_update(_update("42", text="ciao jafta"))
 
     msg = await asyncio.wait_for(bus.consume_inbound(), timeout=1)
     assert msg.channel == "telegram"
-    assert msg.content == "ciao jenny"
+    assert msg.content == "ciao jafta"
     assert msg.session_key_override is None
     # La chiave canale collassa comunque sulla sessione unificata.
     assert session_key_for_channel(msg.channel, msg.chat_id) == UNIFIED_SESSION_KEY

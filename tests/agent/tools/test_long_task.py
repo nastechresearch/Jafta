@@ -7,15 +7,15 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.agent.loop import AgentLoop
-from jenny.agent.tools.context import RequestContext
-from jenny.agent.tools.long_task import (
+from jafta.agent.loop import AgentLoop
+from jafta.agent.tools.context import RequestContext
+from jafta.agent.tools.long_task import (
     CompleteGoalTool,
     LongTaskTool,
 )
-from jenny.bus.queue import MessageBus
-from jenny.session.goal_state import GOAL_STATE_KEY
-from jenny.session.manager import SessionManager
+from jafta.bus.queue import MessageBus
+from jafta.session.goal_state import GOAL_STATE_KEY
+from jafta.session.manager import SessionManager
 
 
 def _tools(sm: SessionManager) -> tuple[LongTaskTool, CompleteGoalTool]:

@@ -18,7 +18,7 @@ from support.js_harness import ASSETS, requires_node, run_js
 
 pytestmark = requires_node
 
-SDK = (ASSETS / "apps" / "jenny-sdk.js").read_text(encoding="utf-8")
+SDK = (ASSETS / "apps" / "jafta-sdk.js").read_text(encoding="utf-8")
 ACTIONS = (ASSETS / "shared" / "apps-actions.js").read_text(encoding="utf-8")
 
 

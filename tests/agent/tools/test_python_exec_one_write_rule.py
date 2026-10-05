@@ -22,11 +22,11 @@ dell'installazione.
 **Nessuna costruzione dell'albero produce quella forma, oggi.** Enumerate a
 mano, sono due (piu' i test):
 
-* ``AgentLoop._register_default_tools`` (``jenny/agent/loop.py``) costruisce il
+* ``AgentLoop._register_default_tools`` (``jafta/agent/loop.py``) costruisce il
   ``ToolContext`` con ``workspace=str(self.workspace)``, cioe' la radice
   dell'installazione: la radice del tool e' sempre **larga almeno quanto** lo
   scope, quindi la clamp non morde;
-* ``SubagentManager._run_subagent`` (``jenny/agent/subagent.py``) usa
+* ``SubagentManager._run_subagent`` (``jafta/agent/subagent.py``) usa
   ``root = workspace_scope.project_path if workspace_scope is not None else
   self.workspace`` e poi lega **quello stesso scope** con
   ``enter_workspace_scope(workspace_scope)``. Con lo scope: radice del tool ==
@@ -52,10 +52,10 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.tools.python_exec import PythonExecTool
-from jenny.agent.tools.python_exec_builtins import _register_builtin_functions
-from jenny.config.tool_schemas import PythonExecConfig
-from jenny.security.workspace_access import (
+from jafta.agent.tools.python_exec import PythonExecTool
+from jafta.agent.tools.python_exec_builtins import _register_builtin_functions
+from jafta.config.tool_schemas import PythonExecConfig
+from jafta.security.workspace_access import (
     WorkspaceScope,
     build_workspace_scope,
     enter_workspace_scope,

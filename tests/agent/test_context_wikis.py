@@ -19,7 +19,7 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.context import ContextBuilder
+from jafta.agent.context import ContextBuilder
 
 pytestmark = pytest.mark.usefixtures("_configure_jenny_workspace")
 
@@ -197,7 +197,7 @@ class TestShape:
 
     def test_survives_an_untouched_memory_template(self, tmp_path):
         """La regressione piu' facile: annidare il blocco nella guardia di MEMORY.md."""
-        from jenny.utils.helpers import load_bundled_template
+        from jafta.utils.helpers import load_bundled_template
 
         workspace = _workspace(tmp_path)
         template = load_bundled_template("memory/MEMORY.md")

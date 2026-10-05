@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 
-from jenny.apps.summary import build_apps_summary
+from jafta.apps.summary import build_apps_summary
 
 MANIFEST = {
     "name": "Note",

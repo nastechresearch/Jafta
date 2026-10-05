@@ -1,4 +1,4 @@
-"""Le Jenny App si accorgono dei cambi che arrivano dal gateway.
+"""Le Jafta App si accorgono dei cambi che arrivano dal gateway.
 
 Due frame: ``apps_list_changed`` (un turno ha scritto in ``apps/``) e
 ``app_data_changed`` (un'azione di un'app e' girata come tool). Dal 21 al
@@ -23,12 +23,12 @@ from pathlib import Path
 from support.js_harness import requires_node, run_module
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 
 pytestmark = requires_node
 
 _NEIGHBORS = {
-    # Ogni lettura delle Jenny App si conta: e' la domanda di quasi ogni caso.
+    # Ogni lettura delle Jafta App si conta: e' la domanda di quasi ogni caso.
     "api-client.js": """
 export const api = {
   reads: 0,
@@ -129,7 +129,7 @@ def test_the_open_app_hears_that_its_data_changed() -> None:
         const actions = new AppsActions(source, { sendChatPrompt() {} });
         const mailbox = open(actions, 'orto');
         frame({ event: 'app_data_changed', slug: 'orto' });
-        assert.deepEqual(mailbox, [{ type: 'jenny:data-changed', slug: 'orto' }]);
+        assert.deepEqual(mailbox, [{ type: 'jafta:data-changed', slug: 'orto' }]);
         """
     )
 

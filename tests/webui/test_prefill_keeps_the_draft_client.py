@@ -1,6 +1,6 @@
 """Un testo precompilato nel composer non si porta via la bozza.
 
-«Chiedi a Jenny» dalle altre viste
+«Chiedi a Jafta» dalle altre viste
 (``MobileApp.sendInChat``) e i comandi con un argomento (``runCommand`` con
 ``arg_hint``) **riscrivevano** il composer: la domanda che stavi scrivendo
 spariva. ``_sendCommandLine`` invece la rimetteva. Ora i due passano da

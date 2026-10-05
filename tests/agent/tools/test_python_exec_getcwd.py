@@ -4,7 +4,7 @@ Il fallimento riprodotto qui è stato catturato sul device un'ora dopo aver reso
 `working_dir` reale (B5). Il modello ha scritto da sé, dentro un ciclo di
 heartbeat, questa chiamata::
 
-    {"working_dir": "/data/data/com.flagdizero.jenny/files/workspace",
+    {"working_dir": "/data/data/com.flagdizero.jafta/files/workspace",
      "code": "import sys, os\\n"
              "sys.path.insert(0, os.path.join(os.getcwd(), 'skills', 'raincheck', 'scripts'))\\n"
              "import re, rc_probe\\n..."}
@@ -37,9 +37,9 @@ import threading
 
 import pytest
 
-from jenny.agent.tools.python_exec import PythonNamespace, _path_guard_bypass
-from jenny.agent.tools.python_exec_builtins import _register_builtin_functions
-from jenny.config.tool_schemas import PythonExecConfig
+from jafta.agent.tools.python_exec import PythonNamespace, _path_guard_bypass
+from jafta.agent.tools.python_exec_builtins import _register_builtin_functions
+from jafta.config.tool_schemas import PythonExecConfig
 
 
 @pytest.fixture

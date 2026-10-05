@@ -19,8 +19,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from jenny.agent.tools import browser
-from jenny.agent.tools.browser import (
+from jafta.agent.tools import browser
+from jafta.agent.tools.browser import (
     BrowserCloseTool,
     BrowserDoTool,
     BrowserOpenTool,
@@ -28,7 +28,7 @@ from jenny.agent.tools.browser import (
     BrowserSnapshotTool,
     _decode,
 )
-from jenny.config.tool_schemas import AndroidWebBrowserConfig
+from jafta.config.tool_schemas import AndroidWebBrowserConfig
 
 
 @pytest.fixture(autouse=True)
@@ -115,7 +115,7 @@ def _allow_url(monkeypatch):
     la rete invece del codice. I due casi di rifiuto (loopback, schema non
     http) passano dalla funzione vera e non usano questo.
     """
-    import jenny.security.network as net
+    import jafta.security.network as net
 
     monkeypatch.setattr(net, "validate_url_target", lambda url, **kw: (True, ""))
 
@@ -482,7 +482,7 @@ class TestConcurrency:
 
 class TestRegistration:
     def test_the_module_is_in_the_fixed_list(self):
-        from jenny.agent.tools.loader import _HARDCODED_TOOL_MODULES
+        from jafta.agent.tools.loader import _HARDCODED_TOOL_MODULES
 
         assert "browser" in _HARDCODED_TOOL_MODULES
 

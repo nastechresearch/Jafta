@@ -1,4 +1,4 @@
-"""Test della logica pura di ``jenny.webui.skills_api``.
+"""Test della logica pura di ``jafta.webui.skills_api``.
 
 Copre il parsing/elenco delle skill da una directory workspace su ``tmp_path``,
 senza passare per l'handler HTTP (quello è coperto in
@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from jenny.webui.skills_api import (
+from jafta.webui.skills_api import (
     update_workspace_skill,
     webui_skills_payload,
 )
@@ -169,7 +169,7 @@ def test_payload_description_falls_back_to_name_when_blank(
 def test_payload_reports_unavailable_skill_with_reason(tmp_path: Path, skills_dir: Path) -> None:
     extra = (
         "metadata:\n"
-        "  jenny:\n"
+        "  jafta:\n"
         "    requires:\n"
         "      bins: [nonexistent_binary_xyz]\n"
     )

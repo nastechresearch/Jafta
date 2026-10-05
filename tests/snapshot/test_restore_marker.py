@@ -5,14 +5,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from jenny.snapshot.locations import (
+from jafta.snapshot.locations import (
     MARKER_FILE_NAME,
     SAFETY_DIR_PREFIX,
     SANITY_FILE_NAME,
     STAGED_SNAPSHOTS_DIR_NAME,
     STAGED_WORKSPACE_DIR_NAME,
 )
-from jenny.snapshot.restore_marker import (
+from jafta.snapshot.restore_marker import (
     apply_pending_restore,
     clear_marker,
     read_marker,
@@ -223,7 +223,7 @@ def test_a_restore_applied_days_after_staging_keeps_its_safety_copy(tmp_path: Pa
 
 def test_safety_dir_collision_gets_unique_suffix(tmp_path: Path, monkeypatch) -> None:
     """Se la safety dir esiste già, il vecchio workspace va in una dir con suffisso."""
-    from jenny.snapshot import restore_marker
+    from jafta.snapshot import restore_marker
 
     _make_workspace(tmp_path)
     _make_staging(tmp_path)

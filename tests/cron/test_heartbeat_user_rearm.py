@@ -1,6 +1,6 @@
 """Un messaggio dell'utente riarma l'escalation dell'heartbeat.
 
-La decisione: **se ha scritto a Jenny, l'avviso l'ha letto.** Da lì in poi un
+La decisione: **se ha scritto a Jafta, l'avviso l'ha letto.** Da lì in poi un
 guasto ancora aperto torna a essere una notizia, e nessun tetto temporale serve
 a dirlo — lo dice l'utente stesso, presentandosi.
 
@@ -22,7 +22,7 @@ funzione è una seccatura invece di una correzione:
   tre chiacchiere in una nottata di guasto valgono tre avvisi.
 - **un turno di cron non è l'utente.** Le righe ``role:"user"`` della sessione
   unificata sono anche il modo in cui un ``reminder`` schedulato si persiste
-  (``jenny/cron/session_turns.py``): senza il filtro, un promemoria delle 09:00
+  (``jafta/cron/session_turns.py``): senza il filtro, un promemoria delle 09:00
   riarmerebbe ogni avviso ogni mattina senza nessuno davanti allo schermo.
 """
 
@@ -36,32 +36,32 @@ from typing import Any
 
 import pytest
 
-from jenny.agent.turn_types import TurnOutcome
-from jenny.cron.could_not_check import ESCALATE_AFTER_FAILURES
-from jenny.cron.heartbeat_tasks import (
+from jafta.agent.turn_types import TurnOutcome
+from jafta.cron.could_not_check import ESCALATE_AFTER_FAILURES
+from jafta.cron.heartbeat_tasks import (
     parse_heartbeat_tasks,
     rearm_after_user_message,
     tasks_already_warned,
     tasks_due_for_escalation,
 )
-from jenny.cron.service import CronService
-from jenny.cron.session_turns import CRON_HISTORY_META
-from jenny.cron.types import (
+from jafta.cron.service import CronService
+from jafta.cron.session_turns import CRON_HISTORY_META
+from jafta.cron.types import (
     CronJob,
     CronJobState,
     CronPayload,
     CronSchedule,
     CronTaskCheckState,
 )
-from jenny.runtime.cron_dispatch import CronDispatcher
-from jenny.session.history_meta import (
+from jafta.runtime.cron_dispatch import CronDispatcher
+from jafta.session.history_meta import (
     GOAL_CONTINUE_EVENT,
     INJECTED_EVENT_META,
     SUBAGENT_RESULT_EVENT,
 )
-from jenny.session.keys import UNIFIED_SESSION_KEY, session_key_for_channel
-from jenny.session.manager import Session, last_user_message_ms
-from jenny.utils.runtime import SUSTAINED_GOAL_CONTINUE_PROMPT
+from jafta.session.keys import UNIFIED_SESSION_KEY, session_key_for_channel
+from jafta.session.manager import Session, last_user_message_ms
+from jafta.utils.runtime import SUSTAINED_GOAL_CONTINUE_PROMPT
 
 _RAINCHECK = (
     "- Ogni ciclo, controlla la pioggia nelle città e avvisami solo se una è sopra il 70%."
@@ -296,7 +296,7 @@ class TestTheRateIsStillCapped:
 
 class TestWhatIsNotAUser:
     async def test_a_scheduled_reminder_does_not_re_arm(self, broken: _Harness) -> None:
-        """``jenny/agent/loop.py`` persiste un ``reminder`` cron come riga
+        """``jafta/agent/loop.py`` persiste un ``reminder`` cron come riga
         ``role:"user"`` nella sessione unificata. Senza il filtro, un promemoria
         delle 09:00 riarmerebbe ogni avviso ogni mattina."""
         await broken.cycles(ESCALATE_AFTER_FAILURES)
@@ -307,7 +307,7 @@ class TestWhatIsNotAUser:
         assert len(broken.agent.messages) == 1
 
     async def test_an_assistant_message_does_not_re_arm(self, broken: _Harness) -> None:
-        """Jenny che scrive non è l'utente che legge — ed è ciò che rende
+        """Jafta che scrive non è l'utente che legge — ed è ciò che rende
         inutilizzabile ``session.updated_at``: si muove anche quando è lei a
         scrivere l'avviso stesso."""
         await broken.cycles(ESCALATE_AFTER_FAILURES)
@@ -472,7 +472,7 @@ class TestTheTwoBlocksStayDisjoint:
 
 
 class TestTheLastUserMessageReader:
-    """Il lettore da solo: ``jenny/session/manager.py``."""
+    """Il lettore da solo: ``jafta/session/manager.py``."""
 
     def test_no_session_at_all(self) -> None:
         assert last_user_message_ms(None) is None

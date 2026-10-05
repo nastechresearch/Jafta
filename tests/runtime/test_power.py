@@ -1,4 +1,4 @@
-"""Test per jenny/runtime/power.py (wakelock e risvegli, solo Android).
+"""Test per jafta/runtime/power.py (wakelock e risvegli, solo Android).
 
 Il bridge Chaquopy non esiste nei test desktop: si verificano il degrado a
 no-op senza contesto Android, il refcount annidato e il gating sulla modalità
@@ -13,8 +13,8 @@ from typing import Any
 
 import pytest
 
-from jenny.config.schema import PowerConfig
-from jenny.runtime import power
+from jafta.config.schema import PowerConfig
+from jafta.runtime import power
 
 
 @pytest.fixture(autouse=True)
@@ -100,7 +100,7 @@ def _install_mode(
     class _Cfg:
         power = PowerConfig(keep_awake=mode, wakelock_rotate_min=rotate_min)
 
-    monkeypatch.setattr("jenny.config.loader.load_config", lambda *a, **k: _Cfg())
+    monkeypatch.setattr("jafta.config.loader.load_config", lambda *a, **k: _Cfg())
 
 
 def _install_power_config(monkeypatch: pytest.MonkeyPatch, **fields: Any) -> None:
@@ -109,7 +109,7 @@ def _install_power_config(monkeypatch: pytest.MonkeyPatch, **fields: Any) -> Non
     class _Cfg:
         power = PowerConfig(**fields)
 
-    monkeypatch.setattr("jenny.config.loader.load_config", lambda *a, **k: _Cfg())
+    monkeypatch.setattr("jafta.config.loader.load_config", lambda *a, **k: _Cfg())
 
 
 class TestWithoutAndroid:
@@ -129,7 +129,7 @@ class TestWithoutAndroid:
         def _boom(*a: Any, **k: Any) -> Any:
             raise AssertionError("config should not be read without an Android context")
 
-        monkeypatch.setattr("jenny.config.loader.load_config", _boom)
+        monkeypatch.setattr("jafta.config.loader.load_config", _boom)
         async with power.keep_awake("turn"):
             pass
 
@@ -180,7 +180,7 @@ class TestKeepAwakeModes:
         def _boom(*a: Any, **k: Any) -> Any:
             raise RuntimeError("no config on this device")
 
-        monkeypatch.setattr("jenny.config.loader.load_config", _boom)
+        monkeypatch.setattr("jafta.config.loader.load_config", _boom)
 
         async with power.keep_awake("turn"):
             pass
@@ -352,7 +352,7 @@ class TestApplyWatchdogConfig:
                 watchdog_enabled = True
                 watchdog_interval_min = "presto"
 
-        monkeypatch.setattr("jenny.config.loader.load_config", lambda *a, **k: _Cfg())
+        monkeypatch.setattr("jafta.config.loader.load_config", lambda *a, **k: _Cfg())
 
         await power.apply_watchdog_config()
 
@@ -398,7 +398,7 @@ class TestApplyAlarmClockConfig:
             class power:  # noqa: N801 - config finta, non uno schema
                 keep_awake = "turns"
 
-        monkeypatch.setattr("jenny.config.loader.load_config", lambda *a, **k: _Cfg())
+        monkeypatch.setattr("jafta.config.loader.load_config", lambda *a, **k: _Cfg())
 
         await power.apply_alarm_clock_config()
 

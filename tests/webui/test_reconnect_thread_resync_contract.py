@@ -3,7 +3,7 @@
 Il thread si legge **una volta sola** per caricamento di pagina — il latch
 ``_initialHistoryLoaded`` in ``loadInitialHistory()`` — e da lì in poi la vista si
 regge sui soli frame WebSocket accodati dal vivo. ``invalidateHistory()`` azzera
-quel latch, ma il suo unico chiamante era ``mobile-jenny.js`` al cambio di
+quel latch, ma il suo unico chiamante era ``mobile-jafta.js`` al cambio di
 sessione: nessuno lo chiamava su una riconnessione. Un messaggio pubblicato mentre
 il socket era giù non arrivava mai alla vista, e non ci arrivava più.
 
@@ -41,7 +41,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 CHAT_JS = ASSETS / "mobile-chat.js"
 WS_JS = ASSETS / "shared" / "ws-manager.js"
 

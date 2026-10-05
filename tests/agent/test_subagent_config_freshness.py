@@ -17,13 +17,13 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from jenny.agent.agent_types import AGENT_TYPES
-from jenny.agent.loop import AgentLoop
-from jenny.agent.subagent import SubagentManager
-from jenny.bus.queue import MessageBus
-from jenny.config.schema import Config, ToolsConfig
-from jenny.config.tool_schemas import SshConfig, SshHostConfig
-from jenny.providers.base import LLMProvider
+from jafta.agent.agent_types import AGENT_TYPES
+from jafta.agent.loop import AgentLoop
+from jafta.agent.subagent import SubagentManager
+from jafta.bus.queue import MessageBus
+from jafta.config.schema import Config, ToolsConfig
+from jafta.config.tool_schemas import SshConfig, SshHostConfig
+from jafta.providers.base import LLMProvider
 
 SSH_TOOLS = {"ssh_hosts", "ssh_exec", "ssh_job", "ssh_transfer"}
 
@@ -136,7 +136,7 @@ def test_agent_loop_wires_a_provider_that_reads_config_json(tmp_path):
     ``AgentLoop`` a doverla concedere al manager, e lo fa una volta sola in
     costruzione, quindi e proprio li che si rompe in silenzio.
     """
-    from jenny.config import paths as paths_mod
+    from jafta.config import paths as paths_mod
 
     workspace = tmp_path / "workspace"
     workspace.mkdir()
@@ -174,6 +174,6 @@ def test_agent_loop_wires_a_provider_that_reads_config_json(tmp_path):
 
 
 def _workspace_is_set() -> bool:
-    from jenny.runtime.context import get_runtime_context
+    from jafta.runtime.context import get_runtime_context
 
     return bool(get_runtime_context().workspace_dir)

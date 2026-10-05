@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from jenny.providers.openai_compat_helpers import (
+from jafta.providers.openai_compat_helpers import (
     _requires_max_completion_tokens,
     is_openai_reasoning_model,
 )
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 
 def test_recognizes_openai_reasoning_families() -> None:

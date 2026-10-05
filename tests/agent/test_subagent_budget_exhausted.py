@@ -9,9 +9,9 @@ finito che era stato interrotto a metà.
 
 from __future__ import annotations
 
-from jenny.agent.subagent import SubagentManager
-from jenny.bus.queue import MessageBus
-from jenny.providers.base import LLMResponse, ToolCallRequest
+from jafta.agent.subagent import SubagentManager
+from jafta.bus.queue import MessageBus
+from jafta.providers.base import LLMResponse, ToolCallRequest
 from tests.support.aio import wait_until
 from tests.support.subagent_provider_fakes import fake_provider
 

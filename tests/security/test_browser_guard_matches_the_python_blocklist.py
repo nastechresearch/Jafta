@@ -3,7 +3,7 @@
 Con una sessione interattiva Python l'indirizzo di un link non lo vede mai: il
 modello clicca, Chromium naviga, e l'unico strato che vede dove porta un click,
 un redirect o una sottorisorsa e' ``JennyBrowserBridge.isBlockedAddress``. Le sue
-reti devono essere quelle di ``jenny/security/network.py::_BLOCKED_NETWORKS``;
+reti devono essere quelle di ``jafta/security/network.py::_BLOCKED_NETWORKS``;
 la versione Kotlin era rimasta indietro e lasciava passare ``::127.0.0.1``
 (IPv4-compatibile, che ``isLoopbackAddress`` non riconosce), il multicast, il
 broadcast, e un IPv4 locale dentro un NAT64 (``64:ff9b::/96``) o un 6to4
@@ -20,7 +20,7 @@ import re
 
 from support.kotlin_source import function_body, read_code, read_source
 
-from jenny.security import network
+from jafta.security import network
 
 # Come il Kotlin copre ogni rete IPv6 di Python: l'API di InetAddress o un
 # controllo sui byte. Una rete nuova in Python senza voce qui fa fallire il test:

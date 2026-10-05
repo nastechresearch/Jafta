@@ -15,8 +15,8 @@ import hmac
 import pytest
 from loguru import logger
 
-from jenny import android_entry
-from jenny.agent.tools import diagnostics
+from jafta import android_entry
+from jafta.agent.tools import diagnostics
 
 SECRET = "zz-gateway-secret-4815162342"
 

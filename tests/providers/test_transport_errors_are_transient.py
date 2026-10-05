@@ -14,9 +14,9 @@ from __future__ import annotations
 import httpx
 import pytest
 
-from jenny.providers.anthropic_provider import AnthropicProvider
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
-from jenny.providers.retry_policy import is_transient_response
+from jafta.providers.anthropic_provider import AnthropicProvider
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.retry_policy import is_transient_response
 
 MESSAGES = [{"role": "user", "content": "ciao"}]
 
@@ -70,7 +70,7 @@ async def test_openai_stream_retries_a_dropped_keepalive(monkeypatch) -> None:
     async def _no_sleep(_delay: float) -> None:
         return None
 
-    monkeypatch.setattr("jenny.providers.base.asyncio.sleep", _no_sleep)
+    monkeypatch.setattr("jafta.providers.base.asyncio.sleep", _no_sleep)
     provider = OpenAICompatProvider(api_key="k", api_base="https://api.example.com/v1")
     provider._http_client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
     response = await provider.chat_stream_with_retry(messages=MESSAGES, model="m")

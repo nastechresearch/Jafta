@@ -19,7 +19,7 @@ from pathlib import Path
 from support.home_dom import requires_jsdom, run_home
 from support.js_harness import function, requires_node, run_js
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 READER_JS = ASSETS / "home-reader.js"
 CONTENT_LINK_JS = ASSETS / "shared" / "content-link.js"
 

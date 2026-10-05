@@ -11,8 +11,8 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from jenny.channels.websocket import WebSocketConfig
-from jenny.webui.gateway_services import build_gateway_services
+from jafta.channels.websocket import WebSocketConfig
+from jafta.webui.gateway_services import build_gateway_services
 
 
 def test_command_context_carries_the_settings_hooks(tmp_path: Path) -> None:

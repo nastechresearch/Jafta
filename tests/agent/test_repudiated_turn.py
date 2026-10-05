@@ -15,8 +15,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 from support.agent import make_loop, make_provider
 
-from jenny.agent.loop import AgentLoop
-from jenny.bus.events import InboundMessage, OutboundMessage
+from jafta.agent.loop import AgentLoop
+from jafta.bus.events import InboundMessage, OutboundMessage
 
 
 def _make_loop(tmp_path) -> AgentLoop:

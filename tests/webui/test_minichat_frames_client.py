@@ -1,6 +1,6 @@
 """La minichat legge i frame del turno come la mascotte madre, e ci mette sopra il fumetto.
 
-Dal 28/09/2026 la minichat e' dei due gusci (``shared/jenny-minichat.js``), e
+Dal 28/09/2026 la minichat e' dei due gusci (``shared/jafta-minichat.js``), e
 cambia in tre punti misurati nel codice prima di toccarlo:
 
 * il fumetto contiene **tutta** la risposta, formattata, un blocco per segmento
@@ -9,13 +9,13 @@ cambia in tre punti misurati nel codice prima di toccarlo:
 * chiudere la minichat, o cambiare vista, **non smette di seguire** la domanda:
   la risposta la trovi riaprendola (prima si perdeva), e il turno lento non si
   chiude allo scadere dei 90 secondi (prima il fumetto restava sulla nota);
-* mentre Jenny risponde il tasto e' spento, anche se la risposta e' partita
+* mentre Jafta risponde il tasto e' spento, anche se la risposta e' partita
   dalla chat (decisione dell'utente), e un filo caduto lo riaccende.
 
-In node, coi moduli veri (``shared/jenny-minichat.js`` e ``shared/jenny-mascot.js``)
+In node, coi moduli veri (``shared/jafta-minichat.js`` e ``shared/jafta-mascot.js``)
 e i vicini finti. L'istanza nasce da ``Object.create`` senza costruttore: il
 costruttore disegna il DOM, e qui interessa la lettura dei frame. Lo stato di
-Jenny e l'umore si registrano invece di disegnarli; il markdown si riconosce dal
+Jafta e l'umore si registrano invece di disegnarli; il markdown si riconosce dal
 prefisso ``md:`` del finto ``renderMarkdown``.
 """
 
@@ -29,7 +29,7 @@ from pathlib import Path
 from support.js_harness import requires_node, run_module
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 
 pytestmark = requires_node
 
@@ -83,7 +83,7 @@ const timers = [];
 globalThis.setTimeout = (fn) => { timers.push(fn); return timers.length; };
 globalThis.clearTimeout = () => {};
 
-const { JennyWithMinichat } = await import('./shared/jenny-minichat.js');
+const { JennyWithMinichat } = await import('./shared/jafta-minichat.js');
 const { richened } = await import('./shared/rich-content.js');
 const { wsManager } = await import('./shared/ws-manager.js');
 
@@ -116,7 +116,7 @@ function minichat({ open = true, asked = true, sends = true } = {}) {
   j.closed = 0;
   j._adapter = {
     send: (text) => { j.sent.push(text); return sends; },
-    placeholder: () => 'Scrivi a Jenny',
+    placeholder: () => 'Scrivi a Jafta',
     onTurnClosed: () => { j.closed += 1; },
   };
   j.states = [];
@@ -139,7 +139,7 @@ def _run(body: str) -> None:
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         (root / "shared").mkdir()
-        for name in ("jenny-minichat.js", "jenny-mascot.js", "wire-error.js", "bot-name.js"):
+        for name in ("jafta-minichat.js", "jafta-mascot.js", "wire-error.js", "bot-name.js"):
             shutil.copy(ASSETS / "shared" / name, root / "shared" / name)
         for name, text in _NEIGHBORS.items():
             (root / "shared" / name).write_text(text, encoding="utf-8")
@@ -232,7 +232,7 @@ def test_turn_end_without_a_reply_shows_the_flower_and_closes_the_turn() -> None
         j._replyTimer = 7;
         j._handleFrame({ event: 'turn_end', turn_id: 't1' });
         assert.deepEqual(blocks(j), ['✿']);
-        assert.equal(last(j), 'idle', 'il fiore non lascia Jenny a parlare');
+        assert.equal(last(j), 'idle', 'il fiore non lascia Jafta a parlare');
         assert.equal(j._pendingTurn, false);
         assert.equal(j._replyTimer, null, 'il timer della risposta lenta va spento');
         assert.equal(j._lastClosedTurnId, 't1');
@@ -365,7 +365,7 @@ def test_a_slow_turn_says_so_and_keeps_listening() -> None:
         assert.deepEqual(j.sent, ['una cosa lunga']);
         assert.equal(timers.length, 1);
         timers[0]();
-        assert.deepEqual(blocks(j), ['jenny.workingReply']);
+        assert.deepEqual(blocks(j), ['jafta.workingReply']);
         assert.equal(j.bubble.children[0].dataset.kind, 'note');
         assert.equal(j._pendingTurn, true, 'il turno lento non si chiude');
         j._handleFrame({ event: 'delta', text: 'Finito!', turn_id: 't9' });
@@ -417,7 +417,7 @@ def test_leaving_the_chat_with_nothing_asked_puts_her_to_rest() -> None:
 
 
 def test_the_send_is_off_while_any_turn_is_in_flight() -> None:
-    """Decisione dell'utente (28/09/2026): mentre Jenny risponde non parte
+    """Decisione dell'utente (28/09/2026): mentre Jafta risponde non parte
     niente, anche se la risposta e' partita dalla chat. Il campo dice perche'."""
     _run(
         """
@@ -425,16 +425,16 @@ def test_the_send_is_off_while_any_turn_is_in_flight() -> None:
         j.input.value = 'che ore sono?';
         j._syncSend();
         assert.equal(j.sendBtn.disabled, false);
-        assert.equal(j.input.placeholder, 'Scrivi a Jenny', 'dove va il messaggio');
+        assert.equal(j.input.placeholder, 'Scrivi a Jafta', 'dove va il messaggio');
         // In chat il turno c1 sta scorrendo; la minichat non lo disegna.
         j._handleFrame({ event: 'goal_status', status: 'running' });
         j._handleFrame({ event: 'delta', text: 'Ecco il riassunto', turn_id: 'c1' });
         assert.deepEqual(blocks(j), []);
         assert.equal(j.sendBtn.disabled, true, 'col turno in volo il tasto si spegne');
-        assert.equal(j.input.placeholder, 'jenny.busy');
+        assert.equal(j.input.placeholder, 'jafta.busy');
         j._handleFrame({ event: 'turn_end', turn_id: 'c1' });
         assert.equal(j.sendBtn.disabled, false, 'finito il turno si riaccende');
-        assert.equal(j.input.placeholder, 'Scrivi a Jenny');
+        assert.equal(j.input.placeholder, 'Scrivi a Jafta');
         j._handleFrame({ event: 'goal_status', status: 'running' });
         j._handleFrame({ event: 'goal_status', status: 'idle' });
         assert.equal(j.sendBtn.disabled, false, 'anche idle lo riaccende');
@@ -469,7 +469,7 @@ def test_a_dropped_wire_lets_the_question_go_and_says_why() -> None:
         j._onWireClose();
         assert.equal(j._pendingTurn, false);
         assert.equal(j._chatRunning, false);
-        assert.deepEqual(blocks(j), ['jenny.connectionError']);
+        assert.deepEqual(blocks(j), ['jafta.connectionError']);
         j.input.value = 'riprovo';
         j._syncSend();
         assert.equal(j.sendBtn.disabled, false);
@@ -488,7 +488,7 @@ def test_a_send_that_never_left_says_so() -> None:
         await j._send('ciao');
         assert.equal(j._pendingTurn, false, 'niente e\\' partito: nessun turn_end arrivera\\'');
         assert.equal(j._turnActive, false);
-        assert.deepEqual(blocks(j), ['jenny.connectionError']);
+        assert.deepEqual(blocks(j), ['jafta.connectionError']);
         """
     )
 
@@ -562,7 +562,7 @@ def test_the_placeholder_falls_back_when_the_shell_has_none() -> None:
         const j = minichat({ asked: false });
         j._adapter.placeholder = () => '';
         j._syncPlaceholder();
-        assert.equal(j.input.placeholder, 'jenny.askHere');
+        assert.equal(j.input.placeholder, 'jafta.askHere');
         """
     )
 
@@ -578,8 +578,8 @@ def test_a_command_reply_closes_the_question() -> None:
         """
         const j = minichat({ asked: false });
         await j._send('/status');
-        j._handleFrame({ event: 'message', text: 'jenny v0.11.0', turn_id: 's1' });
-        assert.deepEqual(blocks(j), ['md:jenny v0.11.0']);
+        j._handleFrame({ event: 'message', text: 'jafta v0.11.0', turn_id: 's1' });
+        assert.deepEqual(blocks(j), ['md:jafta v0.11.0']);
         assert.equal(j._pendingTurn, false, 'la risposta di un comando chiude la domanda');
         assert.equal(j._turnActive, false);
         assert.equal(j._streamTurnId, null, 'e non lascia un id appeso');

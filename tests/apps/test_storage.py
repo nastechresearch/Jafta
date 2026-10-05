@@ -1,4 +1,4 @@
-"""Tests for the Jenny Apps storage executor."""
+"""Tests for the Jafta Apps storage executor."""
 
 from __future__ import annotations
 
@@ -6,8 +6,8 @@ import json
 
 import pytest
 
-from jenny.apps.manifest import AppAction
-from jenny.apps.storage import StorageError, execute_storage_action
+from jafta.apps.manifest import AppAction
+from jafta.apps.storage import StorageError, execute_storage_action
 
 
 def _action(op: str, collection: str = "notes") -> AppAction:

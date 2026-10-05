@@ -1,4 +1,4 @@
-"""Test diretti per jenny/providers/message_repair.py.
+"""Test diretti per jafta/providers/message_repair.py.
 
 ``enforce_role_alternation`` è già coperta esaustivamente in
 ``tests/providers/test_enforce_role_alternation.py`` (che la esercita tramite
@@ -11,7 +11,7 @@ edge di ``enforce_role_alternation`` non toccati dalla suite esistente.
 
 from __future__ import annotations
 
-from jenny.providers.message_repair import (
+from jafta.providers.message_repair import (
     enforce_role_alternation,
     sanitize_empty_content,
     strip_image_content,

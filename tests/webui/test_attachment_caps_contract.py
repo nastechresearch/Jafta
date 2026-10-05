@@ -23,9 +23,9 @@ from pathlib import Path
 from support.js_harness import requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-HANDLER_JS = (ROOT / "jenny" / "templates" / "ui" / "assets" / "shared"
+HANDLER_JS = (ROOT / "jafta" / "templates" / "ui" / "assets" / "shared"
               / "image-handler.js").read_text(encoding="utf-8")
-WS_PARSING = (ROOT / "jenny" / "channels" / "ws_parsing.py").read_text(encoding="utf-8")
+WS_PARSING = (ROOT / "jafta" / "channels" / "ws_parsing.py").read_text(encoding="utf-8")
 
 
 def _server_int(name: str) -> int:
@@ -102,7 +102,7 @@ def test_the_client_refuses_with_the_server_s_own_words() -> None:
     assert caps["video"]["over"] == "too_many_videos"
     assert caps["file"]["over"] == "too_many_files"
     server_codes = set(re.findall(r'return \[\], "([a-z_]+)"',
-                                  (ROOT / "jenny" / "channels" / "websocket.py")
+                                  (ROOT / "jafta" / "channels" / "websocket.py")
                                   .read_text(encoding="utf-8")))
     for kind, entry in caps.items():
         assert entry["over"] in server_codes, (kind, entry["over"])
@@ -137,7 +137,7 @@ def test_nothing_is_dropped_without_saying_so() -> None:
 
 
 def test_both_shells_listen_to_the_refusal() -> None:
-    assets = ROOT / "jenny" / "templates" / "ui" / "assets"
+    assets = ROOT / "jafta" / "templates" / "ui" / "assets"
     home = (assets / "home-app.js").read_text(encoding="utf-8")
     workshop = (assets / "mobile-chat.js").read_text(encoding="utf-8")
     assert "onReject = (reason) =>" in home, "la casa non ascolta i rifiuti locali"
@@ -147,7 +147,7 @@ def test_both_shells_listen_to_the_refusal() -> None:
 def test_the_workshop_hook_comes_after_the_handler_exists() -> None:
     """Un aggancio scritto prima del `new ImageHandler()` è un TypeError al
     caricamento: la chat non parte affatto, e `node --check` non lo vede."""
-    workshop = (ROOT / "jenny" / "templates" / "ui" / "assets"
+    workshop = (ROOT / "jafta" / "templates" / "ui" / "assets"
                 / "mobile-chat.js").read_text(encoding="utf-8")
     born = workshop.index("this.imageHandler = new ImageHandler();")
     hooked = workshop.index("this.imageHandler.onReject")
@@ -156,7 +156,7 @@ def test_the_workshop_hook_comes_after_the_handler_exists() -> None:
 
 # ── E che i tetti mordano davvero ────────────────────────────────────────────
 
-HANDLER_PATH = ROOT / "jenny" / "templates" / "ui" / "assets" / "shared" / "image-handler.js"
+HANDLER_PATH = ROOT / "jafta" / "templates" / "ui" / "assets" / "shared" / "image-handler.js"
 
 _HARNESS = """
 import assert from 'node:assert/strict';

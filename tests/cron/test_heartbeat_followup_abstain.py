@@ -32,17 +32,17 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from support.sessions import FakeSessions
 
-from jenny.agent.loop import AgentLoop
-from jenny.agent.tools.nothing_to_report import NothingToReportTool
-from jenny.agent.turn_types import TurnOutcome
-from jenny.bus.events import InboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.cron.heartbeat_tasks import parse_heartbeat_tasks
-from jenny.cron.service import CronService
-from jenny.cron.types import CronJob, CronJobState, CronPayload, CronSchedule
-from jenny.providers.base import LLMResponse
-from jenny.runtime.cron_dispatch import CronDispatcher
-from jenny.session.keys import HEARTBEAT_SESSION_KEY
+from jafta.agent.loop import AgentLoop
+from jafta.agent.tools.nothing_to_report import NothingToReportTool
+from jafta.agent.turn_types import TurnOutcome
+from jafta.bus.events import InboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.cron.heartbeat_tasks import parse_heartbeat_tasks
+from jafta.cron.service import CronService
+from jafta.cron.types import CronJob, CronJobState, CronPayload, CronSchedule
+from jafta.providers.base import LLMResponse
+from jafta.runtime.cron_dispatch import CronDispatcher
+from jafta.session.keys import HEARTBEAT_SESSION_KEY
 
 _RAINCHECK = "- Ogni ciclo controlla la pioggia nelle città e avvisami sopra il 70%."
 _VITAMINS = "- Alle 9 ricordami le vitamine."

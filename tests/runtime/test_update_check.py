@@ -1,4 +1,4 @@
-"""Test del nucleo dell'updater (``jenny/runtime/update_check.py``).
+"""Test del nucleo dell'updater (``jafta/runtime/update_check.py``).
 
 Il manifest è dato che arriva dalla rete: la maggior parte di questi test
 descrive che cosa succede quando **non** è quello che ci si aspetta — schema di
@@ -20,8 +20,8 @@ from typing import Any
 import httpx
 import pytest
 
-from jenny.runtime import update_check
-from jenny.runtime.update_check import UpdateInfo
+from jafta.runtime import update_check
+from jafta.runtime.update_check import UpdateInfo
 
 # Riferimenti presi prima di qualunque monkeypatch: alcuni test sostituiscono
 # proprio queste funzioni nel modulo, e chi le rimpiazza deve poter chiamare
@@ -34,12 +34,12 @@ _MANIFEST: dict[str, Any] = {
     "version_code": 9,
     "version_name": "0.7.0",
     "apk_url": (
-        "https://github.com/flagdizero/jenny-android-ai-agent/releases/download/"
-        "v0.7.0/jenny-0.7.0.apk"
+        "https://github.com/flagdizero/jafta-android-ai-agent/releases/download/"
+        "v0.7.0/jafta-0.7.0.apk"
     ),
     "sha256": "a" * 64,
     "size": 48210944,
-    "notes_url": "https://github.com/flagdizero/jenny-android-ai-agent/releases/tag/v0.7.0",
+    "notes_url": "https://github.com/flagdizero/jafta-android-ai-agent/releases/tag/v0.7.0",
     "summary_it": "Aggiornamenti in-app e meno consumo a schermo spento.",
     "summary_en": "In-app updates and less battery drain.",
     "min_supported_code": 6,
@@ -173,7 +173,7 @@ class TestAManifestThatMustNotBeBelieved:
             {"sha256": "abc"},
             {"size": -1},
             {"size": None},
-            {"apk_url": "http://example.com/jenny.apk"},
+            {"apk_url": "http://example.com/jafta.apk"},
             {"apk_url": ""},
             {"critical": "yes"},
             {"rollout": "50"},
@@ -535,7 +535,7 @@ class TestTheInstalledVersionCode:
             getPackageManager=lambda: SimpleNamespace(
                 getPackageInfo=lambda _name, _flags: package_info
             ),
-            getPackageName=lambda: "com.flagdizero.jenny",
+            getPackageName=lambda: "com.flagdizero.jafta",
         )
         monkeypatch.setattr(update_check, "get_android_context", lambda: context)
 
@@ -550,7 +550,7 @@ class TestTheInstalledVersionCode:
             getPackageManager=lambda: SimpleNamespace(
                 getPackageInfo=lambda _name, _flags: package_info
             ),
-            getPackageName=lambda: "com.flagdizero.jenny",
+            getPackageName=lambda: "com.flagdizero.jafta",
         )
         monkeypatch.setattr(update_check, "get_android_context", lambda: context)
 

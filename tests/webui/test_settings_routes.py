@@ -1,7 +1,7 @@
 """Test del router HTTP di WebUISettingsRouter (dispatch, auth, mapping errori).
 
 ``tests/webui/test_settings_api.py`` copre già la logica pura in
-``jenny/webui/settings_api.py``; qui si copre invece lo strato di route:
+``jafta/webui/settings_api.py``; qui si copre invece lo strato di route:
 dispatch per path, 401 senza token, propagazione degli errori applicativi
 (400/404) e mapping degli errori inattesi a 500.
 """
@@ -15,12 +15,12 @@ import pytest
 from support.gateway_http import make_request
 from websockets.http11 import Request as WsRequest
 
-from jenny.channels.http_utils import check_api_secret, http_error, http_json_response, parse_query
-from jenny.config.loader import load_config, save_config
-from jenny.config.schema import Config, ProviderConfig
-from jenny.providers.factory import provider_fingerprint
-from jenny.runtime.context import get_runtime_context
-from jenny.webui.settings_routes import WebUISettingsRouter
+from jafta.channels.http_utils import check_api_secret, http_error, http_json_response, parse_query
+from jafta.config.loader import load_config, save_config
+from jafta.config.schema import Config, ProviderConfig
+from jafta.providers.factory import provider_fingerprint
+from jafta.runtime.context import get_runtime_context
+from jafta.webui.settings_routes import WebUISettingsRouter
 
 _SECRET = "s3cr3t-settings"
 
@@ -301,7 +301,7 @@ async def test_web_search_update_unexpected_error_maps_to_500(config_path, monke
     def boom(query):
         raise RuntimeError("guasto inatteso")
 
-    monkeypatch.setattr("jenny.webui.settings_routes.update_web_search_settings", boom)
+    monkeypatch.setattr("jafta.webui.settings_routes.update_web_search_settings", boom)
     router = _router()
     response = await router.dispatch(
         _request("/api/settings/web-search/update?timeout=45"),
@@ -351,7 +351,7 @@ async def test_writing_routes_turn_an_unexpected_error_into_a_mute_500(
     async def boom(*args, **kwargs):
         raise RuntimeError("kaboom: /Users/someone/workspace/config.json")
 
-    monkeypatch.setattr(f"jenny.webui.settings_routes.{target}", boom)
+    monkeypatch.setattr(f"jafta.webui.settings_routes.{target}", boom)
     router = _router()
 
     response = await router.dispatch(_request(path), path.split("?", 1)[0])
@@ -381,7 +381,7 @@ async def test_a_failed_write_does_not_rearm_any_job(
     async def boom(*args, **kwargs):
         raise RuntimeError("kaboom")
 
-    monkeypatch.setattr(f"jenny.webui.settings_routes.{target}", boom)
+    monkeypatch.setattr(f"jafta.webui.settings_routes.{target}", boom)
     on_jobs_changed = MagicMock()
     router = _router(on_jobs_changed=on_jobs_changed)
 

@@ -20,7 +20,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from jenny.runtime import gap_history
+from jafta.runtime import gap_history
 
 _MINUTE_MS = 60_000
 

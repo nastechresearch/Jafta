@@ -20,7 +20,7 @@ sempre stato, era la vista viva a mentire.
 
 Il flag che tiene aperto il turno deve quindi essere **indipendente dalla UI**:
 ``_closeMini`` non lo tocca, e solo ``turn_end``/``error`` lo chiudono. Dal
-28/09/2026 la minichat e' dei due gusci (``shared/jenny-minichat.js``) e va oltre:
+28/09/2026 la minichat e' dei due gusci (``shared/jafta-minichat.js``) e va oltre:
 a minichat chiusa segue ancora la domanda, e la risposta la trovi riaprendola.
 
 Asserzioni sul sorgente, nello stile di ``test_thinking_scroll_contract.py``: la
@@ -32,10 +32,10 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 CHAT_JS = ASSETS / "mobile-chat.js"
-JENNY_JS = ASSETS / "shared" / "jenny-minichat.js"
-MASCOT_JS = ASSETS / "shared" / "jenny-mascot.js"
+JENNY_JS = ASSETS / "shared" / "jafta-minichat.js"
+MASCOT_JS = ASSETS / "shared" / "jafta-mascot.js"
 
 
 def _method(source: str, name: str) -> str:

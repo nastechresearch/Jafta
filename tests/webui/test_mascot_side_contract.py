@@ -1,4 +1,4 @@
-"""Jenny sta sempre a destra, e dopo un lancio ci torna.
+"""Jafta sta sempre a destra, e dopo un lancio ci torna.
 
 Fino al 24/09/2026 il lato era il ricordo di dove l'avevi lasciata: caduta nella
 metà sinistra, si riagganciava a sinistra, e lì testo, fumetti e riga di lavoro le
@@ -26,13 +26,13 @@ from pathlib import Path
 from support.js_harness import requires_node, run_js
 from support.kotlin_source import read_source
 
-UI = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui"
+UI = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui"
 UI_ASSETS = UI / "assets"
 MASCOT_JS = UI_ASSETS / "shared" / "mascot.js"
 DRAG_JS = UI_ASSETS / "shared" / "mascot-drag.js"
 ANDROID = (
     Path(__file__).resolve().parents[2]
-    / "android" / "app" / "src" / "main" / "java" / "com" / "flagdizero" / "jenny"
+    / "android" / "app" / "src" / "main" / "java" / "com" / "flagdizero" / "jafta"
 )
 
 node = requires_node
@@ -68,7 +68,7 @@ def test_no_left_side_rules_or_hooks_remain() -> None:
 
 
 def test_the_floating_mascot_has_one_edge_too() -> None:
-    """La flottante è la stessa Jenny: nessun bordo sinistro, nessun lato letto."""
+    """La flottante è la stessa Jafta: nessun bordo sinistro, nessun lato letto."""
     flight = read_source(ANDROID / "FloatingFlight.kt")
     overlay = read_source(ANDROID / "FloatingOverlayController.kt")
     assert "dockPivotX: Float" in flight

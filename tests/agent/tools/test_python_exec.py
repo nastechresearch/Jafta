@@ -5,15 +5,15 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from jenny.agent.tools.python_exec import (
+from jafta.agent.tools.python_exec import (
     PythonExecInterrupted,
     PythonExecTool,
     PythonNamespace,
     _register_builtin_functions,
     run_python_async,
 )
-from jenny.config.paths import get_workspace_path
-from jenny.config.tool_schemas import PythonExecConfig
+from jafta.config.paths import get_workspace_path
+from jafta.config.tool_schemas import PythonExecConfig
 
 
 def test_python_namespace_default_working_dir():
@@ -67,7 +67,7 @@ class TestHttpGet:
         fake_resp.text = "hello world"
         fake_resp.raise_for_status = Mock()
 
-        with patch("jenny.security.network.validate_url_target", side_effect=_fake_validate()):
+        with patch("jafta.security.network.validate_url_target", side_effect=_fake_validate()):
             with patch("httpx.get", return_value=fake_resp) as mock_get:
                 _, _, result = ns.call_function("http_get", args=["https://example.com/data"])
 
@@ -79,7 +79,7 @@ class TestHttpGet:
     def test_blocks_ssrf_on_initial_url(self):
         """The initial URL is still validated and blocked as before."""
         ns = _make_namespace()
-        with patch("jenny.security.network.validate_url_target", side_effect=_fake_validate()):
+        with patch("jafta.security.network.validate_url_target", side_effect=_fake_validate()):
             _, _, result = ns.call_function("http_get", args=["http://127.0.0.1:8080/admin"])
         assert result.startswith("Error: SSRF blocked")
 
@@ -94,7 +94,7 @@ class TestHttpGet:
         fake_resp.status_code = 302
         fake_resp.headers = {"location": "http://127.0.0.1:8765/internal-admin"}
 
-        with patch("jenny.security.network.validate_url_target", side_effect=_fake_validate()):
+        with patch("jafta.security.network.validate_url_target", side_effect=_fake_validate()):
             with patch("httpx.get", return_value=fake_resp) as mock_get:
                 _, _, result = ns.call_function("http_get", args=["https://example.com/redirector"])
 
@@ -115,7 +115,7 @@ class TestHttpGet:
             "500 error", request=Mock(), response=Mock(status_code=500)
         ))
 
-        with patch("jenny.security.network.validate_url_target", side_effect=_fake_validate()):
+        with patch("jafta.security.network.validate_url_target", side_effect=_fake_validate()):
             with patch("httpx.get", return_value=fake_resp):
                 stdout, stderr, result = ns.call_function(
                     "http_get", args=["https://example.com/broken"]

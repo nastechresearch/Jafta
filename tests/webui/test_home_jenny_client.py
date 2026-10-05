@@ -1,4 +1,4 @@
-"""«Jenny»: com'e' fatta — la taglia, se si vede, se sta sopra le altre app.
+"""«Jafta»: com'e' fatta — la taglia, se si vede, se sta sopra le altre app.
 
 Due cose si misurano qui, e nessuna delle due si vedrebbe guardando lo schermo
 una volta sola.
@@ -29,8 +29,8 @@ from pathlib import Path
 from support.js_harness import function, member, requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
-JENNY_JS = ASSETS / "home-jenny.js"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
+JENNY_JS = ASSETS / "home-jafta.js"
 MASCOT_JS = ASSETS / "shared" / "mascot.js"
 I18N_JS = ASSETS / "shared" / "i18n.js"
 I18N_DIR = ASSETS / "i18n"
@@ -54,7 +54,7 @@ import assert from 'node:assert/strict';
 const TRANSLATIONS = __TRANSLATIONS__;
 const i18n = { locale: 'it', translations: TRANSLATIONS, __T__ };
 /* Il nome di lei (`shared/bot-name.js`): qui quello di partenza. */
-const botName = { get: () => 'Jenny', set() {}, onChange() { return () => {}; } };
+const botName = { get: () => 'Jafta', set() {}, onChange() { return () => {}; } };
 
 function makeEl(tag) {
   const el = {
@@ -254,7 +254,7 @@ def test_hidden_wins_over_the_size() -> None:
       assert.equal(jennyValue({ visible: true, size: 'md', floating: false }),
                    i18n.t('settings.mascotSizeMedium').toLowerCase());
       assert.equal(jennyValue({ visible: false, size: 'md', floating: false }),
-                   i18n.t('home.jenny.hidden').toLowerCase());
+                   i18n.t('home.jafta.hidden').toLowerCase());
     """)
 
 
@@ -263,8 +263,8 @@ def test_the_window_adds_itself_even_to_a_hidden_one() -> None:
     la casa non c'e'."""
     _run_js("""
       const con = jennyValue({ visible: false, size: 'sm', floating: true });
-      assert.ok(con.includes(i18n.t('home.jenny.hidden').toLowerCase()));
-      assert.ok(con.includes(i18n.t('home.jenny.floatingShort').toLowerCase()));
+      assert.ok(con.includes(i18n.t('home.jafta.hidden').toLowerCase()));
+      assert.ok(con.includes(i18n.t('home.jafta.floatingShort').toLowerCase()));
       assert.ok(con.includes('\\u00b7'), 'le due cose non sono separate: ' + con);
 
       const without = jennyValue({ visible: true, size: 'sm', floating: false });
@@ -282,7 +282,7 @@ def test_the_room_reads_the_preferences_that_are_live() -> None:
       assert.equal(she.value(), jennyValue({ visible: true, size: 'lg', floating: true }));
       she.toggleVisible();
       assert.equal(she.value(), jennyValue({ visible: false, size: 'lg', floating: true }));
-      assert.ok(changes >= 2, 'la riga di «Tu e Jenny» non viene avvisata');
+      assert.ok(changes >= 2, 'la riga di «Tu e Jafta» non viene avvisata');
     """)
 
 
@@ -326,7 +326,7 @@ def test_the_row_is_not_there_where_the_window_cannot_exist() -> None:
 
       she.setFloating({ available: true, enabled: false, active: false });
       assert.equal(she.floatingRow.hidden, false);
-      assert.equal(she.floatingNote.textContent, i18n.t('settings.floatingHint', { name: 'Jenny' }));
+      assert.equal(she.floatingNote.textContent, i18n.t('settings.floatingHint', { name: 'Jafta' }));
     """)
 
 
@@ -362,7 +362,7 @@ def test_the_switch_moves_before_the_server_answers_and_takes_its_word_after() -
       await tick;
       assert.deepEqual(calls, [{ enabled: true }]);
       assert.equal(she.floating.active, true, 'il permesso concesso non e arrivato');
-      assert.equal(she.floatingNote.textContent, i18n.t('settings.floatingHint', { name: 'Jenny' }),
+      assert.equal(she.floatingNote.textContent, i18n.t('settings.floatingHint', { name: 'Jafta' }),
                    'la risposta del server non e\\u2019 stata ascoltata');
     """)
 
@@ -475,7 +475,7 @@ def test_saving_sends_the_trimmed_text_and_remembers_it() -> None:
       assert.deepEqual(saves, ['Dammi del tu.']);
       assert.equal(she.rulesSave.hidden, true, '«Salva» e\\u2019 rimasto dopo aver salvato');
       assert.equal(toasts.length, 1);
-      assert.equal(toasts[0][0], i18n.t('home.jenny.rulesSaved'));
+      assert.equal(toasts[0][0], i18n.t('home.jafta.rulesSaved'));
     """)
 
 
@@ -490,7 +490,7 @@ def test_a_save_that_failed_keeps_the_button_and_says_so() -> None:
       brokenSave = true;
       await she.saveRules();
       assert.equal(she.rulesSave.hidden, false);
-      assert.equal(toasts[0][0], i18n.t('home.jenny.rulesFailed'));
+      assert.equal(toasts[0][0], i18n.t('home.jafta.rulesFailed'));
       assert.equal(toasts[0][1], 'error');
     """)
 
@@ -513,7 +513,7 @@ def test_the_path_is_the_one_the_server_writes() -> None:
     dire anche rifare la copia dentro `SOUL.md`. Le due meta' devono guardare
     lo stesso posto."""
     _run_js("""
-      assert.equal(RULES_PATH, '.jenny/soul_rules.md');
+      assert.equal(RULES_PATH, '.jafta/soul_rules.md');
     """)
 
 
@@ -527,7 +527,7 @@ def test_the_path_is_the_one_the_server_writes() -> None:
 def test_the_save_button_only_shows_when_there_is_something_to_save() -> None:
     """Un «Salva» sempre acceso su un campo che nessuno ha toccato invita a
     toccarlo per vedere cosa fa — e un nome vuoto non e' qualcosa da salvare:
-    il server ripiegherebbe su «Jenny» senza dirlo."""
+    il server ripiegherebbe su «Jafta» senza dirlo."""
     _run_js("""
       const she = room();
       assert.equal(nodi['home-name-save'].hidden, true, 'nascosto finche\u2019 non si sa il nome');
@@ -552,7 +552,7 @@ def test_a_name_being_typed_is_never_overwritten() -> None:
     _run_js("""
       const she = room();
       nodi['home-name'].value = 'Vera';
-      she.setName('Jenny');
+      she.setName('Jafta');
       assert.equal(nodi['home-name'].value, 'Vera', 'la risposta ha scritto sopra');
     """)
 
@@ -563,7 +563,7 @@ def test_saving_the_name_goes_through_the_settings_call() -> None:
     campo solo sarebbe un secondo posto da tenere allineato."""
     _run_js("""
       const she = room();
-      she.setName('Jenny');
+      she.setName('Jafta');
       nodi['home-name'].value = 'Ada';
       await she.saveName();
       assert.deepEqual(savedNames, [{ bot_name: 'Ada' }]);
@@ -576,7 +576,7 @@ def test_a_refused_save_says_so_and_keeps_the_button() -> None:
     bottone che sparisce dopo un errore racconta che il nome e\u2019 cambiato."""
     _run_js("""
       const she = room();
-      she.setName('Jenny');
+      she.setName('Jafta');
       nodi['home-name'].value = 'Ada';
       nodi['home-name'].listeners.input[0]();
       brokenName = true;
@@ -593,7 +593,7 @@ def test_a_saved_name_is_told_to_the_shell() -> None:
     salvataggio rifiutato non dice niente."""
     _run_js("""
       const she = room();
-      she.setName('Jenny');
+      she.setName('Jafta');
       nodi['home-name'].value = 'Ada';
       brokenName = true;
       await she.saveName();
@@ -614,7 +614,7 @@ def test_a_name_that_could_not_be_read_is_not_an_empty_name() -> None:
       nodi['home-name'].value = 'Ada';
       nodi['home-name'].listeners.input[0]();
       assert.equal(nodi['home-name-save'].hidden, true, 'si salva un nome confrontato col nulla');
-      she.setName('Jenny');
+      she.setName('Jafta');
       assert.equal(nodi['home-name'].value, 'Ada', 'la risposta ha scritto sopra');
       assert.equal(nodi['home-name-save'].hidden, false);
     """)

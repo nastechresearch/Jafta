@@ -3,7 +3,7 @@ import sys
 import zipfile
 from pathlib import Path
 
-SCRIPT_DIR = Path(__file__).resolve().parents[2] / "jenny" / "skills" / "skill-creator" / "scripts"
+SCRIPT_DIR = Path(__file__).resolve().parents[2] / "jafta" / "skills" / "skill-creator" / "scripts"
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
@@ -29,7 +29,7 @@ def test_init_skill_creates_expected_files(tmp_path: Path) -> None:
 
 def test_validate_skill_accepts_existing_skill_creator() -> None:
     valid, message = quick_validate.validate_skill(
-        Path(__file__).resolve().parents[2] / "jenny" / "skills" / "skill-creator"
+        Path(__file__).resolve().parents[2] / "jafta" / "skills" / "skill-creator"
     )
 
     assert valid, message

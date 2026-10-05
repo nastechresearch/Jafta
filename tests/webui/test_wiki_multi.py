@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from jenny.webui.wiki import (
+from jafta.webui.wiki import (
     _split_wikilink,
     build_graph,
     create_audit,
@@ -270,7 +270,7 @@ class TestCreateRenderer:
 #
 # **Si scrivono e non si rileggono**, dal 22/09/2026. Le rotte che li elencavano
 # e il comando che li chiudeva sono usciti con lo stesso giro: dal telefono una
-# segnalazione si apre e basta, e chi la legge e' Jenny — con i suoi strumenti
+# segnalazione si apre e basta, e chi la legge e' Jafta — con i suoi strumenti
 # file e ``llm-wiki/scripts/audit_review.py``, che ha il suo analizzatore. Quindi
 # qui si guarda **il disco**, che e' l'unica cosa che entrambe le parti vedono.
 
@@ -335,7 +335,7 @@ class TestAudit:
         def boom(*_args, **_kwargs):
             raise OSError("no space left on device")
 
-        monkeypatch.setattr("jenny.webui.wiki.atomic_write", boom)
+        monkeypatch.setattr("jafta.webui.wiki.atomic_write", boom)
         with pytest.raises(OSError):
             create_audit(
                 wiki_root=wiki_root,
@@ -497,7 +497,7 @@ class TestNoSeverity:
 
 class TestFrontmatterAllowlist:
     def test_drops_internal_keys(self):
-        from jenny.webui.wiki_routes import _filter_frontmatter
+        from jafta.webui.wiki_routes import _filter_frontmatter
 
         fm = {
             "title": "Foo",
@@ -514,7 +514,7 @@ class TestFrontmatterAllowlist:
         assert "draft" not in filtered
 
     def test_none_and_non_dict_passthrough(self):
-        from jenny.webui.wiki_routes import _filter_frontmatter
+        from jafta.webui.wiki_routes import _filter_frontmatter
 
         assert _filter_frontmatter(None) is None
         assert _filter_frontmatter("not a dict") == "not a dict"

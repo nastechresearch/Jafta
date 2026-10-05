@@ -4,8 +4,8 @@ import json
 
 import httpx
 
-from jenny.providers.anthropic_provider import AnthropicProvider
-from jenny.providers.base import (
+from jafta.providers.anthropic_provider import AnthropicProvider
+from jafta.providers.base import (
     parse_tool_arguments,
     tool_arguments_json_for_replay,
     tool_arguments_object_for_replay,

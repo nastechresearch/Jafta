@@ -2,8 +2,8 @@ import json
 import socket
 from unittest.mock import patch
 
-from jenny.config.loader import load_config
-from jenny.security.network import validate_url_target
+from jafta.config.loader import load_config
+from jafta.security.network import validate_url_target
 
 
 def _fake_resolve(host: str, results: list[str]):
@@ -25,11 +25,11 @@ def test_load_config_resets_ssrf_whitelist_when_next_config_is_empty(tmp_path) -
     defaulted.write_text(json.dumps({}), encoding="utf-8")
 
     load_config(whitelisted)
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("ts.local", ["100.100.1.1"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("ts.local", ["100.100.1.1"])):
         ok, err = validate_url_target("http://ts.local/api")
         assert ok, err
 
     load_config(defaulted)
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("ts.local", ["100.100.1.1"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("ts.local", ["100.100.1.1"])):
         ok, _ = validate_url_target("http://ts.local/api")
         assert not ok

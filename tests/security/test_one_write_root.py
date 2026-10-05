@@ -43,14 +43,14 @@ from typing import Any, Awaitable, Callable
 import httpx
 import pytest
 
-from jenny.agent.tools import download as download_mod
-from jenny.agent.tools.download import DownloadFileTool
-from jenny.agent.tools.filesystem import WriteFileTool
-from jenny.agent.tools.journal import JournalAppendTool
-from jenny.agent.tools.python_exec import PythonExecTool
-from jenny.agent.tools.python_exec_builtins import _register_builtin_functions
-from jenny.config.tool_schemas import PythonExecConfig
-from jenny.security.workspace_access import (
+from jafta.agent.tools import download as download_mod
+from jafta.agent.tools.download import DownloadFileTool
+from jafta.agent.tools.filesystem import WriteFileTool
+from jafta.agent.tools.journal import JournalAppendTool
+from jafta.agent.tools.python_exec import PythonExecTool
+from jafta.agent.tools.python_exec_builtins import _register_builtin_functions
+from jafta.config.tool_schemas import PythonExecConfig
+from jafta.security.workspace_access import (
     bind_workspace_scope,
     reset_workspace_scope,
     validate_workspace_scope_payload,
@@ -243,8 +243,8 @@ async def _root_ssh_transfer(env: Env) -> Path:
     """``ssh_transfer`` in discesa: scrive sul telefono il file del remoto."""
     from types import SimpleNamespace
 
-    from jenny.agent.tools import ssh as ssh_mod
-    from jenny.agent.tools.ssh import SshTransferTool
+    from jafta.agent.tools import ssh as ssh_mod
+    from jafta.agent.tools.ssh import SshTransferTool
 
     class _Backend:
         async def get(self, target, remote, local, max_bytes):
@@ -313,7 +313,7 @@ async def test_all_write_surfaces_agree_on_one_root(env: Env) -> None:
 
 # ── 2. la metà strutturale: nessuna settima implementazione ────────────────
 
-_JENNY = Path(__file__).resolve().parents[2] / "jenny"
+_JENNY = Path(__file__).resolve().parents[2] / "jafta"
 _TOOLS_DIR = _JENNY / "agent" / "tools"
 
 # I moduli sotto ``agent/tools/`` che hanno una sonda qui sopra.

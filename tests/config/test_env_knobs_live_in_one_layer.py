@@ -19,7 +19,7 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-JENNY = Path(__file__).resolve().parents[2] / "jenny"
+JAFTA = Path(__file__).resolve().parents[2] / "jafta"
 LAYER = "config/runtime_env.py"
 
 # Chi può nominare un ``JENNY_*`` senza leggerlo dall'ambiente: il layer che lo
@@ -34,9 +34,9 @@ _MAY_NAME_KNOBS = {
 
 def _sources() -> list[tuple[str, str]]:
     return [
-        (path.relative_to(JENNY).as_posix(), path.read_text("utf-8"))
-        for path in sorted(JENNY.rglob("*.py"))
-        if not path.relative_to(JENNY).as_posix().startswith("skills/")
+        (path.relative_to(JAFTA).as_posix(), path.read_text("utf-8"))
+        for path in sorted(JAFTA.rglob("*.py"))
+        if not path.relative_to(JAFTA).as_posix().startswith("skills/")
     ]
 
 
@@ -76,7 +76,7 @@ def test_no_jenny_knob_is_read_outside_the_layer() -> None:
 
 def test_knob_names_are_defined_in_the_layer() -> None:
     """Un knob nominato altrove deve venire dal layer come costante importata."""
-    layer_src = (JENNY / LAYER).read_text("utf-8")
+    layer_src = (JAFTA / LAYER).read_text("utf-8")
     offenders = []
     for rel, src in _sources():
         if rel in _MAY_NAME_KNOBS:

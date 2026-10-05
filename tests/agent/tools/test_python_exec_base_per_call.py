@@ -16,10 +16,10 @@ from __future__ import annotations
 
 import asyncio
 
-from jenny.agent.tools.context import RequestContext, bind_request_context
-from jenny.agent.tools.exec_session import ExecSessionManager
-from jenny.agent.tools.python_exec import PythonExecTool
-from jenny.config.schema import PythonExecConfig
+from jafta.agent.tools.context import RequestContext, bind_request_context
+from jafta.agent.tools.exec_session import ExecSessionManager
+from jafta.agent.tools.python_exec import PythonExecTool
+from jafta.config.schema import PythonExecConfig
 
 
 def _tool(ws, manager: ExecSessionManager | None = None) -> PythonExecTool:
@@ -40,7 +40,7 @@ async def _as_session(key: str, coro):
     try:
         return await coro
     finally:
-        from jenny.agent.tools.context import _CURRENT_REQUEST_CONTEXT
+        from jafta.agent.tools.context import _CURRENT_REQUEST_CONTEXT
 
         _CURRENT_REQUEST_CONTEXT.reset(token)
 

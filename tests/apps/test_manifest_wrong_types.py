@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from jenny.apps.manifest import load_app, scan_apps
+from jafta.apps.manifest import load_app, scan_apps
 
 _BASE = {
     "name": "Piante",

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from jenny.webui.transcript import (
+from jafta.webui.transcript import (
     WEBUI_TRANSCRIPT_SCHEMA_VERSION,
     append_transcript_object,
     build_webui_thread_response,
@@ -13,7 +13,7 @@ from jenny.webui.transcript import (
 
 
 def test_append_and_read_roundtrip(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:t1"
     append_transcript_object(key, {"event": "user", "chat_id": "t1", "text": "hello"})
     lines = read_transcript_lines(key)
@@ -22,8 +22,8 @@ def test_append_and_read_roundtrip(tmp_path, monkeypatch) -> None:
 
 
 def _force_small_transcript_budget(monkeypatch, *, limit: int = 520, target: int = 260) -> None:
-    monkeypatch.setattr("jenny.webui.transcript_store._MAX_TRANSCRIPT_FILE_BYTES", limit)
-    monkeypatch.setattr("jenny.webui.transcript_store._TARGET_ACTIVE_TRANSCRIPT_BYTES", target)
+    monkeypatch.setattr("jafta.webui.transcript_store._MAX_TRANSCRIPT_FILE_BYTES", limit)
+    monkeypatch.setattr("jafta.webui.transcript_store._TARGET_ACTIVE_TRANSCRIPT_BYTES", target)
 
 
 def _append_numbered_turn(key: str, chat_id: str, idx: int) -> None:
@@ -39,7 +39,7 @@ def _append_numbered_turn(key: str, chat_id: str, idx: int) -> None:
 
 
 def _write_segmented_turns(tmp_path, monkeypatch, key: str, chat_id: str, count: int) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     _force_small_transcript_budget(monkeypatch)
     for idx in range(1, count + 1):
         _append_numbered_turn(key, chat_id, idx)
@@ -139,7 +139,7 @@ def test_concurrent_manifest_writers_do_not_share_tmp(tmp_path, monkeypatch) -> 
     import json
     import threading
 
-    from jenny.webui.transcript_store import _segment_ids_on_disk, _write_segment_manifest
+    from jafta.webui.transcript_store import _segment_ids_on_disk, _write_segment_manifest
 
     key = "websocket:manifest-race"
     _write_segmented_turns(tmp_path, monkeypatch, key, "manifest-race", 6)
@@ -172,8 +172,8 @@ def test_concurrent_manifest_writers_do_not_share_tmp(tmp_path, monkeypatch) -> 
 
 
 def test_delete_webui_transcript_removes_segments(tmp_path, monkeypatch) -> None:
-    from jenny.webui.transcript import delete_webui_transcript, webui_transcript_path
-    from jenny.webui.transcript_store import _legacy_webui_thread_path
+    from jafta.webui.transcript import delete_webui_transcript, webui_transcript_path
+    from jafta.webui.transcript_store import _legacy_webui_thread_path
 
     key = "websocket:delete-segments"
     _write_segmented_turns(tmp_path, monkeypatch, key, "delete-segments", 4)
@@ -190,7 +190,7 @@ def test_delete_webui_transcript_removes_segments(tmp_path, monkeypatch) -> None
 
 def test_build_response_reports_fork_boundary_from_legacy_marker(tmp_path, monkeypatch) -> None:
     """Transcripts written before fork removal may still contain marker rows."""
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:fork"
     for ev in (
         {"event": "user", "chat_id": "fork", "text": "round1"},
@@ -208,7 +208,7 @@ def test_build_response_reports_fork_boundary_from_legacy_marker(tmp_path, monke
 
 
 def test_replay_delta_and_turn_end(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:t2"
     for ev in (
         {"event": "user", "chat_id": "t2", "text": "q"},
@@ -234,7 +234,7 @@ def test_thread_response_does_not_mark_completed_message_tool_tail_pending(
     tmp_path,
     monkeypatch,
 ) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:cron-tail"
     turn_id = "cron:job:run"
     for ev in (
@@ -297,7 +297,7 @@ def test_thread_response_does_not_mark_completed_message_tool_tail_pending(
 
 
 def test_thread_response_marks_unfinished_tool_tail_pending(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:active-tail"
     append_transcript_object(
         key,
@@ -316,7 +316,7 @@ def test_thread_response_marks_unfinished_tool_tail_pending(tmp_path, monkeypatc
 
 
 def test_replay_preserves_turn_metadata(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:t-turn"
     for ev in (
         {
@@ -365,7 +365,7 @@ def test_replay_preserves_turn_metadata(tmp_path, monkeypatch) -> None:
 
 
 def test_replay_reused_turn_id_after_turn_end_starts_new_turn(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:t-reused-turn"
 
     def event(
@@ -410,7 +410,7 @@ def test_build_response_restores_session_users_for_legacy_transcript(
     tmp_path,
     monkeypatch,
 ) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:legacy-users"
     append_transcript_object(
         key,
@@ -446,7 +446,7 @@ def test_build_response_restores_session_users_without_duplicating_new_transcrip
     tmp_path,
     monkeypatch,
 ) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:mixed-users"
     append_transcript_object(
         key,
@@ -504,7 +504,7 @@ def test_replay_uses_stream_end_final_text() -> None:
 
 
 def test_build_response_backfills_legacy_sse_only_transcripts(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:t-legacy"
     for ev in (
         {"event": "delta", "chat_id": "t-legacy", "text": "first answer"},
@@ -541,7 +541,7 @@ def test_build_response_backfills_legacy_sse_only_transcripts(tmp_path, monkeypa
 
 
 def test_backfill_does_not_duplicate_existing_user_transcript(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:t-current"
     for ev in (
         {"event": "user", "chat_id": "t-current", "text": "already stored"},
@@ -564,7 +564,7 @@ def test_backfill_does_not_misalign_when_session_only_has_transcript_tail(
     tmp_path,
     monkeypatch,
 ) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:t-tail"
     for ev in (
         {"event": "message", "chat_id": "t-tail", "text": "old answer"},
@@ -672,7 +672,7 @@ def test_replay_infers_file_media_from_attachment_name() -> None:
 
 
 def test_replay_file_edit_event_creates_file_activity(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:t-file"
     for ev in (
         {"event": "user", "chat_id": "t-file", "text": "edit"},
@@ -874,7 +874,7 @@ def test_replay_tool_events_dedupes_finish_after_start() -> None:
 
 
 def test_replay_file_edit_progress_merges_after_interleaved_activity(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:t-file-progress"
     for ev in (
         {"event": "user", "chat_id": "t-file-progress", "text": "edit"},
@@ -947,7 +947,7 @@ def test_replay_file_edit_progress_merges_after_interleaved_activity(tmp_path, m
 
 
 def test_replay_file_edit_pending_placeholder_upgrades_to_path(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:t-file-pending"
     for ev in (
         {"event": "user", "chat_id": "t-file-pending", "text": "write"},
@@ -1009,7 +1009,7 @@ def test_replay_file_edit_pending_placeholder_upgrades_to_path(tmp_path, monkeyp
 
 
 def test_replay_keeps_new_file_edit_after_reasoning_in_order(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:t-file-order"
     for ev in (
         {"event": "user", "chat_id": "t-file-order", "text": "edit"},
@@ -1069,7 +1069,7 @@ def test_replay_keeps_new_file_edit_after_reasoning_in_order(tmp_path, monkeypat
 
 
 def test_build_response_schema(monkeypatch, tmp_path) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:t3"
     append_transcript_object(key, {"event": "user", "chat_id": "t3", "text": "x"})
     out = build_webui_thread_response(key, augment_user_media=None)
@@ -1195,7 +1195,7 @@ def test_cron_turn_does_not_backfill_a_subagent_announce_as_a_user_bubble(
     metà turno con ``role: "user"`` e nessun marcatore — e lo mostrava in chat
     con dentro il prompt integrale del subagent.
     """
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:cron-announce"
     append_transcript_object(
         key,
@@ -1234,7 +1234,7 @@ def test_cron_turn_still_backfills_a_real_user_message(tmp_path, monkeypatch) ->
     Tiene il test qui sopra onesto — deve fallire perché l'annuncio è *marcato*,
     non perché il backfill ha smesso di funzionare.
     """
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     key = "websocket:real-user"
     append_transcript_object(
         key,

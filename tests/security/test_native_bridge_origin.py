@@ -3,7 +3,7 @@
 Prima c'era un oggetto solo, ``JennyNative``, installato con
 ``addJavascriptInterface``. Android lo inietta in **ogni** frame, qualunque sia
 l'origine, e la WebView principale ospita due tipi di pagine non nostre: le
-cornici delle Jenny App (``sandbox="allow-scripts"``) e la vista esterna, cioè
+cornici delle Jafta App (``sandbox="allow-scripts"``) e la vista esterna, cioè
 l'HTML del server dell'utente arrivato in chiaro dal proxy. Una qualunque di
 quelle poteva chiamare ``saveToDownloads('config.json')`` — le chiavi dei
 provider nella cartella Download condivisa — ``restartApp()``, o leggere il
@@ -24,7 +24,7 @@ from support.js_harness import requires_node, run_js
 from support.kotlin_source import block_after, function_body, read_code, read_source
 
 ROOT = Path(__file__).resolve().parents[2]
-UI = ROOT / "jenny" / "templates" / "ui"
+UI = ROOT / "jafta" / "templates" / "ui"
 SHIM = UI / "assets" / "shared" / "native-bridge.js"
 
 # I metodi che un iframe qualunque può chiamare senza danno: nessun effetto,
@@ -188,7 +188,7 @@ def test_the_shells_load_the_shim_before_any_module() -> None:
         first_module = html.index('type="module"')
         assert html.index(tag) < first_module, shell
         assert html.index("bootstrap.js") < html.index(tag), shell
-    manifest = (ROOT / "jenny" / "utils" / "android_assets.py").read_text(encoding="utf-8")
+    manifest = (ROOT / "jafta" / "utils" / "android_assets.py").read_text(encoding="utf-8")
     assert '"assets/shared/native-bridge.js"' in manifest
 
 
@@ -225,7 +225,7 @@ def test_outside_the_shell_there_is_no_bridge() -> None:
 
 @requires_node
 def test_a_frame_with_only_the_read_port_gets_only_reads() -> None:
-    """È ciò che vede una cornice di Jenny App: la porta dei comandi Chromium
+    """È ciò che vede una cornice di Jafta App: la porta dei comandi Chromium
     non ce la inietta, quindi di scrivere non c'è nemmeno il nome."""
     out = _run_shim(
         """

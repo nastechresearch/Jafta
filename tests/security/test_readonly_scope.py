@@ -25,7 +25,7 @@ from pathlib import Path
 
 import pytest
 
-from jenny.security.workspace_access import (
+from jafta.security.workspace_access import (
     WORKSPACE_READONLY_METADATA_KEY,
     WorkspaceScopeResolver,
     build_workspace_scope,
@@ -62,7 +62,7 @@ def test_read_only_is_a_flag_and_not_a_missing_root() -> None:
     dire sì a tutto — e lo direbbe in silenzio, perché è esattamente la forma
     che ha un'installazione senza restrizioni.
     """
-    from jenny.security.workspace_access import current_tool_workspace
+    from jafta.security.workspace_access import current_tool_workspace
 
     scope = build_workspace_scope("/tmp", "restricted").without_write_access()
     with enter_workspace_scope(scope):

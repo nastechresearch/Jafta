@@ -11,7 +11,7 @@ Le due scelte, e perché sono opposte:
 
 - ``agent/project.md`` sta **prima** dell'``AGENTS.md`` del progetto, cioè
   *perde*. Quel blocco è la pianta generale di un progetto; l'``AGENTS.md`` è il
-  posto in cui l'utente — o Jenny — scrive come si lavora *in questo* progetto, e
+  posto in cui l'utente — o Jafta — scrive come si lavora *in questo* progetto, e
   un'eccezione scritta lì non serve a niente se la regola generale la segue e la
   sovrascrive.
 - ``agent/scheduling.md`` sta **dopo**, cioè *vince*: è prosa di sistema estratta
@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import pathlib
 
-from jenny.agent.context import ContextBuilder
+from jafta.agent.context import ContextBuilder
 
 # Il marcatore del blocco di bootstrap è l'intestazione che
 # ``_load_bootstrap_files`` mette davanti a ogni file (``## <nome>``): è la sola

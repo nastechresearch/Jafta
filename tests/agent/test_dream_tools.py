@@ -1,4 +1,4 @@
-from jenny.agent.memory import MemoryStore
+from jafta.agent.memory import MemoryStore
 
 
 def test_build_dream_tools_registers_restricted_toolset(tmp_path):

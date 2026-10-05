@@ -4,8 +4,8 @@ from datetime import datetime, timezone
 
 import pytest
 
-from jenny.agent.hook import AgentHookContext
-from jenny.agent.token_usage import (
+from jafta.agent.hook import AgentHookContext
+from jafta.agent.token_usage import (
     TokenUsageHook,
     record_token_usage,
     token_usage_payload,
@@ -13,7 +13,7 @@ from jenny.agent.token_usage import (
 
 
 def test_record_token_usage_aggregates_by_local_day(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.agent.token_usage.get_webui_dir", lambda: tmp_path / "webui")
+    monkeypatch.setattr("jafta.agent.token_usage.get_webui_dir", lambda: tmp_path / "webui")
 
     record_token_usage(
         {"prompt_tokens": 100, "completion_tokens": 40, "cached_tokens": 20},
@@ -37,7 +37,7 @@ def test_record_token_usage_aggregates_by_local_day(tmp_path, monkeypatch) -> No
 
 
 def test_record_token_usage_skips_empty_usage(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.agent.token_usage.get_webui_dir", lambda: tmp_path / "webui")
+    monkeypatch.setattr("jafta.agent.token_usage.get_webui_dir", lambda: tmp_path / "webui")
 
     record_token_usage({"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0})
 
@@ -47,7 +47,7 @@ def test_record_token_usage_skips_empty_usage(tmp_path, monkeypatch) -> None:
 
 
 def test_record_token_usage_keeps_estimated_split(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.agent.token_usage.get_webui_dir", lambda: tmp_path / "webui")
+    monkeypatch.setattr("jafta.agent.token_usage.get_webui_dir", lambda: tmp_path / "webui")
 
     record_token_usage(
         {"prompt_tokens": 100, "completion_tokens": 25, "estimated_tokens": 125},
@@ -61,7 +61,7 @@ def test_record_token_usage_keeps_estimated_split(tmp_path, monkeypatch) -> None
 
 
 def test_record_token_usage_keeps_source_breakdown(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.agent.token_usage.get_webui_dir", lambda: tmp_path / "webui")
+    monkeypatch.setattr("jafta.agent.token_usage.get_webui_dir", lambda: tmp_path / "webui")
 
     record_token_usage(
         {"prompt_tokens": 100, "completion_tokens": 25},
@@ -82,8 +82,8 @@ def test_record_token_usage_keeps_source_breakdown(tmp_path, monkeypatch) -> Non
 
 @pytest.mark.asyncio
 async def test_token_usage_hook_classifies_source_from_session_key(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.agent.token_usage.get_webui_dir", lambda: tmp_path / "webui")
-    monkeypatch.setattr("jenny.agent.token_usage._local_day", lambda *_, **__: "2026-06-03")
+    monkeypatch.setattr("jafta.agent.token_usage.get_webui_dir", lambda: tmp_path / "webui")
+    monkeypatch.setattr("jafta.agent.token_usage._local_day", lambda *_, **__: "2026-06-03")
 
     hook = TokenUsageHook()
     await hook.after_iteration(
@@ -100,7 +100,7 @@ async def test_token_usage_hook_classifies_source_from_session_key(tmp_path, mon
     assert payload["total_tokens_30d"] == 15
 
 
-from jenny.session.keys import HEARTBEAT_SESSION_KEY, UNIFIED_SESSION_KEY  # noqa: E402
+from jafta.session.keys import HEARTBEAT_SESSION_KEY, UNIFIED_SESSION_KEY  # noqa: E402
 
 # ── A chi si addebita il lavoro interno ─────────────────────────────────────
 #
@@ -142,7 +142,7 @@ def test_internal_work_is_billed_to_itself(session_key, expected) -> None:
     numero di wiki e non col numero di job — dentro `cron` quella crescita non si
     vede.
     """
-    from jenny.agent.token_usage import _source_from_session_key
+    from jafta.agent.token_usage import _source_from_session_key
 
     assert _source_from_session_key(session_key) == expected
 
@@ -151,7 +151,7 @@ def test_a_retired_bucket_keeps_its_label_in_the_ledger() -> None:
     """``atlas`` non spende piu' — nessun kind ci mappa — ma i giorni gia' scritti
     lo portano, e un registro non rietichetta la spesa passata: senza la chiave in
     `_SOURCE_KEYS` quel giorno passerebbe a `"system"` alla prima rilettura."""
-    from jenny.agent.token_usage import (
+    from jafta.agent.token_usage import (
         _INTERNAL_KIND_TO_SOURCE,
         _SOURCE_KEYS,
         normalize_token_usage_state,
@@ -179,7 +179,7 @@ def test_every_bucket_the_map_names_is_a_declared_source() -> None:
     """Un valore fuori da `_SOURCE_KEYS` viene riscritto in `"system"` **in
     silenzio** da `_clean_source`: una voce nuova nella mappa senza la sua chiave
     non darebbe un errore, darebbe un seppellimento."""
-    from jenny.agent.token_usage import _INTERNAL_KIND_TO_SOURCE, _SOURCE_KEYS
+    from jafta.agent.token_usage import _INTERNAL_KIND_TO_SOURCE, _SOURCE_KEYS
 
     assert set(_INTERNAL_KIND_TO_SOURCE.values()) <= set(_SOURCE_KEYS)
 
@@ -206,6 +206,6 @@ def test_the_real_hook_declares_that_it_survives_an_ephemeral_turn() -> None:
 
 def test_a_plain_hook_does_not_survive_one() -> None:
     """Il default, che è quel che rende la riga sopra una *scelta*."""
-    from jenny.agent.hook import AgentHook
+    from jafta.agent.hook import AgentHook
 
     assert AgentHook().runs_when_ephemeral() is False

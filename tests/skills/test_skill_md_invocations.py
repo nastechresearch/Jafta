@@ -9,10 +9,10 @@ falliva e l'agente bruciava quattro tool call per cicli a riscoprire `sys.path`.
 La documentazione da sola non basta: serve un test che diventi rosso.
 
 Cosa controlla, sui file Markdown *impacchettati* (`SKILL.md` e
-`references/*.md` di ogni skill in `jenny/skills/`):
+`references/*.md` di ogni skill in `jafta/skills/`):
 
 1. nessuna invocazione di interprete/shell (`python3 x.py`, `bash …`): su questa
-   piattaforma esiste solo `python_exec` (`jenny/templates/agent/tool_contract.md`);
+   piattaforma esiste solo `python_exec` (`jafta/templates/agent/tool_contract.md`);
 2. nessun percorso con il nome della skill duplicato (`llm-wiki/llm-wiki/…`);
 3. ogni blocco `python_exec` che tocca uno script della skill stessa deve
    passare `working_dir` puntato a `skills/<nome>/scripts`;
@@ -40,9 +40,9 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from jenny.utils.android_assets import _SKILLS_MANIFEST
+from jafta.utils.android_assets import _SKILLS_MANIFEST
 
-SKILLS_DIR = Path(__file__).resolve().parents[2] / "jenny" / "skills"
+SKILLS_DIR = Path(__file__).resolve().parents[2] / "jafta" / "skills"
 
 # Skill che documentano l'autoria di skill in generale: i percorsi di risorse
 # che citano appartengono a skill di esempio, non a loro.
@@ -163,7 +163,7 @@ def test_no_doubled_skill_name_in_documented_paths() -> None:
                     offenders.append(f"{rel}:{lineno}: {line.strip()!r}")
     assert not offenders, (
         "percorso con il segmento della skill duplicato; il manifest "
-        "(jenny/utils/android_assets.py) estrae <skill>/... una volta sola:\n  "
+        "(jafta/utils/android_assets.py) estrae <skill>/... una volta sola:\n  "
         + "\n  ".join(offenders)
     )
 

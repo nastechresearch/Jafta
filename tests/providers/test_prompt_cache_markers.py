@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from jenny.providers.anthropic_provider import AnthropicProvider
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.anthropic_provider import AnthropicProvider
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 
 def _openai_tools(*names: str) -> list[dict[str, Any]]:

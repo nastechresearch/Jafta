@@ -16,7 +16,7 @@ from __future__ import annotations
 import datetime
 from pathlib import Path
 
-CA_COMMON_NAME = "Jenny Test CA"
+CA_COMMON_NAME = "Jafta Test CA"
 
 
 def write_test_ca(path: Path, *, common_name: str = CA_COMMON_NAME) -> Path:

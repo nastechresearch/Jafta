@@ -23,7 +23,7 @@ _HEAD = """
 import assert from 'node:assert/strict';
 import { boot, tick, routes, hooks, ok, failed, rpcAnswers, rpcFailed, $ } from './boot.mjs';
 routes['/api/settings'] = {
-  agent: { bot_name: 'Jenny', model: 'm' }, default_provider: 'anthropic',
+  agent: { bot_name: 'Jafta', model: 'm' }, default_provider: 'anthropic',
   providers: [{ name: 'anthropic' }], version: {}, backup: {},
 };
 """

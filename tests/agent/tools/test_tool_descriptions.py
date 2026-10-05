@@ -1,8 +1,8 @@
-from jenny.agent.tools.apply_patch import ApplyPatchTool
-from jenny.agent.tools.exec_session import ListExecSessionsTool, WriteStdinTool
-from jenny.agent.tools.filesystem import EditFileTool, ReadFileTool, WriteFileTool
-from jenny.agent.tools.python_exec import PythonExecTool
-from jenny.agent.tools.search import FindFilesTool, GrepTool
+from jafta.agent.tools.apply_patch import ApplyPatchTool
+from jafta.agent.tools.exec_session import ListExecSessionsTool, WriteStdinTool
+from jafta.agent.tools.filesystem import EditFileTool, ReadFileTool, WriteFileTool
+from jafta.agent.tools.python_exec import PythonExecTool
+from jafta.agent.tools.search import FindFilesTool, GrepTool
 
 
 def test_coding_tool_descriptions_steer_editing_priority() -> None:

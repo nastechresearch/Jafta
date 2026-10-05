@@ -13,8 +13,8 @@ from unittest.mock import AsyncMock, MagicMock
 import httpx
 import pytest
 
-from jenny.providers.openai_compat_helpers import _versioned_base_candidate
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.openai_compat_helpers import _versioned_base_candidate
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 
 def _response(url: str, status: int, body: str = "") -> httpx.Response:

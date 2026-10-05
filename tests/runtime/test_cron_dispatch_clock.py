@@ -10,9 +10,9 @@ from __future__ import annotations
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
-from jenny.config.schema import Config
-from jenny.runtime.cron_dispatch import CronDispatcher
-from jenny.utils import clock
+from jafta.config.schema import Config
+from jafta.runtime.cron_dispatch import CronDispatcher
+from jafta.utils import clock
 
 
 def _dispatcher(**kwargs) -> CronDispatcher:

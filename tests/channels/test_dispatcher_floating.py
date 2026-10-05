@@ -15,12 +15,12 @@ from typing import Any
 
 import pytest
 
-from jenny.bus.events import FLOATING_CHANNEL, OutboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.channels import floating as fc
-from jenny.channels.dispatcher import WebSocketDispatcher
-from jenny.channels.floating import FloatingChannel
-from jenny.config.schema import Config
+from jafta.bus.events import FLOATING_CHANNEL, OutboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.channels import floating as fc
+from jafta.channels.dispatcher import WebSocketDispatcher
+from jafta.channels.floating import FloatingChannel
+from jafta.config.schema import Config
 
 
 class MockWebSocket:
@@ -149,7 +149,7 @@ async def test_the_channel_is_not_born_without_an_android_context() -> None:
 
 
 async def test_the_channel_is_born_with_an_android_context(monkeypatch) -> None:
-    monkeypatch.setattr("jenny.runtime.context.get_android_context", lambda: object())
+    monkeypatch.setattr("jafta.runtime.context.get_android_context", lambda: object())
     d = WebSocketDispatcher(Config(), MessageBus())
     assert isinstance(d.channels.get(FLOATING_CHANNEL), FloatingChannel)
 
@@ -162,7 +162,7 @@ async def test_the_channel_is_born_even_with_the_mascot_off(monkeypatch) -> None
     a gateway già su, la mascotte avrebbe la finestra e nessun canale — cioè un
     campo che accetta testo e una risposta che non torna mai.
     """
-    monkeypatch.setattr("jenny.runtime.context.get_android_context", lambda: object())
+    monkeypatch.setattr("jafta.runtime.context.get_android_context", lambda: object())
     cfg = Config()
     assert cfg.floating.enabled is False
     d = WebSocketDispatcher(cfg, MessageBus())
@@ -178,7 +178,7 @@ def test_the_channel_is_not_a_target_of_the_proactive_fanout() -> None:
     riga, il che vuol dire che nessun test se ne accorgerebbe: questo lo fa,
     chiedendo i target a fabbrica piena.
     """
-    from jenny.runtime.container import GatewayContainer
+    from jafta.runtime.container import GatewayContainer
 
     class _Dispatcher:
         channels = {

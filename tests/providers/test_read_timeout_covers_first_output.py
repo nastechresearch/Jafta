@@ -16,10 +16,10 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from jenny.config.runtime_env import resolve_first_output_timeout_s
-from jenny.providers.anthropic_provider import AnthropicProvider
-from jenny.providers.endpoint_budget import DEFAULT_REQUEST_TIMEOUT_S, read_timeout_s
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.config.runtime_env import resolve_first_output_timeout_s
+from jafta.providers.anthropic_provider import AnthropicProvider
+from jafta.providers.endpoint_budget import DEFAULT_REQUEST_TIMEOUT_S, read_timeout_s
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 MESSAGES = [{"role": "user", "content": "x"}]
 

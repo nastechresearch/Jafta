@@ -25,9 +25,9 @@ from pathlib import Path
 from support.kotlin_source import read_source
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 APP_JS = ASSETS / "mobile-app.js"
-MAIN_ACTIVITY = ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "flagdizero" / "jenny" / "MainActivity.kt"
+MAIN_ACTIVITY = ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "flagdizero" / "jafta" / "MainActivity.kt"
 
 
 def _app() -> str:
@@ -75,14 +75,14 @@ def test_the_layer_list_is_ordered_by_real_stacking() -> None:
 
     **Questo test congelava l'ordine sbagliato.** Fino a ieri asseriva mini-app
     *prima* della minichat, cioè l'ordine che il codice aveva, non quello che gli
-    z-index impongono: ``.app-frame-overlay`` 110 < ``.jenny-scrim`` 119 <
-    ``.jenny-duo`` 120 < ``.jenny-mc`` 121 (e ``.app`` non crea stacking
+    z-index impongono: ``.app-frame-overlay`` 110 < ``.jafta-scrim`` 119 <
+    ``.jafta-duo`` 120 < ``.jafta-mc`` 121 (e ``.app`` non crea stacking
     context). Con la minichat aperta sopra una mini-app, il back chiudeva l'app
     *sotto* e a schermo non cambiava niente. L'ordine asserito qui è ora quello
     misurato sul CSS.
 
     **Lightbox e minichat sono l'unica coppia fuori ordine, e non per sbaglio.**
-    Con D3 (25/09/2026, «Jenny sempre sopra», anche alle immagini) la lightbox è
+    Con D3 (25/09/2026, «Jafta sempre sopra», anche alle immagini) la lightbox è
     scesa da 1000 a 115, sotto di lei: la minichat (121) le starebbe sopra. Le
     due però non stanno mai aperte insieme — sopra una lightbox lei non prende
     tocchi, e mentre la minichat è aperta il suo scrim (119) copre la chat e
@@ -94,7 +94,7 @@ def test_the_layer_list_is_ordered_by_real_stacking() -> None:
     layers = [
         "dialog[open]",                  # top layer: showModal() sta sopra ogni z-index
         ".image-lightbox",               # z-index 115 (v. sotto: mai con la minichat)
-        ".jenny-mc.open",                # minichat, z-index 121
+        ".jafta-mc.open",                # minichat, z-index 121
         ".app-frame-overlay",            # mini-app, z-index 110
         "this.drawer.activeDrawer",      # drawer
     ]
@@ -109,17 +109,17 @@ def test_the_layer_list_is_ordered_by_real_stacking() -> None:
     css = (ASSETS / "mobile-style.css").read_text(encoding="utf-8")
     z = {
         name: int(re.search(rf"\n{re.escape(name)} \{{[^}}]*?z-index: (\d+);", css).group(1))
-        for name in (".image-lightbox", ".jenny-scrim", ".jenny-mc")
+        for name in (".image-lightbox", ".jafta-scrim", ".jafta-mc")
     }
     frame = re.search(r"\.app-frame-overlay \{[^}]*?z-index: (\d+);", css)
     assert frame, "livello della mini-app non trovato"
     # La lightbox sta sopra la mini-app e sotto lo scrim della minichat.
-    assert int(frame.group(1)) < z[".image-lightbox"] < z[".jenny-scrim"] < z[".jenny-mc"], z
+    assert int(frame.group(1)) < z[".image-lightbox"] < z[".jafta-scrim"] < z[".jafta-mc"], z
     # Le due condizioni che tengono lightbox e minichat separate.
-    assert ":root:has(.image-lightbox) .jenny-duo { pointer-events: none; }" in css, (
+    assert ":root:has(.image-lightbox) .jafta-duo { pointer-events: none; }" in css, (
         "sopra una lightbox lei aprirebbe la minichat: due livelli insieme, fuori ordine"
     )
-    scrim_open = re.search(r"\n\.jenny-scrim\.open \{([^}]*)\}", css)
+    scrim_open = re.search(r"\n\.jafta-scrim\.open \{([^}]*)\}", css)
     assert scrim_open and "pointer-events: auto" in scrim_open.group(1), (
         "con la minichat aperta un'immagine della chat si aprirebbe da sotto lo scrim"
     )
@@ -156,7 +156,7 @@ def test_the_back_chain_walks_the_single_layer_list() -> None:
     assert "layer.dismiss() !== false" in body
     # Una copia locale di un test di presenza è la ricomparsa della quarta
     # sorgente di verità: i livelli si aggiungono solo in _overlayLayers().
-    for marker in ("dialog[open]", ".image-lightbox", ".jenny-mc", ".app-frame-overlay"):
+    for marker in ("dialog[open]", ".image-lightbox", ".jafta-mc", ".app-frame-overlay"):
         assert marker not in body, f"il back riscrive un livello invece di percorrerlo: {marker}"
 
 
@@ -232,7 +232,7 @@ def test_the_layers_are_dismissed_through_public_entry_points() -> None:
     cleanup dei rispettivi proprietari (listener su ``document``, object URL,
     tastiera da abbassare). La shell parla solo con gli ingressi pubblici."""
     layers = _method(_app(), "_overlayLayers")
-    assert "this.jenny?.handleBack()" in layers
+    assert "this.jafta?.handleBack()" in layers
     assert "this._appsActions?.handleBack()" in layers
     assert "this.drawer.closeAll()" in layers
     assert "_setOut(" not in _app(), "la shell non tocca lo stato interno della mascotte"
@@ -242,7 +242,7 @@ def test_the_two_dangerous_collaborators_of_the_chain_still_exist() -> None:
     """Gli anelli che il piano ha deciso di **non** ammutolire.
 
     ``_overlayLayers`` chiama ``this._appsActions?.handleBack()`` e
-    ``this.jenny?.handleBack()``: l'optional chaining copre l'*oggetto* assente
+    ``this.jafta?.handleBack()``: l'optional chaining copre l'*oggetto* assente
     (controller non ancora istanziato, mascotte spenta), non il *metodo*. Se un
     domani uno dei due metodi sparisce o viene rinominato, la catena solleva un
     TypeError — che finisce in ``window.onerror`` → toast → ``/api/client-log``,
@@ -275,8 +275,8 @@ def test_the_two_dangerous_collaborators_of_the_chain_still_exist() -> None:
 
     # La minichat e' dei due gusci dal 28/09/2026: il suo Indietro sta nel
     # modulo condiviso, e l'officina lo eredita.
-    jenny = (ASSETS / "shared" / "jenny-minichat.js").read_text(encoding="utf-8")
-    jenny_back = _method(jenny, "handleBack")
+    jafta = (ASSETS / "shared" / "jafta-minichat.js").read_text(encoding="utf-8")
+    jenny_back = _method(jafta, "handleBack")
     assert "return false;" in jenny_back, (
         "a minichat chiusa il livello deve lasciar proseguire la catena"
     )
@@ -347,7 +347,7 @@ def test_the_type_ahead_guard_consumes_the_layer_list() -> None:
 
 
 def test_back_at_the_root_does_nothing_and_never_trusts_history_length() -> None:
-    """Jenny è il launcher: sotto la radice non c'è nessuna app a cui tornare.
+    """Jafta è il launcher: sotto la radice non c'è nessuna app a cui tornare.
 
     ``history.length`` non sa rispondere: conta l'intera sessione del WebView
     (iframe delle mini-app, reload) e non cala mai.
@@ -359,7 +359,7 @@ def test_back_at_the_root_does_nothing_and_never_trusts_history_length() -> None
 
 """Esenzioni dell'imbuto della history, per *path* e non per basename.
 
-``jenny-sdk.js`` gira dentro l'iframe della mini-app (history sua, v.
+``jafta-sdk.js`` gira dentro l'iframe della mini-app (history sua, v.
 ``test_mini_app_navigation_contract``) e ``shared/api-client.js`` riscrive la
 entry corrente nel reload (v. il test dedicato qui sotto). Prima erano elencati
 per nome del file: un futuro ``assets/qualcosa/api-client.js`` sarebbe stato
@@ -576,7 +576,7 @@ def test_the_house_closes_the_minichat_before_the_app_under_it() -> None:
     `_overlayLayers`."""
     home = (ASSETS / "home-app.js").read_text(encoding="utf-8")
     overlays = _method(home, "_closeOverlays")
-    mini = overlays.find("this.jenny?.handleBack()")
+    mini = overlays.find("this.jafta?.handleBack()")
     app = overlays.find("this._appActions?.handleBack()")
     assert mini != -1, "Indietro in casa non chiude piu' la minichat"
     assert app != -1

@@ -14,7 +14,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 MESSAGES = [{"role": "user", "content": "x"}]
 CONTENT = {"choices": [{"delta": {"content": "hi"}}]}

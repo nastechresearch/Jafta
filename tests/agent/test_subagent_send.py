@@ -8,16 +8,16 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.agent.runner import AgentRunResult, AgentRunSpec
-from jenny.agent.subagent import (
+from jafta.agent.runner import AgentRunResult, AgentRunSpec
+from jafta.agent.subagent import (
     MAX_AUTO_ATTEMPTS,
     SubagentManager,
     SubagentSendError,
 )
-from jenny.agent.subagent_history import SubagentHistoryStore
-from jenny.bus.queue import MessageBus
-from jenny.providers.base import LLMProvider
-from jenny.session.manager import SessionManager
+from jafta.agent.subagent_history import SubagentHistoryStore
+from jafta.bus.queue import MessageBus
+from jafta.providers.base import LLMProvider
+from jafta.session.manager import SessionManager
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -353,7 +353,7 @@ class TestResumeCapacity:
         return await _spawn_and_settle(sm, task="write the report")
 
     async def test_resume_is_refused_when_the_pool_is_full(self, tmp_path: Path) -> None:
-        from jenny.agent.subagent import SubagentConcurrencyLimitError
+        from jafta.agent.subagent import SubagentConcurrencyLimitError
 
         sm = _manager(tmp_path, max_concurrent_subagents=2)
         lineage = await self._finished_lineage(sm)
@@ -377,7 +377,7 @@ class TestResumeCapacity:
         await asyncio.gather(*list(sm._running_tasks.values()), return_exceptions=True)
 
     async def test_a_quick_resume_may_use_the_reserved_slot(self, tmp_path: Path) -> None:
-        from jenny.agent.subagent import SubagentConcurrencyLimitError
+        from jafta.agent.subagent import SubagentConcurrencyLimitError
 
         sm = _manager(tmp_path, max_concurrent_subagents=2)
         lineage = await self._finished_lineage(sm)
@@ -409,7 +409,7 @@ class TestResumeCapacity:
     async def test_a_refused_resume_leaves_the_history_intact(
         self, tmp_path: Path
     ) -> None:
-        from jenny.agent.subagent import SubagentConcurrencyLimitError
+        from jafta.agent.subagent import SubagentConcurrencyLimitError
 
         sm = _manager(tmp_path, max_concurrent_subagents=1)
         lineage = await self._finished_lineage(sm)
@@ -457,7 +457,7 @@ class TestSessionCacheHygiene:
         assert sm._history._sessions is sessions
 
     async def test_loop_injects_its_own_session_manager(self, tmp_path: Path) -> None:
-        from jenny.agent.loop import AgentLoop
+        from jafta.agent.loop import AgentLoop
 
         provider = MagicMock()
         provider.get_default_model.return_value = "test-model"

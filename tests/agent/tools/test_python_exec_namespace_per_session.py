@@ -13,15 +13,15 @@ one-shot (executor) sia dal ramo ``yield_time_ms`` (thread di sessione).
 
 from __future__ import annotations
 
-from jenny.agent.tools.context import (
+from jafta.agent.tools.context import (
     _CURRENT_REQUEST_CONTEXT,
     RequestContext,
     bind_request_context,
 )
-from jenny.agent.tools.exec_session import ExecSessionManager
-from jenny.agent.tools.python_exec import PythonExecTool
-from jenny.agent.tools.python_exec_builtins import _register_builtin_functions
-from jenny.config.schema import PythonExecConfig
+from jafta.agent.tools.exec_session import ExecSessionManager
+from jafta.agent.tools.python_exec import PythonExecTool
+from jafta.agent.tools.python_exec_builtins import _register_builtin_functions
+from jafta.config.schema import PythonExecConfig
 
 
 def _tool(ws, manager: ExecSessionManager) -> PythonExecTool:
@@ -94,7 +94,7 @@ def _make_project(ws, name: str, wiki_id: str):
 
 
 async def _run_in_project(name: str, tool: PythonExecTool, ws, **kwargs) -> str:
-    from jenny.security.workspace_access import (
+    from jafta.security.workspace_access import (
         bind_workspace_scope,
         build_workspace_scope,
         reset_workspace_scope,
@@ -168,8 +168,8 @@ async def test_a_function_registered_later_reaches_every_session(tmp_path) -> No
 
 async def test_a_monitor_job_run_leaves_no_python_globals(tmp_path) -> None:
     """La sessione ``cron:<id>`` di un monitor non porta variabili da un run all'altro."""
-    from jenny.bus.events import InboundMessage
-    from jenny.providers.base import LLMResponse, ToolCallRequest
+    from jafta.bus.events import InboundMessage
+    from jafta.providers.base import LLMResponse, ToolCallRequest
     from tests.support.agent import make_loop, make_provider
 
     provider = make_provider()

@@ -1,4 +1,4 @@
-"""Test per ``jenny/runtime/native_input.py`` (ingresso dalla tendina).
+"""Test per ``jafta/runtime/native_input.py`` (ingresso dalla tendina).
 
 Il chiamante vero è Kotlin da un thread JNI, e questo file lo imita: l'unica
 prova che conta davvero è quella che entra da un thread che **non** è il loop,
@@ -15,9 +15,9 @@ import pytest
 from support.aio import wait_until
 from support.kotlin_source import read_source
 
-from jenny.bus.events import NOTIFICATION_CHANNEL, InboundMessage
-from jenny.runtime import native_input as ni
-from jenny.session.keys import UNIFIED_SESSION_KEY
+from jafta.bus.events import NOTIFICATION_CHANNEL, InboundMessage
+from jafta.runtime import native_input as ni
+from jafta.session.keys import UNIFIED_SESSION_KEY
 
 
 class _FakeBus:
@@ -100,7 +100,7 @@ class TestBind:
         """
         import inspect
 
-        from jenny.runtime.container import GatewayContainer
+        from jafta.runtime.container import GatewayContainer
 
         source = inspect.getsource(GatewayContainer.run)
         assert "bind_native_input(self.bus)" in source
@@ -110,7 +110,7 @@ class TestBind:
         precedente è morto e i suoi riferimenti vanno buttati."""
         import inspect
 
-        from jenny import android_entry
+        from jafta import android_entry
 
         source = inspect.getsource(android_entry)
         assert "reset_native_input()" in source
@@ -129,12 +129,12 @@ class TestBoundaryWithKotlin:
     @staticmethod
     def _gateway_service() -> str:
         repo = pathlib.Path(__file__).resolve().parents[2]
-        kt = repo / "android/app/src/main/java/com/flagdizero/jenny/GatewayService.kt"
+        kt = repo / "android/app/src/main/java/com/flagdizero/jafta/GatewayService.kt"
         return read_source(kt)
 
     def test_kotlin_calls_this_module(self):
-        assert 'getModule("jenny.runtime.native_input")' in self._gateway_service()
-        assert ni.__name__ == "jenny.runtime.native_input"
+        assert 'getModule("jafta.runtime.native_input")' in self._gateway_service()
+        assert ni.__name__ == "jafta.runtime.native_input"
 
     def test_kotlin_calls_this_function(self):
         assert 'callAttr("on_native_text"' in self._gateway_service()
@@ -212,7 +212,7 @@ class TestDelivery:
     async def test_the_mascot_enters_on_its_own_channel(self):
         """Due superfici native, due canali: la risposta a una domanda scritta
         nel fumetto deve tornare **nel fumetto**, non squillare in tendina."""
-        from jenny.bus.events import FLOATING_CHANNEL
+        from jafta.bus.events import FLOATING_CHANNEL
 
         bus = await _bound()
         assert ni.on_native_text("che ore sono?", ni.SOURCE_FLOATING) is True

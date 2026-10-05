@@ -1,4 +1,4 @@
-"""Test della logica pura di preview file (jenny/webui/file_preview.py).
+"""Test della logica pura di preview file (jafta/webui/file_preview.py).
 
 Nessuna route qui: ``file_preview_payload`` è invocata direttamente con uno
 ``WorkspaceScope`` reale su ``tmp_path``. Copre i codici di errore (400/403/
@@ -12,8 +12,8 @@ from pathlib import Path
 
 import pytest
 
-from jenny.security.workspace_access import default_workspace_scope
-from jenny.webui.file_preview import (
+from jafta.security.workspace_access import default_workspace_scope
+from jafta.webui.file_preview import (
     WebUIFilePreviewError,
     _clean_preview_path,
     _language_for_path,
@@ -172,7 +172,7 @@ def notebook(tmp_path: Path):
 
 
 def test_a_notebook_page_path_is_found_under_wiki(notebook, tmp_path: Path) -> None:
-    """Nella chat di piante Jenny scrive ``entities/Pothos.md``: il percorso di
+    """Nella chat di piante Jafta scrive ``entities/Pothos.md``: il percorso di
     una pagina, relativo a ``wiki/``. L'anteprima lo cercava dalla radice del
     progetto e rispondeva 404 («Failed to load» sul Titan 2, 26/09/2026)."""
     scope = default_workspace_scope(notebook, restrict_to_workspace=True)

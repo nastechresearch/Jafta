@@ -28,7 +28,7 @@ from pathlib import Path
 import pytest
 
 _SKILL = (
-    Path(__file__).resolve().parents[3] / "jenny" / "skills" / "llm-wiki" / "SKILL.md"
+    Path(__file__).resolve().parents[3] / "jafta" / "skills" / "llm-wiki" / "SKILL.md"
 )
 
 _SECTION_TITLE = "#### `compile` in a **project** wiki (notebook layout)"
@@ -188,7 +188,7 @@ def test_the_pointer_and_the_section_name_the_same_operation(skill: str) -> None
     """
     template = (
         Path(__file__).resolve().parents[3]
-        / "jenny" / "templates" / "agent" / "project.md"
+        / "jafta" / "templates" / "agent" / "project.md"
     )
     pointer = _flat(template.read_text(encoding="utf-8"))
 

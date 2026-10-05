@@ -1,0 +1,104 @@
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build docs site
+        run: |
+          mkdir -p _site
+          # Copy docs as the source; MkDocs will be added later
+          cp -r docs/* _site/ 2>/dev/null || true
+          cp -r docs/.gitkeep _site/ 2>/dev/null || true
+          cat > _site/index.html <<'HTML'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Jafta — Personal AI for your phone</title>
+            <meta name="description" content="Jafta is a local-first personal AI agent that lives on your Android phone. Permanent memory, scheduled autonomous work, self-written mini-apps. Your data stays on the device.">
+            <style>
+              :root { --bg: #0a0a0a; --fg: #f5f5f5; --accent: #f4a261; --muted: #888; }
+              * { box-sizing: border-box; margin: 0; padding: 0; }
+              body { background: var(--bg); color: var(--fg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; padding: 4rem 2rem; max-width: 800px; margin: 0 auto; }
+              h1 { font-size: 3rem; font-weight: 800; margin-bottom: 1rem; letter-spacing: -0.02em; }
+              h1::before { content: "✿ "; color: var(--accent); }
+              .tagline { font-size: 1.25rem; color: var(--muted); margin-bottom: 3rem; }
+              h2 { font-size: 1.5rem; margin: 2rem 0 1rem; color: var(--accent); }
+              ul { padding-left: 1.5rem; margin-bottom: 1.5rem; }
+              li { margin-bottom: 0.5rem; }
+              a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+              a:hover { border-bottom-color: var(--accent); }
+              .meta { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #222; color: var(--muted); font-size: 0.875rem; }
+            </style>
+          </head>
+          <body>
+            <h1>Jafta</h1>
+            <p class="tagline">A local-first personal AI agent that lives on your Android phone.</p>
+
+            <h2>What it does</h2>
+            <ul>
+              <li>Permanent on-device memory that learns from you</li>
+              <li>Scheduled autonomous work, even with the screen off</li>
+              <li>Self-written mini-apps on request</li>
+              <li>Optional home-screen launcher</li>
+              <li>All 11 official South African languages + Luganda</li>
+              <li>Your data, your model, your phone</li>
+            </ul>
+
+            <h2>Privacy by design</h2>
+            <ul>
+              <li>No telemetry, no analytics, no crash reporting</li>
+              <li>BYO API key or run fully local</li>
+              <li>All memory stays on the device, encrypted at rest</li>
+              <li>PII redaction before any network call</li>
+            </ul>
+
+            <h2>Open source</h2>
+            <p>Jafta is derived from <a href="https://github.com/flagdizero/jenny-android-ai-agent">Jenny</a> (AGPL-3.0), which is itself derived from <a href="https://github.com/HKUDS/nanobot">nanobot</a> (MIT). Built and maintained by <a href="https://nastechresearch.github.io">NasTech Research</a>.</p>
+
+            <div class="meta">
+              <p>Jafta v0.1.0 · <a href="https://github.com/nastechresearch/Jafta">Source on GitHub</a></p>
+            </div>
+          </body>
+          </html>
+          HTML
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

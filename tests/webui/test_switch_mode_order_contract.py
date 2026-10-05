@@ -35,7 +35,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-APP_JS = ROOT / "jenny" / "templates" / "ui" / "assets" / "mobile-app.js"
+APP_JS = ROOT / "jafta" / "templates" / "ui" / "assets" / "mobile-app.js"
 
 
 def _body(src: str, start: int) -> str:

@@ -25,8 +25,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.channels.websocket import WebSocketChannel, WebSocketConfig
-from jenny.webui.gateway_services import build_gateway_services
+from jafta.channels.websocket import WebSocketChannel, WebSocketConfig
+from jafta.webui.gateway_services import build_gateway_services
 
 # Nomi che una cartella vera può avere e una sessione no. Non ipotetici: sono
 # quelli che un utente italiano scrive per primo.
@@ -84,7 +84,7 @@ class TestAnImpossibleProjectIsRejected:
         errors = [e for e in _events(conn) if e.get("event") == "error"]
         assert len(errors) == 1, _events(conn)
         assert errors[0]["reason"] == "invalid_project_name"
-        # Il client mostra `detail` così com'è (`mobile-jenny.js`, `case 'error'`):
+        # Il client mostra `detail` così com'è (`mobile-jafta.js`, `case 'error'`):
         # deve essere una frase, non un codice.
         assert "cannot be opened" in errors[0]["detail"]
         # Il nome arriva da un client e non torna indietro nel frame: la sua

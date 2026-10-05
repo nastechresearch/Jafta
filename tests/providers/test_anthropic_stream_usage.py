@@ -16,8 +16,8 @@ from typing import Any
 
 import httpx
 
-from jenny.providers.anthropic_provider import AnthropicProvider
-from jenny.providers.anthropic_usage import merge_raw_usage
+from jafta.providers.anthropic_provider import AnthropicProvider
+from jafta.providers.anthropic_usage import merge_raw_usage
 
 
 async def _stream_usage(*events: tuple[str, dict[str, Any]]) -> dict[str, int]:

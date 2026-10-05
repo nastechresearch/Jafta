@@ -11,10 +11,10 @@ from typing import Any
 
 import pytest
 
-from jenny.agent.tools.context import RequestContext
-from jenny.agent.tools.cron import CronTool
-from jenny.agent.tools.registry import ToolRegistry
-from jenny.cron.types import CronJob, CronPayload, CronSchedule
+from jafta.agent.tools.context import RequestContext
+from jafta.agent.tools.cron import CronTool
+from jafta.agent.tools.registry import ToolRegistry
+from jafta.cron.types import CronJob, CronPayload, CronSchedule
 
 
 class _RecordingCronService:

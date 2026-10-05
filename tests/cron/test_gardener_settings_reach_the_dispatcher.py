@@ -26,10 +26,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.config.loader import get_config_path, save_config
-from jenny.config.schema import Config
-from jenny.cron.service import CronService
-from jenny.runtime.cron_dispatch import (
+from jafta.config.loader import get_config_path, save_config
+from jafta.config.schema import Config
+from jafta.cron.service import CronService
+from jafta.runtime.cron_dispatch import (
     GARDENER_JOB_ID,
     CronDispatcher,
     refresh_system_job,
@@ -63,8 +63,8 @@ def _workspace(tmp_path, monkeypatch):
     rilegge da disco, un test senza override andrebbe a leggere il `config.json`
     di chi esegue la suite.
     """
-    from jenny.config import paths
-    from jenny.runtime.context import get_runtime_context
+    from jafta.config import paths
+    from jafta.runtime.context import get_runtime_context
 
     previous = paths.get_workspace_path()
     paths.set_workspace_dir(str(tmp_path))
@@ -113,7 +113,7 @@ async def test_off_written_after_startup_stops_the_next_tick(tmp_path, monkeypat
     async def _fake_run(agent, store):
         called.append(store.name)
 
-    monkeypatch.setattr("jenny.agent.gardener.run_gardener", _fake_run)
+    monkeypatch.setattr("jafta.agent.gardener.run_gardener", _fake_run)
     _project(tmp_path)
     startup = _write(enabled=True)
     dispatcher = _dispatcher(_FakeAgent(tmp_path), startup)
@@ -145,7 +145,7 @@ async def test_the_two_clocks_written_after_startup_reach_the_next_tick(
         seen.update(kwargs)
         return None
 
-    monkeypatch.setattr("jenny.agent.gardener_schedule.pick_project", _fake_pick)
+    monkeypatch.setattr("jafta.agent.gardener_schedule.pick_project", _fake_pick)
     _project(tmp_path)
     dispatcher = _dispatcher(_FakeAgent(tmp_path), _write(idle_min=30, min_hours_between_passes=6))
 

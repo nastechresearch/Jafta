@@ -19,7 +19,7 @@ from pathlib import Path
 
 from support.js_harness import member, requires_node, run_js
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 HOME_CHAT_JS = ASSETS / "home-chat.js"
 
 
@@ -113,7 +113,7 @@ function makeChat() {
 const readThread = (chat) => chat.el.children.map((n) => {
   if (String(n.className).includes('home-boundary')) return '---';
   const block = n.children.find((c) => c.className === 'home-block');
-  const who = String(n.className).includes('home-msg-user') ? 'tu' : 'jenny';
+  const who = String(n.className).includes('home-msg-user') ? 'tu' : 'jafta';
   return who + ': ' + (block ? (block.textContent || block.innerHTML) : '');
 });
 
@@ -152,9 +152,9 @@ def test_an_older_page_lands_above_what_was_already_there() -> None:
       chat.prependTurns([user('di ieri', 't1'), said('risposta di ieri', 't1')]);
       assert.deepEqual(readThread(chat), [
         'tu: di ieri',
-        'jenny: risposta di ieri',
+        'jafta: risposta di ieri',
         'tu: di oggi',
-        'jenny: risposta di oggi',
+        'jafta: risposta di oggi',
       ]);
     """)
 
@@ -169,9 +169,9 @@ def test_the_page_keeps_its_own_order() -> None:
         user('terzo', 't3'), said('terzo detto', 't3'),
       ]);
       assert.deepEqual(readThread(chat), [
-        'tu: primo', 'jenny: primo detto',
-        'tu: secondo', 'jenny: secondo detto',
-        'tu: terzo', 'jenny: terzo detto',
+        'tu: primo', 'jafta: primo detto',
+        'tu: secondo', 'jafta: secondo detto',
+        'tu: terzo', 'jafta: terzo detto',
       ]);
     """)
 

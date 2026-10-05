@@ -28,19 +28,19 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.agent.tools.context import RequestContext
-from jenny.agent.tools.cron import CronTool
-from jenny.agent.tools.download import DownloadFileTool
-from jenny.agent.tools.long_task import CompleteGoalTool, LongTaskTool
-from jenny.apps.manifest import AppAction
-from jenny.apps.storage import StorageError, execute_storage_action
-from jenny.security.workspace_access import (
+from jafta.agent.tools.context import RequestContext
+from jafta.agent.tools.cron import CronTool
+from jafta.agent.tools.download import DownloadFileTool
+from jafta.agent.tools.long_task import CompleteGoalTool, LongTaskTool
+from jafta.apps.manifest import AppAction
+from jafta.apps.storage import StorageError, execute_storage_action
+from jafta.security.workspace_access import (
     READONLY_TOOL_REFUSAL,
     build_workspace_scope,
     enter_workspace_scope,
 )
-from jenny.session.goal_state import GOAL_STATE_KEY
-from jenny.session.manager import SessionManager
+from jafta.session.goal_state import GOAL_STATE_KEY
+from jafta.session.manager import SessionManager
 
 _MARK = "read-only"
 
@@ -144,7 +144,7 @@ def _cron_tool(session_key: str) -> tuple[CronTool, _Cron]:
 async def test_cron_is_closed_in_the_personal_chat_too(readonly: Path, params: dict) -> None:
     """Il passo 3 chiudeva solo i progetti; la sola lettura vale anche qui.
 
-    Un job è fra le cose più durature che Jenny possa creare: sopravvive al
+    Un job è fra le cose più durature che Jafta possa creare: sopravvive al
     turno, alla conversazione e al riavvio.
     """
     tool, service = _cron_tool("unified:default")

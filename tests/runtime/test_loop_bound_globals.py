@@ -31,7 +31,7 @@ import ast
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-PACKAGE = REPO / "jenny"
+PACKAGE = REPO / "jafta"
 
 # Le primitive di ``asyncio`` che si legano al loop, più i riferimenti a un loop
 # vivo: tutte cose che un secondo ``asyncio.run`` non può ereditare.
@@ -55,20 +55,20 @@ _LOOP_BOUND_FACTORIES = {
 # verificata due volte: che esista ancora, e che il reset sia davvero chiamato
 # da ``android_entry.run_gateway``.
 ALLOWED: dict[str, str] = {
-    "jenny/agent/tools/android_web.py:_BRIDGE_LOCK": "reset_android_web_state",
-    "jenny/agent/tools/ssh_jobs.py:_store._lock": "reset_job_store",
-    "jenny/agent/tools/browser.py:_BROWSER_LOCK": "reset_browser_state",
-    "jenny/config/store.py:_LOCK": "reset_config_store_state",
-    "jenny/runtime/floating.py:_BRIDGE.lock": "reset_floating_state",
-    "jenny/runtime/location.py:_BRIDGE.lock": "reset_location_state",
-    "jenny/runtime/notifier.py:_BRIDGE.lock": "reset_notifier_state",
-    "jenny/runtime/power.py:_BRIDGE.lock": "reset_power_state",
-    "jenny/runtime/power.py:_STATE_LOCK": "reset_power_state",
-    "jenny/runtime/power.py:_WAKE_EVENT": "reset_power_state",
-    "jenny/runtime/power.py:_WAKE_LOOP": "reset_power_state",
-    "jenny/runtime/native_input.py:_LOOP": "reset_native_input",
-    "jenny/webui/android_apps_api.py:_BRIDGE.lock": "reset_installed_apps_state",
-    "jenny/webui/settings_api.py:_update_check_lock": "reset_update_check_state",
+    "jafta/agent/tools/android_web.py:_BRIDGE_LOCK": "reset_android_web_state",
+    "jafta/agent/tools/ssh_jobs.py:_store._lock": "reset_job_store",
+    "jafta/agent/tools/browser.py:_BROWSER_LOCK": "reset_browser_state",
+    "jafta/config/store.py:_LOCK": "reset_config_store_state",
+    "jafta/runtime/floating.py:_BRIDGE.lock": "reset_floating_state",
+    "jafta/runtime/location.py:_BRIDGE.lock": "reset_location_state",
+    "jafta/runtime/notifier.py:_BRIDGE.lock": "reset_notifier_state",
+    "jafta/runtime/power.py:_BRIDGE.lock": "reset_power_state",
+    "jafta/runtime/power.py:_STATE_LOCK": "reset_power_state",
+    "jafta/runtime/power.py:_WAKE_EVENT": "reset_power_state",
+    "jafta/runtime/power.py:_WAKE_LOOP": "reset_power_state",
+    "jafta/runtime/native_input.py:_LOOP": "reset_native_input",
+    "jafta/webui/android_apps_api.py:_BRIDGE.lock": "reset_installed_apps_state",
+    "jafta/webui/settings_api.py:_update_check_lock": "reset_update_check_state",
 }
 
 
@@ -159,14 +159,14 @@ def _class_named(tree: ast.Module, name: str) -> ast.ClassDef | None:
 
 
 def _locate_class(path: Path, name: str) -> ast.ClassDef | None:
-    """La ``ClassDef`` di ``name``: definita qui, o importata da un modulo ``jenny``."""
+    """La ``ClassDef`` di ``name``: definita qui, o importata da un modulo ``jafta``."""
     found = _class_named(_tree(path), name)
     if found is not None:
         return found
     for node in ast.walk(_tree(path)):
         if not isinstance(node, ast.ImportFrom) or not node.module:
             continue
-        if not node.module.startswith("jenny"):
+        if not node.module.startswith("jafta"):
             continue
         if name not in {alias.asname or alias.name for alias in node.names}:
             continue

@@ -19,21 +19,21 @@ from typing import Any
 
 import pytest
 
-from jenny.cron.could_not_check import ESCALATE_AFTER_FAILURES
-from jenny.cron.service import CronService
-from jenny.cron.silence_watchdog import (
+from jafta.cron.could_not_check import ESCALATE_AFTER_FAILURES
+from jafta.cron.service import CronService
+from jafta.cron.silence_watchdog import (
     WATCHDOG_AFTER_FAILURES,
     WATCHDOG_QUIET_MS,
     alert_silently_broken_checks,
     silently_broken_checks,
 )
-from jenny.cron.types import (
+from jafta.cron.types import (
     CronJobState,
     CronMonitorCouldNotCheckError,
     CronSchedule,
     CronTaskCheckState,
 )
-from jenny.webui.metadata import WEBUI_MESSAGE_SOURCE_METADATA_KEY
+from jafta.webui.metadata import WEBUI_MESSAGE_SOURCE_METADATA_KEY
 
 _NOW = 1_760_000_000_000
 
@@ -41,7 +41,7 @@ _NOW = 1_760_000_000_000
 def _spy(monkeypatch: pytest.MonkeyPatch) -> list[tuple[str, Any]]:
     sent: list[tuple[str, Any]] = []
     monkeypatch.setattr(
-        "jenny.runtime.notifier.notify_delivery",
+        "jafta.runtime.notifier.notify_delivery",
         lambda content, metadata: sent.append((content, metadata)),
     )
     return sent

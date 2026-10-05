@@ -33,7 +33,7 @@ from pathlib import Path
 from support.js_harness import member, requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 SETTINGS_JS = ASSETS / "mobile-settings.js"
 WORKSPACE_JS = ASSETS / "mobile-workspace.js"
 I18N_JS = ASSETS / "shared" / "i18n.js"

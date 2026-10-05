@@ -8,7 +8,7 @@ snapshot, lo staging dei backup, e nel workspace ``config.json`` con le chiavi
 dei provider.
 
 Ora il recinto è il workspace — dove stanno i file dell'esploratore e gli
-allegati della chat (``uploads/``, ``.jenny/media/``, gli unici path che il JS
+allegati della chat (``uploads/``, ``.jafta/media/``, gli unici path che il JS
 passa) — con ``config.json`` e i suoi compagni esclusi; e il FileProvider
 espone solo ``workspace/`` e il temporaneo della fotocamera.
 """
@@ -57,7 +57,7 @@ def test_the_quarantined_copy_of_a_broken_config_is_refused_too() -> None:
     src = read_source("MainActivity")
     secret = src[src.index("private fun isWorkspaceSecret(") :].split("\n\n", 1)[0]
     prefixes = re.findall(r'name\.startsWith\("([^"]+)"\)', secret)
-    loader = (Path(__file__).resolve().parents[2] / "jenny/config/loader.py").read_text(
+    loader = (Path(__file__).resolve().parents[2] / "jafta/config/loader.py").read_text(
         encoding="utf-8"
     )
     assert '{path.stem}.corrupt-{stamp}{path.suffix}' in loader, "il nome della quarantena e' cambiato"

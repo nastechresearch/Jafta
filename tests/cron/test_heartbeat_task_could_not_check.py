@@ -30,16 +30,16 @@ from typing import Any
 import pytest
 from support.sessions import FakeSessions
 
-from jenny.agent.turn_types import TurnOutcome
-from jenny.cron.could_not_check import ESCALATE_AFTER_FAILURES
-from jenny.cron.heartbeat_tasks import (
+from jafta.agent.turn_types import TurnOutcome
+from jafta.cron.could_not_check import ESCALATE_AFTER_FAILURES
+from jafta.cron.heartbeat_tasks import (
     active_section_text,
     parse_heartbeat_tasks,
     task_index_block,
 )
-from jenny.cron.service import CronService
-from jenny.cron.types import CronJob, CronJobState, CronPayload, CronSchedule
-from jenny.runtime.cron_dispatch import _HEARTBEAT_PREAMBLE, CronDispatcher
+from jafta.cron.service import CronService
+from jafta.cron.types import CronJob, CronJobState, CronPayload, CronSchedule
+from jafta.runtime.cron_dispatch import _HEARTBEAT_PREAMBLE, CronDispatcher
 
 _RAINCHECK = (
     "- Ogni ciclo, controlla la pioggia nelle città e avvisami solo se una è sopra il 70%. "

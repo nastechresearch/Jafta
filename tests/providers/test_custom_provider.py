@@ -1,6 +1,6 @@
 """Tests for OpenAICompatProvider handling custom/direct endpoints."""
 
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 
 def test_custom_provider_parse_handles_empty_choices() -> None:

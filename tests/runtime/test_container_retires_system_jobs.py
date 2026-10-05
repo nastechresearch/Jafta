@@ -20,11 +20,11 @@ from pathlib import Path
 import pytest
 from loguru import logger as loguru_logger
 
-from jenny.config import paths as paths_mod
-from jenny.config.schema import Config
-from jenny.cron.service import CronService
-from jenny.cron.types import CronJob, CronPayload, CronSchedule
-from jenny.runtime.container import _RETIRED_SYSTEM_JOBS, GatewayContainer
+from jafta.config import paths as paths_mod
+from jafta.config.schema import Config
+from jafta.cron.service import CronService
+from jafta.cron.types import CronJob, CronPayload, CronSchedule
+from jafta.runtime.container import _RETIRED_SYSTEM_JOBS, GatewayContainer
 
 _HOUR_MS = 3_600_000
 

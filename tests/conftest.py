@@ -6,9 +6,9 @@ from typing import Generator
 
 import pytest
 
-from jenny.config.paths import set_workspace_dir
-from jenny.runtime.context import get_runtime_context
-from jenny.utils.helpers import sync_workspace_templates
+from jafta.config.paths import set_workspace_dir
+from jafta.runtime.context import get_runtime_context
+from jafta.utils.helpers import sync_workspace_templates
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -34,7 +34,7 @@ def _configure_jenny_workspace(
 _MODULE_REGISTRIES: tuple[tuple[str, str], ...] = (
     # Un turno websocket segnato «in corso» e mai chiuso: il canale lo legge
     # all'attach e manda un `goal_status` che le prove dopo non si aspettano.
-    ("jenny.session.webui_turns", "_WEBSOCKET_TURN_WALL_STARTED_AT"),
+    ("jafta.session.webui_turns", "_WEBSOCKET_TURN_WALL_STARTED_AT"),
 )
 
 

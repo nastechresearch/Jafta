@@ -7,17 +7,17 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from jenny.agent.hook import AgentHookContext
-from jenny.agent.runner import AgentRunResult
-from jenny.agent.subagent import (
+from jafta.agent.hook import AgentHookContext
+from jafta.agent.runner import AgentRunResult
+from jafta.agent.subagent import (
     SubagentManager,
     SubagentSpec,
     SubagentStatus,
     _SubagentHook,
 )
-from jenny.bus.queue import MessageBus
-from jenny.config.schema import AgentDefaults
-from jenny.providers.base import LLMProvider
+from jafta.bus.queue import MessageBus
+from jafta.config.schema import AgentDefaults
+from jafta.providers.base import LLMProvider
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -226,7 +226,7 @@ class TestSpawn:
     async def test_raises_when_concurrency_limit_reached(self, tmp_path):
         """L'invariante di concorrenza e applicata nel manager: al raggiungimento
         del limite spawn solleva SubagentConcurrencyLimitError senza creare task."""
-        from jenny.agent.subagent import SubagentConcurrencyLimitError
+        from jafta.agent.subagent import SubagentConcurrencyLimitError
 
         sm = _manager(tmp_path, max_concurrent_subagents=1)
         block = asyncio.Event()
@@ -265,7 +265,7 @@ class TestSpawn:
     async def test_reserves_one_slot_for_quick_spawns(self, tmp_path):
         """Uno spawn normale non puo prendere l'ultimo slot: senza riserva i
         long-running saturano il pool e non resta modo di fare un job breve."""
-        from jenny.agent.subagent import SubagentConcurrencyLimitError
+        from jafta.agent.subagent import SubagentConcurrencyLimitError
 
         sm = _manager(tmp_path, max_concurrent_subagents=5)
         block = asyncio.Event()

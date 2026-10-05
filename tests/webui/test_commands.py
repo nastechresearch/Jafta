@@ -1,4 +1,4 @@
-"""Test del layer comando della WebUI (``jenny/webui/commands.py``).
+"""Test del layer comando della WebUI (``jafta/webui/commands.py``).
 
 Qui è finita la logica di quel che porta **contenuto**: il testo di un file, una
 riga di regole, una pagina di quaderno. La superficie ``/api/`` non lo trasporta
@@ -8,7 +8,7 @@ passare è qui: un file italiano con emoji, oltre 8 KB.
 
 C'era anche ``audit.resolve``, che chiudeva una segnalazione con una nota. Se
 n'è andato il 22/09/2026 con la metà «leggi e chiudi» del giro degli audit: dal
-telefono una segnalazione si apre e basta, e chi la lavora è Jenny, che il file
+telefono una segnalazione si apre e basta, e chi la lavora è Jafta, che il file
 lo sposta con i suoi strumenti come le dice la skill.
 """
 
@@ -18,10 +18,10 @@ from pathlib import Path
 
 import pytest
 
-from jenny.config.loader import load_config, save_config
-from jenny.config.schema import Config
-from jenny.runtime.context import get_runtime_context
-from jenny.webui.commands import (
+from jafta.config.loader import load_config, save_config
+from jafta.config.schema import Config
+from jafta.runtime.context import get_runtime_context
+from jafta.webui.commands import (
     MAX_WRITE_BYTES,
     CommandContext,
     CommandError,
@@ -32,7 +32,7 @@ from jenny.webui.commands import (
 # ISO-8859-1, `new Headers()` le rifiuta), accenti (surrogate escape lato
 # server → UnicodeEncodeError → 400) e più di 8192 byte (MAX_LINE_LENGTH).
 _SOUL_LIKE = (
-    "# Chi sono\n\nsono Jenny 😏 e parlo con boss — perché è così che è nata "
+    "# Chi sono\n\nsono Jafta 😏 e parlo con boss — perché è così che è nata "
     "questa cosa 💋\n\n" + "riempimento: però, città, già, ciò 🙄\n" * 400
 )
 
@@ -83,7 +83,7 @@ async def test_unexpected_exception_becomes_internal(
     def boom(*_args, **_kwargs):
         raise RuntimeError("kaboom")
 
-    monkeypatch.setattr("jenny.webui.workspace_files.write_file", boom)
+    monkeypatch.setattr("jafta.webui.workspace_files.write_file", boom)
     with pytest.raises(CommandError) as exc:
         await dispatch_command(ctx, "workspace.write", {"path": "a.txt", "content": "x"})
     assert exc.value.code == "internal"
@@ -150,7 +150,7 @@ async def test_write_fails_closed_when_config_raises(
     def _boom(*args, **kwargs):
         raise RuntimeError("config unreadable")
 
-    monkeypatch.setattr("jenny.config.loader.load_config", _boom)
+    monkeypatch.setattr("jafta.config.loader.load_config", _boom)
     with pytest.raises(CommandError) as exc:
         await dispatch_command(ctx, "workspace.write", {"path": "a.txt", "content": "x"})
     assert exc.value.code == "unavailable"
@@ -207,7 +207,7 @@ async def test_write_that_fails_keeps_the_previous_content(
     def boom(*_args, **_kwargs):
         raise OSError("no space left on device")
 
-    monkeypatch.setattr("jenny.webui.workspace_files.atomic_write", boom)
+    monkeypatch.setattr("jafta.webui.workspace_files.atomic_write", boom)
     with pytest.raises(CommandError) as exc:
         await dispatch_command(
             ctx, "workspace.write", {"path": "note.txt", "content": "nuovo"}
@@ -299,7 +299,7 @@ async def test_page_write_in_a_subfolder(
 async def test_page_write_refuses_a_stale_base_without_writing(
     ctx: CommandContext, workspace_root: Path, config_path: Path
 ) -> None:
-    """**La prova che conta.** Jenny ha riscritto la pagina mentre era aperta.
+    """**La prova che conta.** Jafta ha riscritto la pagina mentre era aperta.
 
     Due asserzioni, e la seconda e' il punto: non basta che la risposta sia un
     ``conflict``, deve essere vero che **il file non e' stato toccato**. Un
@@ -307,7 +307,7 @@ async def test_page_write_refuses_a_stale_base_without_writing(
     l'utente vedrebbe un errore e crederebbe di non aver perso niente.
     """
     pages_dir = _workspace_with_page(workspace_root)
-    meanwhile = "# Orto\n\nRiscritto da Jenny mentre l'editor era aperto.\n"
+    meanwhile = "# Orto\n\nRiscritto da Jafta mentre l'editor era aperto.\n"
     (pages_dir / "index.md").write_text(meanwhile, encoding="utf-8")
 
     with pytest.raises(CommandError) as exc:
@@ -585,7 +585,7 @@ async def test_audit_create_fails_closed_when_config_raises(
     def _boom(*args, **kwargs):
         raise RuntimeError("config rotta")
 
-    monkeypatch.setattr("jenny.config.loader.load_config", _boom)
+    monkeypatch.setattr("jafta.config.loader.load_config", _boom)
     with pytest.raises(CommandError) as exc:
         await dispatch_command(
             ctx, "audit.create", {"wiki": "main", "target": "index.md", "comment": "c"}
@@ -599,7 +599,7 @@ async def test_the_audit_get_route_is_gone(workspace_root: Path) -> None:
     from websockets.http11 import Headers
     from websockets.http11 import Request as WsRequest
 
-    from jenny.webui.wiki_routes import WikiRoutes
+    from jafta.webui.wiki_routes import WikiRoutes
 
     _workspace_with_page(workspace_root)
     routes = WikiRoutes(
@@ -628,9 +628,9 @@ async def test_saving_rules_writes_the_truth_and_the_copy(
     copia che il prompt legge. Se il comando ne facesse una sola, l'altra
     comincerebbe a divergere al primo salvataggio.
     """
-    from jenny.agent.soul_rules import RULES_FILE, extract_rules
+    from jafta.agent.soul_rules import RULES_FILE, extract_rules
 
-    (workspace_root / "SOUL.md").write_text("# Soul\n\nI am Jenny.\n", encoding="utf-8")
+    (workspace_root / "SOUL.md").write_text("# Soul\n\nI am Jafta.\n", encoding="utf-8")
 
     result = await dispatch_command(
         ctx, "soul.rules.write", {"content": "  Chiamami per nome. 😏  "}
@@ -642,7 +642,7 @@ async def test_saving_rules_writes_the_truth_and_the_copy(
     )
     soul = (workspace_root / "SOUL.md").read_text(encoding="utf-8")
     assert extract_rules(soul) == "Chiamami per nome. 😏"
-    assert "I am Jenny." in soul
+    assert "I am Jafta." in soul
 
 
 async def test_rules_longer_than_the_cap_are_refused(
@@ -650,7 +650,7 @@ async def test_rules_longer_than_the_cap_are_refused(
 ) -> None:
     """Il tetto non è di trasporto — quello è mille volte più alto — è una
     misura di cosa sia una regola: quel testo entra nel prompt di ogni turno."""
-    from jenny.webui.commands import MAX_SOUL_RULES_CHARS
+    from jafta.webui.commands import MAX_SOUL_RULES_CHARS
 
     with pytest.raises(CommandError) as exc:
         await dispatch_command(
@@ -674,16 +674,16 @@ async def test_rules_are_refused_when_writes_are_off(
 async def test_emptying_the_rules_takes_the_block_out(
     ctx: CommandContext, workspace_root: Path, config_path: Path
 ) -> None:
-    from jenny.agent.soul_rules import HEADING, RULES_FILE
+    from jafta.agent.soul_rules import HEADING, RULES_FILE
 
-    (workspace_root / "SOUL.md").write_text("# Soul\n\nI am Jenny.\n", encoding="utf-8")
+    (workspace_root / "SOUL.md").write_text("# Soul\n\nI am Jafta.\n", encoding="utf-8")
     await dispatch_command(ctx, "soul.rules.write", {"content": "Chiamami per nome."})
     await dispatch_command(ctx, "soul.rules.write", {"content": ""})
 
     assert not (workspace_root / RULES_FILE).exists()
     soul = (workspace_root / "SOUL.md").read_text(encoding="utf-8")
     assert HEADING not in soul
-    assert "I am Jenny." in soul
+    assert "I am Jafta." in soul
 
 
 async def test_rules_that_are_not_text_are_a_bad_request(

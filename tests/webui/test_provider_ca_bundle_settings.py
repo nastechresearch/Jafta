@@ -16,10 +16,10 @@ from unittest.mock import MagicMock, patch
 import pytest
 from support.tls import write_test_ca
 
-from jenny.config.loader import load_config, save_config
-from jenny.config.schema import Config, ProviderConfig
-from jenny.runtime.context import get_runtime_context
-from jenny.webui.settings_api import (
+from jafta.config.loader import load_config, save_config
+from jafta.config.schema import Config, ProviderConfig
+from jafta.runtime.context import get_runtime_context
+from jafta.webui.settings_api import (
     WebUISettingsError,
     provider_models_payload,
     update_provider,

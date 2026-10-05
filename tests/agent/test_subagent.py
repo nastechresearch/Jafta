@@ -5,14 +5,14 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.agent.agent_types import AGENT_TYPES
-from jenny.agent.subagent import SubagentManager
-from jenny.agent.tools.filesystem import FileToolsConfig
-from jenny.bus.queue import MessageBus
-from jenny.config.paths import get_output_path
-from jenny.config.schema import ToolsConfig
-from jenny.config.tool_schemas import SshConfig, SshHostConfig
-from jenny.providers.base import LLMProvider
+from jafta.agent.agent_types import AGENT_TYPES
+from jafta.agent.subagent import SubagentManager
+from jafta.agent.tools.filesystem import FileToolsConfig
+from jafta.bus.queue import MessageBus
+from jafta.config.paths import get_output_path
+from jafta.config.schema import ToolsConfig
+from jafta.config.tool_schemas import SshConfig, SshHostConfig
+from jafta.providers.base import LLMProvider
 
 
 @pytest.mark.asyncio

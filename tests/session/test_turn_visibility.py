@@ -1,4 +1,4 @@
-"""Copertura per ``jenny.session.turn_visibility``.
+"""Copertura per ``jafta.session.turn_visibility``.
 
 Il modulo è il confine unico fra "questo turno può parlare all'utente" e "questo
 turno è lavoro interno". Prima esistevano tre meccanismi incompatibili — il gate
@@ -8,9 +8,9 @@ turno di annuncio di un subagent, che è proprio quello che finiva in chat.
 
 from __future__ import annotations
 
-from jenny.bus.events import INTERNAL_CHANNEL
-from jenny.session.keys import HEARTBEAT_SESSION_KEY, UNIFIED_SESSION_KEY
-from jenny.session.turn_visibility import (
+from jafta.bus.events import INTERNAL_CHANNEL
+from jafta.session.keys import HEARTBEAT_SESSION_KEY, UNIFIED_SESSION_KEY
+from jafta.session.turn_visibility import (
     TURN_VISIBILITY_META,
     TurnVisibility,
     is_silent_turn,
@@ -110,7 +110,7 @@ class TestInheritanceAcrossDerivedTurns:
         (È il gemello del bug che il vecchio segnale ``_cron_monitor_spoke`` aveva
         proprio qui: viaggiava in un dict che la continuation copiava.)
         """
-        from jenny.session.turn_continuation import _internal_continuation_metadata
+        from jafta.session.turn_continuation import _internal_continuation_metadata
 
         inherited = _internal_continuation_metadata(silent_turn_metadata({"webui": True}))
 
@@ -120,7 +120,7 @@ class TestInheritanceAcrossDerivedTurns:
         ) is TurnVisibility.SILENT
 
     def test_a_continuation_of_a_visible_turn_stays_visible(self) -> None:
-        from jenny.session.turn_continuation import _internal_continuation_metadata
+        from jafta.session.turn_continuation import _internal_continuation_metadata
 
         inherited = _internal_continuation_metadata({"webui": True})
 

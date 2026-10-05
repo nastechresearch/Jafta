@@ -6,8 +6,8 @@ import json
 
 import pytest
 
-from jenny.apps.manifest import AppAction
-from jenny.apps.storage import StorageError, execute_storage_action
+from jafta.apps.manifest import AppAction
+from jafta.apps.storage import StorageError, execute_storage_action
 
 
 def _action(op: str) -> AppAction:
@@ -51,7 +51,7 @@ def _contend(app_dir) -> None:
     """
     import asyncio
 
-    from jenny.apps.storage import _lock_for
+    from jafta.apps.storage import _lock_for
 
     async def _two():
         lock = _lock_for(_file(app_dir))
@@ -66,7 +66,7 @@ def _contend(app_dir) -> None:
 
 def test_a_lock_left_by_a_previous_loop_is_forgotten_by_the_reset(tmp_path) -> None:
     """Il gateway riparte nello stesso processo, con un loop nuovo."""
-    from jenny.apps.storage import reset_storage_locks
+    from jafta.apps.storage import reset_storage_locks
 
     reset_storage_locks()
     _contend(tmp_path)  # lega il lock al primo loop, che poi muore

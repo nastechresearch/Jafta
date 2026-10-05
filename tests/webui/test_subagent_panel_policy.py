@@ -29,7 +29,7 @@ from support.js_harness import requires_node, run_js
 
 POLICY_JS = (
     Path(__file__).resolve().parents[2]
-    / "jenny" / "templates" / "ui" / "assets" / "shared" / "subagent-policy.js"
+    / "jafta" / "templates" / "ui" / "assets" / "shared" / "subagent-policy.js"
 )
 
 

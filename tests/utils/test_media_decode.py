@@ -1,4 +1,4 @@
-"""Tests for ``jenny.utils.media_decode``."""
+"""Tests for ``jafta.utils.media_decode``."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import base64
 
 import pytest
 
-from jenny.utils.media_decode import (
+from jafta.utils.media_decode import (
     DEFAULT_MAX_BYTES,
     FileSizeExceeded,
     save_base64_data_url,
