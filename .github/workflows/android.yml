@@ -20,7 +20,11 @@
 #      against android/keystore/... — a path that does not exist. Absolute here.
 #   4. setup-android@v3 defaults to packages: 'tools platform-tools', and Google
 #      removed the legacy tools package, so sdkmanager fails the whole job with
-#      "Failed to find package 'tools'". v4 defaults to 'platform-tools' only.
+#      "Failed to find package 'tools'". v4 drops it from the default and also
+#      filters 'tools' out in src/main.ts, warning rather than failing.
+#
+# A fifth bug was found by CI after the first four were fixed, and is the
+# reason the packages line below is quoted on a single line. See that comment.
 name: Android Build
 
 on:
@@ -74,13 +78,19 @@ jobs:
       # Gradle 8.9 (android/gradle/wrapper/gradle-wrapper.properties) wants a
       # compileSdk of 34 and build-tools 34.0.0; the action only installs the
       # platform-tools by default, so the rest is asked for by name.
+      # packages is split on a single space (`packages.split(' ')` in
+      # src/main.ts) — never on newlines. A YAML block scalar arrives as one
+      # string containing newlines, so `packages: |` hands sdkmanager a single
+      # package literally named "platform-tools\nplatforms;android-34\n..." and
+      # the step dies with "Failed to find package". Keep this on one line.
+      #
+      # platform-tools is the action's own default, but setting `packages`
+      # overrides the default, so it has to be named here to stay installed.
+      # build-tools;34.0.0 is AGP 8.7.0's default for compileSdk 34.
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
         with:
-          packages: |
-            platform-tools
-            platforms;android-34
-            build-tools;34.0.0
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
 
       - name: Grant execute permission for gradlew
         run: chmod +x android/gradlew
