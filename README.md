@@ -13,11 +13,11 @@ hardware and keep the whole loop offline.
 
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 [![Platform: Android 8+](https://img.shields.io/badge/Platform-Android_8%2B-3DDC84.svg)](#quick-start)
-[![Python 3.11 embedded](https://img.shields.io/badge/Python-3.11_embedded-yellow.svg)](https://jafta.nastechresearch.github.io/docs/internals/architecture/)
-[![BYOK: 40+ providers](https://img.shields.io/badge/BYOK-40%2B_LLM_providers-orange.svg)](https://jafta.nastechresearch.github.io/docs/reference/providers/)
+[![Python 3.11 embedded](https://img.shields.io/badge/Python-3.11_embedded-yellow.svg)](https://nastechresearch.github.io/Jafta/internals/architecture/)
+[![BYOK: 40+ providers](https://img.shields.io/badge/BYOK-40%2B_LLM_providers-orange.svg)](https://nastechresearch.github.io/Jafta/reference/providers/)
 [![Local-first](https://img.shields.io/badge/Data-on--device-brightgreen.svg)](#privacy-and-security)
 
-[**Documentation**](https://jafta.nastechresearch.github.io/docs/) · [Quick start](#quick-start) · [Features](#what-it-can-do) · [Privacy & security](#privacy-and-security) · [Limitations](#known-limitations) · [FAQ](#faq)
+[**Documentation**](https://nastechresearch.github.io/Jafta/) · [Quick start](#quick-start) · [Features](#what-it-can-do) · [Privacy & security](#privacy-and-security) · [Limitations](#known-limitations) · [FAQ](#faq)
 
 </div>
 
@@ -63,7 +63,7 @@ proprietary service with an open-source shell.
   nowhere for me to look from.
 - **The model provider is your choice, and it is optional.** Point Jafta at Ollama or
   LM Studio on your own hardware and the loop is fully offline: no traffic leaves your
-  network. See [local models](https://jafta.nastechresearch.github.io/docs/reference/local-models/).
+  network. See [local models](https://nastechresearch.github.io/Jafta/reference/local-models/).
 
 If you use a hosted provider, then yes — your prompts go to that provider under your own key,
 and Jafta depends on a non-free network service for as long as you choose one. That is your
@@ -76,7 +76,7 @@ conversation and distils it into structured Markdown on disk: who you are, the a
 behavioural notes, an index of durable context, and any procedure it saw you repeat, written
 down as a reusable skill. Noise is pruned, signal accumulates. It's plain Markdown on the
 device, so switching provider doesn't cost you your memory.
-→ [Memory](https://jafta.nastechresearch.github.io/docs/using/memory/)
+→ [Memory](https://nastechresearch.github.io/Jafta/using/memory/)
 
 **📚 It builds you a wiki.** Feed it articles, notes, PDFs or web pages and ask it to compile
 them: you get cross-linked Markdown pages — concepts and entities, joined by `[[wikilinks]]` —
@@ -85,29 +85,29 @@ above). Driven entirely from chat through a built-in `llm-wiki` skill: create on
 source, compile, ask it questions, run a lint pass for dead links and orphan pages. It does
 **not** update itself — every step is a request you make, or a job you schedule. Multiple wikis
 live side by side as plain files in the workspace, so they're editable and backed up like
-everything else. → [Wiki](https://jafta.nastechresearch.github.io/docs/using/wiki/)
+everything else. → [Wiki](https://nastechresearch.github.io/Jafta/using/wiki/)
 
 **⚡ It acts on its own.** Reminders, one-shot actions and recurring jobs ("every Monday,
 summarise my week"). When one fires, **it messages you first**, screen off. It reads and
 writes files, executes Python, and searches the web through a real hidden Chrome WebView
 rather than a plain fetch, so JavaScript-rendered pages work.
-→ [Scheduling](https://jafta.nastechresearch.github.io/docs/using/scheduling/) ·
-[Tools](https://jafta.nastechresearch.github.io/docs/reference/tools/)
+→ [Scheduling](https://nastechresearch.github.io/Jafta/using/scheduling/) ·
+[Tools](https://nastechresearch.github.io/Jafta/reference/tools/)
 
 **🛠️ It writes its own Android mini-apps.** Describe one in chat — "something to track my
 plants" — and the agent builds it: UI, typed actions, persistent storage, installed into its
 own app grid. Each action becomes a callable tool, so the same app is usable by you, by the
 agent in conversation, and by anything that triggers a turn, **including cron**. That last one
 is what makes "alert me if the basil needs water" work end to end.
-→ [Mini-apps](https://jafta.nastechresearch.github.io/docs/using/mini-apps/)
+→ [Mini-apps](https://nastechresearch.github.io/Jafta/using/mini-apps/)
 
 **📱 It can be your Android launcher.** It declares `HOME` + `DEFAULT` + `LAUNCHER` and handles
 the Home gesture, listing and launching your installed apps from a panel inside the UI. Seven
 visual themes and a draggable mascot you can switch off. Judged purely as a launcher it would
 be a bad one — no widgets, folders or icon packs. The launcher part is the *how*, not the
-*what*. → [Launcher setup](https://jafta.nastechresearch.github.io/docs/start/launcher-setup/)
+*what*. → [Launcher setup](https://nastechresearch.github.io/Jafta/start/launcher-setup/)
 
-**💬 Optional [Telegram bridge](https://jafta.nastechresearch.github.io/docs/using/telegram/)** for
+**💬 Optional [Telegram bridge](https://nastechresearch.github.io/Jafta/using/telegram/)** for
 reaching the agent from anywhere — outbound-only, your own bot token, so nothing on your
 network becomes reachable from the internet. Messages through it pass through Telegram's
 servers; your memory and files never do. Off by default.
@@ -130,10 +130,10 @@ follow onboarding, paste your API key. No account to create, at any point.
 Or **build it yourself** — the whole thing builds from this repository, which is rather the
 point of not having a store in the middle.
 
-[Installing](https://jafta.nastechresearch.github.io/docs/start/install/) ·
-[first run](https://jafta.nastechresearch.github.io/docs/start/first-run/) ·
-[build from source](https://jafta.nastechresearch.github.io/docs/contribute/build-from-source/) ·
-[is it for you?](https://jafta.nastechresearch.github.io/docs/start/is-jafta-for-you/)
+[Installing](https://nastechresearch.github.io/Jafta/start/install/) ·
+[first run](https://nastechresearch.github.io/Jafta/start/first-run/) ·
+[build from source](https://nastechresearch.github.io/Jafta/contribute/build-from-source/) ·
+[is it for you?](https://nastechresearch.github.io/Jafta/start/is-jafta-for-you/)
 
 ## Privacy and security
 
@@ -153,7 +153,7 @@ query string — a public file fetched and compared on the device. It is the onl
 to a server this project controls, and the only one you did not switch on: it runs every 24h,
 and `updates.enabled: false` stops it. Jafta declares 16 permissions and asks for **no**
 camera, microphone, contacts, SMS, call log, background location or storage.
-→ [Every connection and permission](https://jafta.nastechresearch.github.io/docs/reference/android-permissions/)
+→ [Every connection and permission](https://nastechresearch.github.io/Jafta/reference/android-permissions/)
 
 Two disclosures I would rather you hear from me than discover:
 
@@ -163,7 +163,7 @@ Two disclosures I would rather you hear from me than discover:
   phone would be worse. But with Google backup on, the app's private storage, *including the
   config file that holds your API keys in plain text*, is eligible for your Google account's
   backup. Turn backup off for this app and use Jafta's own encrypted backup instead.
-  → [Privacy in detail](https://jafta.nastechresearch.github.io/docs/internals/privacy/)
+  → [Privacy in detail](https://nastechresearch.github.io/Jafta/internals/privacy/)
 
 Security, short version: **`python_exec` is not a sandbox** — arbitrary Python, in-process; the
 module lists are a usability guardrail, not containment. **Provider keys are plain text**,
@@ -171,7 +171,7 @@ protected by the app sandbox and readable by the agent's own file tools. **Promp
 not solved** — nobody's is; asking Jafta to "read this URL and do what it says" is handing a
 stranger your tools. [**SECURITY.md**](SECURITY.md) is the long version, written to be useful
 rather than reassuring — read it before you point this at anything you care about.
-→ [Security model](https://jafta.nastechresearch.github.io/docs/internals/security-model/)
+→ [Security model](https://nastechresearch.github.io/Jafta/internals/security-model/)
 
 ## Known limitations
 
@@ -227,9 +227,9 @@ core. Over 12,000 tests; CI runs `ruff`, `pytest` on 3.11 and 3.12, and `pyright
 subsystems that are already type-clean, advisory on the rest, which is the honest state of a
 codebase being tightened rather than one pretending to be finished.
 
-→ [Architecture](https://jafta.nastechresearch.github.io/docs/internals/architecture/) ·
-[Concepts](https://jafta.nastechresearch.github.io/docs/internals/concepts/) ·
-[The agent turn](https://jafta.nastechresearch.github.io/docs/internals/agent-turn/)
+→ [Architecture](https://nastechresearch.github.io/Jafta/internals/architecture/) ·
+[Concepts](https://nastechresearch.github.io/Jafta/internals/concepts/) ·
+[The agent turn](https://nastechresearch.github.io/Jafta/internals/agent-turn/)
 
 ## License, trademark, and upstream
 
@@ -287,6 +287,6 @@ work.
 
 *Local-first personal AI agent for Android · on-device memory · BYOK · offline-capable · AGPL-3.0*
 
-**[Documentation](https://jafta.nastechresearch.github.io/docs/) · [Quick start](#quick-start) · [Report an issue](../../issues)**
+**[Documentation](https://nastechresearch.github.io/Jafta/) · [Quick start](#quick-start) · [Report an issue](../../issues)**
 
 </div>

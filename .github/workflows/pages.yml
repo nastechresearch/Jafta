@@ -1,0 +1,82 @@
+# Publishes docs/ to GitHub Pages on every push to main.
+#
+# Fully automatic: `docs/` is the only source, mkdocs.yml only describes it, and
+# nothing about the published site is edited by hand. Merging to main is the
+# whole publish step.
+#
+# What this replaces: an earlier `pages.yml` that only existed on the
+# unmerged rebrand branch, did `cp -r docs/* _site/` and then wrote a
+# hand-rolled index.html by hand ("MkDocs will be added later"). That published
+# the Markdown as loose files with no site around them, so every docs link in
+# the README pointed at a URL with nothing behind it.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  # A redeploy of the same main content is worth having on demand: it is how you
+  # recover if a deploy fails for reasons unrelated to the content.
+  workflow_dispatch:
+
+# Cancels a superseded run rather than letting two deploys race, where the
+# older commit's site could win. Top level, not under `on:` — nesting it there
+# makes it a key of the trigger config, which GitHub silently ignores, so the
+# race you are trying to prevent still happens.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # configure-pages resolves the base path of the site from the repo, so
+          # the checkout has to be the real ref.
+          fetch-depth: 0
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      # Pinned exactly, for the reason jsdom is pinned in ci.yml: an unpinned
+      # docs toolchain means the same commit can build differently tomorrow
+      # without the repo changing, and a new mkdocs release can turn a warning
+      # into a hard failure under --strict. Bumping this is deliberate.
+      - name: Install mkdocs
+        run: pip install "mkdocs==1.6.1"
+
+      # --strict turns warnings into a failed build. That is the point: it is
+      # what catches a page added to docs/ without a nav entry, a cross-link to
+      # a file that was renamed, and an anchor that no longer matches a heading.
+      # All three were live in this repo before this workflow existed.
+      - name: Build site (strict)
+        run: mkdocs build --strict
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # The environment is what makes the deployment show up under
+    # Settings -> Environments and gives the published URL a protection rule.
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

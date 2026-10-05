@@ -44,7 +44,7 @@ npx pyright || true
 Two config carve-outs are worth knowing:
 
 - `reportMissingImports` is off project-wide, because the Android/Chaquopy-only dependencies aren't installed in a plain environment.
-- `jafta/pydantic_compat` gets relaxed `reportGeneralTypeIssues` / `reportAttributeAccessIssue`; it's the homemade stdlib-only `BaseModel` (see [`FORK_BOUNDARY.md`](../../FORK_BOUNDARY.md)) and leans on metaprogramming pyright can't follow.
+- `jafta/pydantic_compat` gets relaxed `reportGeneralTypeIssues` / `reportAttributeAccessIssue`; it's the homemade stdlib-only `BaseModel` (see [`FORK_BOUNDARY.md`](https://github.com/nastechresearch/Jafta/blob/main/FORK_BOUNDARY.md)) and leans on metaprogramming pyright can't follow.
 
 CI pins the checker version (`npx --yes pyright@1.1.411`); a bare `npx pyright` locally may pick up a newer release and report slightly different results.
 
@@ -60,7 +60,7 @@ CI pins the checker version (`npx --yes pyright@1.1.411`); a bare `npx pyright` 
 ruff check jafta/ tests/ && npx pyright jafta/bus jafta/command jafta/runtime jafta/session jafta/snapshot jafta/gateway_runtime.py && pytest -q
 ```
 
-Lint, blocking type check, tests — the same sequence CI gates on. Commits also need a DCO `Signed-off-by:` line; see [`CONTRIBUTING.md`](../../CONTRIBUTING.md).
+Lint, blocking type check, tests — the same sequence CI gates on. Commits also need a DCO `Signed-off-by:` line; see [`CONTRIBUTING.md`](https://github.com/nastechresearch/Jafta/blob/main/CONTRIBUTING.md).
 
 ## Which language to write in
 

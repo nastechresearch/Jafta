@@ -15,7 +15,7 @@ Type in the box at the bottom (placeholder "Ask something…"; inside a notebook
 Around the box sit the Console's other controls:
 
 - **At the left of the box**, the grid button opens the [app drawer](app-launcher.md) as a sheet over the chat.
-- **Inside the box**, before you type: **New chat**, which asks for confirmation and then sends `/new` (see [Slash commands](slash-commands.md#new--start-a-fresh-conversation)), and the paperclip for [attachments](attachments.md).
+- **Inside the box**, before you type: **New chat**, which asks for confirmation and then sends `/new` (see [Slash commands](slash-commands.md#new-start-a-fresh-conversation)), and the paperclip for [attachments](attachments.md).
 - **In the row above the box**, three chips: the **scope chip** (✿ and her name, or the notebook you are in), which switches conversation — see [Notebooks](projects.md); the **Writes / Read-only** switch, which decides whether the message you are about to send may change anything on the device — see [Notebooks](projects.md#the-switch-beside-the-chip-writes-or-read-only); and **Commands**, the list of slash commands this conversation accepts, one tap each.
 
 If you have a hardware keyboard (for example on a Unihertz Titan-style device), you don't have to tap the input first: typing any single printable character while the Console is active moves focus into the message box automatically ("type-ahead focus"). This does not trigger on Enter, Escape, arrow keys, spacebar, key combinations with a modifier held down, or while another input/textarea/select/dialog already has focus.

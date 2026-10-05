@@ -80,7 +80,7 @@ deliberate act, not something that happens because you typed a version number.
 
 ### 1. Bump the version
 
-First give the release its entry in [`CHANGELOG.md`](../../CHANGELOG.md): rename the
+First give the release its entry in [`CHANGELOG.md`](https://github.com/nastechresearch/Jafta/blob/main/CHANGELOG.md): rename the
 `Unreleased` heading to the version and today's date, and keep it written for the person
 holding the phone. The release notes on GitHub can link to it instead of repeating it.
 

@@ -7,7 +7,7 @@ Jafta exposes a WebSocket server channel used by the Android WebView UI and any 
 Everything below describes the general-purpose channel as configured through `config.json`'s `websocket` object. On the shipped Android app, the runtime overrides several of these fields at startup regardless of what `config.json` says:
 
 - The gateway binds host `127.0.0.1` and a single port, **18790**, shared by both the WebSocket upgrade and the HTTP `/api/` and `/webui/` routes — one origin for the WebView to talk to. These are the defaults of `run_gateway(data_dir, android_context=None, *, host="127.0.0.1", port=18790)`, and `run_gateway` **always** passes them on: at startup they overwrite `gateway.host`, `gateway.port`, `websocket.host` and `websocket.port` from config, on or off Android. Kotlin calls it with the defaults, so on the phone the values in `config.json` never win.
-- `websocket.enabled` ends up `true` in practice: the auto-generated `config.json` created on first run writes `"websocket": {"enabled": true, ...}` explicitly, and the same override fills in `enabled: true` if the key is ever missing. The schema-level default of `enabled: false` (documented below) only applies when the gateway is started without that override — see [Quick Start](#quick-start-off-device--standalone-gateway).
+- `websocket.enabled` ends up `true` in practice: the auto-generated `config.json` created on first run writes `"websocket": {"enabled": true, ...}` explicitly, and the same override fills in `enabled: true` if the key is ever missing. The schema-level default of `enabled: false` (documented below) only applies when the gateway is started without that override — see [Quick Start](#quick-start-off-device-standalone-gateway).
 
 So: the `enabled: false` default, the `8765` default port, and a custom `host` are real and correct for **off-device** use of this channel (running the gateway standalone on a workstation), but through `run_gateway` they take effect only if you pass them as `host=` and `port=`. The Android APK always ends up on `ws://127.0.0.1:18790/`. Everything else in the `websocket` object (`path`, `allowFrom`, the token and TLS fields, `streaming`) is read from `config.json` as documented.
 
@@ -216,7 +216,7 @@ The frame is a recomputable refresh hint — it is never persisted to the transc
 `GET /api/subagents/<task_id>/digest` serves the condensed "what did it do" of one subagent, for the block the chat shows under its result: `{"task_id", "events", "count", "source"}`, up to 300 events. `source` says how complete it is — `"digest"` is the persisted, immutable one written when the subagent finished, `"live"` is a preview built from the running subagent's activity (it will change), and `"none"` means there is nothing to show (empty `events`, never a 404). Unlike `/activity`, it has no cursor.
 
 **`subagent_activity`** — the fine-grained activity of one subagent, sent **only** to the
-connections that asked for it with `subagent_watch` (see [Client → Server](#client--server)):
+connections that asked for it with `subagent_watch` (see [Client → Server](#client-server)):
 
 ```json
 {
@@ -590,7 +590,7 @@ Outbound `message` events may include a `media` field containing local filesyste
 
 ## Common Patterns
 
-These are off-device / standalone-gateway patterns — they do not apply to the Android app, which always forces `host: 127.0.0.1`, `port: 18790`, `enabled: true`. The `host` and `port` in the examples below reach the server only if you start the gateway with `run_gateway(data_dir, host=..., port=...)` (or through `_run_gateway(config=None)`, see [Quick Start](#quick-start-off-device--standalone-gateway)): a bare `run_gateway(data_dir)` overwrites them with `127.0.0.1:18790`.
+These are off-device / standalone-gateway patterns — they do not apply to the Android app, which always forces `host: 127.0.0.1`, `port: 18790`, `enabled: true`. The `host` and `port` in the examples below reach the server only if you start the gateway with `run_gateway(data_dir, host=..., port=...)` (or through `_run_gateway(config=None)`, see [Quick Start](#quick-start-off-device-standalone-gateway)): a bare `run_gateway(data_dir)` overwrites them with `127.0.0.1:18790`.
 
 ### Trusted local network (no auth)
 
