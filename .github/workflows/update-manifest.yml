@@ -1,0 +1,290 @@
+# Republishes latest.json without rebuilding anything.
+#
+# The in-app update check reads one file: releases/latest/download/latest.json.
+# It is fetched on every app start, and two of its fields are operational levers
+# rather than release facts:
+#
+#   rollout          0-100. The client hashes its install id into a bucket and
+#                    only offers the update to devices under the threshold
+#                    (_rollout_bucket / _rollout_allows). 10 means "start with a
+#                    tenth of users"; set it to 0 to stop the update dead without
+#                    publishing a new APK.
+#   min_supported_code  the oldest versionCode still allowed to update. Raising it
+#                    forces older installs to update rather than letting them
+#                    sit on a version that may be the broken one.
+#
+# That means a bad release can be halted, or widened to everyone, by editing a
+# JSON file. Doing that through the GitHub UI means hand-editing a downloaded
+# asset with the schema from memory, which is how the previous manifest ended up
+# with keys the client does not read. This workflow regenerates it through
+# scripts/release.py — the code the test suite covers — and re-uploads it with
+# --clobber.
+#
+# scripts/release.py bumps version files only when it is not given
+# --manifest-only, so this never dirties the working tree.
+name: Update Manifest
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag whose APK this manifest points at, e.g. v1.0.0"
+        required: true
+        type: string
+      rollout:
+        description: "Percentage of installs offered the update, 0-100 (0 halts it)"
+        required: true
+        default: "100"
+        type: choice
+        options: ["0", "5", "10", "25", "50", "75", "90", "100"]
+      critical:
+        description: "Critical updates are insisted on instead of offered once"
+        required: false
+        default: false
+        type: boolean
+      min_supported_code:
+        description: "Oldest versionCode still allowed to update (blank = keep current)"
+        required: false
+        type: string
+      summary_it:
+        description: "One-line Italian summary shown in the app"
+        required: false
+        default: "Aggiornamento di sicurezza e correzioni."
+        type: string
+      summary_en:
+        description: "One-line English summary shown in the app"
+        required: false
+        default: "Security and bug fixes."
+        type: string
+      dry_run:
+        description: "Show what would change, upload nothing"
+        required: false
+        default: true
+        type: boolean
+
+# contents: write is required: this replaces an asset on an existing release.
+permissions:
+  contents: write
+
+concurrency:
+  group: update-manifest
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Resolve inputs
+        id: args
+        env:
+          TAG: ${{ inputs.tag }}
+          ROLLOUT: ${{ inputs.rollout }}
+          CRITICAL: ${{ inputs.critical }}
+          MIN_CODE: ${{ inputs.min_supported_code }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::tag must be vX.Y.Z (got '$TAG')"
+            exit 1
+          fi
+          VERSION="${TAG#v}"
+
+          if ! [[ "$ROLLOUT" =~ ^[0-9]+$ ]] || [ "$ROLLOUT" -gt 100 ]; then
+            echo "::error::rollout must be 0-100 (got '$ROLLOUT')"
+            exit 1
+          fi
+
+          if [ -n "$MIN_CODE" ] && ! [[ "$MIN_CODE" =~ ^[0-9]+$ ]]; then
+            echo "::error::min_supported_code must be a whole number (got '$MIN_CODE')"
+            exit 1
+          fi
+
+          {
+            echo "version=$VERSION"
+            echo "rollout=$ROLLOUT"
+            echo "critical=$CRITICAL"
+            echo "dry_run=$DRY_RUN"
+          } >> "$GITHUB_OUTPUT"
+          [ -z "$MIN_CODE" ] || echo "min_code=$MIN_CODE" >> "$GITHUB_OUTPUT"
+
+      # The manifest's sha256 and size must describe an APK that actually exists
+      # on the release. Generating them from a fresh local build would produce a
+      # manifest describing bytes nobody has, and the client verifies the hash
+      # before offering an update — so every phone would compute a mismatch.
+      # Instead the existing release asset is downloaded and hashed as-is.
+      - name: Download the released APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+          VERSION: ${{ steps.args.outputs.version }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist/release
+          gh release download "$TAG" \
+            --repo "${{ github.repository }}" \
+            --pattern "jafta-$VERSION.apk" \
+            --dir dist/release \
+            --clobber
+          ls -l dist/release/
+          echo "downloaded the APK already on the release, not a fresh build"
+
+      - name: Regenerate the manifest
+        env:
+          CRITICAL: ${{ steps.args.outputs.critical }}
+          MIN_CODE: ${{ steps.args.outputs.min_code }}
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.args.outputs.version }}"
+          APK="dist/release/jafta-$VERSION.apk"
+
+          ARGS=(
+            "$VERSION"
+            --manifest-only
+            --apk "$APK"
+            --repo "${{ github.repository }}"
+            --summary-it "${{ inputs.summary_it }}"
+            --summary-en "${{ inputs.summary_en }}"
+            --rollout "${{ steps.args.outputs.rollout }}"
+            --out dist/release
+          )
+          [ "$CRITICAL" = "true" ] && ARGS+=(--critical)
+          # Omitted when blank, so release.py falls back to the previous
+          # manifest's value instead of resetting it to 0 and locking out every
+          # install older than the current build.
+          [ -z "$MIN_CODE" ] || ARGS+=(--min-supported-code "$MIN_CODE")
+
+          if [ "${{ steps.args.outputs.dry_run }}" = "true" ]; then
+            ARGS+=(--dry-run)
+          fi
+
+          python3 scripts/release.py "${ARGS[@]}"
+
+      # Fetched before validation, not after: the step below diffs the new
+      # manifest against whatever the app is being served right now, so this has
+      # to exist on disk by then. Placed after, the comparison silently saw no
+      # file and printed nothing.
+      - name: Fetch the manifest currently being served
+        if: ${{ inputs.dry_run == false }}
+        run: |
+          set -euo pipefail
+          URL="https://github.com/${{ github.repository }}/releases/latest/download/latest.json"
+          curl -sS -o served-latest.json -w 'HTTP %{http_code}\n' -L --max-time 30 "$URL" || true
+          [ -s served-latest.json ] || echo "  (nothing served yet — first release)"
+
+      # Same field-by-field check the release workflow runs, plus a direct
+      # comparison against the manifest currently being served. A typo here is
+      # invisible until every phone silently stops seeing updates.
+      - name: Validate before uploading
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, pathlib, re, sys
+
+          new = json.loads(pathlib.Path("dist/release/latest.json").read_text())
+
+          for key in ("schema", "version_code", "version_name", "apk_url", "sha256", "size"):
+              if key not in new:
+                  sys.exit(f"missing {key!r}: the client would reject this manifest")
+          if new["schema"] != 1:
+              sys.exit(f"schema must be 1, got {new['schema']}")
+          if not str(new["apk_url"]).startswith("https://"):
+              sys.exit("apk_url must be https")
+          if not re.fullmatch(r"[0-9a-f]{64}", str(new["sha256"]).lower()):
+              sys.exit("sha256 must be 64 hex chars")
+          if not isinstance(new["size"], int) or new["size"] <= 0:
+              sys.exit("size must be a positive int")
+          if not 0 <= new.get("rollout", 100) <= 100:
+              sys.exit(f"rollout out of range: {new.get('rollout')}")
+
+          apk = pathlib.Path("dist/release") / f"jafta-{new['version_name']}.apk"
+          if not apk.exists():
+              sys.exit(f"APK missing: {apk}")
+          if hashlib.sha256(apk.read_bytes()).hexdigest() != str(new["sha256"]).lower():
+              sys.exit("sha256 does not match the release APK")
+          if apk.stat().st_size != new["size"]:
+              sys.exit("size does not match the release APK")
+
+          print(f"manifest valid: v{new['version_name']} "
+                f"rollout={new.get('rollout', 100)}% critical={new.get('critical', False)} "
+                f"min_supported_code={new.get('min_supported_code')}")
+
+          # Compare against what is live right now, and say what changes.
+          served = pathlib.Path("served-latest.json")
+          if served.exists() and served.stat().st_size:
+              try:
+                  old = json.loads(served.read_text())
+              except json.JSONDecodeError:
+                  old = None
+              if old:
+                  diffs = []
+                  for key in ("version_code", "version_name", "rollout",
+                              "min_supported_code", "critical", "sha256", "size"):
+                      if old.get(key) != new.get(key):
+                          diffs.append(f"    {key}: {old.get(key)!r} -> {new.get(key)!r}")
+                  if diffs:
+                      print("changes vs the manifest now live:")
+                      print("\n".join(diffs))
+                  else:
+                      print("no change against the live manifest")
+          PY
+
+      - name: Upload the manifest
+        if: ${{ inputs.dry_run == false }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          # --clobber replaces the asset in place. Without it the upload fails,
+          # because the asset name is always latest.json.
+          gh release upload "$TAG" dist/release/latest.json \
+            --repo "${{ github.repository }}" \
+            --clobber
+          echo "::notice::latest.json replaced on $TAG"
+
+      # Only meaningful after an upload: the app fetches this exact URL, and a
+      # cached or not-yet-propagated response is indistinguishable from a broken
+      # update path from the phone's side.
+      - name: Verify the app can read it
+        if: ${{ inputs.dry_run == false }}
+        run: |
+          set -euo pipefail
+          URL="https://github.com/${{ github.repository }}/releases/latest/download/latest.json"
+          echo "GET $URL"
+          HTTP=$(curl -sS -o /tmp/served.json -w '%{http_code}' -L --max-time 30 "$URL" || echo 000)
+          echo "HTTP $HTTP"
+          if [ "$HTTP" != "200" ]; then
+            echo "::error::served manifest returned HTTP $HTTP — in-app updates are broken"
+            exit 1
+          fi
+          python3 -c "
+          import json,sys
+          m=json.load(open('/tmp/served.json'))
+          print('served: v%s code=%s rollout=%s%% critical=%s' % (
+              m.get('version_name'), m.get('version_code'),
+              m.get('rollout',100), m.get('critical',False)))
+          sys.exit(0 if m.get('schema')==1 and m.get('apk_url') else 1)
+          "
+
+      - name: Summary
+        run: |
+          {
+            echo "### Manifest update"
+            echo ""
+            echo "- **Tag**: \`${{ inputs.tag }}\`"
+            echo "- **Rollout**: \`${{ steps.args.outputs.rollout }}%\`"
+            echo "- **Critical**: \`${{ steps.args.outputs.critical }}\`"
+            echo "- **Uploaded**: \`${{ inputs.dry_run == false }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
