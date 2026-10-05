@@ -1,9 +1,9 @@
 """Il kit delle app ascolta solo il guscio che lo ospita.
 
 Il listener ``message`` di
-``apps/jenny-sdk.js`` non guardava ``event.source``: un frame annidato
+``apps/jafta-sdk.js`` non guardava ``event.source``: un frame annidato
 nell'app (una mappa, un video, una pagina esterna) poteva mandare
-``jenny:ui-query`` e ricevere l'``outerHTML`` dell'app intera, o cambiarle tema
+``jafta:ui-query`` e ricevere l'``outerHTML`` dell'app intera, o cambiarle tema
 e navigazione. Il kit vero gira qui in node, come in
 ``test_app_sdk_swipe_client.py``.
 """
@@ -16,7 +16,7 @@ from support.js_harness import ASSETS, requires_node, run_js
 
 pytestmark = requires_node
 
-SDK = (ASSETS / "apps" / "jenny-sdk.js").read_text(encoding="utf-8")
+SDK = (ASSETS / "apps" / "jafta-sdk.js").read_text(encoding="utf-8")
 
 
 def _answers(source_expr: str) -> list:
@@ -45,8 +45,8 @@ const stranger = {{ postMessage() {{}} }};
 {SDK}
 await new Promise((r) => setTimeout(r, 0));
 posted.length = 0;
-for (const fn of listeners) fn({{ source: {source_expr}, data: {{ type: 'jenny:ui-query', nonce: 'n1' }} }});
-console.log(JSON.stringify(posted.filter((m) => m.type === 'jenny:ui-result')));
+for (const fn of listeners) fn({{ source: {source_expr}, data: {{ type: 'jafta:ui-query', nonce: 'n1' }} }});
+console.log(JSON.stringify(posted.filter((m) => m.type === 'jafta:ui-result')));
 """
     )
     return json.loads(out.strip().splitlines()[-1])

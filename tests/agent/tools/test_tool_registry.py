@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from jenny.agent.tools.base import Tool
-from jenny.agent.tools.registry import ToolRegistry
+from jafta.agent.tools.base import Tool
+from jafta.agent.tools.registry import ToolRegistry
 
 
 class _FakeTool(Tool):

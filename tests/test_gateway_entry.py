@@ -7,9 +7,9 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from jenny.android_entry import MAX_RETRIES, run_gateway
-from jenny.config.bootstrap import ensure_minimal_config
-from jenny.runtime.context import get_runtime_context
+from jafta.android_entry import MAX_RETRIES, run_gateway
+from jafta.config.bootstrap import ensure_minimal_config
+from jafta.runtime.context import get_runtime_context
 
 
 def test_run_gateway_prepares_workspace_and_passes_overrides(
@@ -22,7 +22,7 @@ def test_run_gateway_prepares_workspace_and_passes_overrides(
     # Il workspace vive nel RuntimeContext; monkeypatch ripristina la sessione.
     monkeypatch.setattr(get_runtime_context(), "workspace_dir", None)
 
-    with patch("jenny.gateway_runtime._run_gateway", new=mock_run):
+    with patch("jafta.gateway_runtime._run_gateway", new=mock_run):
         run_gateway(
             str(tmp_path),
             host="127.0.0.1",
@@ -49,7 +49,7 @@ def test_run_gateway_retries_after_a_system_exit(
     i tre tentativi venivano saltati e run_gateway tornava a Kotlin lasciando
     il servizio in piedi senza agente dietro."""
     monkeypatch.setattr(get_runtime_context(), "workspace_dir", None)
-    monkeypatch.setattr("jenny.android_entry.RETRY_DELAY_S", 0)
+    monkeypatch.setattr("jafta.android_entry.RETRY_DELAY_S", 0)
 
     calls: list[int] = []
 
@@ -58,7 +58,7 @@ def test_run_gateway_retries_after_a_system_exit(
         if len(calls) == 1:
             raise SystemExit(2)
 
-    with patch("jenny.gateway_runtime._run_gateway", new=_fake_run):
+    with patch("jafta.gateway_runtime._run_gateway", new=_fake_run):
         run_gateway(str(tmp_path), host="127.0.0.1", port=18001)
 
     assert len(calls) == 2
@@ -69,7 +69,7 @@ def test_run_gateway_reraises_after_max_retries_of_base_exception(
 ):
     """Esaurititi i tentativi la BaseException risale, come per Exception."""
     monkeypatch.setattr(get_runtime_context(), "workspace_dir", None)
-    monkeypatch.setattr("jenny.android_entry.RETRY_DELAY_S", 0)
+    monkeypatch.setattr("jafta.android_entry.RETRY_DELAY_S", 0)
 
     calls: list[int] = []
 
@@ -77,7 +77,7 @@ def test_run_gateway_reraises_after_max_retries_of_base_exception(
         calls.append(1)
         raise SystemExit(9)
 
-    with patch("jenny.gateway_runtime._run_gateway", new=_always_exit):
+    with patch("jafta.gateway_runtime._run_gateway", new=_always_exit):
         with pytest.raises(SystemExit):
             run_gateway(str(tmp_path), host="127.0.0.1", port=18002)
 
@@ -89,7 +89,7 @@ def test_run_gateway_does_not_retry_a_keyboard_interrupt(
 ):
     """Ctrl-C è volontario: un solo tentativo, poi risale."""
     monkeypatch.setattr(get_runtime_context(), "workspace_dir", None)
-    monkeypatch.setattr("jenny.android_entry.RETRY_DELAY_S", 0)
+    monkeypatch.setattr("jafta.android_entry.RETRY_DELAY_S", 0)
 
     calls: list[int] = []
 
@@ -97,7 +97,7 @@ def test_run_gateway_does_not_retry_a_keyboard_interrupt(
         calls.append(1)
         raise KeyboardInterrupt
 
-    with patch("jenny.gateway_runtime._run_gateway", new=_interrupted):
+    with patch("jafta.gateway_runtime._run_gateway", new=_interrupted):
         with pytest.raises(KeyboardInterrupt):
             run_gateway(str(tmp_path), host="127.0.0.1", port=18003)
 
@@ -116,10 +116,10 @@ def test_run_gateway_resets_loop_bound_state_before_every_attempt(
     """
     import asyncio
 
-    from jenny.config import store
+    from jafta.config import store
 
     monkeypatch.setattr(get_runtime_context(), "workspace_dir", None)
-    monkeypatch.setattr("jenny.android_entry.RETRY_DELAY_S", 0)
+    monkeypatch.setattr("jafta.android_entry.RETRY_DELAY_S", 0)
     config_path = tmp_path / "workspace" / "config.json"
 
     async def _mutate_with_a_queued_writer() -> None:
@@ -147,7 +147,7 @@ def test_run_gateway_resets_loop_bound_state_before_every_attempt(
             raise RuntimeError("first attempt crashes after binding the lock")
 
     try:
-        with patch("jenny.gateway_runtime._run_gateway", new=_fake_run):
+        with patch("jafta.gateway_runtime._run_gateway", new=_fake_run):
             run_gateway(str(tmp_path), host="127.0.0.1", port=18004)
     finally:
         store.reset_config_store_state()
@@ -190,13 +190,13 @@ def test_ensure_minimal_config_is_idempotent(tmp_path: Path):
 
 
 def test_loop_bound_reset_includes_the_app_storage_locks(monkeypatch: pytest.MonkeyPatch):
-    """Anche i lock per collezione delle Jenny App si rimettono a nuovo.
+    """Anche i lock per collezione delle Jafta App si rimettono a nuovo.
 
     Sono ``asyncio.Lock`` di modulo come quello di ``config.store``: un
     tentativo morto li lascerebbe legati al suo loop.
     """
-    from jenny.android_entry import _reset_loop_bound_state
-    from jenny.apps import storage
+    from jafta.android_entry import _reset_loop_bound_state
+    from jafta.apps import storage
 
     calls: list[str] = []
     monkeypatch.setattr(storage, "reset_storage_locks", lambda: calls.append("apps"))

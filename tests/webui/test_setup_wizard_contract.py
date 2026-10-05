@@ -34,7 +34,7 @@ from pathlib import Path
 from support.js_harness import member, requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-UI = ROOT / "jenny" / "templates" / "ui"
+UI = ROOT / "jafta" / "templates" / "ui"
 ASSETS = UI / "assets"
 WIZARD_JS = ASSETS / "onboarding-wizard.js"
 HOST_JS = ASSETS / "onboarding-app.js"
@@ -146,7 +146,7 @@ def test_a_late_model_list_does_not_write_into_the_next_step() -> None:
 @requires_node
 def test_first_run_has_three_answers() -> None:
     """«Non lo so» non è né «sì» né «no». Preso per «configurato» lasciava una
-    Jenny senza provider e senza strada verso il wizard; preso per «primo
+    Jafta senza provider e senza strada verso il wizard; preso per «primo
     avvio» manderebbe al wizard chi ha già i suoi provider, che
     ``onboarding.save`` sostituirebbe.
 
@@ -219,7 +219,7 @@ def test_the_onboarding_goes_home_only_on_a_certain_no() -> None:
 
 
 def test_finishing_the_wizard_lands_in_the_home() -> None:
-    """Il «Fatto» porta alla casa, su Jenny, dove il saluto scritto da
+    """Il «Fatto» porta alla casa, su Jafta, dove il saluto scritto da
     ``onboarding.save`` aspetta. Prima ricaricava la pagina, cioè l'officina.
 
     E niente marcatori: ``onboarding-complete`` esisteva per sbloccare il dock
@@ -265,15 +265,15 @@ def test_the_host_answers_the_whole_native_contract() -> None:
 
 
 @requires_node
-def test_the_mini_jenny_falls_even_when_the_native_ready_already_came() -> None:
+def test_the_mini_jafta_falls_even_when_the_native_ready_already_came() -> None:
     """``onNativeReady`` arriva una volta per WebView, al primo
     ``onPageFinished`` (``MainActivity``, ``if (loaded) return``). Dalla casa
     all'onboarding quel momento è già passato: senza il timer la caduta della
-    mini Jenny aspetterebbe per sempre."""
+    mini Jafta aspetterebbe per sempre."""
     host = _host()
     run_js(
         "import assert from 'node:assert/strict';\n"
-        "globalThis.window = { JennyNative: {} };\n"
+        "globalThis.window = { JaftaNative: {} };\n"
         "const SHELL_READY_FALLBACK_MS = 20;\n"
         "class H {\n"
         "  constructor() { this._shellReady = false; this._shellReadyCbs = []; }\n"
@@ -330,7 +330,7 @@ def test_the_wizard_is_only_the_first_run() -> None:
 @requires_node
 def test_from_the_first_run_there_is_no_way_out() -> None:
     """Dal wizard del primo avvio non si esce col back, senza eccezioni: sotto
-    non c'e' niente, e una Jenny senza provider portata in chat non puo' fare
+    non c'e' niente, e una Jafta senza provider portata in chat non puo' fare
     niente. L'host consegna il tasto al wizard, che consuma sempre."""
     source = _wizard()
     # Eseguito, non letto: `handleBack()` vero a ogni step, e ogni volta la

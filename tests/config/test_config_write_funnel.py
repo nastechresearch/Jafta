@@ -23,7 +23,7 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-JENNY = Path(__file__).resolve().parents[2] / "jenny"
+JAFTA = Path(__file__).resolve().parents[2] / "jafta"
 
 # L'unico chiamante legittimo, più il modulo che la definisce.
 _FUNNEL_CALLERS = {"config/store.py", "config/loader.py"}
@@ -39,8 +39,8 @@ _DIRECT_WRITE_EXCEPTIONS = {
 
 def _modules() -> list[tuple[str, str]]:
     out = []
-    for path in sorted(JENNY.rglob("*.py")):
-        rel = path.relative_to(JENNY).as_posix()
+    for path in sorted(JAFTA.rglob("*.py")):
+        rel = path.relative_to(JAFTA).as_posix()
         # ``skills/**/scripts`` sono script che l'agente esegue via python_exec,
         # non parte del gateway, e non importano il pacchetto.
         if rel.startswith("skills/"):
@@ -96,15 +96,15 @@ def test_the_documented_exceptions_still_explain_themselves() -> None:
     togliere la voce da ``_DIRECT_WRITE_EXCEPTIONS`` perché la deroga non serve
     più. Quello che non va fatto è lasciare la lista senza la spiegazione.
     """
-    bootstrap = (JENNY / "config" / "bootstrap.py").read_text("utf-8")
+    bootstrap = (JAFTA / "config" / "bootstrap.py").read_text("utf-8")
     # Si cerca il *funnel per nome*, non la parola "mutate": il commento cita
-    # ``jenny.config.store``, che è il modulo, ed è il riferimento giusto.
+    # ``jafta.config.store``, che è il modulo, ed è il riferimento giusto.
     assert "config.store" in bootstrap and "funnel" in bootstrap, (
         "config/bootstrap.py non nomina più il funnel da cui è esente: "
         "il commento che spiega la deroga è stato perso."
     )
 
-    loader = (JENNY / "config" / "loader.py").read_text("utf-8")
+    loader = (JAFTA / "config" / "loader.py").read_text("utf-8")
     assert "save_config" in loader, (
         "config/loader.py non definisce più save_config: se la funzione è "
         "sparita, questa deroga e il test sopra non hanno più soggetto."

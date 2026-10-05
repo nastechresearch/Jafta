@@ -13,7 +13,7 @@ import time
 
 import pytest
 
-from jenny.agent.subagent_activity import (
+from jafta.agent.subagent_activity import (
     ACTIVITY_KINDS,
     DIGEST_KIND_TOOL,
     DIGEST_STATUS_INCOMPLETE,
@@ -36,7 +36,7 @@ from jenny.agent.subagent_activity import (
     format_tool_start,
     known_tools,
 )
-from jenny.agent.subagent_records import (
+from jafta.agent.subagent_records import (
     SubagentRecord,
     SubagentRecordStore,
     SubagentSpec,
@@ -332,7 +332,7 @@ class TestFormatterPerTool:
         assert format_tool_end("list_dir", {}, "Directory docs is empty") == "empty directory"
 
     def test_apply_patch(self):
-        args = {"edits": [{"path": "jenny/agent/loop.py"}, {"path": "jenny/agent/loop.py"}]}
+        args = {"edits": [{"path": "jafta/agent/loop.py"}, {"path": "jafta/agent/loop.py"}]}
         assert format_tool_start("apply_patch", args) == "patching loop.py"
         assert format_tool_end("apply_patch", args, "- replace loop.py (+2/-1)") == "2 hunks applied"
         multi = {"edits": [{"path": "a.py"}, {"path": "b.py"}]}
@@ -357,14 +357,14 @@ class TestFormatterPerTool:
 
     def test_grep_and_find_files(self):
         assert (
-            format_tool_start("grep", {"pattern": "handle_", "path": "jenny", "glob": "*.py"})
-            == 'grepping jenny for "handle_"'
+            format_tool_start("grep", {"pattern": "handle_", "path": "jafta", "glob": "*.py"})
+            == 'grepping jafta for "handle_"'
         )
         assert format_tool_end("grep", {"output_mode": "content"}, "a\nb") == "2 matches"
         assert format_tool_end("grep", {}, "a.py\nb.py") == "2 files"
         assert format_tool_end("grep", {}, "No matches found") == "no matches"
-        assert format_tool_start("find_files", {"path": "jenny", "glob": "*.py"}) == (
-            "finding files in jenny matching *.py"
+        assert format_tool_start("find_files", {"path": "jafta", "glob": "*.py"}) == (
+            "finding files in jafta matching *.py"
         )
         assert format_tool_end("find_files", {}, "a.py\nb.py\nc.py") == "3 matches"
 
@@ -390,8 +390,8 @@ class TestFormatterPerTool:
     def test_logs_source_and_location(self):
         assert format_tool_start("get_recent_logs", {"count": 200}) == "reading recent logs"
         assert format_tool_end("get_recent_logs", {}, "l1\nl2") == "2 log lines"
-        assert format_tool_start("get_source", {"target": "jenny.agent.loop"}) == (
-            "reading source of jenny.agent.loop"
+        assert format_tool_start("get_source", {"target": "jafta.agent.loop"}) == (
+            "reading source of jafta.agent.loop"
         )
         assert format_tool_end("get_source", {}, "a\nb\nc") == "3 lines of source"
         assert format_tool_start("get_location", {}) == "getting device location"
@@ -481,7 +481,7 @@ class TestFormatterPerTool:
         # domani degrada in silenzio al fallback e nessuno lo nota. ``remote``
         # (i tool SSH del tipo ``sysadmin``) e nell'elenco per lo stesso motivo:
         # e uno scope in piu, non un'eccezione.
-        from jenny.agent.tools.loader import ToolLoader, declared_tool_name
+        from jafta.agent.tools.loader import ToolLoader, declared_tool_name
 
         scope_tools = {
             name
@@ -497,13 +497,13 @@ class TestFormatterPerTool:
         # L'invariante sopra vale solo se l'elenco degli scope parametrizzati e
         # quello vero: un tipo nuovo con uno scope nuovo deve rompere qui, non
         # passare inosservato con i suoi tool sul fallback.
-        from jenny.agent.agent_types import AGENT_TYPES
+        from jafta.agent.agent_types import AGENT_TYPES
 
         scopes = {scope for t in AGENT_TYPES.values() for scope in t.scopes}
         assert scopes == {"subagent", "remote"}
 
     def test_all_agent_type_allowlists_are_covered(self):
-        from jenny.agent.agent_types import AGENT_TYPES
+        from jafta.agent.agent_types import AGENT_TYPES
 
         allowed: set[str] = set()
         for agent_type in AGENT_TYPES.values():

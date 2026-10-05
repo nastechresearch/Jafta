@@ -1,4 +1,4 @@
-"""Test per le riparazioni di history in ``jenny.agent.history_repair``.
+"""Test per le riparazioni di history in ``jafta.agent.history_repair``.
 
 Copre ognuna delle quattro funzioni del modulo (drop degli orfani, backfill dei
 tool_use non soddisfatti, microcompact dei vecchi risultati tool, taglio del
@@ -8,7 +8,7 @@ casi rotti che richiedono la riparazione.
 
 from __future__ import annotations
 
-from jenny.agent.history_repair import (
+from jafta.agent.history_repair import (
     BACKFILL_CONTENT,
     COMPACTABLE_TOOLS,
     MICROCOMPACT_KEEP_RECENT,

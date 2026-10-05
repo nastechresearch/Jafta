@@ -11,10 +11,10 @@ import sys
 import pytest
 from support.android import force_android_context, force_no_android_context
 
-from jenny.snapshot.crypto import get_crypto_backend
-from jenny.snapshot.crypto_backends.android import AndroidAesGcmBackend
-from jenny.snapshot.crypto_backends.base import CryptoUnavailableError
-from jenny.snapshot.crypto_backends.dev import DevAesGcmBackend
+from jafta.snapshot.crypto import get_crypto_backend
+from jafta.snapshot.crypto_backends.android import AndroidAesGcmBackend
+from jafta.snapshot.crypto_backends.base import CryptoUnavailableError
+from jafta.snapshot.crypto_backends.dev import DevAesGcmBackend
 
 
 def test_android_context_selects_javax_backend(monkeypatch: pytest.MonkeyPatch) -> None:

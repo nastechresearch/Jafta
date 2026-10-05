@@ -12,8 +12,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.agent.loop import AgentLoop
-from jenny.config.schema import Config
+from jafta.agent.loop import AgentLoop
+from jafta.config.schema import Config
 
 
 def _loop(tmp_path, **defaults):
@@ -43,7 +43,7 @@ def test_config_knobs_reach_the_manager(tmp_path, key, value, attr) -> None:
 
 def test_defaults_reach_the_manager(tmp_path) -> None:
     """Senza override valgono i default dello schema, non quelli del manager."""
-    from jenny.config.schema import AgentDefaults
+    from jafta.config.schema import AgentDefaults
 
     loop = _loop(tmp_path)
     defaults = AgentDefaults()

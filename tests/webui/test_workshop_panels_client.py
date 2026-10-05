@@ -41,7 +41,7 @@ def _script(body: str) -> str:
 import assert from 'node:assert/strict';
 
 /* Il nome di lei (`shared/bot-name.js`): qui quello di partenza. */
-const botName = {{ get: () => 'Jenny', set() {{}}, onChange() {{ return () => {{}}; }} }};
+const botName = {{ get: () => 'Jafta', set() {{}}, onChange() {{ return () => {{}}; }} }};
 const i18n = {{ t: (k) => k }};
 const escapeHtml = (s) => String(s);
 const toasts = [];

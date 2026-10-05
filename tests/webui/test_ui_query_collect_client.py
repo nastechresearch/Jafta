@@ -2,7 +2,7 @@
 
 ``UiQueryResponder._collect`` cercava ``getElementById('view-' + view)``: per
 ``brain``, ``hands`` e ``memory`` quell'id non esiste (sono tutti e tre
-``view-settings``), quindi Jenny riceveva un HTML vuoto proprio dove l'utente le
+``view-settings``), quindi Jafta riceveva un HTML vuoto proprio dove l'utente le
 chiede «cosa vedi?». E la mini-app aperta si cercava in ``controllers.apps`` con
 ``view === 'apps'``: la scheda «App» che non esiste piu', quindi l'app non le
 arrivava mai.
@@ -71,7 +71,7 @@ def test_an_open_miniapp_is_described_over_any_view() -> None:
         _script(
             """
 AppState.currentMode = 'hands';
-window.mobileApp._appsSource = { jennyApps: [{ slug: 'spesa', name: 'Spesa' }] };
+window.mobileApp._appsSource = { jaftaApps: [{ slug: 'spesa', name: 'Spesa' }] };
 window.mobileApp._appsActions = {
   _openApp: { slug: 'spesa' },
   requestAppHtml: async () => '<ul><li>latte</li></ul>',

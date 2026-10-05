@@ -1,11 +1,11 @@
-"""Tests for Jenny App manifest loading and validation."""
+"""Tests for Jafta App manifest loading and validation."""
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
-from jenny.apps.manifest import (
+from jafta.apps.manifest import (
     ACTION_NAME_RE,
     COLLECTION_RE,
     SLUG_RE,
@@ -241,7 +241,7 @@ class TestSchemaAndRegexParity:
         """The runtime and the app-creator validator must agree on names."""
         validator = (
             Path(__file__).resolve().parents[2]
-            / "jenny" / "skills" / "app-creator" / "scripts" / "validate_app.py"
+            / "jafta" / "skills" / "app-creator" / "scripts" / "validate_app.py"
         ).read_text(encoding="utf-8")
         assert SLUG_RE.pattern in validator
         assert ACTION_NAME_RE.pattern in validator

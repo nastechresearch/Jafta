@@ -50,10 +50,10 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from loguru import logger
 
-from jenny.agent.autocompact import AutoCompact
-from jenny.agent.gardener import GardenerStore
-from jenny.agent.gardener_state import GardenerState, write_state
-from jenny.session.manager import SessionManager
+from jafta.agent.autocompact import AutoCompact
+from jafta.agent.gardener import GardenerStore
+from jafta.agent.gardener_state import GardenerState, write_state
+from jafta.session.manager import SessionManager
 
 PROJECT = "project:palestra"
 PERSONAL = "unified:default"
@@ -202,7 +202,7 @@ def test_length_based_compaction_runs_for_every_session_including_projects() -> 
     quella chiamata diventasse condizionale sulla chiave, questo test è il posto
     in cui accorgersene.
     """
-    src = Path("jenny/agent/loop.py").read_text(encoding="utf-8")
+    src = Path("jafta/agent/loop.py").read_text(encoding="utf-8")
     # **Dopo** `prepare_session`, non la prima del file: la prima occorrenza sta
     # in `_on_context_overflow`, cioè *prima* nel testo, e cercarla da lì dava una
     # finestra vuota — un test che passava qualunque cosa ci si mettesse dentro
@@ -226,7 +226,7 @@ def test_length_based_compaction_runs_for_every_session_including_projects() -> 
 # verità sta nelle pagine, che entrano in contesto d'ufficio (T3 e T6.4) — quindi
 # archiviarla non butta via nulla.
 #
-# Nota su cosa si perde comunque: il transcript **visibile** (``.jenny/webui/``)
+# Nota su cosa si perde comunque: il transcript **visibile** (``.jafta/webui/``)
 # non viene toccato dalla compattazione, che riscrive ``sessions/``. L'amnesia è
 # dell'agente, non del registro: una persona può ancora rileggere.
 
@@ -345,8 +345,8 @@ def test_the_knob_reaches_autocompact_from_the_config() -> None:
     accendere in ``config.json`` senza che cambi niente."""
     import inspect
 
-    from jenny.agent.loop import AgentLoop
-    from jenny.config.schema import AgentDefaults
+    from jafta.agent.loop import AgentLoop
+    from jafta.config.schema import AgentDefaults
 
     assert AgentDefaults().compact_projects_when_idle is False
     source = inspect.getsource(AgentLoop)

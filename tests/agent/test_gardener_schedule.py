@@ -28,10 +28,10 @@ from types import SimpleNamespace
 import pytest
 from loguru import logger
 
-from jenny.agent import gardener_schedule as mod
-from jenny.agent.gardener import MAP_TARGET_CHARS
-from jenny.agent.gardener_schedule import pick_project
-from jenny.agent.gardener_state import GardenerState, write_state
+from jafta.agent import gardener_schedule as mod
+from jafta.agent.gardener import MAP_TARGET_CHARS
+from jafta.agent.gardener_schedule import pick_project
+from jafta.agent.gardener_state import GardenerState, write_state
 
 _NOW = datetime(2026, 8, 23, 21, 0, 0)
 
@@ -273,7 +273,7 @@ def test_the_journal_is_not_even_opened_when_a_cheaper_gate_is_shut(tmp_path, mo
         cursor={}, last_run_at=(_NOW - timedelta(minutes=10)).isoformat()
     ))
     opened: list[str] = []
-    from jenny.agent import gardener_schedule as mod
+    from jafta.agent import gardener_schedule as mod
 
     real = mod.GardenerStore.read_delta
 

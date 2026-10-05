@@ -2,7 +2,7 @@
 
 I test che fissano regole sui sorgenti Android (il Kotlin in CI non gira)
 cercano sottostringhe. Letto grezzo, il file le offre anche nei commenti: la
-correzione ha commentato il cancello di ``JennyBrowserBridge.kt``,
+correzione ha commentato il cancello di ``JaftaBrowserBridge.kt``,
 ha messo ``setSupportZoom(true)`` sotto un commento che diceva ``false``, e i
 test sono rimasti verdi. Era già la regressione di una voce precedente: i test
 nuovi erano tornati a ``read_text``.

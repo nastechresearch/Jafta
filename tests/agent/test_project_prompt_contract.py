@@ -39,10 +39,10 @@ import re
 
 import pytest
 
-from jenny.agent.context import ContextBuilder
-from jenny.agent.memory import MemoryStore
+from jafta.agent.context import ContextBuilder
+from jafta.agent.memory import MemoryStore
 
-SRC = pathlib.Path(__file__).resolve().parents[2] / "jenny"
+SRC = pathlib.Path(__file__).resolve().parents[2] / "jafta"
 
 WORKSPACE_FILE_RULES = ("## Where Produced Files Go", "## Which File a Fact Belongs In")
 
@@ -239,7 +239,7 @@ def test_the_block_stays_small() -> None:
     token per turno di progetto, ed è il prezzo di non archiviare la famiglia di
     qualcuno sotto un progetto di lavoro.
     """
-    from jenny.utils.prompt_templates import render_template
+    from jafta.utils.prompt_templates import render_template
 
     # ``capture=True`` **è la modifica del 25/08**, e senza di essa questo test
     # non misurava quel che dice di misurare. In Jinja una variabile non definita
@@ -424,7 +424,7 @@ def test_the_subagent_gets_the_layout_but_not_the_capture_rule() -> None:
     Un file solo con una condizione, non due template: il layout è la stessa
     verità per tutti e due, e due copie divergerebbero al primo cambio.
     """
-    from jenny.utils.prompt_templates import render_template
+    from jafta.utils.prompt_templates import render_template
 
     args = {"project_path": "/w/wikis/x"}
     con = render_template("agent/project.md", capture=True, **args)
@@ -524,7 +524,7 @@ def test_a_long_map_is_cut_and_says_so(tmp_path) -> None:
     non la norma: una mappa oltre soglia sta assorbendo contenuto che spetta alle
     pagine, e il lint (T5) lo dirà.
     """
-    from jenny.agent.context import _PROJECT_MAP_MAX_CHARS
+    from jafta.agent.context import _PROJECT_MAP_MAX_CHARS
 
     long_map = "# Casa\n\n" + "\n".join(f"- riga {i}" for i in range(2000))
     assert len(long_map) > _PROJECT_MAP_MAX_CHARS
@@ -564,7 +564,7 @@ def test_a_cut_map_keeps_the_page_list_and_not_the_first_paragraph(tmp_path) -> 
     tetto di 2.000 — quindi si tornerebbe a tagliare e si perderebbe metà indice.
     Nemmeno testa+coda regge: là i link stanno nel mezzo.
     """
-    from jenny.agent.context import _PROJECT_MAP_MAX_CHARS
+    from jafta.agent.context import _PROJECT_MAP_MAX_CHARS
 
     long_map = _map_with_links_at_the_bottom(30)
     assert len(long_map) > _PROJECT_MAP_MAX_CHARS
@@ -594,7 +594,7 @@ def test_an_index_too_long_for_the_ceiling_says_how_many_it_left_out(tmp_path) -
     nomina 64 pagine con percorsi lunghi, e l'elenco completo sfonda il tetto da
     solo — si tiene quel che entra e si dice **quante** mancano. Un elenco tagliato
     zitto si legge come «sono tutte»."""
-    from jenny.agent.context import _PROJECT_MAP_MAX_CHARS, _map_page_targets
+    from jafta.agent.context import _PROJECT_MAP_MAX_CHARS, _map_page_targets
 
     long_map = _map_with_links_at_the_bottom(400)
     project = _wiki_with_map(tmp_path, "casa", long_map)
@@ -656,7 +656,7 @@ def test_the_render_of_one_map_is_byte_stable(tmp_path) -> None:
 
     script = (
         "import pathlib, sys;"
-        "from jenny.agent.context import ContextBuilder;"
+        "from jafta.agent.context import ContextBuilder;"
         f"sys.stdout.write(ContextBuilder(pathlib.Path({str(tmp_path)!r}))"
         f"._read_project_map(pathlib.Path({str(project)!r})))"
     )
@@ -834,7 +834,7 @@ def test_long_term_memory_does_not_travel_into_a_project(tmp_path) -> None:
     cioè sono «dove altro lavori», e un fatto che serve a un progetto ha già una
     casa: la wiki di quel progetto.
 
-    «Jenny non è più Jenny» — la ragione con cui questa asserzione stava al
+    «Jafta non è più Jafta» — la ragione con cui questa asserzione stava al
     contrario — resta vera e resta coperta: sono ``SOUL.md`` e ``USER.md``, che
     passano da ``_IDENTITY_FILES`` e questo cancello non li tocca
     (``test_project_boundary_end_to_end.py``).
@@ -877,7 +877,7 @@ def test_the_personal_chat_still_gets_the_whole_long_term_memory(tmp_path) -> No
 
 
 def test_the_subagent_inside_a_wiki_gets_the_same_block(tmp_path) -> None:
-    from jenny.utils.prompt_templates import render_template
+    from jafta.utils.prompt_templates import render_template
 
     root = tmp_path
     project = _wiki(root, "etna-guide")
@@ -901,7 +901,7 @@ def test_the_subagent_inside_a_wiki_gets_the_same_block(tmp_path) -> None:
 
 
 def test_the_subagent_outside_a_wiki_keeps_the_workspace_rules(tmp_path) -> None:
-    from jenny.utils.prompt_templates import render_template
+    from jafta.utils.prompt_templates import render_template
 
     root = tmp_path
     prompt = render_template(
@@ -929,8 +929,8 @@ def test_no_other_system_prompt_describes_the_wiki_layout() -> None:
     ``tool_contract.md`` e ``subagent_system.md`` portavano la stessa frase
     sull'``output/`` parola per parola.
     """
-    from jenny.utils.android_assets import _SYSTEM_PROMPT_TEMPLATES
-    from jenny.utils.helpers import load_bundled_template
+    from jafta.utils.android_assets import _SYSTEM_PROMPT_TEMPLATES
+    from jafta.utils.helpers import load_bundled_template
 
     layout = ("wiki/concepts/", "raw/refs/", "outputs/queries/", "audit/resolved/")
     for name in _SYSTEM_PROMPT_TEMPLATES:
@@ -957,7 +957,7 @@ def test_a_wiki_still_on_the_old_filename_is_mute_until_the_migration(tmp_path) 
     file sono due nomi da tenere allineati in ognuno dei quattro lettori.
 
     Il prezzo, dichiarato: una wiki copiata da un'installazione vecchia *mentre
-    Jenny gira* ha le sue istruzioni invisibili fino al riavvio successivo — che
+    Jafta gira* ha le sue istruzioni invisibili fino al riavvio successivo — che
     è quando la migrazione la rinomina. Piccola, e si chiude da sé.
     """
     root = tmp_path
@@ -980,7 +980,7 @@ def test_the_migration_makes_that_same_wiki_speak(tmp_path) -> None:
 
     Senza questa, il 7.5 avrebbe solo tolto una capacità.
     """
-    from jenny.utils.wiki_migration import migrate_wikis
+    from jafta.utils.wiki_migration import migrate_wikis
 
     root = tmp_path
     project = _wiki(root, "andes-trek")
@@ -1039,7 +1039,7 @@ def test_the_installation_root_never_looks_for_the_old_name(tmp_path) -> None:
     istruzioni del workspace.
     """
     root = tmp_path
-    (root / "CLAUDE.md").write_text("istruzioni di un repo, non di Jenny\n", encoding="utf-8")
+    (root / "CLAUDE.md").write_text("istruzioni di un repo, non di Jafta\n", encoding="utf-8")
     prompt = ContextBuilder(root).build_system_prompt(session_key="unified:default")
 
     assert "istruzioni di un repo" not in prompt
@@ -1208,7 +1208,7 @@ def test_a_page_with_nothing_to_escape_is_fenced_exactly_as_before(tmp_path) -> 
 )
 def test_the_fence_is_one_longer_than_the_longest_run(text: str, expected: int) -> None:
     """La tabella del confine, che i due test sopra esercitano solo agli estremi."""
-    from jenny.agent.context import _fence_for
+    from jafta.agent.context import _fence_for
 
     assert _fence_for(text) == "`" * expected
 
@@ -1235,7 +1235,7 @@ def test_no_page_is_cut_in_half(tmp_path) -> None:
     assente — che la mappa segnala comunque. Oltre il tetto la pagina si salta
     intera; quella che entra entra tutta, e il pezzo che *non* entra non compare
     da nessuna parte."""
-    from jenny.agent.context import _PROJECT_PAGES_MAX_CHARS
+    from jafta.agent.context import _PROJECT_PAGES_MAX_CHARS
 
     # Tre pagine da un quarto di tetto ciascuna: la quarta non ci sta più, e il
     # suo inizio non deve comparire come coda della terza.
@@ -1261,7 +1261,7 @@ def test_a_first_page_over_the_cap_is_skipped_not_swallowed(tmp_path) -> None:
     Saltata, non troncata: mezza pagina resta peggio di una pagina assente. Ma le
     *altre* devono arrivare, ed è per questo che sopra il tetto si salta e si
     continua invece di fermarsi."""
-    from jenny.agent.context import _PROJECT_PAGES_MAX_CHARS
+    from jafta.agent.context import _PROJECT_PAGES_MAX_CHARS
 
     huge = "# Grande\n\n" + ("parola " * 3000)
     assert len(huge) > _PROJECT_PAGES_MAX_CHARS
@@ -1305,7 +1305,7 @@ def test_an_unreadable_page_is_counted_among_the_ones_left_out(tmp_path) -> None
 
 
 def test_the_pages_left_out_are_declared(tmp_path) -> None:
-    from jenny.agent.context import _PROJECT_PAGES_MAX_CHARS
+    from jafta.agent.context import _PROJECT_PAGES_MAX_CHARS
 
     pages = {f"p{i:02d}.md": f"# P{i}\n\n" + ("x" * 1000) for i in range(12)}
     prompt = _pages_prompt(tmp_path, pages)
@@ -1449,7 +1449,7 @@ def test_the_two_numbers_come_from_the_disk_not_from_the_turn(tmp_path) -> None:
     E devono **tornare con l'avviso di T3.2**: quello dice quante sono rimaste
     fuori, questo quante sono dentro, e se i due non sommano al totale il blocco
     mente due volte."""
-    from jenny.agent.context import _pages_left_out_notice
+    from jafta.agent.context import _pages_left_out_notice
 
     pages = {f"p{i:02d}.md": f"# P{i}\n\n" + ("x" * 1000) for i in range(12)}
     project = _wiki_with_pages(tmp_path, "casa", pages)
@@ -1490,7 +1490,7 @@ def test_the_pages_never_exceed_their_own_cap(tmp_path, size: int) -> None:
     il recinto di ogni blocco, il ``\\n\\n`` fra i blocchi e l'avviso finale: sono
     tutti caratteri che il turno paga, e contare il solo testo delle pagine li
     regalava. Con pagine minuscole il recinto *è* il costo."""
-    from jenny.agent.context import _PROJECT_PAGES_MAX_CHARS
+    from jafta.agent.context import _PROJECT_PAGES_MAX_CHARS
 
     # Abbastanza pagine per sfondare il tetto a qualunque taglia.
     project = _many_pages(tmp_path, size, count=(_PROJECT_PAGES_MAX_CHARS // size) + 50)
@@ -1509,7 +1509,7 @@ def test_the_injected_block_has_a_ceiling_too(tmp_path, size: int) -> None:
     dice niente sul costo vero: quel che si paga a ogni turno è prosa + mappa +
     pagine. Questo lo pinna, così nessuno alza i due tetti senza accorgersene.
     """
-    from jenny.agent.context import _PROJECT_MAP_MAX_CHARS, _PROJECT_PAGES_MAX_CHARS
+    from jafta.agent.context import _PROJECT_MAP_MAX_CHARS, _PROJECT_PAGES_MAX_CHARS
 
     # Si misura la **differenza** fra un progetto pieno e uno vuoto: una fetta di
     # stringa dal titolo del blocco arriverebbe alla fine del prompt intero e
@@ -1739,7 +1739,7 @@ def test_the_order_is_byte_stable_across_processes(tmp_path) -> None:
 
     script = (
         "import pathlib, sys;"
-        "from jenny.agent.context import ContextBuilder;"
+        "from jafta.agent.context import ContextBuilder;"
         f"sys.stdout.write(ContextBuilder(pathlib.Path({str(tmp_path)!r}))"
         f"._read_project_pages(pathlib.Path({str(project)!r})).text)"
     )
@@ -1868,7 +1868,7 @@ def test_the_block_does_not_depend_on_the_page_titles(tmp_path) -> None:
     lo dice — ed è l'unico posto che lo direbbe, perché il costo è invisibile
     all'output.
     """
-    from jenny.utils import wiki_paths
+    from jafta.utils import wiki_paths
 
     pages = {
         "furgone.md": "---\ntitle: Il Furgone\n---\n\n# Furgone\n\nDucato 2011.",
@@ -1901,7 +1901,7 @@ def test_a_page_that_cannot_fit_at_all_is_not_opened(tmp_path) -> None:
     pagina scartata perché troppo grossa non consuma budget. Sulle wiki vere
     tocca 2 casi su 11.
     """
-    from jenny.agent.context import _PROJECT_PAGES_MAX_CHARS as CAP
+    from jafta.agent.context import _PROJECT_PAGES_MAX_CHARS as CAP
 
     rel_a, rel_b = "grande-a.md", "grande-b.md"
     len_a = CAP // 2
@@ -1920,7 +1920,7 @@ def test_a_page_that_cannot_fit_at_all_is_not_opened(tmp_path) -> None:
         f"le 20 pagine minuscole non potevano entrare e sono state aperte: {opened}"
     )
     # E il conto che il blocco dichiara è quello vero, saltate comprese.
-    from jenny.agent.context import _pages_left_out_notice
+    from jafta.agent.context import _pages_left_out_notice
 
     counted = ContextBuilder(tmp_path)._read_project_pages(project)
     assert counted.total == 22

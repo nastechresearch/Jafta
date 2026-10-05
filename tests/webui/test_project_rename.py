@@ -1,4 +1,4 @@
-"""Rinominare un quaderno da Jenny: la cartella, la chat, le pagine in casa.
+"""Rinominare un quaderno da Jafta: la cartella, la chat, le pagine in casa.
 
 La meta' *all'indietro* c'era gia' — una wiki rinominata a mano, e la chat che
 al turno dopo la ritrova per id (`session/project_rename.py`) — e ha i suoi
@@ -19,9 +19,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from jenny.session.project_rename import pending_project_renames
-from jenny.session.project_traces import describe_project_traces, project_trace_paths
-from jenny.webui.project_rename import ProjectRenameError, rename_project
+from jafta.session.project_rename import pending_project_renames
+from jafta.session.project_traces import describe_project_traces, project_trace_paths
+from jafta.webui.project_rename import ProjectRenameError, rename_project
 
 OLD = "viaggio"
 NEW = "viaggi"
@@ -35,7 +35,7 @@ def _ensure(path: Path) -> Path:
 @pytest.fixture
 def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setattr(
-        "jenny.config.paths.get_webui_dir", lambda: _ensure(tmp_path / ".jenny" / "webui")
+        "jafta.config.paths.get_webui_dir", lambda: _ensure(tmp_path / ".jafta" / "webui")
     )
     return tmp_path
 
@@ -121,7 +121,7 @@ def test_a_look_after_the_rename_does_not_resurrect_the_old_chat(workspace) -> N
     leggerne i metadati, e la sessione vuota torna in cache. Lo spegnimento
     ordinato (``flush_all``) la scriveva: ``project_<vecchio>.jsonl`` risorgeva
     orfano, e il rinomino all'indietro veniva rifiutato con ``name_taken``."""
-    from jenny.session.manager import SessionManager
+    from jafta.session.manager import SessionManager
 
     _notebook(workspace, OLD, con_chat=False)
     sessions = SessionManager(workspace)
@@ -236,7 +236,7 @@ def test_the_same_name_is_refused(workspace) -> None:
 def test_a_clean_refusal_to_follow_puts_the_folder_back(workspace, monkeypatch) -> None:
     """Meglio un rinomino non fatto che due meta': la cartella torna al suo
     nome, e la chat — che non si e' mossa — resta con lei."""
-    from jenny.webui import project_rename as module
+    from jafta.webui import project_rename as module
 
     _notebook(workspace, OLD)
     monkeypatch.setattr(
@@ -252,8 +252,8 @@ def test_halfway_is_left_to_the_journal_not_undone(workspace, monkeypatch) -> No
     """A meta' strada qualcosa si e' gia' mosso, ed e' scritto nel giornale: il
     prossimo avvio finisce il lavoro. Disfare la cartella adesso vorrebbe dire
     tracce da una parte e cartella dall'altra — proprio il male da evitare."""
-    from jenny.session import project_rename as follow_up
-    from jenny.webui import project_rename as module
+    from jafta.session import project_rename as follow_up
+    from jafta.webui import project_rename as module
 
     _notebook(workspace, OLD)
 
@@ -272,9 +272,9 @@ def test_halfway_is_left_to_the_journal_not_undone(workspace, monkeypatch) -> No
 
 @pytest.fixture
 def config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    from jenny.config.loader import save_config
-    from jenny.config.schema import Config
-    from jenny.runtime.context import get_runtime_context
+    from jafta.config.loader import save_config
+    from jafta.config.schema import Config
+    from jafta.runtime.context import get_runtime_context
 
     path = tmp_path / "config.json"
     c = Config()
@@ -288,8 +288,8 @@ def _pages(config: Path) -> list[dict]:
 
 
 async def _with_pages(pages: list[dict]) -> None:
-    from jenny.config import store
-    from jenny.config.schema import HomePageConfig
+    from jafta.config import store
+    from jafta.config.schema import HomePageConfig
 
     def _put(c):
         c.home.pages = [HomePageConfig(**p) for p in pages]
@@ -299,8 +299,8 @@ async def _with_pages(pages: list[dict]) -> None:
 
 
 async def test_a_pinned_notebook_page_follows_the_new_name(workspace, config, monkeypatch) -> None:
-    from jenny.webui import commands
-    from jenny.webui import project_rename as module
+    from jafta.webui import commands
+    from jafta.webui import project_rename as module
 
     monkeypatch.setattr(module, "rename_project", lambda **kw: {"new_name": kw["new_name"]})
     await _with_pages([
@@ -320,9 +320,9 @@ async def test_a_pinned_notebook_page_follows_the_new_name(workspace, config, mo
 
 
 async def test_a_refused_rename_leaves_the_pages_alone(workspace, config, monkeypatch) -> None:
-    from jenny.webui import commands
-    from jenny.webui import project_rename as module
-    from jenny.webui.commands import CommandError
+    from jafta.webui import commands
+    from jafta.webui import project_rename as module
+    from jafta.webui.commands import CommandError
 
     def _refuses(**kw):
         raise module.ProjectRenameError("a folder named viaggi already exists")
@@ -337,8 +337,8 @@ async def test_a_refused_rename_leaves_the_pages_alone(workspace, config, monkey
 
 
 async def test_the_command_refuses_a_bad_name_before_any_thread(workspace, config) -> None:
-    from jenny.webui import commands
-    from jenny.webui.commands import CommandError
+    from jafta.webui import commands
+    from jafta.webui.commands import CommandError
 
     ctx = SimpleNamespace(get_workspace_root=lambda: workspace, invalidate_session=lambda k: None,
                           busy_session_keys=lambda: ())
@@ -353,9 +353,9 @@ async def test_the_command_refuses_while_a_turn_is_running_there(
     """Un turno in volo ha la sessione in mano: sgomberare la cache non lo ferma,
     e a fine turno la salverebbe sotto il nome vecchio — una chat senza cartella
     accanto a quella spostata. Si rifiuta **prima** di toccare qualunque cosa."""
-    from jenny.webui import commands
-    from jenny.webui import project_rename as module
-    from jenny.webui.commands import CommandError
+    from jafta.webui import commands
+    from jafta.webui import project_rename as module
+    from jafta.webui.commands import CommandError
 
     touched: list[str] = []
     monkeypatch.setattr(module, "rename_project", lambda **kw: touched.append("rename"))
@@ -383,8 +383,8 @@ async def test_the_expected_refusals_carry_their_own_code(
 ) -> None:
     """Il client dice questi rifiuti nella sua lingua, e per farlo gli serve
     il codice, non il testo inglese del server."""
-    from jenny.webui import commands
-    from jenny.webui.commands import CommandError
+    from jafta.webui import commands
+    from jafta.webui.commands import CommandError
 
     for name in prepare:
         _notebook(workspace, name)
@@ -396,14 +396,14 @@ async def test_the_expected_refusals_carry_their_own_code(
 
 
 def test_the_command_is_registered() -> None:
-    from jenny.webui.commands import COMMANDS, project_rename
+    from jafta.webui.commands import COMMANDS, project_rename
 
     assert COMMANDS["project.rename"] is project_rename
 
 
 def test_the_interrupted_turn_journal_follows_the_rename(workspace) -> None:
     """Il diario del turno in corso segue la sessione come le altre tracce."""
-    from jenny.session.manager import SessionManager
+    from jafta.session.manager import SessionManager
 
     _notebook(workspace, OLD)
     sessions = SessionManager(workspace)

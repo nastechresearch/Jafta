@@ -1,18 +1,18 @@
 # Tool reference
 
-Every capability Jenny can invoke on its own — files, code execution, web, device sensors, scheduling, self-diagnosis and app updates, and whatever your Jenny Apps expose — documented tool by tool.
+Every capability Jafta can invoke on its own — files, code execution, web, device sensors, scheduling, self-diagnosis and app updates, and whatever your Jafta Apps expose — documented tool by tool.
 
 ## The list is dynamic
 
-There is no fixed tool count. What Jenny actually has available in a given conversation depends on:
+There is no fixed tool count. What Jafta actually has available in a given conversation depends on:
 
 - **Config toggles** — most tools can be disabled in `workspace/config.json` (Location and SSH also from the workshop's Hands drawer; see the table at the end of this page).
 - **The runtime platform** — `web_search`, `web_fetch` and `get_location` only register when an Android context is available (they are backed by Android-only bridges: a hidden WebView and the location bridge). On any other platform they simply do not exist. `ui_view` registers whenever a WebUI query service is present rather than on a platform check, and `download_file` has no platform gate at all.
-- **Installed Jenny Apps** — every app under `workspace/apps/` contributes one tool per declared action, re-synced every turn.
+- **Installed Jafta Apps** — every app under `workspace/apps/` contributes one tool per declared action, re-synced every turn.
 
 - **The agent's scope** — the main agent loads either the `orchestrator` scope (default, see `agents.defaults.orchestratorMode`) or the historical `core` scope; a subagent loads the `subagent` scope, narrowed further by its agent type. The four SSH tools sit in a scope of their own, `remote`, which **no** agent loads by default — only the `sysadmin` subagent type asks for it. The same install therefore exposes different tools to the orchestrator, to a `sysadmin` subagent, and to every other subagent.
 
-A conversation agent can draw on **42** named built-in tools: 41 registered through the standard loader (`jenny/agent/tools/loader.py`, which imports 23 modules — `self.py` among them, with an empty `TOOLS` list) plus `my`, which is registered by hand in `jenny/agent/loop.py` because it needs a live reference to the running agent loop. Two more tool classes are built outside the loader too, so the loader's module list is not a complete inventory of the tool surface: `memory` (`MemoryEntryTool` in `memory_entries.py`), which needs the memory store and is given only to Dream's own runs (see [The internal registry: Dream](#the-internal-registry-dream)), and `AppActionTool` (`app_actions.py`), instantiated once per declared app action and re-synced every turn. No single agent sees all 42 at once — see the scope note above. Add to that N dynamic app tools. If you ask Jenny to list its tools, expect the number to vary between installs.
+A conversation agent can draw on **42** named built-in tools: 41 registered through the standard loader (`jafta/agent/tools/loader.py`, which imports 23 modules — `self.py` among them, with an empty `TOOLS` list) plus `my`, which is registered by hand in `jafta/agent/loop.py` because it needs a live reference to the running agent loop. Two more tool classes are built outside the loader too, so the loader's module list is not a complete inventory of the tool surface: `memory` (`MemoryEntryTool` in `memory_entries.py`), which needs the memory store and is given only to Dream's own runs (see [The internal registry: Dream](#the-internal-registry-dream)), and `AppActionTool` (`app_actions.py`), instantiated once per declared app action and re-synced every turn. No single agent sees all 42 at once — see the scope note above. Add to that N dynamic app tools. If you ask Jafta to list its tools, expect the number to vary between installs.
 
 Below, tools are grouped into ten categories. Each entry gives the exact tool name the model calls, what it does for you in practice, the parameters worth knowing, hard numeric limits, the config toggle that controls it, and any gotcha worth knowing before you rely on it.
 
@@ -24,7 +24,7 @@ Fifteen of the tools below are marked **subagent-only**. The config toggle on th
 
 ## 1. Files and workspace
 
-All seven tools in this group share the same access boundary — which is not the same as all seven being available to the same agent. With `security.restrictToWorkspace` at its default of `true`, every read and write any of them performs is confined to the workspace, plus `skills/`, the media directory, and — if `tools.file.exposePackageSource` is on (default `true`) — a read-only view of Jenny's own source code.
+All seven tools in this group share the same access boundary — which is not the same as all seven being available to the same agent. With `security.restrictToWorkspace` at its default of `true`, every read and write any of them performs is confined to the workspace, plus `skills/`, the media directory, and — if `tools.file.exposePackageSource` is on (default `true`) — a read-only view of Jafta's own source code.
 
 Who holds which, in the default configuration: the orchestrator gets `read_file`, `list_dir` and a reduced `grep`. `write_file`, `edit_file`, `apply_patch` and `find_files` are **subagent-only**.
 
@@ -52,7 +52,7 @@ Config: `tools.file.enable` (default `true`). Gotcha: CRLF line endings are norm
 
 Creates a new file, or **replaces an existing one entirely** with the given content. Parent directories are created automatically.
 
-There is no confirmation prompt and no undo built into the tool. If Jenny overwrites something you wanted to keep, the only way back is the workspace's automatic snapshot system (see the Backup and restore page) — `write_file` itself keeps no history.
+There is no confirmation prompt and no undo built into the tool. If Jafta overwrites something you wanted to keep, the only way back is the workspace's automatic snapshot system (see the Backup and restore page) — `write_file` itself keeps no history.
 
 Config: `tools.file.enable` (default `true`). **Subagent-only** in the default orchestrator mode.
 
@@ -253,7 +253,7 @@ Config: `tools.location.enable` (default `true`), `tools.location.telegramTtlS` 
 
 ### ui_view
 
-A **pull** model for letting Jenny see the screen: there is no ambient screen access. Jenny sees the current view only at the exact moment it calls this tool, which queries the connected WebUI client for the active view's HTML (chat, wiki, workspace, apps, settings, graph) and, if a Jenny App is open, that app's HTML too.
+A **pull** model for letting Jafta see the screen: there is no ambient screen access. Jafta sees the current view only at the exact moment it calls this tool, which queries the connected WebUI client for the active view's HTML (chat, wiki, workspace, apps, settings, graph) and, if a Jafta App is open, that app's HTML too.
 
 - No parameters.
 - Only works while the WebUI is attached in the foreground for that turn. From Telegram, from a cron-triggered turn, or with the app backgrounded/screen off, it either fails immediately (no client attached) or times out after ~6 seconds — **this is by design, not a bug**. In both failure cases the tool's own error message tells the model to just ask the user what they see instead of retrying.
@@ -302,8 +302,8 @@ Gotcha: **there is no TTY and no stdin.** An interactive command doesn't prompt,
 
 Long remote commands, detached from the connection. Actions: `start`, `poll`, `stop`, `list`.
 
-- `start` launches the command with `nohup` writing to a log file on the server (`<jobLogDir>/<job_id>.log`, default `jobLogDir` is `/tmp/jenny-jobs`), records the remote pid, and returns a `job_id` immediately. The exit code is written to a sibling `.rc` file, because by the time anyone polls, the process no longer exists to be asked.
-- `poll` returns **only the output produced since the previous poll**, plus liveness and the exit code once there is one. The byte cursor is kept by Jenny — never by the model — and it is persisted, so it survives context compaction, a gateway restart, and days of elapsed time. If the log was rotated or truncated under it, the cursor resets to 0 rather than reading garbage.
+- `start` launches the command with `nohup` writing to a log file on the server (`<jobLogDir>/<job_id>.log`, default `jobLogDir` is `/tmp/jafta-jobs`), records the remote pid, and returns a `job_id` immediately. The exit code is written to a sibling `.rc` file, because by the time anyone polls, the process no longer exists to be asked.
+- `poll` returns **only the output produced since the previous poll**, plus liveness and the exit code once there is one. The byte cursor is kept by Jafta — never by the model — and it is persisted, so it survives context compaction, a gateway restart, and days of elapsed time. If the log was rotated or truncated under it, the cursor resets to 0 rather than reading garbage.
 - `stop` sends SIGTERM to the process's children and then to the process itself. Best-effort by construction: a deep process tree or a program that ignores SIGTERM survives, and only a subsequent `poll` says what really happened.
 - `list` is answered from the local registry with **no connection at all**, so pending jobs stay readable when the host is unreachable or its key has changed.
 - Parameters: `host`, `action`, `command` (required for `start`) and `job_id` (required for `poll` and `stop`).
@@ -314,7 +314,7 @@ Statuses are four, and the fourth matters: `running`, `finished` (with an exit c
 |---|---|
 | Bytes returned per poll | `maxOutputChars` (default 10,000) |
 | Jobs kept in the registry | 100, pruning finished ones only — running jobs are never pruned |
-| Registry location | `<workspace>/.jenny/ssh_jobs/jobs.json` |
+| Registry location | `<workspace>/.jafta/ssh_jobs/jobs.json` |
 
 Config: `tools.ssh.commandTimeoutS` (applies to the short launch/poll/stop commands, not to the job itself — the job has no timeout), `tools.ssh.maxOutputChars`, per-host `jobLogDir`.
 
@@ -338,7 +338,7 @@ Config: `tools.ssh.maxTransferBytes`, `security.restrictToWorkspace` (the local 
 
 Schedules reminders and recurring work. Actions: `add`, `list`, `remove`.
 
-- `add` requires a `message` (the instruction Jenny executes when the job fires) plus **exactly one** of three schedule kinds:
+- `add` requires a `message` (the instruction Jafta executes when the job fires) plus **exactly one** of three schedule kinds:
   - `every_seconds` — recurring interval.
   - `cron_expr` — a cron expression (`"0 9 * * *"`), optionally with an explicit `tz` (IANA name). `tz` is **only** accepted alongside `cron_expr` — passing it with `every_seconds` or `at` is an error.
   - `at` — a one-shot ISO datetime; the job auto-deletes itself after it fires.
@@ -351,14 +351,14 @@ Schedules reminders and recurring work. Actions: `add`, `list`, `remove`.
   - A monitor still costs a full turn every cycle even when it says nothing. Silence saves the notification, not the tokens.
   - The mode is fixed at creation: to change it, remove the job and create it again.
 - `remove` needs a `job_id` from `list`.
-- `list` also shows a job the user paused from the workshop (Hands), marked as paused since a given time, so Jenny does not recreate it; a job that simply ran out (a fired `at`) is left out.
+- `list` also shows a job the user paused from the workshop (Hands), marked as paused since a given time, so Jafta does not recreate it; a job that simply ran out (a fired `at`) is left out.
 - System-managed jobs show up in `list` for transparency but are **protected** — removal is refused with an explanation, not silently ignored. `list` prints the purpose of each next to it: `dream` (memory consolidation), `heartbeat` (checks `HEARTBEAT.md` for tasks you left), the [gardener](../using/gardener.md) and the update check. Each is registered only if its own config enables it — `agents.defaults.dream.enabled`, `agents.defaults.gardener.enabled`, `gateway.heartbeat.enabled`, `updates.enabled` — so a disabled one is absent from `list` rather than present and idle.
 - Jobs cannot be created from inside another cron job's own execution (no self-scheduling chains).
-- **`cron` is closed inside a notebook conversation, in all three directions** — `add`, `list` and `remove` all return a refusal that tells Jenny to ask again in the personal chat, where reminders are also delivered. It is closed on a read-only turn too, wherever that turn happens.
+- **`cron` is closed inside a notebook conversation, in all three directions** — `add`, `list` and `remove` all return a refusal that tells Jafta to ask again in the personal chat, where reminders are also delivered. It is closed on a read-only turn too, wherever that turn happens.
 
 Config: no direct user toggle; the default timezone comes from the device/config, not a tool setting.
 
-Gotcha: seeing `dream`, `gardener` and `heartbeat` in the list is expected, not a sign of something wrong — they are Jenny's own periodic jobs, meant to be visible but not removable. To stop one, turn it off in config; there is no way to delete it from the job list.
+Gotcha: seeing `dream`, `gardener` and `heartbeat` in the list is expected, not a sign of something wrong — they are Jafta's own periodic jobs, meant to be visible but not removable. To stop one, turn it off in config; there is no way to delete it from the job list.
 
 ### spawn
 
@@ -440,7 +440,7 @@ Gotcha: if the model uses `message` instead of a normal reply for the current co
 
 ### nothing_to_report
 
-The counterpart to `message` on a silent scheduled run (Heartbeat, a monitor reminder, or the turn where a subagent's result comes back to one of them). On those turns Jenny's written answer is delivered nowhere, so `message` is the only way to reach you — which made "I have nothing to say" the *absence* of an action, and small models express that by sending a message with a placeholder in it. Real examples that reached the chat before this tool existed: `silent`, `noop`, `placeholder`, an Italian "all fine" line, and two empty bubbles.
+The counterpart to `message` on a silent scheduled run (Heartbeat, a monitor reminder, or the turn where a subagent's result comes back to one of them). On those turns Jafta's written answer is delivered nowhere, so `message` is the only way to reach you — which made "I have nothing to say" the *absence* of an action, and small models express that by sending a message with a placeholder in it. Real examples that reached the chat before this tool existed: `silent`, `noop`, `placeholder`, an Italian "all fine" line, and two empty bubbles.
 
 - `task` is optional: the number of the check being declared, as listed in that run's prompt. One call per number.
 - Nothing is delivered and no notification is raised. A run that calls it is still recorded as `silenced`, exactly like one that said nothing at all.
@@ -455,11 +455,11 @@ Gotcha: it is not a way to report a check that *failed*. A check that could not 
 
 ## 7. Self-diagnosis and updates
 
-`my`, `get_source` and `get_recent_logs` let Jenny look at her own runtime; `update_status` and `install_update`, at the end of this section, deal with the app itself.
+`my`, `get_source` and `get_recent_logs` let Jafta look at her own runtime; `update_status` and `install_update`, at the end of this section, deal with the app itself.
 
 ### my
 
-The tool Jenny uses to check — and, if allowed, change — its own runtime state.
+The tool Jafta uses to check — and, if allowed, change — its own runtime state.
 
 - `check` with no key gives a full overview: model, `max_iterations`, `context_window_tokens`, token usage, workspace, active subagents. `check` with a dot-path key (e.g. `_last_usage.prompt_tokens`, `android_web_config.enable`) drills into one value.
 - `set` is **disabled by default** (`tools.my.allowSet=false` — the only tool toggle whose default is restrictive rather than permissive). When enabled, it only allows changing whitelisted keys: `max_iterations` (1–100), `context_window_tokens` (4096–1,000,000), `model`, `model_preset` — plus a free-form scratchpad (up to 64 JSON-safe keys) for notes the agent wants to keep across turns.
@@ -467,23 +467,23 @@ The tool Jenny uses to check — and, if allowed, change — its own runtime sta
 
 Config: `tools.my.enable` (default `true`), `tools.my.allowSet` (default `false`).
 
-Gotcha: the scratchpad is **not** long-term memory — it's wiped on every app restart. If you want Jenny to remember something across restarts, that's what Dream/MEMORY.md is for, not this tool's scratchpad.
+Gotcha: the scratchpad is **not** long-term memory — it's wiped on every app restart. If you want Jafta to remember something across restarts, that's what Dream/MEMORY.md is for, not this tool's scratchpad.
 
 ### get_source
 
-Returns the source code of Jenny's own package, by dotted path (e.g. `jenny.agent.tools.android_web._looks_like_captcha`).
+Returns the source code of Jafta's own package, by dotted path (e.g. `jafta.agent.tools.android_web._looks_like_captcha`).
 
-- Read-only, and restricted to the `jenny` package itself — anything else is refused.
+- Read-only, and restricted to the `jafta` package itself — anything else is refused.
 - Output capped at 50,000 characters.
 - On packaged (no-`.py`) builds it falls back to reading from the extracted source-asset tree instead of `inspect.getsource`.
 
-Config: `tools.introspect.enable` (default `true`). This is how Jenny self-diagnoses ("why does web_search keep failing?") without guessing from bytecode; it does not let Jenny modify its own code.
+Config: `tools.introspect.enable` (default `true`). This is how Jafta self-diagnoses ("why does web_search keep failing?") without guessing from bytecode; it does not let Jafta modify its own code.
 
 ### get_recent_logs
 
 Reads recent runtime log lines (DEBUG and above) from an in-memory ring buffer.
 
-- On Android, loguru's normal output goes to Logcat, which is unreachable without `adb` — this tool is the only way Jenny (and you, through it) can see why something failed at runtime.
+- On Android, loguru's normal output goes to Logcat, which is unreachable without `adb` — this tool is the only way Jafta (and you, through it) can see why something failed at runtime.
 - `module_filter` narrows by substring (e.g. `"android_web"`); `count` defaults to 50, max 200.
 
 | Limit | Value |
@@ -492,11 +492,11 @@ Reads recent runtime log lines (DEBUG and above) from an in-memory ring buffer.
 | Default count returned | 50 |
 | Max count | 200 |
 
-Config: `tools.diagnostics.enable` (default `true`). Gotcha: the buffer **empties on every app restart** — asking Jenny to "check its logs" only works for things that happened since the app last started. This is the recommended first troubleshooting step for a failing tool. Note also that log lines can contain URLs visited and file names — worth knowing before pasting logs into a screenshot or bug report.
+Config: `tools.diagnostics.enable` (default `true`). Gotcha: the buffer **empties on every app restart** — asking Jafta to "check its logs" only works for things that happened since the app last started. This is the recommended first troubleshooting step for a failing tool. Note also that log lines can contain URLs visited and file names — worth knowing before pasting logs into a screenshot or bug report.
 
 ### update_status
 
-Reports whether a newer version of the Jenny app is available for this device, and how far along a started installation is.
+Reports whether a newer version of the Jafta app is available for this device, and how far along a started installation is.
 
 - Reads local state only: **no network call and no side effects**, so it is safe to call whenever you ask "is there an update?". The check that fetches the manifest is the periodic `update_check` job, not this tool (see `updates.*` in [Configuration](configuration.md)).
 - Android-only: it registers only when an Android context is present. Scope `core` + `orchestrator`: the agent you talk to has it, never a subagent.
@@ -505,21 +505,21 @@ Reports whether a newer version of the Jenny app is available for this device, a
 
 Downloads and installs the pending app update on this device.
 
-- **Requires `confirm=true`** — the only parameter, and a call without it is refused. Jenny should set it only after you asked, in this conversation, for the update to be installed now.
-- **Destructive and final.** Android replaces the app and kills the process, so Jenny restarts and the conversation is cut off mid-turn — she does not get to report back. Ask before calling it.
-- Requires the "Install unknown apps" permission for Jenny; without it `PackageInstaller` refuses the session. Android normally still shows its own install prompt (see [Android permissions](android-permissions.md)).
+- **Requires `confirm=true`** — the only parameter, and a call without it is refused. Jafta should set it only after you asked, in this conversation, for the update to be installed now.
+- **Destructive and final.** Android replaces the app and kills the process, so Jafta restarts and the conversation is cut off mid-turn — she does not get to report back. Ask before calling it.
+- Requires the "Install unknown apps" permission for Jafta; without it `PackageInstaller` refuses the session. Android normally still shows its own install prompt (see [Android permissions](android-permissions.md)).
 - Android-only and scoped `core` + `orchestrator`, same as `update_status`; refused on a read-only turn.
 
 ---
 
 ## 8. App tools
 
-Every action declared in an installed Jenny App's `<workspace>/apps/<slug>/app.json` becomes a native tool named `<slug>_<action>` (the slug's hyphens are kept as-is, never normalized, so `my-app` and `my_app` can't collide with each other).
+Every action declared in an installed Jafta App's `<workspace>/apps/<slug>/app.json` becomes a native tool named `<slug>_<action>` (the slug's hyphens are kept as-is, never normalized, so `my-app` and `my_app` can't collide with each other).
 
 - The app-tool set is **re-synced every turn**: editing a manifest makes new/changed tools available on the very next turn, no restart needed.
 - A broken app (invalid manifest) contributes zero tools — it doesn't crash tool loading, it's just silently absent (with a warning in the logs).
 - If an app declares an action name that collides with a built-in tool name, that action is skipped with a warning rather than overriding the built-in.
-- Jenny can act on an app's data through these tools even while the app's own screen is closed — the app UI and the tool layer are independent.
+- Jafta can act on an app's data through these tools even while the app's own screen is closed — the app UI and the tool layer are independent.
 
 See the Mini-apps page for how apps and actions are authored. Config: `apps.enabled` (default `true`, turning it off removes all app tools at once), `apps.httpTimeoutS` (default 20.0, range 1–120 — timeout for an app action's outbound proxy calls), `apps.maxCollectionBytes` (default 5,000,000 — per-collection storage cap).
 
@@ -548,7 +548,7 @@ Searches the verbatim turn-by-turn log of the personal conversation — what was
 Appends one line to the current project's working journal (`raw/journal/<today>.md`).
 
 - Meant for the moment something is said that will still be true next week — a constraint, a decision, a preference, a name, a date.
-- Parameters: `text` (required, one short line, at most 500 characters — a longer one is refused as page material; the timestamp and the leading dash are added for you) and `attribution`, `said` when you stated the fact yourself or `inferred` when Jenny concluded it (default `inferred`). Only a `said` line can later become a decided page.
+- Parameters: `text` (required, one short line, at most 500 characters — a longer one is refused as page material; the timestamp and the leading dash are added for you) and `attribution`, `said` when you stated the fact yourself or `inferred` when Jafta concluded it (default `inferred`). Only a `said` line can later become a decided page.
 - The only tool in this group a subagent also gets (`core`, `orchestrator`, `subagent`), and it has no config toggle: it is always registered.
 
 ---
@@ -591,7 +591,7 @@ Config, under `tools.androidWeb.browser`: `timeout`, `maxSnapshotChars`, `maxRea
 
 Dream does not use the tool loader or any scope above. It builds its own small registry by hand, with the write side narrowed to an explicit list of files, so that a run cannot touch anything it wasn't meant to. (The [gardener](../using/gardener.md) does the same inside one project — see its page.) Nothing here is reachable from a chat turn, and none of it appears in a tool list the model shows you.
 
-**Dream** (`jenny/agent/memory.py::build_dream_tools`) gets five tools on a batch from the personal chat:
+**Dream** (`jafta/agent/memory.py::build_dream_tools`) gets five tools on a batch from the personal chat:
 
 | Tool | What it can touch |
 |---|---|
@@ -617,7 +617,7 @@ The workshop's **Hands** drawer governs exactly two tool settings, and SSH gets 
 | Self-inspection (`my`) | No | `tools.my.enable`, `tools.my.allowSet` |
 | Source introspection (`get_source`) | No | `tools.introspect.enable` |
 | Log access (`get_recent_logs`) | No | `tools.diagnostics.enable` |
-| Jenny Apps / app tools | No | `apps.enabled` (+ `httpTimeoutS`, `maxCollectionBytes`) |
+| Jafta Apps / app tools | No | `apps.enabled` (+ `httpTimeoutS`, `maxCollectionBytes`) |
 | Subagent concurrency | No | `agents.defaults.maxConcurrentSubagents` |
 | Subagent stall threshold | No | `agents.defaults.subagentStallThresholdSeconds` |
 | Orchestrator mode (main agent's toolset) | No | `agents.defaults.orchestratorMode` |
@@ -630,5 +630,5 @@ The SSH switch is **asymmetric**, which is worth knowing before you file a bug: 
 
 Two settings apply across almost every tool in this page, not just one:
 
-- **`security.restrictToWorkspace`** (default `true`) confines file reads/writes (`read_file`, `write_file`, `edit_file`, `apply_patch`, `list_dir`, `find_files`, `grep`), `python_exec`'s file I/O (`open`, `os.open`, pathlib), `ssh_transfer`'s local side, and `message`'s attachment paths to the workspace, plus `skills/`, the media directory, and (if enabled) Jenny's own read-only source tree. Turning it off is an application-level policy change, not an OS sandbox — see the Security model page.
+- **`security.restrictToWorkspace`** (default `true`) confines file reads/writes (`read_file`, `write_file`, `edit_file`, `apply_patch`, `list_dir`, `find_files`, `grep`), `python_exec`'s file I/O (`open`, `os.open`, pathlib), `ssh_transfer`'s local side, and `message`'s attachment paths to the workspace, plus `skills/`, the media directory, and (if enabled) Jafta's own read-only source tree. Turning it off is an application-level policy change, not an OS sandbox — see the Security model page.
 - **`security.ssrfWhitelist`** (default empty list of CIDRs) is checked by every tool that makes outbound network requests on the model's behalf: `web_fetch`, `download_file`, and the `http_get`/`http_post` helpers inside `python_exec`. The SSH tools do **not** need it: they have their own, wider policy that allows private LAN ranges and the CGNAT range Tailscale uses, blocking only loopback and link-local/metadata. An SSH host is typed by you in Settings and host-key pinned by hand, so it needs no whitelist entry — and giving it one here would have opened CGNAT to `web_fetch` too, where the model picks the address. It exists to let you deliberately open specific private-network ranges (a Tailscale CIDR, for example) without disabling the SSRF protection everywhere else. It does **not** apply to LLM provider calls themselves — those are a separate, explicit configuration (see Providers and models).

@@ -25,16 +25,16 @@ from support.gateway_http import make_handler
 from websockets.datastructures import Headers
 from websockets.http11 import Request as WsRequest
 
-from jenny.webui.commands import (
+from jafta.webui.commands import (
     MAX_PROJECT_SEED_CHARS,
     CommandContext,
     CommandError,
     dispatch_command,
 )
-from jenny.webui.workspaces import WebUIWorkspaceController
+from jafta.webui.workspaces import WebUIWorkspaceController
 
 _REPO = Path(__file__).resolve().parents[2]
-_SKILL_SCRIPTS = _REPO / "jenny" / "skills" / "llm-wiki" / "scripts"
+_SKILL_SCRIPTS = _REPO / "jafta" / "skills" / "llm-wiki" / "scripts"
 _AUTH_SECRET = "test-secret"
 
 
@@ -172,7 +172,7 @@ class TestAProjectIsBornComplete:
     async def test_rerunning_it_rewrites_nothing(self, ctx, workspace):
         """Lo scaffolder scrive solo quel che manca: è la regola che rende sicuro
         ripassare su una cartella rimasta a metà."""
-        from jenny.webui.project_scaffold import scaffold_project
+        from jafta.webui.project_scaffold import scaffold_project
 
         await _create(ctx, name="nuovo", seed="x")
         root = workspace / "wikis" / "nuovo"
@@ -230,7 +230,7 @@ class TestAHalfDoneProjectCanBeFinished:
         riscrive quel che c'è, lascerebbe il segnaposto — progetto completo e
         senza scopo, cioè la cosa per cui la riga viene chiesta.
         """
-        from jenny.utils.wiki_migration import migrate_wikis
+        from jafta.utils.wiki_migration import migrate_wikis
 
         (workspace / "wikis" / "morta-a-meta" / "wiki").mkdir(parents=True)
         migrate_wikis(workspace / "wikis")
@@ -363,7 +363,7 @@ class TestTheGateIsOnTheServer:
 
 @pytest.fixture
 def handler(workspace: Path, monkeypatch):
-    from jenny.config import paths as paths_mod
+    from jafta.config import paths as paths_mod
 
     monkeypatch.setattr(paths_mod, "get_workspace_path", lambda: workspace)
     # Controller vero e non un mock: la route ci legge lo scope da mettere nel
@@ -458,7 +458,7 @@ class TestAListedNameIsAnOpenableName:
     `project.create` la regex la applica, quindi da lì una cartella così non
     nasce; ma una cartella sotto `wikis/` può arrivare da qualunque altra parte —
     l'agente con `write_file`, lo scaffolder della skill, un rinomino fuori da
-    Jenny, un ripristino da backup. E allora `_collect_projects` la elencava e
+    Jafta, un ripristino da backup. E allora `_collect_projects` la elencava e
     `_envelope_chat_id` la dirottava sulla chat personale: scope
     `default()`, `session_kind` `personal` (cioè dentro `MEMORY.md`) e la
     trascrizione personale servita nella schermata del progetto.
@@ -506,7 +506,7 @@ class TestAListedNameIsAnOpenableName:
         Il difetto non era in nessuno dei due punti da solo — era che facevano
         domande diverse. Questo test le fa fare la stessa.
         """
-        from jenny.channels.websocket import WebSocketChannel
+        from jafta.channels.websocket import WebSocketChannel
 
         for name in ("buona", "Ricerca ETNA", "università", "altra_1"):
             self._wiki(workspace, name)
@@ -525,7 +525,7 @@ class TestAListedNameIsAnOpenableName:
 
 
 def _scaffold_module():
-    """``scaffold.py`` della skill, importato dal checkout in ``jenny/skills/``.
+    """``scaffold.py`` della skill, importato dal checkout in ``jafta/skills/``.
 
     Non fa parte del package importabile e si importa ``reindex_wikis`` da se',
     quindi la dir ``scripts/`` va su ``sys.path`` — come in
@@ -576,9 +576,9 @@ class TestTheScaffolderWarns:
         assert (root / "wiki" / "index.md").is_file()
 
     def test_the_copied_regex_does_not_diverge_from_the_canonical_one(self):
-        """La copia è deliberata (lo script non può importare `jenny`), quindi il
+        """La copia è deliberata (lo script non può importare `jafta`), quindi il
         test è il solo posto che tiene le due in pari."""
-        from jenny.session.keys import is_valid_project_name
+        from jafta.session.keys import is_valid_project_name
 
         scaffold = _scaffold_module()
         for name in [
@@ -597,7 +597,7 @@ def test_the_chip_no_longer_reads_a_projects_folder():
     """Guardia contro il ritorno del difetto: il chip elencava
     `workspace/projects/` con `listWorkspace`, e quella cartella non esiste."""
     source = (
-        _REPO / "jenny" / "templates" / "ui" / "assets" / "shared" / "scope-chip.js"
+        _REPO / "jafta" / "templates" / "ui" / "assets" / "shared" / "scope-chip.js"
     ).read_text(encoding="utf-8")
 
     assert "listWorkspace" not in source
@@ -606,7 +606,7 @@ def test_the_chip_no_longer_reads_a_projects_folder():
     # La creazione non la fa più il chip: la fa il giro condiviso, che è anche
     # quello che usa il pannello della casa.
     flow = (
-        _REPO / "jenny" / "templates" / "ui" / "assets" / "shared" / "project-create.js"
+        _REPO / "jafta" / "templates" / "ui" / "assets" / "shared" / "project-create.js"
     ).read_text(encoding="utf-8")
     assert "rpc.createProject(" in flow
     assert "createProjectFlow(" in source

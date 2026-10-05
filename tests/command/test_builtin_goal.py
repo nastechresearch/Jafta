@@ -8,9 +8,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.bus.events import InboundMessage
-from jenny.command.builtin import cmd_goal
-from jenny.command.router import CommandContext
+from jafta.bus.events import InboundMessage
+from jafta.command.builtin import cmd_goal
+from jafta.command.router import CommandContext
 
 
 def _make_ctx(*, active_tasks, running_subagents=0, key="websocket:chat1"):

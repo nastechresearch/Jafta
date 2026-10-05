@@ -1,4 +1,4 @@
-"""Le Jenny App si accorgono dei cambi che arrivano dal gateway.
+"""Le Jafta App si accorgono dei cambi che arrivano dal gateway.
 
 Due frame: ``apps_list_changed`` (un turno ha scritto in ``apps/``) e
 ``app_data_changed`` (un'azione di un'app e' girata come tool). Dal 21 al
@@ -23,16 +23,16 @@ from pathlib import Path
 from support.js_harness import requires_node, run_module
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 
 pytestmark = requires_node
 
 _NEIGHBORS = {
-    # Ogni lettura delle Jenny App si conta: e' la domanda di quasi ogni caso.
+    # Ogni lettura delle Jafta App si conta: e' la domanda di quasi ogni caso.
     "api-client.js": """
 export const api = {
   reads: 0,
-  async getJennyApps() { this.reads += 1; return { apps: [{ slug: 'orto', name: 'Orto' }] }; },
+  async getJaftaApps() { this.reads += 1; return { apps: [{ slug: 'orto', name: 'Orto' }] }; },
   async getAndroidApps() { return { apps: [] }; },
   getSecret() { return 'ok'; },
 };
@@ -93,7 +93,7 @@ def test_a_list_already_read_is_read_again() -> None:
     _run(
         """
         const source = new AppsSource();
-        await source.loadJennyApps();
+        await source.loadJaftaApps();
         assert.equal(api.reads, 1);
         let notices = 0;
         source.addChangeListener(() => { notices += 1; });
@@ -101,7 +101,7 @@ def test_a_list_already_read_is_read_again() -> None:
         // La rilettura non torna «in caricamento»: il cassetto aperto non
         // deve riaccendere lo scheletro per una risposta che arriva subito.
         assert.equal(source.isLoadingLists(), true, 'le Android non sono lette: resta vero');
-        assert.equal(source._jennyLoaded, true);
+        assert.equal(source._jaftaLoaded, true);
         await tick();
         assert.equal(api.reads, 2);
         assert.equal(notices, 1, 'chi guarda il cassetto deve saperlo');
@@ -129,7 +129,7 @@ def test_the_open_app_hears_that_its_data_changed() -> None:
         const actions = new AppsActions(source, { sendChatPrompt() {} });
         const mailbox = open(actions, 'orto');
         frame({ event: 'app_data_changed', slug: 'orto' });
-        assert.deepEqual(mailbox, [{ type: 'jenny:data-changed', slug: 'orto' }]);
+        assert.deepEqual(mailbox, [{ type: 'jafta:data-changed', slug: 'orto' }]);
         """
     )
 
@@ -170,7 +170,7 @@ def test_unrelated_frames_do_nothing() -> None:
     _run(
         """
         const source = new AppsSource();
-        await source.loadJennyApps();
+        await source.loadJaftaApps();
         const seen = [];
         source.onAppDataChanged((slug) => seen.push(slug));
         for (const event of ['delta', 'turn_end', 'message', 'runtime_model_updated']) {
@@ -191,14 +191,14 @@ def test_an_older_answer_does_not_overwrite_a_newer_one() -> None:
         """
         const source = new AppsSource();
         const expected = [];
-        api.getJennyApps = () => new Promise((r) => expected.push(r));
-        const before = source.loadJennyApps();
-        const second = source.loadJennyApps();
+        api.getJaftaApps = () => new Promise((r) => expected.push(r));
+        const before = source.loadJaftaApps();
+        const second = source.loadJaftaApps();
         expected[1]({ apps: [{ slug: 'nuova', name: 'Nuova' }] });
         await second;
         expected[0]({ apps: [{ slug: 'vecchia', name: 'Vecchia' }] });
         await before;
-        assert.deepEqual(source.jennyApps.map((a) => a.slug), ['nuova']);
+        assert.deepEqual(source.jaftaApps.map((a) => a.slug), ['nuova']);
         """
     )
 
@@ -209,12 +209,12 @@ def test_a_failed_refresh_keeps_the_list_that_was_fine() -> None:
     _run(
         """
         const source = new AppsSource();
-        await source.loadJennyApps();
-        api.getJennyApps = async () => { throw new Error('giù'); };
+        await source.loadJaftaApps();
+        api.getJaftaApps = async () => { throw new Error('giù'); };
         frame({ event: 'apps_list_changed' });
         await tick();
-        assert.deepEqual(source.jennyApps.map((a) => a.slug), ['orto']);
-        assert.equal(source.jennyListFailed(), false);
+        assert.deepEqual(source.jaftaApps.map((a) => a.slug), ['orto']);
+        assert.equal(source.jaftaListFailed(), false);
         """
     )
 
@@ -224,12 +224,12 @@ def test_a_first_reading_that_fails_still_says_so() -> None:
     _run(
         """
         const source = new AppsSource();
-        api.getJennyApps = async () => { throw new Error('giù'); };
-        await source.loadJennyApps();
-        assert.deepEqual(source.jennyApps, []);
-        assert.equal(source.jennyListFailed(), true);
-        api.getJennyApps = async () => ({ apps: [{ slug: 'orto' }] });
-        await source.loadJennyApps();
-        assert.equal(source.jennyListFailed(), false, 'una lettura buona spegne il guasto');
+        api.getJaftaApps = async () => { throw new Error('giù'); };
+        await source.loadJaftaApps();
+        assert.deepEqual(source.jaftaApps, []);
+        assert.equal(source.jaftaListFailed(), true);
+        api.getJaftaApps = async () => ({ apps: [{ slug: 'orto' }] });
+        await source.loadJaftaApps();
+        assert.equal(source.jaftaListFailed(), false, 'una lettura buona spegne il guasto');
         """
     )

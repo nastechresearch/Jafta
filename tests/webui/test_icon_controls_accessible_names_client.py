@@ -95,7 +95,7 @@ class Fake {{
 }}
 new Fake().renderActions([
   {{ icon: 'ti-refresh', title: 'Refresh', action: 'refresh' }},
-  {{ icon: 'ti-home', title: 'Back home', action: 'home', pill: 'Jenny' }},
+  {{ icon: 'ti-home', title: 'Back home', action: 'home', pill: 'Jafta' }},
 ]);
 const [bare, pill] = root.querySelectorAll('button');
 console.log(JSON.stringify({{
@@ -109,7 +109,7 @@ console.log(JSON.stringify({{
         "bareLabel": "Refresh",
         "bareIconHidden": "true",
         "pillIconHidden": "true",
-        "pillText": "Jenny",
+        "pillText": "Jafta",
     }
 
 
@@ -121,7 +121,7 @@ _ICON_TAG = re.compile(r"<i class=\"ti[^\"]*\"[^>]*>")
 # e così resta.
 _SHELL_FILES = sorted(p.name for p in ASSETS.glob("home-*.js")) + [
     "mobile-header.js",
-    "mobile-jenny.js",
+    "mobile-jafta.js",
 ]
 
 

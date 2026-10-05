@@ -4,8 +4,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.bus.events import InboundMessage
-from jenny.session import webui_turns as wth
+from jafta.bus.events import InboundMessage
+from jafta.session import webui_turns as wth
 
 
 @pytest.fixture(autouse=True)

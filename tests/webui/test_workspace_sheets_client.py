@@ -20,7 +20,7 @@ from pathlib import Path
 
 from support.js_harness import requires_node, run_js
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 WORKSPACE_JS = ASSETS / "mobile-workspace.js"
 
 pytestmark = requires_node

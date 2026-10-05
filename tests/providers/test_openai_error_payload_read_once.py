@@ -7,7 +7,7 @@ in due ordini diversi. Ora la lettura e' quella della base, passata ai metadati.
 
 from __future__ import annotations
 
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 
 class _BodyError(Exception):

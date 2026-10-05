@@ -1,6 +1,6 @@
 """Le mini-app prendono i colori del tema attivo, non una palette di riserva.
 
-Il difetto: `jenny-kit.css` porta una copia dei token della SPA perché le custom
+Il difetto: `jafta-kit.css` porta una copia dei token della SPA perché le custom
 property non attraversano l'origine opaca dell'iframe — ma era una copia
 *statica*, una palette dark e una light, mentre i temi sono 7. L'unico token che
 seguiva il tema era `--accent`, l'unico che l'SDK riscrivesse: tutto il resto
@@ -11,7 +11,7 @@ come y2k l'app intera restava grigia mentre la SPA era rosa.
 
 Il contratto è: la SPA serializza i valori *calcolati* del tema attivo
 (`APP_TOKEN_MAP` → `themeTokens()`), li manda su entrambi i canali — query string
-al primo paint, `jenny:theme` a ogni cambio — e l'SDK li riapplica dopo averne
+al primo paint, `jafta:theme` a ogni cambio — e l'SDK li riapplica dopo averne
 ripassato nome e formato, perché da dentro il frame non si può sapere chi ha
 scritto nella query string.
 
@@ -25,9 +25,9 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
-SDK_JS = ASSETS / "apps" / "jenny-sdk.js"
-KIT_CSS = ASSETS / "apps" / "jenny-kit.css"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
+SDK_JS = ASSETS / "apps" / "jafta-sdk.js"
+KIT_CSS = ASSETS / "apps" / "jafta-kit.css"
 APPS_JS = ASSETS / "shared" / "apps-actions.js"
 THEME_JS = ASSETS / "shared" / "theme.js"
 SPA_CSS = ASSETS / "mobile-style.css"
@@ -61,9 +61,9 @@ def _token_map() -> dict[str, str]:
 
 
 def _kit_tokens() -> set[str]:
-    """Token dichiarati nel blocco di riserva scuro di jenny-kit.css."""
+    """Token dichiarati nel blocco di riserva scuro di jafta-kit.css."""
     block = re.search(r":root, \[data-theme=\"dark\"\] \{(.*?)\n\}", _read(KIT_CSS), re.S)
-    assert block, "blocco di riserva non trovato in jenny-kit.css"
+    assert block, "blocco di riserva non trovato in jafta-kit.css"
     return set(re.findall(r"^\s*(--[\w-]+):", block.group(1), re.M))
 
 
@@ -100,7 +100,7 @@ def test_sdk_and_spa_agree_on_which_tokens_cross():
     non può importare un modulo ES del parent — quindi la coerenza va asserita.
     """
     block = re.search(r"const KIT_TOKENS = new Set\(\[(.*?)\]\);", _read(SDK_JS), re.S)
-    assert block, "KIT_TOKENS non trovato in jenny-sdk.js"
+    assert block, "KIT_TOKENS non trovato in jafta-sdk.js"
     allowed = set(re.findall(r"'([\w-]+)'", block.group(1)))
     expected = {name[2:] for name in _token_map()}
     assert allowed == expected, (
@@ -115,12 +115,12 @@ def test_the_palette_travels_on_both_channels():
     assert "themeTokens()" in apps, "apps-actions.js non legge mai la palette del tema"
     src = re.search(r"const src = (.*?);\n", apps, re.S)
     assert src and "tokens=" in src.group(1), "la palette manca dalla query string dell'iframe"
-    post = re.search(r"type: 'jenny:theme'.*?\}", apps, re.S)
-    assert post and "tokens:" in post.group(0), "la palette manca dal messaggio jenny:theme"
+    post = re.search(r"type: 'jafta:theme'.*?\}", apps, re.S)
+    assert post and "tokens:" in post.group(0), "la palette manca dal messaggio jafta:theme"
 
     sdk = _read(SDK_JS)
     assert "applyTokens(qs.get('tokens'))" in sdk, "l'SDK non applica la palette al primo paint"
-    assert re.search(r"jenny:theme'.*?applyTokens\(msg\.tokens\)", sdk, re.S), (
+    assert re.search(r"jafta:theme'.*?applyTokens\(msg\.tokens\)", sdk, re.S), (
         "l'SDK non riapplica la palette al cambio tema"
     )
 
@@ -132,7 +132,7 @@ def test_values_from_the_parent_are_rechecked_before_ending_up_in_a_style():
     rete pilotabile da fuori dentro una custom property applicata al documento.
     """
     body = re.search(r"function applyTokens\(spec\) \{(.*?)\n  \}", _read(SDK_JS), re.S)
-    assert body, "applyTokens non trovata in jenny-sdk.js"
+    assert body, "applyTokens non trovata in jafta-sdk.js"
     assert "KIT_TOKENS.has(name)" in body.group(1), "applyTokens non filtra i nomi"
     assert "COLOR.test(value)" in body.group(1), "applyTokens non filtra i valori"
 
@@ -145,7 +145,7 @@ def test_values_from_the_parent_are_rechecked_before_ending_up_in_a_style():
 
 def test_no_indigo_left_in_the_kit():
     """La riserva è chanel/pietra, i due temi di default — non un colore inventato."""
-    for path in (KIT_CSS, ASSETS / "apps" / "jenny-charts.js"):
+    for path in (KIT_CSS, ASSETS / "apps" / "jafta-charts.js"):
         source = _read(path).lower().replace(" ", "")
         leftovers = [ink for ink in INDIGO if ink in source]
         assert not leftovers, f"{path.name} contiene ancora l'indaco di riserva: {leftovers}"

@@ -14,13 +14,13 @@ parent non può guardarci dentro:
    catena (che interroga solo il documento del parent), e la skill che genera le
    app prescrive proprio ``<dialog>``: Indietro chiudeva **tutta** l'app
    portandosi via il form a metà.
-3. La skill ``app-creator`` non nominava ``jenny.navigate()`` da nessuna parte —
+3. La skill ``app-creator`` non nominava ``jafta.navigate()`` da nessuna parte —
    ed è la skill, non i docs, ciò che l'agente ha in contesto mentre scrive
    un'app: ogni schermata interna nasceva quindi non dichiarata.
 
 Il contratto è: la joint history resta proprietà esclusiva di
 ``pushNav``/``replaceNav`` della SPA, la profondità dell'app è pura contabilità
-dichiarata via ``jenny:nav-state``, e i dialog contano come livelli.
+dichiarata via ``jafta:nav-state``, e i dialog contano come livelli.
 
 Asserzioni sul sorgente, nello stile di
 ``test_back_navigation_contract.py``: la WebUI non ha un runner JS con DOM.
@@ -32,10 +32,10 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
-SDK_JS = ASSETS / "apps" / "jenny-sdk.js"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
+SDK_JS = ASSETS / "apps" / "jafta-sdk.js"
 APPS_JS = ASSETS / "shared" / "apps-actions.js"
-SKILL_DIR = ROOT / "jenny" / "skills" / "app-creator"
+SKILL_DIR = ROOT / "jafta" / "skills" / "app-creator"
 
 
 def _sdk() -> str:
@@ -49,7 +49,7 @@ def _apps() -> str:
 def _fn(source: str, name: str) -> str:
     """Corpo di una ``function name(...)`` di primo livello dell'SDK."""
     body = re.search(rf"\n  function {name}\([^)]*\)\s*\{{(.*?)\n  \}}", source, re.S)
-    assert body, f"{name} non trovato in jenny-sdk.js"
+    assert body, f"{name} non trovato in jafta-sdk.js"
     return body.group(1)
 
 
@@ -77,7 +77,7 @@ def test_the_sdk_never_touches_the_browser_history() -> None:
     code = _no_comments(_sdk())
     for forbidden in ("history.pushState", "history.replaceState", "history.back",
                       "history.go", "location.hash ="):
-        assert forbidden not in code, f"jenny-sdk.js scrive la history con {forbidden}"
+        assert forbidden not in code, f"jafta-sdk.js scrive la history con {forbidden}"
 
 
 def test_navigate_only_counts_a_level_and_declares_it() -> None:
@@ -146,7 +146,7 @@ def test_go_back_dismisses_the_topmost_dialog_before_the_screen() -> None:
 def test_the_parent_routes_the_press_into_the_app_while_depth_is_above_one() -> None:
     body = _method(_apps(), "handleBack")
     assert "open.depth > 1" in body
-    assert "{ type: 'jenny:go-back' }" in body
+    assert "{ type: 'jafta:go-back' }" in body
     assert "this.closeApp();" in body, "all'ultimo livello la pressione esce dall'app"
 
 
@@ -158,7 +158,7 @@ def test_the_declared_depth_is_clamped_before_being_trusted() -> None:
 
 def test_the_two_sides_agree_on_the_protocol_strings() -> None:
     sdk, apps = _sdk(), _apps()
-    for message in ("jenny:nav-state", "jenny:go-back"):
+    for message in ("jafta:nav-state", "jafta:go-back"):
         assert message in sdk and message in apps, f"{message} non è più un contratto condiviso"
 
 
@@ -172,8 +172,8 @@ def test_the_app_creator_skill_teaches_the_navigation_contract() -> None:
         p.read_text(encoding="utf-8")
         for p in sorted(SKILL_DIR.rglob("*.md"))
     )
-    assert "jenny.navigate(" in skill, "l'agente non può usare ciò che la skill non nomina"
-    assert "jenny.back()" in skill
+    assert "jafta.navigate(" in skill, "l'agente non può usare ciò che la skill non nomina"
+    assert "jafta.back()" in skill
     assert "popstate" in skill, "dichiarare il livello senza ridisegnare la schermata non basta"
     assert re.search(r"back button closes the whole app", skill), (
         "la regola va enunciata come conseguenza, non come dettaglio d'API"

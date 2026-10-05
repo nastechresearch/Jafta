@@ -1,4 +1,4 @@
-"""Test per ``jenny.webui.telegram_api``: masking del token, salvataggio con
+"""Test per ``jafta.webui.telegram_api``: masking del token, salvataggio con
 validazione getMe, unpair, toggle enabled e persistenza del pairing."""
 
 from __future__ import annotations
@@ -7,11 +7,11 @@ import json
 
 import pytest
 
-from jenny.config.loader import load_config, save_config
-from jenny.config.schema import Config
-from jenny.runtime.context import get_runtime_context
-from jenny.webui.settings_api import WebUISettingsError
-from jenny.webui.telegram_api import (
+from jafta.config.loader import load_config, save_config
+from jafta.config.schema import Config
+from jafta.runtime.context import get_runtime_context
+from jafta.webui.settings_api import WebUISettingsError
+from jafta.webui.telegram_api import (
     record_paired,
     save_telegram_token,
     set_telegram_enabled,
@@ -44,7 +44,7 @@ class FakeAPI:
     async def get_me(self):
         if FakeAPI.fail is not None:
             raise FakeAPI.fail
-        return {"username": "jenny_bot"}
+        return {"username": "jafta_bot"}
 
     async def set_my_commands(self, commands):
         if FakeAPI.fail_commands is not None:
@@ -61,7 +61,7 @@ def _fake_api(monkeypatch):
     FakeAPI.fail = None
     FakeAPI.fail_commands = None
     FakeAPI.commands_calls = []
-    monkeypatch.setattr("jenny.channels.telegram_api.TelegramAPI", FakeAPI)
+    monkeypatch.setattr("jafta.channels.telegram_api.TelegramAPI", FakeAPI)
     yield
 
 
@@ -98,7 +98,7 @@ async def test_save_token_validates_and_generates_code(tmp_path, monkeypatch) ->
     payload = await save_telegram_token(TOKEN)
 
     assert payload["enabled"] is True
-    assert payload["bot_username"] == "jenny_bot"
+    assert payload["bot_username"] == "jafta_bot"
     assert payload["paired"] is False
     assert len(payload["pairing_code"]) == 6
 
@@ -120,7 +120,7 @@ async def test_save_new_token_resets_previous_pairing(tmp_path, monkeypatch) -> 
 
 
 async def test_save_rejected_token_raises(tmp_path, monkeypatch) -> None:
-    from jenny.channels.telegram_api import TelegramAPIError
+    from jafta.channels.telegram_api import TelegramAPIError
 
     _configure(tmp_path, monkeypatch)
     FakeAPI.fail = TelegramAPIError(401, "Unauthorized")
@@ -272,7 +272,7 @@ async def test_provider_added_during_pairing_is_not_lost(tmp_path, monkeypatch) 
     """
     import asyncio
 
-    from jenny.webui.settings_api import update_provider
+    from jafta.webui.settings_api import update_provider
 
     _configure(tmp_path, monkeypatch)
     provider_added = asyncio.Event()
@@ -287,9 +287,9 @@ async def test_provider_added_during_pairing_is_not_lost(tmp_path, monkeypatch) 
                 "api_base": "http://127.0.0.1:8080/v1",
             })
             provider_added.set()
-            return {"username": "jenny_bot"}
+            return {"username": "jafta_bot"}
 
-    monkeypatch.setattr("jenny.channels.telegram_api.TelegramAPI", SlowAPI)
+    monkeypatch.setattr("jafta.channels.telegram_api.TelegramAPI", SlowAPI)
 
     payload = await save_telegram_token(TOKEN)
 

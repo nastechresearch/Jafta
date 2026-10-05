@@ -11,15 +11,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from jenny.utils.android_assets import (
+from jafta.utils.android_assets import (
     _SKILLS_MANIFEST,
     _TEMPLATES_MANIFEST,
     bundled_skill_names,
 )
 
-_JENNY_DIR = Path(__file__).resolve().parents[2] / "jenny"
-TEMPLATES_DIR = _JENNY_DIR / "templates"
-SKILLS_DIR = _JENNY_DIR / "skills"
+_JAFTA_DIR = Path(__file__).resolve().parents[2] / "jafta"
+TEMPLATES_DIR = _JAFTA_DIR / "templates"
+SKILLS_DIR = _JAFTA_DIR / "skills"
 
 # File presenti nel package ma volutamente NON estratti sul device.
 _SKILLS_EXCLUDED_NAMES = {"__init__.py", "README.md"}
@@ -88,7 +88,7 @@ def test_manifests_have_no_duplicates() -> None:
 
 def test_write_bytes_force_overwrites_readonly_mirror(tmp_path: Path) -> None:
     """La sync del mirror non deve crashare su un file reso read-only al boot."""
-    from jenny.utils.android_assets import _write_bytes_force
+    from jafta.utils.android_assets import _write_bytes_force
 
     target = tmp_path / "index.html"
     target.write_bytes(b"old")

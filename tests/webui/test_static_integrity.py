@@ -15,8 +15,8 @@ from pathlib import Path
 import pytest
 from support.gateway_http import make_handler
 
-from jenny.utils.android_assets import read_asset
-from jenny.webui.ws_http import GatewayHTTPHandler
+from jafta.utils.android_assets import read_asset
+from jafta.webui.ws_http import GatewayHTTPHandler
 
 _AUTH_SECRET = "test-secret"
 
@@ -41,7 +41,7 @@ def test_tampered_index_html_is_not_served(tmp_path):
 
     assert resp is not None
     assert marker not in resp.body, "la copia manomessa su disco è stata servita"
-    assert resp.body == read_asset("jenny.templates.ui", "index.html")
+    assert resp.body == read_asset("jafta.templates.ui", "index.html")
 
 
 def test_tampered_first_party_js_is_not_served(tmp_path):
@@ -55,7 +55,7 @@ def test_tampered_first_party_js_is_not_served(tmp_path):
 
     assert resp is not None
     assert b"__pwned" not in resp.body
-    assert resp.body == read_asset("jenny.templates.ui", rel)
+    assert resp.body == read_asset("jafta.templates.ui", rel)
 
 
 def test_spa_fallback_serves_canonical_index_even_without_disk_copy(tmp_path):
@@ -66,7 +66,7 @@ def test_spa_fallback_serves_canonical_index_even_without_disk_copy(tmp_path):
     resp = handler._serve_static("/html-mobile/some/unknown/route")
 
     assert resp is not None
-    assert resp.body == read_asset("jenny.templates.ui", "index.html")
+    assert resp.body == read_asset("jafta.templates.ui", "index.html")
 
 
 def test_non_manifest_orphan_file_is_served_from_disk(tmp_path):
@@ -88,7 +88,7 @@ def test_font_asset_is_served_from_disk(tmp_path):
     # nome serve solo a essere di un tipo non attivo — ma è comunque uno che
     # esiste davvero, per non descrivere un asset che non spediamo.
     handler = _make_handler(tmp_path)
-    image = "assets/jenny-idle.webp"
+    image = "assets/jafta-idle.webp"
     disk = handler.static_dist_path / image
     disk.parent.mkdir(parents=True, exist_ok=True)
     disk.write_bytes(b"RIFF\x00\x00\x00\x00WEBP-test-bytes")
@@ -125,7 +125,7 @@ def test_another_spelling_of_a_manifest_path_still_gets_the_canonical_bytes(
 
     assert resp is not None and resp.status_code == 200
     assert b"__pwned" not in resp.body
-    assert resp.body == read_asset("jenny.templates.ui", rel)
+    assert resp.body == read_asset("jafta.templates.ui", rel)
 
 
 @pytest.mark.parametrize("spelling", [

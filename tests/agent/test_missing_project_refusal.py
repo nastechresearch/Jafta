@@ -24,9 +24,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.agent.loop import AgentLoop
-from jenny.bus.events import InboundMessage
-from jenny.bus.queue import MessageBus
+from jafta.agent.loop import AgentLoop
+from jafta.bus.events import InboundMessage
+from jafta.bus.queue import MessageBus
 
 
 @pytest.fixture
@@ -125,7 +125,7 @@ def test_the_check_runs_before_the_init_expansion() -> None:
     percorso che non esiste, e a mandare il modello a scrivere un file dentro
     una cartella che non c'è.
     """
-    src = Path("jenny/agent/loop.py").read_text(encoding="utf-8")
+    src = Path("jafta/agent/loop.py").read_text(encoding="utf-8")
     check = src.index("_refuse_missing_project(msg, effective_key)")
     init = src.index("if raw == PROJECT_INIT_COMMAND")
     assert check < init, "il controllo della cartella deve precedere l'espansione di /init"

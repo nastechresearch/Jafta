@@ -23,7 +23,7 @@ _HEAD = """
 import assert from 'node:assert/strict';
 import { boot, tick, routes, hooks, ok, failed, rpcAnswers, rpcFailed, $ } from './boot.mjs';
 routes['/api/settings'] = {
-  agent: { bot_name: 'Jenny', model: 'm' }, default_provider: 'anthropic',
+  agent: { bot_name: 'Jafta', model: 'm' }, default_provider: 'anthropic',
   providers: [{ name: 'anthropic' }], version: {}, backup: {},
 };
 """
@@ -65,13 +65,13 @@ hooks.fetch = async (u) => {
 const app = await boot();
 app.homePages.goToId('settings');
 await tick(30);
-app.openJenny();
+app.openJafta();
 await tick(30);
 assert.equal(reads, 1);
 app.goBackOneRoom();
 await tick(10);
-app.openJenny();
+app.openJafta();
 await tick(30);
 assert.equal(reads, 2, 'dopo un errore le regole non si rileggono piu\\u2019');
-assert.equal(app.jennyRoom.rulesEl.value, 'Be brief.');
+assert.equal(app.jaftaRoom.rulesEl.value, 'Be brief.');
 """)

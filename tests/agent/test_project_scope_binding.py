@@ -20,8 +20,8 @@ from pathlib import Path
 
 import pytest
 
-from jenny.security.workspace_access import WorkspaceScopeResolver
-from jenny.session.keys import (
+from jafta.security.workspace_access import WorkspaceScopeResolver
+from jafta.session.keys import (
     is_valid_project_name,
     project_session_key,
     session_key_for_channel,
@@ -119,7 +119,7 @@ class TestWhenSomethingDoesNotAddUp:
 
     def test_a_channel_other_than_the_webui_has_no_projects(self, resolver, workspace):
         """Un progetto è una sessione di lavoro alla tastiera: la vita fuori di
-        Jenny — Telegram, cron, avvisi — non ci entra."""
+        Jafta — Telegram, cron, avvisi — non ci entra."""
         scope = _turn(resolver, project_session_key("palestra"), channel="telegram")
 
         assert scope.project_path == workspace.resolve()
@@ -211,8 +211,8 @@ class TestTheChainIsReallyConnected:
     """
 
     def test_from_chat_id_to_prompt(self, resolver, workspace, monkeypatch):
-        from jenny.agent.context import ContextBuilder
-        from jenny.bus.events import InboundMessage
+        from jafta.agent.context import ContextBuilder
+        from jafta.bus.events import InboundMessage
 
         (workspace / "SOUL.md").write_text("sono fatta così", encoding="utf-8")
         (workspace / "wikis" / "palestra" / "AGENTS.md").write_text(
@@ -242,7 +242,7 @@ class TestTheChainIsReallyConnected:
     def test_the_same_round_for_the_personal_conversation_does_not_change(
         self, resolver, workspace
     ):
-        from jenny.bus.events import InboundMessage
+        from jafta.bus.events import InboundMessage
 
         msg = InboundMessage(
             channel="websocket", sender_id="me", chat_id="default", content="ciao"
@@ -266,8 +266,8 @@ class TestTheLoopUsesTheMessageKey:
     """
 
     def test_a_project_message_is_not_hijacked(self):
-        from jenny.agent.loop import AgentLoop
-        from jenny.bus.events import InboundMessage
+        from jafta.agent.loop import AgentLoop
+        from jafta.bus.events import InboundMessage
 
         msg = InboundMessage(
             channel="websocket",
@@ -279,8 +279,8 @@ class TestTheLoopUsesTheMessageKey:
         assert AgentLoop._effective_session_key(None, msg) == "project:palestra"
 
     def test_the_personal_conversation_stays_where_it_was(self):
-        from jenny.agent.loop import AgentLoop
-        from jenny.bus.events import InboundMessage
+        from jafta.agent.loop import AgentLoop
+        from jafta.bus.events import InboundMessage
 
         msg = InboundMessage(
             channel="websocket", sender_id="me", chat_id="default", content="ciao"
@@ -290,8 +290,8 @@ class TestTheLoopUsesTheMessageKey:
 
     def test_an_explicit_override_still_wins(self):
         """È così che cron e Dream si portano la propria sessione."""
-        from jenny.agent.loop import AgentLoop
-        from jenny.bus.events import InboundMessage
+        from jafta.agent.loop import AgentLoop
+        from jafta.bus.events import InboundMessage
 
         msg = InboundMessage(
             channel="websocket",
@@ -340,7 +340,7 @@ class TestTheChannelReadsTheChatIdFromTheFrame:
         ],
     )
     def test_only_a_valid_project_changes_conversation(self, frame_chat_id, expected):
-        from jenny.channels.websocket import WebSocketChannel
+        from jafta.channels.websocket import WebSocketChannel
 
         envelope = {"type": "message", "content": "ciao"}
         if frame_chat_id is not None:

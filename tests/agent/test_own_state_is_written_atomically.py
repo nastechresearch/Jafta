@@ -1,4 +1,4 @@
-"""Lo stato che Jenny tiene per sé si scrive in modo atomico, dovunque lo scriva.
+"""Lo stato che Jafta tiene per sé si scrive in modo atomico, dovunque lo scriva.
 
 Tre punti di produzione dichiarano ``atomic_write`` come portante, e il commento
 sul posto dice perché: su Android il processo muore quando vuole, e nessuno di
@@ -8,9 +8,9 @@ persona; un ``gardener.json`` troncato si rilegge come JSON invalido, cioè curs
 perso; e il file d'archivio è l'**unica copia rimasta** del fatto nell'istante in
 cui ``remove`` lo toglie dal file caldo.
 
-    jenny/agent/memory_archive.py        archive_entry
-    jenny/agent/gardener_state.py        write_state
-    jenny/agent/tools/memory_entries.py  MemoryEntryTool._commit
+    jafta/agent/memory_archive.py        archive_entry
+    jafta/agent/gardener_state.py        write_state
+    jafta/agent/tools/memory_entries.py  MemoryEntryTool._commit
 
 Tutti e tre sopravvivevano alla sostituzione con ``Path.write_text``: la proprietà
 era documentata a commento e non verificata da niente. Qui lo è, e in due modi che
@@ -20,7 +20,7 @@ niente». La seconda è quella che uccide la mutazione anche se un domani il sit
 scrivesse due volte.
 
 Il punto di patch è il binding **del modulo che scrive**, non
-``jenny.utils.path``: questi tre importano il nome a import-time, quindi patchare
+``jafta.utils.path``: questi tre importano il nome a import-time, quindi patchare
 la sorgente non ha alcun effetto e l'assert fallirebbe su codice corretto. È anche
 la convenzione del resto della suite.
 
@@ -39,14 +39,14 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.gardener_state import (
+from jafta.agent.gardener_state import (
     GardenerState,
     gardener_state_file,
     read_state,
     write_state,
 )
-from jenny.agent.memory_archive import ArchivedEntry, archive_entry
-from jenny.agent.tools.memory_entries import MemoryEntryTool
+from jafta.agent.memory_archive import ArchivedEntry, archive_entry
+from jafta.agent.tools.memory_entries import MemoryEntryTool
 
 
 class _Spy:
@@ -63,7 +63,7 @@ class _Spy:
     def __call__(self, path, content, **kwargs) -> None:
         self.calls.append((Path(path), content))
         if self._passthrough:
-            from jenny.utils.path import atomic_write as real
+            from jafta.utils.path import atomic_write as real
 
             real(path, content, **kwargs)
 
@@ -89,7 +89,7 @@ def _spy_on(monkeypatch, module_path: str, *, passthrough: bool) -> _Spy:
 
 
 # --------------------------------------------------------------------------- #
-# jenny/agent/memory_archive.py :: archive_entry
+# jafta/agent/memory_archive.py :: archive_entry
 # --------------------------------------------------------------------------- #
 
 _ENTRY = ArchivedEntry(
@@ -104,7 +104,7 @@ class TestArchiveEntry:
     """Il tier freddo: qui il file *è* la sola copia del fatto."""
 
     def test_the_archive_file_goes_through_atomic_write(self, tmp_path, monkeypatch):
-        spy = _spy_on(monkeypatch, "jenny.agent.memory_archive", passthrough=True)
+        spy = _spy_on(monkeypatch, "jafta.agent.memory_archive", passthrough=True)
 
         path = archive_entry(tmp_path / "memory", _ENTRY, when=date(2026, 8, 18))
 
@@ -116,7 +116,7 @@ class TestArchiveEntry:
         assert "Preferisce risposte brevi" in path.read_text(encoding="utf-8")
 
     def test_nothing_lands_if_atomic_write_does_not_happen(self, tmp_path, monkeypatch):
-        spy = _spy_on(monkeypatch, "jenny.agent.memory_archive", passthrough=False)
+        spy = _spy_on(monkeypatch, "jafta.agent.memory_archive", passthrough=False)
 
         path = archive_entry(tmp_path / "memory", _ENTRY, when=date(2026, 8, 18))
 
@@ -125,7 +125,7 @@ class TestArchiveEntry:
 
 
 # --------------------------------------------------------------------------- #
-# jenny/agent/gardener_state.py :: write_state
+# jafta/agent/gardener_state.py :: write_state
 # --------------------------------------------------------------------------- #
 
 
@@ -149,7 +149,7 @@ class TestWriteState:
     """Il cursore del giardiniere: troncato vale perso, cioè rilettura da capo."""
 
     def test_the_cursor_goes_through_atomic_write(self, project, monkeypatch):
-        spy = _spy_on(monkeypatch, "jenny.agent.gardener_state", passthrough=True)
+        spy = _spy_on(monkeypatch, "jafta.agent.gardener_state", passthrough=True)
 
         write_state(project, _STATE)
 
@@ -159,7 +159,7 @@ class TestWriteState:
         assert read_state(project).cursor == _STATE.cursor
 
     def test_nothing_lands_if_atomic_write_does_not_happen(self, project, monkeypatch):
-        spy = _spy_on(monkeypatch, "jenny.agent.gardener_state", passthrough=False)
+        spy = _spy_on(monkeypatch, "jafta.agent.gardener_state", passthrough=False)
 
         write_state(project, _STATE)
 
@@ -176,14 +176,14 @@ class TestWriteState:
         before = '{"version": 2, "cursor": {}, "last_run_at": null, "witness": {}}'
         path.write_text(before, encoding="utf-8")
 
-        _spy_on(monkeypatch, "jenny.agent.gardener_state", passthrough=False)
+        _spy_on(monkeypatch, "jafta.agent.gardener_state", passthrough=False)
         write_state(project, _STATE)
 
         assert path.read_text(encoding="utf-8") == before
 
 
 # --------------------------------------------------------------------------- #
-# jenny/agent/tools/memory_entries.py :: MemoryEntryTool._commit
+# jafta/agent/tools/memory_entries.py :: MemoryEntryTool._commit
 # --------------------------------------------------------------------------- #
 
 _USER_MD = """# User Profile
@@ -207,7 +207,7 @@ class TestMemoryEntryCommit:
     @pytest.mark.asyncio
     async def test_add_goes_through_atomic_write(self, entry_tool, monkeypatch):
         tool, target = entry_tool
-        spy = _spy_on(monkeypatch, "jenny.agent.tools.memory_entries", passthrough=True)
+        spy = _spy_on(monkeypatch, "jafta.agent.tools.memory_entries", passthrough=True)
 
         result = await tool.execute(
             action="add", file="user", text="- Lavora sul Titan 2",
@@ -224,7 +224,7 @@ class TestMemoryEntryCommit:
         self, entry_tool, monkeypatch
     ):
         tool, target = entry_tool
-        spy = _spy_on(monkeypatch, "jenny.agent.tools.memory_entries", passthrough=False)
+        spy = _spy_on(monkeypatch, "jafta.agent.tools.memory_entries", passthrough=False)
 
         await tool.execute(
             action="add", file="user", text="- Lavora sul Titan 2",
@@ -238,7 +238,7 @@ class TestMemoryEntryCommit:
     async def test_remove_rewrites_the_hot_file_atomically(self, entry_tool, monkeypatch):
         """Il momento in cui l'archivio è l'unica copia: ``remove`` sul file caldo."""
         tool, target = entry_tool
-        spy = _spy_on(monkeypatch, "jenny.agent.tools.memory_entries", passthrough=True)
+        spy = _spy_on(monkeypatch, "jafta.agent.tools.memory_entries", passthrough=True)
 
         result = await tool.execute(
             action="remove", file="user", target="Risposte brevi",

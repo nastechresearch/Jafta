@@ -4,7 +4,7 @@ Prima di questa suite, con ``restrict_to_workspace=True`` il codice guardato non
 poteva LEGGERE un file fuori dal workspace (``open``/``io.open``/``os.open``
 passavano da ``resolve_allowed_path``) ma poteva cancellare, rinominare,
 troncare ed ENUMERARE qualunque cosa raggiungibile dall'uid dell'app —
-``workspace/config.json``, ``sessions/``, ``jenny_src/``, lo snapshot store.
+``workspace/config.json``, ``sessions/``, ``jafta_src/``, lo snapshot store.
 Una sola chiamata, due confini diversi.
 
 Ogni test qui sotto verifica una delle due metà del contratto:
@@ -28,8 +28,8 @@ import threading
 
 import pytest
 
-from jenny.agent.tools.python_exec import PythonNamespace
-from jenny.config.tool_schemas import PythonExecConfig
+from jafta.agent.tools.python_exec import PythonNamespace
+from jafta.config.tool_schemas import PythonExecConfig
 
 _REFUSED = "outside allowed directory"
 
@@ -355,7 +355,7 @@ def test_shutil_rmtree_inside_workspace_still_works(sandbox) -> None:
 
     Senza un trattamento esplicito i wrapper la romperebbero anche DENTRO il
     workspace, togliendo all'agente una capability legittima (è come cancella
-    una Jenny App).
+    una Jafta App).
     """
     workspace, _ = sandbox
     tree = workspace / "tree" / "sub"
@@ -549,7 +549,7 @@ def test_os_open_inside_workspace_does_not_log_a_wall_of_refusals(sandbox, caplo
     """
     workspace, _ = sandbox
     ns = _namespace(workspace)
-    with caplog.at_level(logging.WARNING, logger="jenny.agent.tools.python_exec"):
+    with caplog.at_level(logging.WARNING, logger="jafta.agent.tools.python_exec"):
         stdout, stderr = _run(
             ns,
             "import os\n"

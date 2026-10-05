@@ -4,7 +4,7 @@ Every control in the Settings screens, what it does, and its default value.
 
 Settings lives in two places:
 
-- The home's **Settings** page, for the everyday choices: the theme, **Who answers**, **Jenny**, **Updates** and **Backup**. At the bottom of that page a **Workshop** row ("watch, tune, repair") opens the second place.
+- The home's **Settings** page, for the everyday choices: the theme, **Who answers**, **Jafta**, **Updates** and **Backup**. At the bottom of that page a **Workshop** row ("watch, tune, repair") opens the second place.
 - The **workshop**, whose dock has four entries: **Console** and three drawers, **Brain**, **Hands** and **Memory**. Each drawer is a list of named groups, always open, and a few rows in them open a panel of their own when tapped (a provider, an SSH host, Telegram, Skills, Local history, the memory budgets).
 
 There is no global Save button. Most controls save as soon as you change them and confirm with a toast. The theme and the mascot's visibility and size live entirely on the device and never touch `config.json`: those are called out below.
@@ -13,7 +13,7 @@ There is no global Save button. Most controls save as soon as you change them an
 
 In the workshop, text and number fields (the model parameters, the web search fields) save when the field reports a change, which on a phone means when you confirm or leave the field, and then after a **600 ms** debounce. They do not save on every keystroke. The Dream and gardener numbers save on the same change event, without the debounce. Toggles, segmented controls and the theme save on tap. A successful write shows **"Saved!"** (or a more specific toast). A failed write shows the error instead (the Location toggle only says "Couldn't save"), and toggles roll back to their previous state.
 
-On the home's **Jenny** page, **Her name** and **The rules you gave her** are different: each has its own **Save** button, which appears only when there is something new to save.
+On the home's **Jafta** page, **Her name** and **The rules you gave her** are different: each has its own **Save** button, which appears only when there is something new to save.
 
 Most controls take effect the moment you use them. These ask you to confirm first:
 
@@ -27,7 +27,7 @@ Most controls take effect the moment you use them. These ask you to confirm firs
 - **Replacing a host key that changed**, which asks **twice**: once in the side-by-side dialog showing the old and new fingerprints, and again in a plain confirmation. That is deliberate: a changed key is treated as a possible man-in-the-middle, not as an update.
 - **Setting the Dream review cadence below 12** (see [Memory](#memory)).
 
-**One silent restart:** changing the assistant's name flips a `requires_restart` flag on the backend, but the **Her name** Save button only says "Saved". If you rename her and she still introduces herself with the old name, restart Jenny. The other fields that flip that flag (timezone, bot icon, `tool_hint_max_length`) have no control in either screen.
+**One silent restart:** changing the assistant's name flips a `requires_restart` flag on the backend, but the **Her name** Save button only says "Saved". If you rename her and she still introduces herself with the old name, restart Jafta. The other fields that flip that flag (timezone, bot icon, `tool_hint_max_length`) have no control in either screen.
 
 ## The home's Settings page
 
@@ -35,7 +35,7 @@ Most controls take effect the moment you use them. These ask you to confirm firs
 |---|---|---|
 | **Theme** | A row of theme pills, each a three-colour swatch with the theme's short name. Tap one to switch instantly, with no confirmation. The full name sits beside **Theme** at the top of the card, and a one-line description under the row. See [Themes and mascot](../using/themes-mascot.md). | Synthwave '84 |
 | **Who answers** | Opens the page where you choose the model. The row shows the provider that answers now. | — |
-| **Jenny** (her name, if you renamed her) | Opens her page: name, mascot and rules (below). The page's title is her name too. The row shows how she is now, for example "small · floating". | — |
+| **Jafta** (her name, if you renamed her) | Opens her page: name, mascot and rules (below). The page's title is her name too. The row shows how she is now, for example "small · floating". | — |
 | **Updates** | Opens the update check and install page. The row shows the installed version, and the new one when an update is waiting. | — |
 | **Backup** | Opens export and restore. The row shows when you last exported a backup. | — |
 | **Workshop** | Opens the workshop. | — |
@@ -54,11 +54,11 @@ Under the tiles, **Key** shows the masked key of the provider you're looking at,
 
 There is no field for typing a model ID by hand on this page. You pick an ID from the provider's list, or enter one as the **First model** when you add a provider in the workshop.
 
-### Jenny
+### Jafta
 
 | Control | Effect | Default |
 |---|---|---|
-| **Her name** | The name she introduces herself with (up to 40 characters). Saved with its own **Save** button. See the silent restart note above. | "Jenny" |
+| **Her name** | The name she introduces herself with (up to 40 characters). Saved with its own **Save** button. See the silent restart note above. | "Jafta" |
 | **Show mascot** | Switch the in-app mascot on or off. | On |
 | **Mascot size** | Small / Medium / Large: the side of her square, 120 / 160 / 210 px. | Small |
 | **Floating mascot** | Only on Android. Puts her in a window above other apps, where tapping her lets you talk and the answer comes in a bubble, in the same conversation. It needs Android's "Display over other apps" permission: if that is missing, the switch stays on and a note explains what to allow. Stored in `config.json` (`floating.enabled`). | Off |
@@ -78,7 +78,7 @@ Under the buttons, a line says when the last successful check happened. When the
 
 ### Backup
 
-**Export a backup** makes one encrypted file with a passphrase you choose. **Restore from a file** replaces everything with the file's contents and restarts Jenny. A note at the bottom describes the automatic local history, which is browsed in the workshop (see [Local history](#local-history)). Full details, including the irrecoverable-passphrase warning: [Backup and restore](../using/backup.md).
+**Export a backup** makes one encrypted file with a passphrase you choose. **Restore from a file** replaces everything with the file's contents and restarts Jafta. A note at the bottom describes the automatic local history, which is browsed in the workshop (see [Local history](#local-history)). Full details, including the irrecoverable-passphrase warning: [Backup and restore](../using/backup.md).
 
 ## Brain
 
@@ -115,20 +115,20 @@ A rejected value comes back as an error rather than being silently clamped: Max 
 
 Saving any of these also rebuilds the provider when needed, so the new value applies to your very next message. Nothing needs restarting.
 
-Reasoning Effort has values beyond the four in the select. The API accepts `none` (disable thinking explicitly) and `minimal` (plus `minimum`, a DashScope-native alias normalized to `minimal`), so those reach `config.json` if you write them through the endpoint; the select simply doesn't offer them. `adaptive` (Anthropic adaptive thinking) is the exception: the endpoint **rejects** it, so it can only be set by editing `config.json` directly. The select can't represent a value it doesn't list: if `config.json` holds `adaptive`, the field renders blank, and touching it replaces the value. <!-- verified in code: jenny/webui/settings_api.py (_parse_max_tokens / _parse_temperature / _parse_reasoning_effort) + jenny/webui/settings_routes.py (provider rebuild) + jenny/providers/anthropic_provider.py (adaptive) -->
+Reasoning Effort has values beyond the four in the select. The API accepts `none` (disable thinking explicitly) and `minimal` (plus `minimum`, a DashScope-native alias normalized to `minimal`), so those reach `config.json` if you write them through the endpoint; the select simply doesn't offer them. `adaptive` (Anthropic adaptive thinking) is the exception: the endpoint **rejects** it, so it can only be set by editing `config.json` directly. The select can't represent a value it doesn't list: if `config.json` holds `adaptive`, the field renders blank, and touching it replaces the value. <!-- verified in code: jafta/webui/settings_api.py (_parse_max_tokens / _parse_temperature / _parse_reasoning_effort) + jafta/webui/settings_routes.py (provider rebuild) + jafta/providers/anthropic_provider.py (adaptive) -->
 
 You can still set these per-model instead of globally, by defining a [model preset](configuration.md) with its own override and switching to it with `/model`.
 
 ### Background activity
 
-Everything about Jenny surviving a screen that's been off for hours. The group ends with a line pointing out that Dream and the gardener live in **Memory**.
+Everything about Jafta surviving a screen that's been off for hours. The group ends with a line pointing out that Dream and the gardener live in **Memory**.
 
 | Control | Effect | Default |
 |---|---|---|
 | **Exempt from battery** | Opens Android's own "ignore battery optimizations" prompt. Once granted, the button is replaced by a confirmation line rather than disappearing. The same request appears during first-run setup and in the Telegram panel, and is offered again when a system update has silently reset it. Shown only in the Android app. | Not exempt |
-| **Keep the CPU awake** | The `power.keepAwake` mode, as three buttons: *Never* (best battery, scheduled work can slip by hours), *While working* (recommended: awake for a turn, a cron job or an SSH command, then released), *Always* (nothing slips, drains battery constantly, for a phone on charge). The cost of the selected mode is written under the buttons. **Takes effect at the next Jenny restart**, which the UI says under the control: the service-lifetime lock is taken once, at startup. | While working |
+| **Keep the CPU awake** | The `power.keepAwake` mode, as three buttons: *Never* (best battery, scheduled work can slip by hours), *While working* (recommended: awake for a turn, a cron job or an SSH command, then released), *Always* (nothing slips, drains battery constantly, for a phone on charge). The cost of the selected mode is written under the buttons. **Takes effect at the next Jafta restart**, which the UI says under the control: the service-lifetime lock is taken once, at startup. | While working |
 | **Current state** | Three yes/no lines: battery optimisation exemption, exact alarms, CPU kept awake right now. Refreshed when you come back from a system dialog. When exact alarms are not permitted, an **Allow exact alarms** button opens the system screen that grants them. | — |
-| **Recorded outages** | The last few stretches of at least `power.gapWarningMin` (default 60) minutes when Jenny was not running, with duration and date. Empty is the healthy state. When the list isn't empty, a card explains that the phone's battery manager is the cause, with a link to dontkillmyapp.com for your brand and, where the phone allows it, a button that opens the manufacturer's battery screen. | Empty |
+| **Recorded outages** | The last few stretches of at least `power.gapWarningMin` (default 60) minutes when Jafta was not running, with duration and date. Empty is the healthy state. When the list isn't empty, a card explains that the phone's battery manager is the cause, with a link to dontkillmyapp.com for your brand and, where the phone allows it, a button that opens the manufacturer's battery screen. | Empty |
 
 Only the wake-lock mode is editable here. The rest of the `power.*` family (wake-lock rotation, the restart watchdog, alarm-driven cron, the alarm-clock fallback, the outage threshold) is `config.json`-only; see [Configuration](./configuration.md#power). Outside the Android app the group still shows the wake-lock mode, which lives in the gateway's config, but not the battery exemption card.
 
@@ -170,9 +170,9 @@ The Search engine dropdown looks like a choice but has exactly one working optio
 
 A single toggle, **"Share my location"**, default **on**. Its hint explains the model: a recent last-known position is injected into the conversation context on every message (free, no GPS fix), and a precise fix is only requested on demand. It applies immediately on toggle, with a toast confirming "Location enabled"/"Location disabled" and a rollback if the request fails. Switching it on also asks Android for the permission, in the same tap.
 
-The toggle records your preference; it does not grant the Android permission, and both have to be satisfied for location to reach the agent. When the toggle is on and Android has not allowed Jenny to use the location, the group says so with a warning notice and an **Allow location** button. The button asks Android for the permission, and if Android will no longer ask (it was denied for good), it opens Jenny's page in the system app settings instead. The notice disappears as soon as the permission is granted, and it only appears in the Android app — a browser has no permission to ask for.
+The toggle records your preference; it does not grant the Android permission, and both have to be satisfied for location to reach the agent. When the toggle is on and Android has not allowed Jafta to use the location, the group says so with a warning notice and an **Allow location** button. The button asks Android for the permission, and if Android will no longer ask (it was denied for good), it opens Jafta's page in the system app settings instead. The notice disappears as soon as the permission is granted, and it only appears in the Android app — a browser has no permission to ask for.
 
-Two related values exist only in `config.json`, with no UI control: `tools.location.telegram_ttl_s` (default 3600, how long a location shared from Telegram stays valid) and `tools.location.fresh_timeout_s` (default 15, how long Jenny waits for a fresh GPS fix). See [Location](../using/location.md).
+Two related values exist only in `config.json`, with no UI control: `tools.location.telegram_ttl_s` (default 3600, how long a location shared from Telegram stays valid) and `tools.location.fresh_timeout_s` (default 15, how long Jafta waits for a fresh GPS fix). See [Location](../using/location.md).
 
 ### SSH
 
@@ -203,10 +203,10 @@ Five behaviours worth knowing before you use this screen:
 - **No restart, in either direction.** Switching SSH *on*, or adding your first host, takes effect on the next job: the `sysadmin` subagent builds its tools from the current configuration each time one starts. Switching it *off* applies immediately, even to a subagent already working on a server: that is the emergency stop. See [SSH](../using/ssh.md#no-restart-needed).
 - **There is no trust-on-first-use.** Until you have accepted a fingerprint, every SSH call for that alias fails and tells the agent to ask you. A fingerprint reading older than 10 minutes is refused and has to be taken again.
 - **Pinning is required in both authentication modes, and matters more with a password.** With a key, an unverified host gets a signature it can't reuse; with a password, it gets your password. The fingerprint dialog says so explicitly on a password host. There is no way to skip the step in either mode.
-- **A changed host key is treated as an attack, not an update.** If a host presents a key different from the one you accepted, Jenny shows both fingerprints side by side and requires a second explicit confirmation to replace it.
+- **A changed host key is treated as an attack, not an update.** If a host presents a key different from the one you accepted, Jafta shows both fingerprints side by side and requires a second explicit confirmation to replace it.
 - **Editing the address or port of an existing host clears its verified fingerprint** (and forgets the `known_hosts` line), because a verification of the old address says nothing about the new one. You have to verify again.
 
-The private key and the `known_hosts` file live **outside** the workspace, so they are not in snapshots and not in an encrypted backup: after a restore you have to generate new keys and install them on each server again, and the group says which hosts need it. A **password** is stored in `config.json` like the Telegram token and the API keys, unencrypted at rest, inside the workspace and therefore inside backups. That's the trade: more convenient, weaker, and a dedicated key can be revoked without touching the password you log in with yourself. One field has no UI at all: the per-host `jobLogDir` (default `/tmp/jenny-jobs`), which is `config.json`-only. Full walkthrough: [SSH access](../using/ssh.md).
+The private key and the `known_hosts` file live **outside** the workspace, so they are not in snapshots and not in an encrypted backup: after a restore you have to generate new keys and install them on each server again, and the group says which hosts need it. A **password** is stored in `config.json` like the Telegram token and the API keys, unencrypted at rest, inside the workspace and therefore inside backups. That's the trade: more convenient, weaker, and a dedicated key can be revoked without touching the password you log in with yourself. One field has no UI at all: the per-host `jobLogDir` (default `/tmp/jafta-jobs`), which is `config.json`-only. Full walkthrough: [SSH access](../using/ssh.md).
 
 ### Telegram
 
@@ -214,7 +214,7 @@ One row shows the state (for example "paired with …", "on, not paired" or "off
 
 ### Skills
 
-One row, **What she knows**, counts the skills that come with the app and the ones that are yours. Tapping it opens the list in two blocks. You can switch your own skills on and off there; the built-in ones can't be turned off. To create, change or delete a skill, ask Jenny in chat.
+One row, **What she knows**, counts the skills that come with the app and the ones that are yours. Tapping it opens the list in two blocks. You can switch your own skills on and off there; the built-in ones can't be turned off. To create, change or delete a skill, ask Jafta in chat.
 
 ### When she acts on her own
 
@@ -227,12 +227,12 @@ Your own scheduled jobs and the heartbeat, with what each one did last time and 
 | **Overdue instead of a past date** | Next-run times are stored, not computed on the fly: they are recalculated at startup and after each run. With the scheduler stopped, or right after the phone comes back from a long doze, the stored time is in the past, so the row shows how long ago it was due ("5 min ago"), in the warning colour, instead of a date that looks like the future. |
 | **Armed but does nothing** | A system job survives the setting behind it: switch the heartbeat off, or leave `HEARTBEAT.md` with no active tasks, and its job stays scheduled and records `ok`. A notice above the list tells you. |
 | **A rebuilt list** | If `cron/jobs.json` was recovered at startup, the group says so above the list, not just in the notice at the top of the screen: a short list looks like a correct list. |
-| **Times in the job's own timezone** | A job created with an explicit timezone is shown in it, named only when it differs from the phone's, so the panel and what Jenny says in chat never disagree. |
+| **Times in the job's own timezone** | A job created with an explicit timezone is shown in it, named only when it differs from the phone's, so the panel and what Jafta says in chat never disagree. |
 | **"As of HH:MM", with a Refresh button** | The panel does not poll. On a phone where scheduled work is kept punctual through deep doze, a screen that woke the gateway every few seconds would undo that, so it reads once when you open the drawer and the timestamp says it is a snapshot. |
 
 Tapping a job opens its details: what a system job is for, the reminder's full text, the recent runs with their errors, and, for the heartbeat, the checks it can see in `HEARTBEAT.md`.
 
-Your own jobs can be managed from there. An active job has **Pause** and **Delete**, and a paused one has **Resume** and **Delete**. Pausing doesn't ask, because resuming undoes it. **Delete** asks first, and a deleted job only comes back if you ask Jenny again. A one-time reminder whose time passed while it was paused can only be deleted. System jobs have no buttons: their switches are in their own settings. There is no "run now", because that would start an agent turn, which costs tokens and may message you. Creating or changing a job is still done by asking Jenny. See [Scheduling and proactivity](../using/scheduling.md).
+Your own jobs can be managed from there. An active job has **Pause** and **Delete**, and a paused one has **Resume** and **Delete**. Pausing doesn't ask, because resuming undoes it. **Delete** asks first, and a deleted job only comes back if you ask Jafta again. A one-time reminder whose time passed while it was paused can only be deleted. System jobs have no buttons: their switches are in their own settings. There is no "run now", because that would start an agent turn, which costs tokens and may message you. Creating or changing a job is still done by asking Jafta. See [Scheduling and proactivity](../using/scheduling.md).
 
 ## Memory
 

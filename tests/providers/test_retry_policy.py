@@ -1,4 +1,4 @@
-"""Test diretti per jenny/providers/retry_policy.py.
+"""Test diretti per jafta/providers/retry_policy.py.
 
 Copre i classificatori puri (transient/arrearage/429) e l'estrazione di
 type/code dal payload d'errore. Il motore di retry vero e proprio
@@ -12,8 +12,8 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.providers.base import LLMResponse
-from jenny.providers.retry_policy import (
+from jafta.providers.base import LLMResponse
+from jafta.providers.retry_policy import (
     extract_error_type_code,
     is_arrearage_response,
     is_retryable_429_response,

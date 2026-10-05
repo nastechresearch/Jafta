@@ -26,7 +26,7 @@ from pathlib import Path
 from support.js_harness import function, member, requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 ROOM_JS = ASSETS / "home-backup.js"
 WHEN_JS = ASSETS / "shared" / "when.js"
 I18N_JS = ASSETS / "shared" / "i18n.js"
@@ -170,7 +170,7 @@ def test_a_cancelled_export_does_not_move_the_row() -> None:
 
       assert.deepEqual(actions, ['export']);
       assert.equal(s.value(), i18n.t('home.backup.never'), 'la riga si e mossa su un annullamento');
-      assert.deepEqual(notices, [], 'ha avvisato «Tu e Jenny» di un backup che non c e');
+      assert.deepEqual(notices, [], 'ha avvisato «Tu e Jafta» di un backup che non c e');
       assert.equal(nodi['home-backup-export'].disabled, false, 'il bottone e rimasto spento');
     """)
 

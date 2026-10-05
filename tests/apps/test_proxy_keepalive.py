@@ -3,7 +3,7 @@
 Il proxy riscriveva solo la **prima** richiesta di una connessione (Host,
 prefisso di ``baseUrl``, cookie-capability tolto) e poi pompava byte grezzi: la
 seconda richiesta della stessa connessione keep-alive arrivava al server
-dell'utente com'era, con il cookie ``jenny_app_view`` dentro e l'``Host`` del
+dell'utente com'era, con il cookie ``jafta_app_view`` dentro e l'``Host`` del
 proxy. Adesso una connessione porta **una** richiesta: al server si chiede
 ``Connection: close``, al browser si risponde ``Connection: close``, e dopo il
 body della prima richiesta non si inoltra altro. Resta fuori l'upgrade
@@ -16,8 +16,8 @@ import asyncio
 
 import pytest
 
-from jenny.apps import proxy as proxy_mod
-from jenny.apps.proxy import COOKIE_NAME, AppViewProxy
+from jafta.apps import proxy as proxy_mod
+from jafta.apps.proxy import COOKIE_NAME, AppViewProxy
 
 
 class _KeepAliveUpstream:

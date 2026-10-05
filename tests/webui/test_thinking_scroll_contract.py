@@ -17,7 +17,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-UI_DIR = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui"
+UI_DIR = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui"
 CHAT_JS = UI_DIR / "assets" / "mobile-chat.js"
 CSS = UI_DIR / "assets" / "mobile-style.css"
 

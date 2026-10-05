@@ -16,7 +16,7 @@ from pathlib import Path
 
 from support import theme_tokens
 
-CSS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets" / "home-style.css"
+CSS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets" / "home-style.css"
 
 
 def _rgb(color: str, under: str) -> tuple[float, float, float]:

@@ -16,7 +16,7 @@ Le due direzioni non sono simmetriche, ed è il punto:
 - **da un progetto verso il personale:** niente. Il diario non deve contenere
   niente di nessun progetto;
 - **dal personale verso un progetto:** chi sei viaggia. ``SOUL.md`` e ``USER.md``
-  entrano, perché Jenny resta Jenny anche al lavoro.
+  entrano, perché Jafta resta Jafta anche al lavoro.
 
 L'asimmetria è la decisione del 21/08 in una riga: *chi sei viaggia, dove altro
 lavori no.*
@@ -35,8 +35,8 @@ import pathlib
 
 import pytest
 
-from jenny.agent.context import ContextBuilder
-from jenny.session.keys import is_personal_session_key, is_project_session_key
+from jafta.agent.context import ContextBuilder
+from jafta.session.keys import is_personal_session_key, is_project_session_key
 
 
 @pytest.fixture
@@ -57,7 +57,7 @@ def install(tmp_path: pathlib.Path) -> pathlib.Path:
             f"---\nsummary: {name}{' PAROLA-RUBRICA' if name == 'etna' else ''}\n---\n\n"
             f"# {name}\n\n{secret}\n", encoding="utf-8"
         )
-    (tmp_path / "SOUL.md").write_text("Sono Jenny. PAROLA-ANIMA\n", encoding="utf-8")
+    (tmp_path / "SOUL.md").write_text("Sono Jafta. PAROLA-ANIMA\n", encoding="utf-8")
     (tmp_path / "USER.md").write_text("Si chiama Marta. PAROLA-UTENTE\n", encoding="utf-8")
     memory = tmp_path / "memory"
     memory.mkdir()
@@ -135,7 +135,7 @@ def test_the_long_term_memory_does_not_travel_but_says_where_it_is(
     — e ``recall`` non lo copre, perché legge ``memory/archive/``, il tier freddo,
     non il file vivo.
     """
-    from jenny.agent.memory import MemoryStore
+    from jafta.agent.memory import MemoryStore
 
     prompt = _prompt(install, "palestra")
 
@@ -180,7 +180,7 @@ def test_a_project_key_is_neither_personal_nor_internal() -> None:
     key = "project:palestra"
     assert is_project_session_key(key) is True
     assert is_personal_session_key(key) is False
-    from jenny.session.keys import is_internal_session_key
+    from jafta.session.keys import is_internal_session_key
 
     assert is_internal_session_key(key) is False, (
         "una sessione di progetto non è interna: si vede negli elenchi e i suoi token "

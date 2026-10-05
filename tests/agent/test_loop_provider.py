@@ -1,4 +1,4 @@
-"""Test per lo switch runtime di provider/preset in ``jenny.agent.loop_provider``.
+"""Test per lo switch runtime di provider/preset in ``jafta.agent.loop_provider``.
 
 ``ProviderPresetMixin`` è mixato in ``AgentLoop``; qui viene esercitato
 attraverso un ``AgentLoop`` reale costruito con ``make_loop`` (vedi
@@ -18,8 +18,8 @@ from unittest.mock import MagicMock
 import pytest
 from support.agent import make_loop, make_provider
 
-from jenny.agent.loop_provider import ProviderPresetMixin
-from jenny.config.schema import ModelPresetConfig
+from jafta.agent.loop_provider import ProviderPresetMixin
+from jafta.config.schema import ModelPresetConfig
 
 
 class TestApplyProviderSwitch:
@@ -166,7 +166,7 @@ class TestApplyModelPresetWithoutGenerationSupport:
     ``_apply_model_preset`` protegge con ``getattr(self.provider, "generation",
     None)`` prima di toccare max_tokens/temperature/reasoning_effort, ma la
     stessa chiamata propaga sempre a ``Consolidator.set_provider``, che accede
-    a ``provider.generation.max_tokens`` senza guardia (jenny/agent/
+    a ``provider.generation.max_tokens`` senza guardia (jafta/agent/
     consolidator.py). Risultato: il guard di loop_provider.py non basta a
     evitare il crash end-to-end se un provider reale arrivasse senza
     ``generation`` — comportamento sospetto, non corretto qui (fuori scope:

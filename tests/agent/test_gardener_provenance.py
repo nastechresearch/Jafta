@@ -3,10 +3,10 @@
 Il caso che ha prodotto questo file è registrato sul dispositivo e riproducibile.
 Il 24/08, nella wiki `viaggio-lento`:
 
-* Jenny chiede «il telescopio te lo porti in macchina, **o quello resta a casa**?»
+* Jafta chiede «il telescopio te lo porti in macchina, **o quello resta a casa**?»
 * l'utente risponde «il telescopio che cenrtra?» — una domanda, nessuna scelta
 * la cattura scrive nel diario «Il telescopio non c'entra col viaggio — **resta a
-  casa**», cioè l'opzione B della domanda di Jenny, come decisione dell'utente
+  casa**», cioè l'opzione B della domanda di Jafta, come decisione dell'utente
 * la passata la promuove a `state: decided` e la mappa la mette sotto «Decided»,
   che entra in **ogni** turno del progetto.
 
@@ -36,8 +36,8 @@ import pathlib
 
 import pytest
 
-from jenny.agent.gardener import _compose_write_guards
-from jenny.agent.wiki_provenance import _page_frontmatter, _provenance_guard
+from jafta.agent.gardener import _compose_write_guards
+from jafta.agent.wiki_provenance import _page_frontmatter, _provenance_guard
 
 JOURNAL = (
     "# 2026-08-24\n"
@@ -144,7 +144,7 @@ def test_an_unmarked_line_cannot_be_decided_either(project, guard) -> None:
 # silenzio e in un verso solo.
 #
 # E il minuto misto non è esotico: da Fase 4 la cattura fa una chiamata per fatto,
-# quindi un turno in cui l'utente dice una cosa e Jenny ne deduce la conseguenza
+# quindi un turno in cui l'utente dice una cosa e Jafta ne deduce la conseguenza
 # scrive esattamente quelle due righe allo stesso `HH:MM`.
 
 
@@ -356,8 +356,8 @@ def test_every_source_has_to_hold_not_just_one(project, guard) -> None:
 
 from types import SimpleNamespace  # noqa: E402
 
-from jenny.agent.gardener import GardenerStore, run_gardener  # noqa: E402
-from jenny.security.workspace_access import (  # noqa: E402
+from jafta.agent.gardener import GardenerStore, run_gardener  # noqa: E402
+from jafta.security.workspace_access import (  # noqa: E402
     WorkspaceScope,
     bind_workspace_scope,
     reset_workspace_scope,
@@ -497,11 +497,11 @@ def test_the_anchor_the_prompt_teaches_is_the_anchor_the_code_accepts() -> None:
     """
     import re
 
-    import jenny
-    from jenny.agent.wiki_provenance import _ANCHOR_RE
+    import jafta
+    from jafta.agent.wiki_provenance import _ANCHOR_RE
 
     template = (
-        pathlib.Path(jenny.__file__).parent / "templates" / "agent" / "gardener.md"
+        pathlib.Path(jafta.__file__).parent / "templates" / "agent" / "gardener.md"
     ).read_text(encoding="utf-8")
     taught = set(re.findall(r"\.md#(\d{2}:\d{2}(?:\.\d+)?)", template))
 

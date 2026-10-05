@@ -26,11 +26,11 @@ from types import SimpleNamespace
 
 import pytest
 
-from jenny.agent import gardener
-from jenny.agent.autocompact import AutoCompact
-from jenny.agent.loop import AgentLoop
-from jenny.agent.subagent import SubagentManager
-from jenny.runtime.container import GatewayContainer
+from jafta.agent import gardener
+from jafta.agent.autocompact import AutoCompact
+from jafta.agent.loop import AgentLoop
+from jafta.agent.subagent import SubagentManager
+from jafta.runtime.container import GatewayContainer
 
 
 def _subagents(sessions: dict[str, dict[str, bool]]) -> SubagentManager:
@@ -110,7 +110,7 @@ async def test_a_diary_harvest_keeps_its_project_busy_until_it_saves(tmp_path) -
     """
     from datetime import datetime, timedelta
 
-    from jenny.session.manager import SessionManager
+    from jafta.session.manager import SessionManager
     from tests.support.aio import wait_until
 
     entered, release = asyncio.Event(), asyncio.Event()

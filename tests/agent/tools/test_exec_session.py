@@ -16,13 +16,13 @@ import time
 
 import pytest
 
-from jenny.agent.tools.exec_session import (
+from jafta.agent.tools.exec_session import (
     ExecSessionManager,
     _PythonSession,
     format_result_line,
     format_session_poll,
 )
-from jenny.agent.tools.python_exec import PythonNamespace
+from jafta.agent.tools.python_exec import PythonNamespace
 
 # A loop with no natural end that periodically hits a Python-level line
 # event (via a call into time.sleep), so the trace-based checkpoint
@@ -213,8 +213,8 @@ def test_concurrent_session_and_oneshot_exec_do_not_cross_contaminate_stdout():
     contaminazione **e** nessuna serializzazione. L'ultima asserzione è quella
     che cambia segno — il one-shot NON deve più aspettare la sessione.
     """
-    from jenny.agent.tools.exec_session import _PythonSession
-    from jenny.agent.tools.python_exec import _ThreadRoutedStream
+    from jafta.agent.tools.exec_session import _PythonSession
+    from jafta.agent.tools.python_exec import _ThreadRoutedStream
 
     real_stdout = sys.stdout
     real_stderr = sys.stderr
@@ -271,7 +271,7 @@ def test_concurrent_session_and_oneshot_exec_do_not_cross_contaminate_stdout():
     # il bersaglio, non l'identità dell'oggetto.)
     for stream, real in ((sys.stdout, real_stdout), (sys.stderr, real_stderr)):
         if isinstance(stream, _ThreadRoutedStream):
-            assert stream._jenny_target is real
+            assert stream._jafta_target is real
         else:
             assert stream is real
 

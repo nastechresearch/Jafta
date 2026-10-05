@@ -14,11 +14,11 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.channels.websocket import WebSocketChannel, WebSocketConfig
-from jenny.config.loader import save_config
-from jenny.config.schema import Config
-from jenny.runtime.context import get_runtime_context
-from jenny.webui.gateway_services import build_gateway_services
+from jafta.channels.websocket import WebSocketChannel, WebSocketConfig
+from jafta.config.loader import save_config
+from jafta.config.schema import Config
+from jafta.runtime.context import get_runtime_context
+from jafta.webui.gateway_services import build_gateway_services
 
 
 class _FakeConnection:
@@ -39,7 +39,7 @@ def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     config_path = tmp_path / "config.json"
     save_config(Config(), config_path)
     monkeypatch.setattr(get_runtime_context(), "config_path", config_path)
-    monkeypatch.setattr("jenny.config.paths.get_workspace_path", lambda: root)
+    monkeypatch.setattr("jafta.config.paths.get_workspace_path", lambda: root)
     return root
 
 

@@ -1,6 +1,6 @@
 """La disposizione della mappa segue il quaderno quando cambia nome, e se ne va con lui.
 
-Gli spilli della mappa stanno in ``.jenny/map-layout.json``, chiave il nome del
+Gli spilli della mappa stanno in ``.jafta/map-layout.json``, chiave il nome del
 quaderno. Fino al 26/09/2026 ne' ``renameNotebook`` ne' la cancellazione
 toccavano il file: rinominato, un quaderno perdeva la sua disposizione;
 cancellato, la lasciava li', e un quaderno nuovo con lo stesso nome ereditava
@@ -18,7 +18,7 @@ from pathlib import Path
 
 from support.js_harness import requires_node, run_module
 
-SHARED = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets" / "shared"
+SHARED = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets" / "shared"
 pytestmark = requires_node
 
 _FAKES = {

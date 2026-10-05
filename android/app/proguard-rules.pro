@@ -2,7 +2,7 @@
 -keep class com.chaquo.python.** { *; }
 
 # Keep Python entry point module
--keep class com.flagdizero.jenny.** { *; }
+-keep class com.nastechresearch.jafta.** { *; }
 
 # SSH (jsch + BouncyCastle).
 # jsch NON referenzia le implementazioni degli algoritmi per tipo: le istanzia

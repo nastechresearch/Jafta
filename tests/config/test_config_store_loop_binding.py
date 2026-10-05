@@ -15,10 +15,10 @@ from unittest.mock import patch
 
 import pytest
 
-from jenny.android_entry import run_gateway
-from jenny.config import store
-from jenny.config.bootstrap import ensure_minimal_config
-from jenny.runtime.context import get_runtime_context
+from jafta.android_entry import run_gateway
+from jafta.config import store
+from jafta.config.bootstrap import ensure_minimal_config
+from jafta.runtime.context import get_runtime_context
 
 
 @pytest.fixture(autouse=True)
@@ -125,7 +125,7 @@ def test_config_store_lock_is_reset_between_gateway_runs(
     nessuna impostazione era più salvabile.
     """
     monkeypatch.setattr(get_runtime_context(), "workspace_dir", None)
-    monkeypatch.setattr("jenny.android_entry.RETRY_DELAY_S", 0)
+    monkeypatch.setattr("jafta.android_entry.RETRY_DELAY_S", 0)
 
     workspace = tmp_path / "workspace"
     ensure_minimal_config(workspace)
@@ -139,7 +139,7 @@ def test_config_store_lock_is_reset_between_gateway_runs(
     async def _fake_run(**_kwargs) -> None:
         await _mutate_with_a_queued_writer(config_path)
 
-    with patch("jenny.gateway_runtime._run_gateway", new=_fake_run):
+    with patch("jafta.gateway_runtime._run_gateway", new=_fake_run):
         run_gateway(str(tmp_path), host="127.0.0.1", port=18042)
 
     assert config_path.is_file()

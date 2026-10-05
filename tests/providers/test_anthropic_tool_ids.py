@@ -22,8 +22,8 @@ from typing import Any
 
 import httpx
 
-from jenny.providers.anthropic_provider import AnthropicProvider
-from jenny.utils.helpers import maybe_persist_tool_result
+from jafta.providers.anthropic_provider import AnthropicProvider
+from jafta.utils.helpers import maybe_persist_tool_result
 
 
 def _provider(handler=None) -> AnthropicProvider:
@@ -242,7 +242,7 @@ async def test_two_large_results_no_longer_collide_on_disk(tmp_path: Path) -> No
         )
 
     stored = sorted(
-        path.read_text() for path in (tmp_path / ".jenny" / "tool-results").rglob("*.txt")
+        path.read_text() for path in (tmp_path / ".jafta" / "tool-results").rglob("*.txt")
     )
     assert stored == payloads
 

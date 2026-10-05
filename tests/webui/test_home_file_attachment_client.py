@@ -2,7 +2,7 @@
 
 Un PDF, un vocale: il filo li mostra come una pastiglia col nome, un ``<a>``
 verso l'URL firmato. Da ``a1b8b1e3`` ogni ``<a>`` del filo passa da
-``shared/content-link.js`` — giusto per il markdown di Jenny, che non deve
+``shared/content-link.js`` — giusto per il markdown di Jafta, che non deve
 poter navigare la casa — e un indirizzo della stessa origine li' e' «link non
 apribile»: la pastiglia non apriva piu' niente.
 
@@ -40,7 +40,7 @@ const inert = [locales.it.common.linkNotOpenable, locales.en.common.linkNotOpena
 def test_a_voice_note_opens_with_the_native_viewer() -> None:
     run_home(_HEAD + """
 const opened = [];
-window.JennyNative = { openFile: async (path) => { opened.push(path); return true; } };
+window.JaftaNative = { openFile: async (path) => { opened.push(path); return true; } };
 const ev = tap();
 await tick(10);
 assert.equal(ev.defaultPrevented, true, 'la WebView navigherebbe sull\\u2019allegato');
@@ -51,7 +51,7 @@ assert.ok(!toasts().some((t) => inert.includes(t)), JSON.stringify(toasts()));
 
 def test_a_native_viewer_that_fails_says_so() -> None:
     run_home(_HEAD + """
-window.JennyNative = { openFile: async () => false };
+window.JaftaNative = { openFile: async () => false };
 tap();
 await tick(10);
 const couldNot = [locales.it.chat.couldNotOpen, locales.en.chat.couldNotOpen]

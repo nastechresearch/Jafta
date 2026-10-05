@@ -3,7 +3,7 @@
 La regola e' dell'utente (23/09/2026): «se swipe orizzontale e' swipe, se click
 e' click. Se pero' ci sono eventi di swipe sulla pagina vince lo swipe sul
 componente e non il cambio di scheda». Prima c'era una sola eccezione, lo
-scorrevole nativo: tutto quel che una Jenny App faceva col suo codice non si
+scorrevole nativo: tutto quel che una Jafta App faceva col suo codice non si
 vedeva, e il dito muoveva l'app **e** la pagina.
 
 Il difetto opposto l'ha trovato l'utente prima che lo scrivessi: «se il bottone
@@ -22,7 +22,7 @@ from pathlib import Path
 from support.js_harness import requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-MODULE = ROOT / "jenny" / "templates" / "ui" / "assets" / "shared" / "horizontal-swipe.js"
+MODULE = ROOT / "jafta" / "templates" / "ui" / "assets" / "shared" / "horizontal-swipe.js"
 
 pytestmark = requires_node
 

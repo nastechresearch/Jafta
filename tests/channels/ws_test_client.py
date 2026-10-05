@@ -1,4 +1,4 @@
-"""Lightweight WebSocket test client for integration testing the jenny WebSocket channel.
+"""Lightweight WebSocket test client for integration testing the jafta WebSocket channel.
 
 Provides an async ``WsTestClient`` class that integration tests can import and
 use directly::

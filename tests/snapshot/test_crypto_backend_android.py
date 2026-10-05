@@ -10,9 +10,9 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.snapshot.crypto import build_header, decrypt_container, encrypt_container
-from jenny.snapshot.crypto_backends.android import AndroidAesGcmBackend
-from jenny.snapshot.crypto_backends.base import CryptoAuthError
+from jafta.snapshot.crypto import build_header, decrypt_container, encrypt_container
+from jafta.snapshot.crypto_backends.android import AndroidAesGcmBackend
+from jafta.snapshot.crypto_backends.base import CryptoAuthError
 
 pytest.importorskip("cryptography")
 
@@ -56,7 +56,7 @@ async def test_container_known_answer(fake_jca) -> None:
 
 async def test_cross_backend_roundtrip(fake_jca) -> None:
     """Un container cifrato da un backend è decifrabile dall'altro."""
-    from jenny.snapshot.crypto_backends.dev import DevAesGcmBackend
+    from jafta.snapshot.crypto_backends.dev import DevAesGcmBackend
 
     android, dev = AndroidAesGcmBackend(), DevAesGcmBackend()
     blob = await encrypt_container("pass àè", b"payload" * 100, iterations=1000, backend=android)

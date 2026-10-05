@@ -3,10 +3,10 @@ from __future__ import annotations
 import httpx
 import pytest
 
-from jenny.config.loader import load_config, save_config
-from jenny.config.schema import Config, ProviderConfig
-from jenny.runtime.context import get_runtime_context
-from jenny.webui.settings_api import (
+from jafta.config.loader import load_config, save_config
+from jafta.config.schema import Config, ProviderConfig
+from jafta.runtime.context import get_runtime_context
+from jafta.webui.settings_api import (
     WebUISettingsError,
     normalize_api_base,
     provider_models_payload,
@@ -192,7 +192,7 @@ async def test_update_context_window_rejects_unknown_values(
 def test_the_context_window_refusal_names_the_options_it_has(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from jenny.webui import settings_api
+    from jafta.webui import settings_api
 
     monkeypatch.setattr(settings_api, "_CONTEXT_WINDOW_TOKEN_OPTIONS", (65_536, 131_072, 262_144))
     with pytest.raises(WebUISettingsError, match="65536 or 131072 or 262144"):
@@ -266,9 +266,9 @@ def test_settings_payload_includes_token_usage_summary(
     config = Config()
     save_config(config, config_path)
     monkeypatch.setattr(get_runtime_context(), "config_path", config_path)
-    monkeypatch.setattr("jenny.agent.token_usage.get_webui_dir", lambda: tmp_path / "webui")
+    monkeypatch.setattr("jafta.agent.token_usage.get_webui_dir", lambda: tmp_path / "webui")
 
-    from jenny.agent.token_usage import record_token_usage
+    from jafta.agent.token_usage import record_token_usage
 
     record_token_usage({"prompt_tokens": 10, "completion_tokens": 5})
 
@@ -306,7 +306,7 @@ def test_provider_models_payload_fetches_openai_compatible_models(
             request=httpx.Request("GET", url),
         )
 
-    monkeypatch.setattr("jenny.webui.settings_api.httpx.get", fake_get)
+    monkeypatch.setattr("jafta.webui.settings_api.httpx.get", fake_get)
 
     payload = provider_models_payload({"provider": ["deepseek"]})
 
@@ -334,7 +334,7 @@ def test_provider_models_payload_fetches_dynamic_custom_provider_models(
             request=httpx.Request("GET", url),
         )
 
-    monkeypatch.setattr("jenny.webui.settings_api.httpx.get", fake_get)
+    monkeypatch.setattr("jafta.webui.settings_api.httpx.get", fake_get)
 
     payload = provider_models_payload({"provider": [DYNAMIC_PROVIDER_NAME]})
 
@@ -421,8 +421,8 @@ async def test_save_onboarding_welcome_lands_in_unified_session(
     quella che la chat rilegge all'attach — con chat_id 'default'."""
     import asyncio
 
-    from jenny.session.keys import UNIFIED_SESSION_KEY
-    from jenny.session.manager import SessionManager
+    from jafta.session.keys import UNIFIED_SESSION_KEY
+    from jafta.session.manager import SessionManager
 
     config_path = tmp_path / "config.json"
     monkeypatch.setattr(get_runtime_context(), "config_path", config_path)
@@ -443,7 +443,7 @@ async def test_save_onboarding_welcome_lands_in_unified_session(
     session = sessions.get_or_create(UNIFIED_SESSION_KEY)
     assert [m.get("role") for m in session.messages] == ["assistant"]
     assert result["welcome_message"] in session.messages[0]["content"]
-    assert "Hi, I'm Jenny" in session.messages[0]["content"]
+    assert "Hi, I'm Jafta" in session.messages[0]["content"]
     # Senza locale si ripiega sull'inglese, come la WebUI, e lo si persiste.
     saved = load_config(config_path)
     assert saved.agents.defaults.language == "en"
@@ -456,8 +456,8 @@ async def test_save_onboarding_welcome_is_localized_to_english(
     """Con locale='en' il saluto di benvenuto è in inglese."""
     import asyncio
 
-    from jenny.session.keys import UNIFIED_SESSION_KEY
-    from jenny.session.manager import SessionManager
+    from jafta.session.keys import UNIFIED_SESSION_KEY
+    from jafta.session.manager import SessionManager
 
     config_path = tmp_path / "config.json"
     monkeypatch.setattr(get_runtime_context(), "config_path", config_path)
@@ -478,7 +478,7 @@ async def test_save_onboarding_welcome_is_localized_to_english(
     assert result["chat_id"] == "default"
     session = sessions.get_or_create(UNIFIED_SESSION_KEY)
     assert [m.get("role") for m in session.messages] == ["assistant"]
-    assert "Hi, I'm Jenny" in session.messages[0]["content"]
+    assert "Hi, I'm Jafta" in session.messages[0]["content"]
     saved = load_config(config_path)
     assert saved.agents.defaults.language == "en"
 
@@ -486,7 +486,7 @@ async def test_save_onboarding_welcome_is_localized_to_english(
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
     ("locale", "greeting", "saved_language"),
-    [("it", "Ciao sono Jenny", "it"), ("fr", "Hi, I'm Jenny", "en")],
+    [("it", "Ciao sono Jafta", "it"), ("fr", "Hi, I'm Jafta", "en")],
 )
 async def test_save_onboarding_welcome_follows_a_known_locale_only(
     tmp_path, monkeypatch: pytest.MonkeyPatch, locale: str, greeting: str, saved_language: str
@@ -498,8 +498,8 @@ async def test_save_onboarding_welcome_follows_a_known_locale_only(
     """
     import asyncio
 
-    from jenny.session.keys import UNIFIED_SESSION_KEY
-    from jenny.session.manager import SessionManager
+    from jafta.session.keys import UNIFIED_SESSION_KEY
+    from jafta.session.manager import SessionManager
 
     config_path = tmp_path / "config.json"
     monkeypatch.setattr(get_runtime_context(), "config_path", config_path)
@@ -554,7 +554,7 @@ def test_settings_payload_reports_a_recovered_cron_store(tmp_path) -> None:
     schermata, quindi senza questo campo l'utente scopriva che i suoi
     promemoria non c'erano più solo quando non suonavano.
     """
-    from jenny.runtime.context import get_runtime_context
+    from jafta.runtime.context import get_runtime_context
 
     ctx = get_runtime_context()
     assert settings_payload()["cron_recovery"] is None

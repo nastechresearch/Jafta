@@ -35,7 +35,7 @@ NODE = shutil.which("node")
 requires_node = pytest.mark.skipif(NODE is None, reason="node non disponibile")
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 I18N_DIR = ASSETS / "i18n"
 
 

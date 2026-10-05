@@ -17,12 +17,12 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.config.loader import load_config, save_config
-from jenny.config.schema import Config, ProviderConfig
-from jenny.providers.factory import provider_fingerprint
-from jenny.runtime.context import get_runtime_context
-from jenny.webui.commands import CommandContext, CommandError, dispatch_command
-from jenny.webui.settings_api import WebUISettingsError
+from jafta.config.loader import load_config, save_config
+from jafta.config.schema import Config, ProviderConfig
+from jafta.providers.factory import provider_fingerprint
+from jafta.runtime.context import get_runtime_context
+from jafta.webui.commands import CommandContext, CommandError, dispatch_command
+from jafta.webui.settings_api import WebUISettingsError
 
 
 @pytest.fixture()
@@ -129,7 +129,7 @@ async def test_an_unexpected_error_is_internal_and_mute(
     async def boom(*_a, **_k):
         raise RuntimeError("kaboom: /Users/someone/workspace/config.json")
 
-    monkeypatch.setattr("jenny.webui.settings_api.update_provider", boom)
+    monkeypatch.setattr("jafta.webui.settings_api.update_provider", boom)
     on_changed = MagicMock()
     err = await _refused(
         _ctx(tmp_path, on_settings_changed=on_changed),
@@ -155,7 +155,7 @@ async def test_provider_models_passes_the_typed_key(
         seen.append(query)
         return {"provider": "x", "models": [], "model_count": 0, "status": "ok"}
 
-    monkeypatch.setattr("jenny.webui.settings_api.provider_models_payload", fake)
+    monkeypatch.setattr("jafta.webui.settings_api.provider_models_payload", fake)
     payload = await dispatch_command(
         _ctx(tmp_path),
         "settings.provider.models",
@@ -174,7 +174,7 @@ async def test_a_settings_error_keeps_its_meaning(
     def boom(_query):
         raise WebUISettingsError("provider sconosciuto", status=status)
 
-    monkeypatch.setattr("jenny.webui.settings_api.provider_models_payload", boom)
+    monkeypatch.setattr("jafta.webui.settings_api.provider_models_payload", boom)
     err = await _refused(_ctx(tmp_path), "settings.provider.models", {"provider": "x"})
     assert err.code == code
     assert err.message == "provider sconosciuto"
@@ -201,7 +201,7 @@ async def test_telegram_save_fires_the_channel_hook(
         tokens.append(token)
         return {"enabled": True}
 
-    monkeypatch.setattr("jenny.webui.telegram_api.save_telegram_token", fake)
+    monkeypatch.setattr("jafta.webui.telegram_api.save_telegram_token", fake)
     on_tg = MagicMock()
     payload = await dispatch_command(
         _ctx(tmp_path, on_telegram_changed=on_tg), "telegram.save", {"token": "123:abc"}
@@ -217,7 +217,7 @@ async def test_a_rejected_telegram_token_does_not_restart_the_channel(
     async def fake(_token):
         raise WebUISettingsError("cannot reach Telegram: ConnectError", status=502)
 
-    monkeypatch.setattr("jenny.webui.telegram_api.save_telegram_token", fake)
+    monkeypatch.setattr("jafta.webui.telegram_api.save_telegram_token", fake)
     on_tg = MagicMock()
     err = await _refused(
         _ctx(tmp_path, on_telegram_changed=on_tg), "telegram.save", {"token": "123:abc"}
@@ -233,7 +233,7 @@ async def test_a_rejected_telegram_token_does_not_restart_the_channel(
 
 @pytest.fixture()
 def reachable(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr("jenny.webui.ssh_api.validate_ssh_target", lambda _h: (True, None))
+    monkeypatch.setattr("jafta.webui.ssh_api.validate_ssh_target", lambda _h: (True, None))
 
 
 async def test_ssh_host_save_keeps_the_password(
@@ -288,7 +288,7 @@ _ONBOARDING = {
     "api_key": "sk-test-123",
     "api_base": "",
     "model": "gpt-x",
-    "bot_name": "Jenny",
+    "bot_name": "Jafta",
     "bot_icon": "",
     "locale": "it",
 }
@@ -299,8 +299,8 @@ async def test_onboarding_save_writes_the_key_and_wakes_the_agent(
 ) -> None:
     import asyncio
 
-    from jenny.session.keys import UNIFIED_SESSION_KEY
-    from jenny.session.manager import SessionManager
+    from jafta.session.keys import UNIFIED_SESSION_KEY
+    from jafta.session.manager import SessionManager
 
     event = asyncio.Event()
     sessions = SessionManager(tmp_path)
@@ -349,7 +349,7 @@ async def test_onboarding_save_hides_an_unexpected_error(
     async def boom(*args, **kwargs):
         raise RuntimeError("kaboom")
 
-    monkeypatch.setattr("jenny.webui.settings_api.save_onboarding", boom)
+    monkeypatch.setattr("jafta.webui.settings_api.save_onboarding", boom)
     err = await _refused(_ctx(tmp_path), "onboarding.save", dict(_ONBOARDING))
     assert err.code == "internal"
     assert "kaboom" not in err.message
@@ -360,8 +360,8 @@ def test_the_gateway_hands_the_onboarding_wiring_to_the_commands(tmp_path: Path)
     gateway resterebbe ad aspettare l'onboarding fino al riavvio."""
     import asyncio
 
-    from jenny.channels.websocket import WebSocketConfig
-    from jenny.webui.gateway_services import build_gateway_services
+    from jafta.channels.websocket import WebSocketConfig
+    from jafta.webui.gateway_services import build_gateway_services
 
     event = asyncio.Event()
     sessions = MagicMock()

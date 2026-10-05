@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.session.keys import UNIFIED_SESSION_KEY, session_key_for_channel
+from jafta.session.keys import UNIFIED_SESSION_KEY, session_key_for_channel
 
 
 def test_unified_key_literal_is_stable() -> None:
@@ -33,7 +33,7 @@ def test_every_channel_chat_maps_to_unified(channel: str, chat_id: str) -> None:
 
 def test_dream_keys_never_collide_with_unified() -> None:
     """Le chiavi interne di Dream vivono in un namespace separato (``dream:``)."""
-    from jenny.agent.memory import MemoryStore
+    from jafta.agent.memory import MemoryStore
 
     key = MemoryStore.dream_session_key()
     assert key.startswith("dream:")
@@ -51,7 +51,7 @@ def test_mapping_a_chat_id_does_not_warn_about_an_unknown_key(chat_id: str) -> N
     """
     from loguru import logger
 
-    from jenny.session import keys as keys_mod
+    from jafta.session import keys as keys_mod
 
     keys_mod._UNCLASSIFIED_WARNED.discard(chat_id)
     messages: list[str] = []
@@ -81,8 +81,8 @@ def test_reading_the_chat_id_of_a_frame_does_not_warn(chat_id: str) -> None:
     """
     from loguru import logger
 
-    from jenny.channels.websocket import WebSocketChannel
-    from jenny.session import keys as keys_mod
+    from jafta.channels.websocket import WebSocketChannel
+    from jafta.session import keys as keys_mod
 
     keys_mod._UNCLASSIFIED_WARNED.discard(chat_id)
     messages: list[str] = []

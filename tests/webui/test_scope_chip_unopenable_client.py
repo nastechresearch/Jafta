@@ -38,7 +38,7 @@ from pathlib import Path
 
 from support.js_harness import locale, member, requires_node, run_js
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 CHIP_JS = ASSETS / "shared" / "scope-chip.js"
 LIST_JS = ASSETS / "shared" / "conversation-list.js"
 I18N_JS = ASSETS / "shared" / "i18n.js"
@@ -471,7 +471,7 @@ def test_the_payload_the_route_builds_is_the_payload_the_chip_reads(tmp_path) ->
     solo — `unopenable` → `unopenables`, `reason` → `why` — muore qui, che è
     l'unico posto in cui i due lati si guardano.
     """
-    from jenny.webui.wiki_routes import _collect_projects
+    from jafta.webui.wiki_routes import _collect_projects
 
     wikis = tmp_path / "wikis"
     for name in ("Ricerca ETNA", "palestra"):

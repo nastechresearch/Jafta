@@ -24,8 +24,8 @@ import threading
 
 import pytest
 
-from jenny.agent.tools.python_exec import PythonExecTool, PythonNamespace
-from jenny.config.tool_schemas import PythonExecConfig
+from jafta.agent.tools.python_exec import PythonExecTool, PythonNamespace
+from jafta.config.tool_schemas import PythonExecConfig
 
 _REFUSED = "outside allowed directory"
 
@@ -495,7 +495,7 @@ class TestModuleShadowing:
 
         È il costo dichiarato della scelta: un modulo di skill viene
         ri-eseguito a ogni exec e non conserva stato a livello di modulo. Su
-        tutti gli script reali di ``jenny/skills/*/scripts/`` quello stato è
+        tutti gli script reali di ``jafta/skills/*/scripts/`` quello stato è
         fatto di regex compilate e costanti, quindi il costo è teorico — ma va
         tenuto fermo da un test, non da una speranza.
         """

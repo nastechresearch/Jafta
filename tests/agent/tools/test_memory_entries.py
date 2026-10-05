@@ -1,4 +1,4 @@
-"""Scrittura per voce sui file di memoria (``jenny/agent/tools/memory_entries.py``).
+"""Scrittura per voce sui file di memoria (``jafta/agent/tools/memory_entries.py``).
 
 Il campione ``_REAL_SHAPE`` riproduce la forma **misurata** di ``USER.md`` sul
 Titan 2 il 2026-08-18 — titolo ``#``, sezioni ``##``, bullet di una riga, alcuni
@@ -13,10 +13,10 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.memory_archive import archive_dir, find_archived
-from jenny.agent.memory_budget import FileBudget, make_write_size_guard
-from jenny.agent.tools.file_state import FileStates
-from jenny.agent.tools.memory_entries import (
+from jafta.agent.memory_archive import archive_dir, find_archived
+from jafta.agent.memory_budget import FileBudget, make_write_size_guard
+from jafta.agent.tools.file_state import FileStates
+from jafta.agent.tools.memory_entries import (
     MEMORY_TARGETS,
     MemoryEntryTool,
     add_entry,
@@ -570,7 +570,7 @@ class TestItIsMountedOnDream:
         """Stesso ``FileStates`` degli altri tool del run, altrimenti i contatori
         raccontano due run diversi; e stesso guard, altrimenti il tetto ha una
         porta di servizio."""
-        from jenny.agent.memory import MemoryStore
+        from jafta.agent.memory import MemoryStore
 
         store = MemoryStore(tmp_path)
         refusals: list[str] = []
@@ -764,7 +764,7 @@ class TestRemovingIsDemoting:
         (tmp_path / "USER.md").write_text(_REAL_SHAPE, encoding="utf-8")
         tool = MemoryEntryTool(tmp_path, file_states=FileStates())
         monkeypatch.setattr(
-            "jenny.agent.tools.memory_entries.archive_entry",
+            "jafta.agent.tools.memory_entries.archive_entry",
             lambda *a, **k: (_ for _ in ()).throw(OSError("disco pieno")),
         )
 
@@ -917,7 +917,7 @@ class TestReplacingAlsoKeepsTheOldVersion:
     @pytest.fixture
     def tool(self, tmp_path: Path):
         (tmp_path / "USER.md").write_text(_REAL_SHAPE, encoding="utf-8")
-        from jenny.agent.tools.memory_entries import make_entry_archiver
+        from jafta.agent.tools.memory_entries import make_entry_archiver
 
         return MemoryEntryTool(
             tmp_path,
@@ -1030,7 +1030,7 @@ class TestCreateRefusesToBuildUnprotected:
     """
 
     def test_it_raises_instead_of_returning_an_unprotected_tool(self, tmp_path):
-        from jenny.agent.tools.context import ToolContext
+        from jafta.agent.tools.context import ToolContext
 
         ctx = ToolContext(config=None, workspace=str(tmp_path))
 

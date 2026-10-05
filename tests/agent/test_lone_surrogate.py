@@ -12,9 +12,9 @@ from __future__ import annotations
 
 import json
 
-from jenny.bus.events import InboundMessage
-from jenny.providers.base import LLMResponse
-from jenny.session.manager import SessionManager, scrub_lone_surrogates
+from jafta.bus.events import InboundMessage
+from jafta.providers.base import LLMResponse
+from jafta.session.manager import SessionManager, scrub_lone_surrogates
 from tests.support.agent import make_loop, make_provider
 
 KEY = "unified:default"
@@ -91,7 +91,7 @@ async def test_a_lone_surrogate_never_reaches_the_provider(tmp_path):
 async def test_a_lone_surrogate_injected_mid_turn_never_reaches_the_provider(tmp_path):
     import asyncio
 
-    from jenny.providers.base import ToolCallRequest
+    from jafta.providers.base import ToolCallRequest
 
     (tmp_path / "a.txt").write_text("A", encoding="utf-8")
     seen: list[str] = []

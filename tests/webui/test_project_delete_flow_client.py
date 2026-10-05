@@ -19,7 +19,7 @@ import pytest
 from support.js_harness import requires_node, run_module
 
 ROOT = Path(__file__).resolve().parents[2]
-SHARED = ROOT / "jenny" / "templates" / "ui" / "assets" / "shared"
+SHARED = ROOT / "jafta" / "templates" / "ui" / "assets" / "shared"
 
 pytestmark = requires_node
 

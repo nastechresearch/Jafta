@@ -10,7 +10,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.memory import Consolidator, MemoryStore, iter_fact_lines
+from jafta.agent.memory import Consolidator, MemoryStore, iter_fact_lines
 
 
 @pytest.fixture
@@ -258,7 +258,7 @@ class TestWhatTheModelActuallyReceives:
     ):
         """La cosa che non deve rompersi.
 
-        Senza questa riga, più Jenny sa e meno può aggiornare: un fatto che
+        Senza questa riga, più Jafta sa e meno può aggiornare: un fatto che
         cambia verrebbe letto come "già registrato" e scartato, e la memoria si
         congelerebbe man mano che cresce.
         """

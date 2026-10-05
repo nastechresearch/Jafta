@@ -18,7 +18,7 @@ from unittest.mock import MagicMock
 from websockets.http11 import Headers
 from websockets.http11 import Request as WsRequest
 
-from jenny.webui.ws_http import GatewayHTTPHandler
+from jafta.webui.ws_http import GatewayHTTPHandler
 
 AUTH_SECRET = "test-secret"
 

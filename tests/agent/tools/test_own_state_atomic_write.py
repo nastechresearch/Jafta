@@ -1,4 +1,4 @@
-"""I tre file di Jenny si riscrivono in modo atomico, anche dal review pass.
+"""I tre file di Jafta si riscrivono in modo atomico, anche dal review pass.
 
 Il percorso incrementale (``MemoryEntryTool._commit``) passava da ``atomic_write``,
 il review pass no: ristruttura MEMORY.md / SOUL.md / USER.md con ``edit_file`` e
@@ -7,7 +7,7 @@ Su Android il processo muore quando vuole, e quel che resta è un file *visibile
 mezzo scritto — che si legge come integro.
 
 Il discriminante è ``extra_write_allowed_files``: un tool costruito con una
-allowlist di file esatti esiste solo per riscrivere stato di Jenny. I file
+allowlist di file esatti esiste solo per riscrivere stato di Jafta. I file
 dell'utente restano scritti in posto, ed è deliberato: rimpiazzare l'inode
 cambierebbe permessi e hardlink.
 """
@@ -18,16 +18,16 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.memory import MemoryStore
-from jenny.agent.tools.apply_patch import ApplyPatchTool
-from jenny.agent.tools.filesystem import EditFileTool, WriteFileTool
+from jafta.agent.memory import MemoryStore
+from jafta.agent.tools.apply_patch import ApplyPatchTool
+from jafta.agent.tools.filesystem import EditFileTool, WriteFileTool
 
 
 @pytest.fixture()
 def atomic_spy(monkeypatch):
     """Registra i path passati ad ``atomic_write``, lasciando avvenire la scrittura."""
-    import jenny.agent.tools.filesystem as fs_module
-    from jenny.utils.path import atomic_write as real_atomic_write
+    import jafta.agent.tools.filesystem as fs_module
+    from jafta.utils.path import atomic_write as real_atomic_write
 
     seen: list[Path] = []
 
@@ -36,10 +36,10 @@ def atomic_spy(monkeypatch):
         return real_atomic_write(path, content, **kwargs)
 
     # Il punto di patch è il binding del modulo che scrive, non
-    # ``jenny.utils.path``: ``filesystem.py`` importa il nome a import-time, e
+    # ``jafta.utils.path``: ``filesystem.py`` importa il nome a import-time, e
     # ``apply_patch`` scrive tramite ``_FsTool._commit_write``, cioè lo stesso
     # binding. È anche la convenzione del resto della suite
-    # (``jenny.agent.skills.atomic_write``, ``jenny.webui.wiki.atomic_write``).
+    # (``jafta.agent.skills.atomic_write``, ``jafta.webui.wiki.atomic_write``).
     monkeypatch.setattr(fs_module, "atomic_write", spy)
     return seen
 
@@ -60,7 +60,7 @@ def _own_files(store: MemoryStore) -> list[Path]:
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("which", ["memory_file", "soul_file", "user_file"])
-async def test_edit_file_writes_jennys_own_files_atomically(dream, atomic_spy, which):
+async def test_edit_file_writes_jaftas_own_files_atomically(dream, atomic_spy, which):
     store, tools = dream
     target = getattr(store, which)
 
@@ -75,7 +75,7 @@ async def test_edit_file_writes_jennys_own_files_atomically(dream, atomic_spy, w
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("which", ["memory_file", "soul_file", "user_file"])
-async def test_apply_patch_writes_jennys_own_files_atomically(dream, atomic_spy, which):
+async def test_apply_patch_writes_jaftas_own_files_atomically(dream, atomic_spy, which):
     store, tools = dream
     target = getattr(store, which)
 

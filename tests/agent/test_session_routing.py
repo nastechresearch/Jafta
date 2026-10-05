@@ -17,14 +17,14 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from support.agent import make_loop
 
-from jenny.agent.loop import AgentLoop
-from jenny.agent.memory import MemoryStore
-from jenny.bus.events import InboundMessage
-from jenny.command.builtin import cmd_new, register_builtin_commands
-from jenny.command.router import CommandContext, CommandRouter
-from jenny.config.schema import Config
-from jenny.session.keys import UNIFIED_SESSION_KEY
-from jenny.session.manager import Session, SessionManager
+from jafta.agent.loop import AgentLoop
+from jafta.agent.memory import MemoryStore
+from jafta.bus.events import InboundMessage
+from jafta.command.builtin import cmd_new, register_builtin_commands
+from jafta.command.router import CommandContext, CommandRouter
+from jafta.config.schema import Config
+from jafta.session.keys import UNIFIED_SESSION_KEY
+from jafta.session.manager import Session, SessionManager
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -34,7 +34,7 @@ def _make_loop(tmp_path: Path) -> AgentLoop:
     """Create a minimal AgentLoop for dispatch-level tests."""
     return make_loop(
         tmp_path, bare=True, model=None, context_window_tokens=None,
-        patches=("jenny.agent.loop.SessionManager", "jenny.agent.loop.SubagentManager"),
+        patches=("jafta.agent.loop.SessionManager", "jafta.agent.loop.SubagentManager"),
     )
 
 
@@ -246,7 +246,7 @@ class TestConsolidationUnaffectedByUnifiedSession:
     @pytest.mark.asyncio
     async def test_consolidation_skips_empty_session_for_unified_key(self):
         """Empty unified:default session → consolidation exits immediately, archive not called."""
-        from jenny.agent.memory import Consolidator, MemoryStore
+        from jafta.agent.memory import Consolidator, MemoryStore
 
         store = MagicMock(spec=MemoryStore)
         mock_provider = MagicMock()
@@ -278,7 +278,7 @@ class TestConsolidationUnaffectedByUnifiedSession:
     async def test_consolidation_behaviour_identical_for_any_key(self):
         """archive call count is the same for 'websocket:123' and 'unified:default'
         under identical token conditions."""
-        from jenny.agent.memory import Consolidator, MemoryStore
+        from jafta.agent.memory import Consolidator, MemoryStore
 
         archive_calls: dict[str, int] = {}
 
@@ -312,7 +312,7 @@ class TestConsolidationUnaffectedByUnifiedSession:
     async def test_consolidation_triggers_when_over_budget_unified_key(self):
         """When tokens exceed budget, consolidation attempts to find a boundary —
         behaviour is identical to any other session key."""
-        from jenny.agent.memory import Consolidator, MemoryStore
+        from jafta.agent.memory import Consolidator, MemoryStore
 
         store = MagicMock(spec=MemoryStore)
         mock_provider = MagicMock()
@@ -386,7 +386,7 @@ class TestStopCommandWithUnifiedSession:
     @pytest.mark.asyncio
     async def test_stop_command_finds_task_in_unified_mode(self, tmp_path: Path):
         """cmd_stop can cancel tasks stored under the unified key."""
-        from jenny.command.builtin import cmd_stop
+        from jafta.command.builtin import cmd_stop
 
         loop = _make_loop(tmp_path)
 
@@ -418,7 +418,7 @@ class TestStopCommandWithUnifiedSession:
     @pytest.mark.asyncio
     async def test_stop_command_uses_effective_key_without_session_override(self, tmp_path: Path):
         """Priority /stop must cancel the unified session even before dispatch rewrites the message."""
-        from jenny.command.builtin import cmd_stop
+        from jafta.command.builtin import cmd_stop
 
         loop = _make_loop(tmp_path)
 
@@ -443,7 +443,7 @@ class TestStopCommandWithUnifiedSession:
     @pytest.mark.asyncio
     async def test_stop_command_cross_channel_in_unified_mode(self, tmp_path: Path):
         """In unified mode, /stop from one channel cancels tasks from another channel."""
-        from jenny.command.builtin import cmd_stop
+        from jafta.command.builtin import cmd_stop
 
         loop = _make_loop(tmp_path)
 

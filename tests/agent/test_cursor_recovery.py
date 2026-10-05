@@ -9,7 +9,7 @@ history.jsonl (e.g. ``"cursor": "abc"``).  The original ``_next_cursor`` and
 
 import pytest
 
-from jenny.agent.memory import MemoryStore
+from jafta.agent.memory import MemoryStore
 
 
 @pytest.fixture

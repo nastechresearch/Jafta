@@ -1,6 +1,6 @@
 """Tests for AnthropicProvider._merge_consecutive."""
 
-from jenny.providers.anthropic_provider import AnthropicProvider
+from jafta.providers.anthropic_provider import AnthropicProvider
 
 
 class TestMergeConsecutive:

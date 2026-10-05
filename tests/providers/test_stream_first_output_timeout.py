@@ -11,12 +11,12 @@ import asyncio
 from typing import Any
 from unittest.mock import AsyncMock, patch
 
-from jenny.providers.openai_compat_helpers import (
+from jafta.providers.openai_compat_helpers import (
     _LOCAL_REQUEST_TIMEOUT_S,
     _OPENAI_COMPAT_REQUEST_TIMEOUT_S,
     _openai_compat_timeout_s,
 )
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 CONTENT_CHUNK = {"choices": [{"delta": {"content": "hi"}}]}
 
@@ -51,8 +51,8 @@ async def _run(provider: OpenAICompatProvider, steps, streamer=None):
 
 
 async def test_slow_first_chunk_is_not_treated_as_a_stall(monkeypatch) -> None:
-    monkeypatch.setenv("JENNY_STREAM_IDLE_TIMEOUT_S", "0.05")
-    monkeypatch.setenv("JENNY_STREAM_FIRST_OUTPUT_TIMEOUT_S", "5")
+    monkeypatch.setenv("JAFTA_STREAM_IDLE_TIMEOUT_S", "0.05")
+    monkeypatch.setenv("JAFTA_STREAM_FIRST_OUTPUT_TIMEOUT_S", "5")
 
     response = await _run(_provider(), [(0.3, CONTENT_CHUNK), (0, None)])
 
@@ -61,8 +61,8 @@ async def test_slow_first_chunk_is_not_treated_as_a_stall(monkeypatch) -> None:
 
 
 async def test_gap_after_the_first_output_still_stalls(monkeypatch) -> None:
-    monkeypatch.setenv("JENNY_STREAM_IDLE_TIMEOUT_S", "0.05")
-    monkeypatch.setenv("JENNY_STREAM_FIRST_OUTPUT_TIMEOUT_S", "5")
+    monkeypatch.setenv("JAFTA_STREAM_IDLE_TIMEOUT_S", "0.05")
+    monkeypatch.setenv("JAFTA_STREAM_FIRST_OUTPUT_TIMEOUT_S", "5")
 
     response = await _run(_provider(), [(0, CONTENT_CHUNK), (0.5, CONTENT_CHUNK)])
 
@@ -72,8 +72,8 @@ async def test_gap_after_the_first_output_still_stalls(monkeypatch) -> None:
 
 
 async def test_no_first_output_at_all_reports_the_longer_wait(monkeypatch) -> None:
-    monkeypatch.setenv("JENNY_STREAM_IDLE_TIMEOUT_S", "0.05")
-    monkeypatch.setenv("JENNY_STREAM_FIRST_OUTPUT_TIMEOUT_S", "0.2")
+    monkeypatch.setenv("JAFTA_STREAM_IDLE_TIMEOUT_S", "0.05")
+    monkeypatch.setenv("JAFTA_STREAM_FIRST_OUTPUT_TIMEOUT_S", "0.2")
 
     response = await _run(_provider(), [(5, CONTENT_CHUNK)])
 
@@ -84,8 +84,8 @@ async def test_no_first_output_at_all_reports_the_longer_wait(monkeypatch) -> No
 
 async def test_keepalive_chunks_do_not_start_the_idle_clock(monkeypatch) -> None:
     """Un chunk senza delta utile (solo role) non conta come primo output."""
-    monkeypatch.setenv("JENNY_STREAM_IDLE_TIMEOUT_S", "0.05")
-    monkeypatch.setenv("JENNY_STREAM_FIRST_OUTPUT_TIMEOUT_S", "5")
+    monkeypatch.setenv("JAFTA_STREAM_IDLE_TIMEOUT_S", "0.05")
+    monkeypatch.setenv("JAFTA_STREAM_FIRST_OUTPUT_TIMEOUT_S", "5")
 
     steps = [
         (0, {"choices": [{"delta": {"role": "assistant"}}]}),
@@ -111,7 +111,7 @@ async def test_loopback_endpoints_get_the_longer_request_timeout() -> None:
 
 
 async def test_request_timeout_env_override_wins_for_both(monkeypatch) -> None:
-    monkeypatch.setenv("JENNY_OPENAI_COMPAT_TIMEOUT_S", "45")
+    monkeypatch.setenv("JAFTA_OPENAI_COMPAT_TIMEOUT_S", "45")
 
     assert _openai_compat_timeout_s(local=True) == 45.0
     assert _openai_compat_timeout_s(local=False) == 45.0

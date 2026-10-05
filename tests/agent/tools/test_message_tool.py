@@ -2,9 +2,9 @@ import os
 
 import pytest
 
-from jenny.agent.tools.message import MessageTool
-from jenny.bus.events import INTERNAL_CHANNEL, OutboundMessage
-from jenny.config.paths import get_workspace_path
+from jafta.agent.tools.message import MessageTool
+from jafta.bus.events import INTERNAL_CHANNEL, OutboundMessage
+from jafta.config.paths import get_workspace_path
 
 
 @pytest.mark.asyncio
@@ -107,7 +107,7 @@ async def test_message_tool_inherits_metadata_for_same_target() -> None:
 
     tool = MessageTool(send_callback=_send)
     thread_meta = {"thread": {"id": "111.222", "kind": "channel"}}
-    from jenny.agent.tools.context import RequestContext
+    from jafta.agent.tools.context import RequestContext
 
     tool.set_context(RequestContext(channel="websocket", chat_id="C123", metadata=thread_meta))
 
@@ -124,7 +124,7 @@ async def test_message_tool_clears_metadata_when_context_has_none() -> None:
         sent.append(msg)
 
     tool = MessageTool(send_callback=_send)
-    from jenny.agent.tools.context import RequestContext
+    from jafta.agent.tools.context import RequestContext
 
     tool.set_context(
         RequestContext(
@@ -148,7 +148,7 @@ async def test_message_tool_does_not_inherit_metadata_for_cross_target() -> None
         sent.append(msg)
 
     tool = MessageTool(send_callback=_send)
-    from jenny.agent.tools.context import RequestContext
+    from jafta.agent.tools.context import RequestContext
 
     tool.set_context(
         RequestContext(
@@ -179,7 +179,7 @@ async def test_cross_target_send_keeps_the_turn_visibility() -> None:
     deve emettersi il proprio ``turn_end``, altrimenti il client resta con un
     turno aperto per sempre.
     """
-    from jenny.session.turn_visibility import is_silent_turn, silent_turn_metadata
+    from jafta.session.turn_visibility import is_silent_turn, silent_turn_metadata
 
     sent: list[OutboundMessage] = []
 
@@ -187,7 +187,7 @@ async def test_cross_target_send_keeps_the_turn_visibility() -> None:
         sent.append(msg)
 
     tool = MessageTool(send_callback=_send)
-    from jenny.agent.tools.context import RequestContext
+    from jafta.agent.tools.context import RequestContext
 
     tool.set_context(
         RequestContext(
@@ -430,7 +430,7 @@ async def test_message_tool_rejects_wrong_explicit_ws_chat_id(tmp_path) -> None:
         sent.append(msg)
 
     tool = MessageTool(send_callback=_send)
-    from jenny.agent.tools.context import RequestContext
+    from jafta.agent.tools.context import RequestContext
 
     conv = "550e8400-e29b-41d4-a716-446655440000"
     tool.set_context(RequestContext(channel="websocket", chat_id=conv, metadata={}))
@@ -454,7 +454,7 @@ async def test_message_tool_allows_ws_explicit_when_matches_context(tmp_path) ->
         sent.append(msg)
 
     tool = MessageTool(send_callback=_send)
-    from jenny.agent.tools.context import RequestContext
+    from jafta.agent.tools.context import RequestContext
 
     conv = "550e8400-e29b-41d4-a716-446655440000"
     tool.set_context(RequestContext(channel="websocket", chat_id=conv, metadata={}))
@@ -479,7 +479,7 @@ async def test_message_tool_cli_context_may_target_other_ws_chat(tmp_path) -> No
         sent.append(msg)
 
     tool = MessageTool(send_callback=_send)
-    from jenny.agent.tools.context import RequestContext
+    from jafta.agent.tools.context import RequestContext
 
     target = "550e8400-e29b-41d4-a716-446655440000"
     tool.set_context(RequestContext(channel="internal", chat_id="direct", metadata={}))
@@ -532,8 +532,8 @@ async def test_proactive_fanout_for_cross_channel_send() -> None:
 
 
 def _silent_tool(sent: list[OutboundMessage]) -> MessageTool:
-    from jenny.agent.tools.context import RequestContext
-    from jenny.session.turn_visibility import silent_turn_metadata
+    from jafta.agent.tools.context import RequestContext
+    from jafta.session.turn_visibility import silent_turn_metadata
 
     async def _send(msg: OutboundMessage) -> None:
         sent.append(msg)
@@ -552,7 +552,7 @@ def _silent_tool(sent: list[OutboundMessage]) -> MessageTool:
 
 
 def _visible_tool(sent: list[OutboundMessage]) -> MessageTool:
-    from jenny.agent.tools.context import RequestContext
+    from jafta.agent.tools.context import RequestContext
 
     async def _send(msg: OutboundMessage) -> None:
         sent.append(msg)
@@ -849,7 +849,7 @@ async def test_a_leaked_marker_before_a_real_alert_is_only_trimmed() -> None:
 @pytest.mark.asyncio
 async def test_an_alert_that_quotes_the_markers_is_still_delivered() -> None:
     """Il rovescio: parlare di quei token è un messaggio legittimo, e questo
-    tool consegna anche le spiegazioni che Jenny scrive all'utente."""
+    tool consegna anche le spiegazioni che Jafta scrive all'utente."""
     sent: list[OutboundMessage] = []
     tool = _silent_tool(sent)
     text = "boss, ieri sera è uscito un `<｜｜DSML｜｜tool_calls>` in chat: era il modello."

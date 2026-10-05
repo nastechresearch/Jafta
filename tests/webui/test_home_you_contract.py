@@ -1,4 +1,4 @@
-"""«Tu e Jenny»: il contratto della quarta stanza.
+"""«Tu e Jafta»: il contratto della quarta stanza.
 
 Grep e struttura, non comportamento — quello sta in `test_home_switch_client.py`,
 che le stanze le fa girare davvero. Qui ci sono le cose che si rompono in
@@ -16,10 +16,10 @@ from pathlib import Path
 
 from support import css_levels, theme_tokens
 
-from jenny.utils.android_assets import _UI_MANIFEST
+from jafta.utils.android_assets import _UI_MANIFEST
 
 ROOT = Path(__file__).resolve().parents[2]
-UI = ROOT / "jenny" / "templates" / "ui"
+UI = ROOT / "jafta" / "templates" / "ui"
 INDEX = UI / "index.html"
 ASSETS = UI / "assets"
 APP_JS = ASSETS / "home-app.js"
@@ -37,8 +37,8 @@ def _app() -> str:
 
 
 def test_settings_is_a_page_and_the_avatar_is_gone() -> None:
-    """Il bottone in testa — chiave inglese, poi avatar — apriva «Tu e Jenny»
-    e, tenuto premuto, l'officina. Dal 23/09/2026 «Tu e Jenny» e' la pagina
+    """Il bottone in testa — chiave inglese, poi avatar — apriva «Tu e Jafta»
+    e, tenuto premuto, l'officina. Dal 23/09/2026 «Tu e Jafta» e' la pagina
     Impostazioni, e il suo nome sta nella fila in alto.
 
     La scorciatoia per l'officina non si e' spostata sul nome: la pressione
@@ -49,7 +49,7 @@ def test_settings_is_a_page_and_the_avatar_is_gone() -> None:
     html = INDEX.read_text(encoding="utf-8")
     assert 'id="casa-door"' not in html, "l'avatar e' tornato in testa"
     page = html.split('data-page="settings"', 1)[1]
-    assert '<section class="home-you" id="home-you">' in page, "«Tu e Jenny» non e' nella sua pagina"
+    assert '<section class="home-you" id="home-you">' in page, "«Tu e Jafta» non e' nella sua pagina"
     app = _app()
     assert "this.door" not in app
     assert "this.homePages.register('settings', { activate: () => this._openSettings() });" in app
@@ -81,7 +81,7 @@ def test_the_rooms_arrive_on_the_phone() -> None:
     non si apre."""
     for asset in (
         "assets/home-you.js",
-        "assets/home-jenny.js",
+        "assets/home-jafta.js",
         "assets/home-model.js",
         "assets/home-updates.js",
         "assets/shared/update-flow.js",
@@ -92,16 +92,16 @@ def test_the_rooms_arrive_on_the_phone() -> None:
 
 
 def test_the_room_of_her_is_not_the_sprite_of_her() -> None:
-    """Lo sprite che cammina sul bordo (`.jenny-duo`, fino al 24/09/2026
-    `.home-jenny`) vive nel guscio da prima di questa stanza. Se la stanza
+    """Lo sprite che cammina sul bordo (`.jafta-duo`, fino al 24/09/2026
+    `.home-jafta`) vive nel guscio da prima di questa stanza. Se la stanza
     avesse preso quel nome, la regola
     della vista avrebbe acceso e spento **lei** invece della pagina — e
     `data-view` avrebbe smesso di parlare solo di stanze."""
     html = INDEX.read_text(encoding="utf-8")
     css = CSS.read_text(encoding="utf-8")
-    assert '<section class="home-jenny-room" id="home-jenny-room">' in html
-    assert ".home-shell[data-view='jenny'] .home-jenny-room" in css
-    assert not re.search(r"\[data-view='jenny'\] \.(?:home-jenny\b(?!-room)|jenny-duo)", css), (
+    assert '<section class="home-jafta-room" id="home-jafta-room">' in html
+    assert ".home-shell[data-view='jafta'] .home-jafta-room" in css
+    assert not re.search(r"\[data-view='jafta'\] \.(?:home-jafta\b(?!-room)|jafta-duo)", css), (
         "la regola della stanza morde lo sprite di lei"
     )
 
@@ -220,25 +220,25 @@ def test_the_rules_are_written_through_the_command_and_not_as_a_file() -> None:
     puo' riscrivere, e la copia dentro `SOUL.md` che il prompt legge. Se la casa
     le salvasse con `workspace.write` ne farebbe una sola, e la copia
     comincerebbe a divergere dalla verita' al primo salvataggio."""
-    jenny = (ASSETS / "home-jenny.js").read_text(encoding="utf-8")
-    assert "rpc.writeSoulRules(" in jenny, "le regole non passano piu' dal comando"
-    assert "writeWorkspaceFile" not in jenny, (
+    jafta = (ASSETS / "home-jafta.js").read_text(encoding="utf-8")
+    assert "rpc.writeSoulRules(" in jafta, "le regole non passano piu' dal comando"
+    assert "writeWorkspaceFile" not in jafta, (
         "le regole vengono scritte come un file qualunque: la copia in SOUL.md non si rifa'"
     )
     rpc = (ASSETS / "shared" / "rpc-client.js").read_text(encoding="utf-8")
     assert "soul.rules.write" in rpc, "il comando non esiste piu' lato client"
 
-    from jenny.webui.commands import COMMANDS
+    from jafta.webui.commands import COMMANDS
 
     assert "soul.rules.write" in COMMANDS, "il comando non esiste piu' lato server"
 
 
 def test_the_two_halves_look_at_the_same_file() -> None:
     """La casa legge il file, il server lo scrive: due costanti, un posto solo."""
-    from jenny.agent.soul_rules import RULES_FILE
+    from jafta.agent.soul_rules import RULES_FILE
 
-    jenny = (ASSETS / "home-jenny.js").read_text(encoding="utf-8")
-    m = re.search(r"export const RULES_PATH = '([^']+)'", jenny)
+    jafta = (ASSETS / "home-jafta.js").read_text(encoding="utf-8")
+    m = re.search(r"export const RULES_PATH = '([^']+)'", jafta)
     assert m, "la casa non dice piu' da dove legge le regole"
     assert m.group(1) == RULES_FILE.as_posix(), (
         f"la casa legge {m.group(1)}, il server scrive {RULES_FILE.as_posix()}"
@@ -248,13 +248,13 @@ def test_the_two_halves_look_at_the_same_file() -> None:
 def test_the_room_says_what_happens_to_what_you_write() -> None:
     """La frase sotto la casella non e' decorazione: dice che quel testo resta
     tuo e che il resto del carattere non e' modificabile da li'. Senza, un
-    campo di testo accanto a «Jenny» promette di poter riscrivere lei."""
+    campo di testo accanto a «Jafta» promette di poter riscrivere lei."""
     for locale in ("it", "en"):
         data = json.loads((I18N / f"{locale}.json").read_text(encoding="utf-8"))
-        jenny = data["home"]["jenny"]
+        jafta = data["home"]["jafta"]
         for key in ("rules", "rulesHint", "rulesPlaceholder", "rulesSave",
                     "rulesSaved", "rulesFailed"):
-            assert jenny.get(key, "").strip(), f"home.jenny.{key} manca in {locale}.json"
+            assert jafta.get(key, "").strip(), f"home.jafta.{key} manca in {locale}.json"
 
 
 # ── Lei sta dietro, e le schede la coprono davvero ──────────────────────────
@@ -280,17 +280,17 @@ def test_she_is_on_top_of_everything_in_the_house() -> None:
 
     Non e' un dettaglio di stile: e' l'invariante che tiene. Per un giro le
     schede delle impostazioni le sono passate davanti, lasciandola tagliata a
-    meta' mentre in chat e fra le pagine resta in cima. «Vedo jenny dietro i
+    meta' mentre in chat e fra le pagine resta in cima. «Vedo jafta dietro i
     menu», dall'uso, il 19/09/2026 — e prima ancora, con lo stesso numero preso
-    da un nome sbagliato, «Jenny dietro la chat».
+    da un nome sbagliato, «Jafta dietro la chat».
 
     **Questo banco guardava un foglio solo, e il difetto stava nell'altro.** La
     casa carica anche `mobile-style.css`, e il JS che condivide con l'officina
     ci costruisce dentro la mini-app (`.app-frame-overlay`, 110) e la lightbox
     (`.image-lightbox`, allora 1000): col suo 5, lei finiva sotto tutte e due.
     Misurato con `elementFromPoint` il 25/09/2026; la
-    decisione dell'utente (D3) e' «Jenny sempre sopra», anche a mini-app e
-    immagini. Adesso il suo livello e' quello di `.jenny-duo` nel foglio
+    decisione dell'utente (D3) e' «Jafta sempre sopra», anche a mini-app e
+    immagini. Adesso il suo livello e' quello di `.jafta-duo` nel foglio
     dell'officina, lo stesso nelle due interfacce, e qui si controlla ogni
     `z-index` di quel foglio che puo' colpire il DOM della casa. Sopra di lei
     restano solo `<dialog>` e toast, che vivono nel top layer.
@@ -305,18 +305,18 @@ def test_she_is_on_top_of_everything_in_the_house() -> None:
     # La casa non dichiara livelli: nemmeno il suo, che sta nell'altro foglio.
     assert not css_levels.levels(home), (
         f"home-style.css dichiara dei livelli: {css_levels.levels(home)}. Il livello "
-        f"di Jenny e' quello di `.jenny-duo` in mobile-style.css; qualunque altro "
+        f"di Jafta e' quello di `.jafta-duo` in mobile-style.css; qualunque altro "
         f"deve stare sotto il suo, e va scritto perche'"
     )
 
-    its = [z for sel, z in css_levels.levels(themes) if sel == ".jenny-duo"]
+    its = [z for sel, z in css_levels.levels(themes) if sel == ".jafta-duo"]
     assert len(its) == 1, f"lo sprite non ha piu' esattamente un livello suo: {its}"
     she = its[0]
     # Nessuna regola la abbassa in un caso particolare (era `:root.launcher-open
-    # .jenny-duo { z-index: 98 }`, sotto lo scrim del cassetto).
+    # .jafta-duo { z-index: 98 }`, sotto lo scrim del cassetto).
     tweaks = [
         (sel, z) for sel, z in css_levels.levels(themes + home)
-        if "jenny-duo" in css_levels.key_names(sel) and sel != ".jenny-duo"
+        if "jafta-duo" in css_levels.key_names(sel) and sel != ".jafta-duo"
     ]
     assert not tweaks, f"qualcuno cambia il suo livello in un caso: {tweaks}"
 
@@ -324,11 +324,11 @@ def test_she_is_on_top_of_everything_in_the_house() -> None:
     # L'unica eccezione, la stessa del gemello dell'officina: la sua minichat,
     # col fumetto sopra la sua testa. E' di lei, e dal 28/09/2026 anche la casa
     # la apre.
-    allowed = {".jenny-mc"}
+    allowed = {".jafta-mc"}
     above = [
         (sel, z) for sel, z in css_levels.levels(themes)
         if z >= she
-        and sel != ".jenny-duo"
+        and sel != ".jafta-duo"
         and sel not in allowed
         and all(name in words for name in css_levels.key_names(sel))
     ]
@@ -337,13 +337,13 @@ def test_she_is_on_top_of_everything_in_the_house() -> None:
         f"Il suo livello e' {she}: una cosa che la casa puo' mostrare sta sotto"
     )
     # Il banco morde: mini-app e lightbox sono davvero parole della casa.
-    for name in ("app-frame-overlay", "image-lightbox", "jenny-duo"):
+    for name in ("app-frame-overlay", "image-lightbox", "jafta-duo"):
         assert name in words, f"{name} non risulta piu' nel DOM della casa"
 
     # E il fondo che le lascia il posto: e' quello che rende superfluo
     # coprirla, quindi toglierlo riaprirebbe il difetto per cui era nata.
     scroll = _rule(home, ".home-you-scroll")
-    assert "--jenny-art-h" in scroll, (
+    assert "--jafta-art-h" in scroll, (
         "il fondo delle stanze non e' piu' alto quanto lei: l'ultima riga non "
         "si puo' piu' portare sopra di lei scorrendo"
     )
@@ -369,7 +369,7 @@ def test_the_settings_page_does_not_borrow_a_name_the_chat_already_uses() -> Non
     `home-block` era gia' la bolla di un messaggio, e chiamando cosi' le schede
     di questa pagina le loro regole sono atterrate su ogni riga della
     conversazione: i messaggi sono diventati schede con bordo e sfondo, e lo
-    `z-index` che serviva a coprire Jenny l'ha mandata **dietro la chat**.
+    `z-index` che serviva a coprire Jafta l'ha mandata **dietro la chat**.
     Nessun banco lo vedeva — i due file non si nominano fra loro — e sul
     telefono era la prima cosa che si notava.
 
@@ -384,7 +384,7 @@ def test_the_settings_page_does_not_borrow_a_name_the_chat_already_uses() -> Non
 
     html = INDEX.read_text(encoding="utf-8")
     stanze = re.findall(
-        r'<section class="(?:home-you|home-(?:jenny-room|model-room|updates-room))".*?</section>', html, re.S
+        r'<section class="(?:home-you|home-(?:jafta-room|model-room|updates-room))".*?</section>', html, re.S
     )
     assert len(stanze) == 4, f"le quattro stanze non si trovano piu' ({len(stanze)})"
     of_rooms = set()
@@ -419,7 +419,7 @@ def test_the_workshop_card_is_inverted() -> None:
     """La tavola la disegna **scura su pagina chiara**: e' l'unica cosa
     invertita della pagina, e lo e' perche' di la' si va a fare un altro
     mestiere. L'avevo appiattita io, per una ragione reale — era
-    semi-trasparente e Jenny si vedeva attraverso — risolta pero' rendendola
+    semi-trasparente e Jafta si vedeva attraverso — risolta pero' rendendola
     identica a tutte le altre schede.
     """
     body = _rule(CSS.read_text(encoding="utf-8"), ".home-workshop")
@@ -442,7 +442,7 @@ def test_the_workshop_card_is_inverted() -> None:
 def test_pressing_the_workshop_card_does_not_punch_a_hole_in_it() -> None:
     """Lo stato premuto non puo' tornare traslucido.
 
-    La scheda copre Jenny, e `--overlay` su una superficie invertita e' due
+    La scheda copre Jafta, e `--overlay` su una superficie invertita e' due
     volte sbagliato: e' semi-trasparente, e la sua tinta e' quella del verso
     opposto — bianca nei temi scuri, dove la scheda invertita e' chiara.
     """
@@ -555,7 +555,7 @@ def test_every_text_token_reads_in_every_theme() -> None:
     Un colore semitrasparente si compone sul fondo, e un fondo traslucido su
     quello che ha sotto; di un gradiente conta la fermata peggiore. Sulla
     rotaia `--overlay` il muto stava a 4,15 (Synthwave), 4,22 (Kyoto) e 4,45
-    (Chanel): «Media» fra le taglie di Jenny.
+    (Chanel): «Media» fra le taglie di Jafta.
     """
     problems = []
     for theme in theme_tokens.themes():
@@ -695,7 +695,7 @@ def test_nothing_that_starts_hidden_is_shown_by_its_own_class() -> None:
     html = INDEX.read_text(encoding="utf-8")
     css = CSS.read_text(encoding="utf-8")
     stanze = re.findall(
-        r'<section class="(?:home-you|home-(?:jenny-room|model-room|updates-room))".*?</section>', html, re.S
+        r'<section class="(?:home-you|home-(?:jafta-room|model-room|updates-room))".*?</section>', html, re.S
     )
     assert stanze, "le stanze non si trovano piu'"
 

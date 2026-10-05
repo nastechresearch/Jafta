@@ -17,10 +17,10 @@ from pathlib import Path
 
 import pytest
 
-from jenny.config.loader import load_config, save_config
-from jenny.config.schema import Config, ModelPresetConfig, ProviderConfig
-from jenny.runtime.context import get_runtime_context
-from jenny.webui.settings_api import delete_provider
+from jafta.config.loader import load_config, save_config
+from jafta.config.schema import Config, ModelPresetConfig, ProviderConfig
+from jafta.runtime.context import get_runtime_context
+from jafta.webui.settings_api import delete_provider
 
 
 @pytest.fixture

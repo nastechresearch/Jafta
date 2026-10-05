@@ -16,17 +16,17 @@ import asyncio
 
 import pytest
 
-from jenny.runtime.chaquopy_bridge import BridgeCache
+from jafta.runtime.chaquopy_bridge import BridgeCache
 
 # I moduli che ci passano. ``agent.tools.android_web`` **non** c'è, e non è una
 # dimenticanza: il suo bridge tiene il lock per l'intera operazione e non per la
 # sola costruzione (WebView nascosta e visibile condividono il renderer
 # Chromium). Semantica diversa, non un parametro.
 BRIDGE_MODULES = [
-    ("jenny.runtime.notifier", "NotifierBridge"),
-    ("jenny.runtime.location", "LocationBridge"),
-    ("jenny.runtime.power", "PowerBridge"),
-    ("jenny.webui.android_apps_api", "InstalledAppsBridge"),
+    ("jafta.runtime.notifier", "NotifierBridge"),
+    ("jafta.runtime.location", "LocationBridge"),
+    ("jafta.runtime.power", "PowerBridge"),
+    ("jafta.webui.android_apps_api", "InstalledAppsBridge"),
 ]
 
 
@@ -54,7 +54,7 @@ async def test_concurrent_callers_build_one_bridge() -> None:
     anche togliendo il double-check, cioè misurerebbe niente. Tenendo il lock si
     accodano tutti e otto per davvero.
     """
-    cache = BridgeCache("com.flagdizero.jenny.Whatever")
+    cache = BridgeCache("com.nastechresearch.jafta.Whatever")
     cls = _FakeBridgeClass()
 
     await cache.lock.acquire()
@@ -84,7 +84,7 @@ async def test_reset_frees_the_cache_and_rebinds_the_lock() -> None:
     accodamento. Riusare la stessa istanza dopo il reset è precisamente ciò che
     non deve funzionare per caso.
     """
-    cache = BridgeCache("com.flagdizero.jenny.Whatever")
+    cache = BridgeCache("com.nastechresearch.jafta.Whatever")
     cls = _FakeBridgeClass()
     first = await cache.get(object(), resolve=lambda: cls)
 
@@ -101,7 +101,7 @@ async def test_reset_frees_the_cache_and_rebinds_the_lock() -> None:
 
 async def test_a_construction_failure_names_the_bridge() -> None:
     """Il messaggio nomina la classe: è l'unico indizio in un log di logcat."""
-    cache = BridgeCache("com.flagdizero.jenny.NotifierBridge")
+    cache = BridgeCache("com.nastechresearch.jafta.NotifierBridge")
 
     def explodes(context: object) -> object:
         raise ValueError("no Chaquopy here")

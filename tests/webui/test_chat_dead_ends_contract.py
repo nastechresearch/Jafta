@@ -20,7 +20,7 @@ sempre stato, era la vista viva a mentire.
 
 Il flag che tiene aperto il turno deve quindi essere **indipendente dalla UI**:
 ``_closeMini`` non lo tocca, e solo ``turn_end``/``error`` lo chiudono. Dal
-28/09/2026 la minichat e' dei due gusci (``shared/jenny-minichat.js``) e va oltre:
+28/09/2026 la minichat e' dei due gusci (``shared/jafta-minichat.js``) e va oltre:
 a minichat chiusa segue ancora la domanda, e la risposta la trovi riaprendola.
 
 Asserzioni sul sorgente, nello stile di ``test_thinking_scroll_contract.py``: la
@@ -32,10 +32,10 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 CHAT_JS = ASSETS / "mobile-chat.js"
-JENNY_JS = ASSETS / "shared" / "jenny-minichat.js"
-MASCOT_JS = ASSETS / "shared" / "jenny-mascot.js"
+JAFTA_JS = ASSETS / "shared" / "jafta-minichat.js"
+MASCOT_JS = ASSETS / "shared" / "jafta-mascot.js"
 
 
 def _method(source: str, name: str) -> str:
@@ -55,7 +55,7 @@ def test_a_failing_native_bridge_is_reported_not_papered_over() -> None:
     source = CHAT_JS.read_text(encoding="utf-8")
     body = _method(source, "_openMediaFile")
 
-    assert "const bridge = window.JennyNative;" in body
+    assert "const bridge = window.JaftaNative;" in body
     assert "typeof bridge.openFile === 'function'" in body, (
         "il ramo va scelto sulla *presenza* del bridge, non sull'esito della chiamata"
     )
@@ -84,7 +84,7 @@ def test_a_failing_native_bridge_is_reported_not_papered_over() -> None:
 
 
 def test_the_pending_turn_flag_is_independent_of_the_minichat_ui() -> None:
-    source = JENNY_JS.read_text(encoding="utf-8")
+    source = JAFTA_JS.read_text(encoding="utf-8")
     close = _method(source, "_closeMini")
 
     # La chiusura legge il flag (per sapere se c'e' ancora una risposta in
@@ -103,7 +103,7 @@ def test_the_pending_turn_flag_is_independent_of_the_minichat_ui() -> None:
 def test_turn_end_reaches_the_history_invalidation_with_the_minichat_closed() -> None:
     # `_handleWsMessage` (condiviso) filtra la conversazione e l'umore, poi
     # passa qui.
-    source = JENNY_JS.read_text(encoding="utf-8")
+    source = JAFTA_JS.read_text(encoding="utf-8")
     body = _method(source, "_handleFrame")
 
     assert "if (!this._pendingTurn) return;" in body, (
@@ -131,7 +131,7 @@ def test_a_send_that_never_left_does_not_leave_the_flag_up() -> None:
     """Se il WebSocket non si apre (o ``sendToChat`` rifiuta) nessun
     ``turn_end`` arriverà mai: il flag resterebbe alzato per sempre e il primo
     ``turn_end`` di un turno *altrui* verrebbe attribuito a questo."""
-    send = _method(JENNY_JS.read_text(encoding="utf-8"), "_send")
+    send = _method(JAFTA_JS.read_text(encoding="utf-8"), "_send")
     catch = send.split("} catch (err) {", 1)
     assert len(catch) == 2, "il ramo d'errore di _send è sparito"
     assert "this._pendingTurn = false;" in catch[1]

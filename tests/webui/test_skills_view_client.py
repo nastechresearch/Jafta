@@ -17,7 +17,7 @@ from support.js_harness import locale, requires_node, run_js
 
 VIEW_JS = (
     Path(__file__).resolve().parents[2]
-    / "jenny" / "templates" / "ui" / "assets" / "shared" / "skills-view.js"
+    / "jafta" / "templates" / "ui" / "assets" / "shared" / "skills-view.js"
 )
 
 

@@ -24,7 +24,7 @@ GUARD_JS = ROOT / "android" / "app" / "src" / "main" / "res" / "raw" / "browser_
 
 
 def _bridge() -> str:
-    return read_code("JennyBrowserBridge")
+    return read_code("JaftaBrowserBridge")
 
 
 # ── Kotlin: la guardia è agganciata ─────────────────────────────────────────
@@ -39,8 +39,8 @@ def test_the_session_webview_gets_the_guard_before_any_page() -> None:
     assert "WebViewCompat.addDocumentStartJavaScript(wv, networkGuardJs, setOf(" in install
     # code_only svuota le stringhe: il nome si controlla sul sorgente vero, sotto.
     assert re.search(r'addJavascriptInterface\(NetworkGuard\(\), "\s*"\)', install)
-    raw = read_source("JennyBrowserBridge")
-    assert 'addJavascriptInterface(NetworkGuard(), "JennyBrowserGuard")' in raw
+    raw = read_source("JaftaBrowserBridge")
+    assert 'addJavascriptInterface(NetworkGuard(), "JaftaBrowserGuard")' in raw
     assert 'setOf("*")' in raw
     assert "R.raw.browser_network_guard" in raw
 
@@ -65,7 +65,7 @@ def test_service_worker_requests_go_through_the_same_filter() -> None:
 
 
 def test_the_comment_no_longer_claims_every_request() -> None:
-    raw = read_source("JennyBrowserBridge")
+    raw = read_source("JaftaBrowserBridge")
     assert "l'unico\n        // punto che vede *ogni* richiesta" not in raw
     assert "ed è l'unico" not in raw
 
@@ -77,7 +77,7 @@ def _run_guard(verdicts: str, script: str, *, with_bridge: bool = True) -> str:
     bridge = (
         f"const VERDICTS = {verdicts};\n"
         "const asked = [];\n"
-        "window.JennyBrowserGuard = { blocked(host) { asked.push(host); return !!VERDICTS[host]; } };\n"
+        "window.JaftaBrowserGuard = { blocked(host) { asked.push(host); return !!VERDICTS[host]; } };\n"
         if with_bridge else "const asked = [];\n"
     )
     source = (
@@ -130,7 +130,7 @@ const Proto = window.WebSocket.prototype.constructor;
 assert.equal(Proto, window.WebSocket);
 assert.throws(() => new Proto('ws://10.0.0.2/'), (e) => e.name === 'SecurityError');
 // Riscrivere il metodo del ponte dopo l'avvio non cambia il verdetto.
-window.JennyBrowserGuard.blocked = () => false;
+window.JaftaBrowserGuard.blocked = () => false;
 assert.throws(() => new window.WebSocket('ws://10.0.0.2/'), (e) => e.name === 'SecurityError');
 assert.throws(() => window.WebSocket('wss://example.org/'), TypeError);
 console.log('ok');

@@ -16,10 +16,10 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from jenny.config.runtime_env import resolve_first_output_timeout_s
-from jenny.providers.anthropic_provider import AnthropicProvider
-from jenny.providers.endpoint_budget import DEFAULT_REQUEST_TIMEOUT_S, read_timeout_s
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.config.runtime_env import resolve_first_output_timeout_s
+from jafta.providers.anthropic_provider import AnthropicProvider
+from jafta.providers.endpoint_budget import DEFAULT_REQUEST_TIMEOUT_S, read_timeout_s
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 MESSAGES = [{"role": "user", "content": "x"}]
 
@@ -54,9 +54,9 @@ async def _silent_server(reader, writer) -> None:
 async def test_a_silent_model_hits_the_first_output_budget_not_httpx(
     monkeypatch, provider_cls,
 ) -> None:
-    monkeypatch.setenv("JENNY_LLM_HTTP_TIMEOUT_S", "0.2")
-    monkeypatch.setenv("JENNY_STREAM_IDLE_TIMEOUT_S", "0.3")
-    monkeypatch.setenv("JENNY_STREAM_FIRST_OUTPUT_TIMEOUT_S", "0.6")
+    monkeypatch.setenv("JAFTA_LLM_HTTP_TIMEOUT_S", "0.2")
+    monkeypatch.setenv("JAFTA_STREAM_IDLE_TIMEOUT_S", "0.3")
+    monkeypatch.setenv("JAFTA_STREAM_FIRST_OUTPUT_TIMEOUT_S", "0.6")
     server = await asyncio.start_server(_silent_server, "127.0.0.1", 0)
     port = server.sockets[0].getsockname()[1]
     try:
@@ -85,8 +85,8 @@ class _StalledResponse:
 
 
 async def test_the_responses_stream_has_a_first_output_budget(monkeypatch) -> None:
-    monkeypatch.setenv("JENNY_STREAM_IDLE_TIMEOUT_S", "0.05")
-    monkeypatch.setenv("JENNY_STREAM_FIRST_OUTPUT_TIMEOUT_S", "0.2")
+    monkeypatch.setenv("JAFTA_STREAM_IDLE_TIMEOUT_S", "0.05")
+    monkeypatch.setenv("JAFTA_STREAM_FIRST_OUTPUT_TIMEOUT_S", "0.2")
     provider = OpenAICompatProvider(
         api_key="k", api_base="https://api.openai.com/v1", default_model="gpt-5",
         api_type="responses",

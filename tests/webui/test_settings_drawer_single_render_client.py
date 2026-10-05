@@ -24,7 +24,7 @@ import assert from 'node:assert/strict';
 let payload = { agent: { model: 'a' }, providers: [] };
 const api = { getSettings: async () => JSON.parse(JSON.stringify(payload)) };
 /* Il nome di lei (`shared/bot-name.js`): qui quello di partenza. */
-const botName = { get: () => 'Jenny', set() {}, onChange() { return () => {}; } };
+const botName = { get: () => 'Jafta', set() {}, onChange() { return () => {}; } };
 const i18n = { t: (k) => k };
 const escapeHtml = (s) => s;
 class Settings {

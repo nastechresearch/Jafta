@@ -22,10 +22,10 @@ import httpx
 import pytest
 from port_alloc import free_port
 
-from jenny.channels.websocket import WebSocketChannel, WebSocketConfig
-from jenny.session.manager import SessionManager
-from jenny.webui.gateway_services import build_gateway_services
-from jenny.webui.media_api import (
+from jafta.channels.websocket import WebSocketChannel, WebSocketConfig
+from jafta.session.manager import SessionManager
+from jafta.webui.gateway_services import build_gateway_services
+from jafta.webui.media_api import (
     b64url_decode,
     b64url_encode,
 )
@@ -116,7 +116,7 @@ def test_sign_media_path_rejects_paths_outside_media_root(
     media = tmp_path / "media"
     media.mkdir()
     channel = _ch(bus, port=0)
-    with patch("jenny.webui.media_gateway.get_media_dir", return_value=media):
+    with patch("jafta.webui.media_gateway.get_media_dir", return_value=media):
         assert channel.gateway.media.sign_media_path(outside) is None
         # Traversal via the media root is also rejected — the resolve() step
         # normalises ``..`` out before the relative_to check.
@@ -131,7 +131,7 @@ def test_sign_media_path_round_trips_via_hmac(
     media.mkdir()
     (media / "a.png").write_bytes(_PNG_BYTES)
     channel = _ch(bus, port=0)
-    with patch("jenny.webui.media_gateway.get_media_dir", return_value=media):
+    with patch("jafta.webui.media_gateway.get_media_dir", return_value=media):
         url = channel.gateway.media.sign_media_path(media / "a.png")
     assert url is not None
     assert url.startswith("/api/media/")
@@ -154,7 +154,7 @@ def test_local_markdown_image_is_staged_and_rewritten(
     media = tmp_path / "media"
     channel = _ch(bus, workspace_path=workspace, port=0)
 
-    with patch("jenny.webui.media_gateway.get_media_dir", side_effect=_fake_media_dir(media)):
+    with patch("jafta.webui.media_gateway.get_media_dir", side_effect=_fake_media_dir(media)):
         rewritten = channel.gateway.media.rewrite_local_markdown_images(
             "The result:\n![Cloud Architecture Diagram](demo_arch.png)"
         )
@@ -172,16 +172,16 @@ def test_local_markdown_video_is_staged_and_rewritten(
     workspace = tmp_path / "workspace"
     workspace.mkdir()
     video_bytes = b"fake mp4"
-    (workspace / "jenny-intro.mp4").write_bytes(video_bytes)
+    (workspace / "jafta-intro.mp4").write_bytes(video_bytes)
     media = tmp_path / "media"
     channel = _ch(bus, workspace_path=workspace, port=0)
 
-    with patch("jenny.webui.media_gateway.get_media_dir", side_effect=_fake_media_dir(media)):
+    with patch("jafta.webui.media_gateway.get_media_dir", side_effect=_fake_media_dir(media)):
         rewritten = channel.gateway.media.rewrite_local_markdown_images(
-            "The result:\n![jenny-intro.mp4](jenny-intro.mp4)"
+            "The result:\n![jafta-intro.mp4](jafta-intro.mp4)"
         )
 
-    assert "![jenny-intro.mp4](/api/media/" in rewritten
+    assert "![jafta-intro.mp4](/api/media/" in rewritten
     staged = list((media / "websocket").iterdir())
     assert len(staged) == 1
     assert staged[0].read_bytes() == video_bytes
@@ -199,7 +199,7 @@ def test_local_markdown_image_rejects_workspace_escape(
     channel = _ch(bus, workspace_path=workspace, port=0)
     text = "![nope](../outside.png)"
 
-    with patch("jenny.webui.media_gateway.get_media_dir", side_effect=_fake_media_dir(media)):
+    with patch("jafta.webui.media_gateway.get_media_dir", side_effect=_fake_media_dir(media)):
         assert channel.gateway.media.rewrite_local_markdown_images(text) == text
 
     assert not (media / "websocket").exists()
@@ -222,7 +222,7 @@ async def test_media_route_serves_signed_file(
     target.write_bytes(_PNG_BYTES)
 
     channel = _ch(bus, port=port)
-    with patch("jenny.webui.media_gateway.get_media_dir", return_value=media):
+    with patch("jafta.webui.media_gateway.get_media_dir", return_value=media):
         url_path = channel.gateway.media.sign_media_path(target)
         assert url_path is not None
         server_task = asyncio.create_task(channel.start())
@@ -256,7 +256,7 @@ async def test_media_route_serves_video_byte_ranges(
     target.write_bytes(b"0123456789")
 
     channel = _ch(bus, port=port)
-    with patch("jenny.webui.media_gateway.get_media_dir", return_value=media):
+    with patch("jafta.webui.media_gateway.get_media_dir", return_value=media):
         url_path = channel.gateway.media.sign_media_path(target)
         assert url_path is not None
         server_task = asyncio.create_task(channel.start())
@@ -289,7 +289,7 @@ async def test_media_route_serves_suffix_video_byte_ranges(
     target.write_bytes(b"0123456789")
 
     channel = _ch(bus, port=port)
-    with patch("jenny.webui.media_gateway.get_media_dir", return_value=media):
+    with patch("jafta.webui.media_gateway.get_media_dir", return_value=media):
         url_path = channel.gateway.media.sign_media_path(target)
         assert url_path is not None
         server_task = asyncio.create_task(channel.start())
@@ -319,7 +319,7 @@ async def test_media_route_rejects_unsatisfiable_byte_range(
     target.write_bytes(b"0123456789")
 
     channel = _ch(bus, port=port)
-    with patch("jenny.webui.media_gateway.get_media_dir", return_value=media):
+    with patch("jafta.webui.media_gateway.get_media_dir", return_value=media):
         url_path = channel.gateway.media.sign_media_path(target)
         assert url_path is not None
         server_task = asyncio.create_task(channel.start())
@@ -353,7 +353,7 @@ async def test_media_route_rejects_bad_signature(
     (media / "f.png").write_bytes(_PNG_BYTES)
 
     channel = _ch(bus, port=port)
-    with patch("jenny.webui.media_gateway.get_media_dir", return_value=media):
+    with patch("jafta.webui.media_gateway.get_media_dir", return_value=media):
         good = channel.gateway.media.sign_media_path(media / "f.png")
         assert good is not None
         _, payload = good[len("/api/media/"):].split("/", 1)
@@ -397,7 +397,7 @@ async def test_media_route_rejects_path_traversal_payload(
     ).digest()[:16]
     url = f"/api/media/{b64url_encode(mac)}/{payload}"
 
-    with patch("jenny.webui.media_gateway.get_media_dir", return_value=media):
+    with patch("jafta.webui.media_gateway.get_media_dir", return_value=media):
         server_task = asyncio.create_task(channel.start())
         await asyncio.sleep(0.3)
         try:
@@ -422,7 +422,7 @@ async def test_media_route_404s_missing_file(
     target.write_bytes(_PNG_BYTES)
 
     channel = _ch(bus, port=port)
-    with patch("jenny.webui.media_gateway.get_media_dir", return_value=media):
+    with patch("jafta.webui.media_gateway.get_media_dir", return_value=media):
         url_path = channel.gateway.media.sign_media_path(target)
         assert url_path is not None
         target.unlink()  # the file vanishes between signing and fetching
@@ -451,7 +451,7 @@ async def test_media_route_degrades_non_image_to_octet_stream(
     (media / "scary.html").write_bytes(b"<script>alert(1)</script>")
 
     channel = _ch(bus, port=port)
-    with patch("jenny.webui.media_gateway.get_media_dir", return_value=media):
+    with patch("jafta.webui.media_gateway.get_media_dir", return_value=media):
         payload = b64url_encode(b"scary.html")
         mac = hmac.new(
             channel.gateway.media.secret, payload.encode("ascii"), hashlib.sha256
@@ -483,7 +483,7 @@ async def test_media_route_serves_svg_with_strict_csp(
     target.write_text("<svg xmlns='http://www.w3.org/2000/svg'><script>alert(1)</script></svg>")
 
     channel = _ch(bus, port=port)
-    with patch("jenny.webui.media_gateway.get_media_dir", return_value=media):
+    with patch("jafta.webui.media_gateway.get_media_dir", return_value=media):
         url_path = channel.gateway.media.sign_media_path(target)
         assert url_path is not None
         server_task = asyncio.create_task(channel.start())

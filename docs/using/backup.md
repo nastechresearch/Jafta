@@ -1,6 +1,6 @@
 # Backup and restore
 
-Jenny keeps two independent safety nets for your workspace: automatic local snapshots and an encrypted backup file you export yourself. They solve different problems, and only one of them protects you against uninstalling the app.
+Jafta keeps two independent safety nets for your workspace: automatic local snapshots and an encrypted backup file you export yourself. They solve different problems, and only one of them protects you against uninstalling the app.
 
 ## Two different things, don't confuse them
 
@@ -13,7 +13,7 @@ Jenny keeps two independent safety nets for your workspace: automatic local snap
 | Needs a passphrase | No | Yes, and it's unrecoverable if lost |
 | Created automatically | Yes | No, you trigger it manually |
 
-If you only care about undoing something Jenny (or you) did to a file, snapshots already cover you. If you want to survive an uninstall, a phone upgrade, or a debug-to-release signature change, you need to export a `.jbk` backup and move it off the device.
+If you only care about undoing something Jafta (or you) did to a file, snapshots already cover you. If you want to survive an uninstall, a phone upgrade, or a debug-to-release signature change, you need to export a `.jbk` backup and move it off the device.
 
 Exporting and restoring from a file are on the home's **Settings → Backup** page. The local snapshots are browsed in the workshop, under **Memory → Local history**. See the [Settings reference](../reference/settings.md#backup).
 
@@ -29,12 +29,12 @@ The **Backup** row on the Settings page says when you last exported one ("never"
 
 1. Open **Settings → Backup** and tap **Export a backup**.
 2. Choose a passphrase and type it twice to confirm.
-3. Jenny takes a `pre-export` snapshot, encrypts everything, and hands the file to Android's Storage Access Framework (SAF) "save as" picker — you can save it to Google Drive, an SD card, or any location the picker offers. No storage permission is requested; SAF handles it.
-4. The suggested filename is `jenny-backup-YYYYMMDD-HHMMSS.jbk`.
+3. Jafta takes a `pre-export` snapshot, encrypts everything, and hands the file to Android's Storage Access Framework (SAF) "save as" picker — you can save it to Google Drive, an SD card, or any location the picker offers. No storage permission is requested; SAF handles it.
+4. The suggested filename is `jafta-backup-YYYYMMDD-HHMMSS.jbk`.
 
-Format details, if you care: the container is AES-256-GCM with a key derived via PBKDF2-HMAC-SHA256 at 600,000 iterations by default (configurable between 100,000 and 10,000,000 via `snapshots.pbkdf2_iterations`). Inside the encrypted envelope is a plain, readable zip archive (a file tree plus the snapshot store) — so in a real emergency you can decrypt the container and open the zip even without Jenny installed. This is a deliberate design choice: your backup isn't locked to this app.
+Format details, if you care: the container is AES-256-GCM with a key derived via PBKDF2-HMAC-SHA256 at 600,000 iterations by default (configurable between 100,000 and 10,000,000 via `snapshots.pbkdf2_iterations`). Inside the encrypted envelope is a plain, readable zip archive (a file tree plus the snapshot store) — so in a real emergency you can decrypt the container and open the zip even without Jafta installed. This is a deliberate design choice: your backup isn't locked to this app.
 
-The payload is encrypted in 1 MiB segments rather than in one piece (format version 2), so a workspace full of chat photos doesn't have to fit in the phone's memory to be exported. Photos, audio and video go into the zip as they are, without recompression. Backups in the older single-piece format (version 1) still import. The layout is documented at the top of `jenny/snapshot/crypto.py`. A segmented file is standard AES-GCM, just applied once per segment, so a dozen lines of Python with the `cryptography` package decrypt it:
+The payload is encrypted in 1 MiB segments rather than in one piece (format version 2), so a workspace full of chat photos doesn't have to fit in the phone's memory to be exported. Photos, audio and video go into the zip as they are, without recompression. Backups in the older single-piece format (version 1) still import. The layout is documented at the top of `jafta/snapshot/crypto.py`. A segmented file is standard AES-GCM, just applied once per segment, so a dozen lines of Python with the `cryptography` package decrypt it:
 
 ```python
 import hashlib, struct, sys
@@ -56,21 +56,21 @@ with open("backup.zip", "wb") as out:
 
 The export/import picker uses Android's standard document APIs, so Drive should work like any other SAF target, but a full save-to-Drive round trip hasn't been confirmed on-device yet.
 
-**The passphrase cannot be recovered or reset.** There is no "forgot passphrase" flow. If you lose it, the backup file is permanently unreadable — Jenny warns you about this in the passphrase dialog. Write it down somewhere safe, not just in your head.
+**The passphrase cannot be recovered or reset.** There is no "forgot passphrase" flow. If you lose it, the backup file is permanently unreadable — Jafta warns you about this in the passphrase dialog. Write it down somewhere safe, not just in your head.
 
 ### Importing
 
 1. From **Settings → Backup**, tap **Restore from a file** (worded as "Restore from backup" during onboarding — see below).
 2. Pick the `.jbk` file with Android's file picker. The picker has no MIME filter for `.jbk` (it isn't a registered file type), so it shows up as a generic file — just pick it by name.
-3. Enter the passphrase. There is no separate confirmation after this: the warning is the note under the button, *"Replaces everything there is now with what's in the file, and restarts Jenny."* This is not a merge of your current workspace and the backup — it's a full replacement.
-4. Jenny decrypts and validates the backup first, **then** takes a `pre-restore` snapshot of your **current** state, and finally shows a non-cancellable **"Restore ready"** dialog with a single **Restart now** button. You cannot back out of this dialog with the Android back button.
+3. Enter the passphrase. There is no separate confirmation after this: the warning is the note under the button, *"Replaces everything there is now with what's in the file, and restarts Jafta."* This is not a merge of your current workspace and the backup — it's a full replacement.
+4. Jafta decrypts and validates the backup first, **then** takes a `pre-restore` snapshot of your **current** state, and finally shows a non-cancellable **"Restore ready"** dialog with a single **Restart now** button. You cannot back out of this dialog with the Android back button.
 5. Tapping Restart now kills and relaunches the app. The actual workspace swap happens at that restart, not before — the app restarts itself to do the swap cleanly.
 
 What actually gets replaced: the whole workspace tree is swapped for the one in the backup — and only the workspace tree, which is why the SSH key directory next to it is neither replaced nor restored. Your current workspace isn't deleted immediately — it's kept as an internal safety copy for 7 days in case something goes wrong, but that copy is not reachable from the UI; it exists purely as an emergency recovery mechanism, not something you can browse or restore from yourself.
 
 **The snapshot history is the one exception to "replace everything."** The snapshot history bundled inside the `.jbk` is merged additively into your local snapshot store — nothing is thrown away. After the restore, you can see both the snapshots that came with the backup and the ones you had locally before, including the `pre-restore` snapshot the import just took. So even after a full restore, you can still step back to the moment right before you imported.
 
-Restore is also offered on the **"Restore from backup"** card during [first-run onboarding](../start/first-run.md) (*"Used Jenny before? Bring everything back from an encrypted backup file"*) for people setting up a new phone. After the restart the rest of the setup wizard is skipped: the app opens straight on the home, on Jenny's page, with the restored provider, name and history. The phone's Back button closes the passphrase dialog; it doesn't close the final **Restart now** dialog.
+Restore is also offered on the **"Restore from backup"** card during [first-run onboarding](../start/first-run.md) (*"Used Jafta before? Bring everything back from an encrypted backup file"*) for people setting up a new phone. After the restart the rest of the setup wizard is skipped: the app opens straight on the home, on Jafta's page, with the restored provider, name and history. The phone's Back button closes the passphrase dialog; it doesn't close the final **Restart now** dialog.
 
 ### Errors and edge cases
 
@@ -92,11 +92,11 @@ Since 0.6.6 the **SSH** group in the workshop's **Hands** drawer says so instead
 
 The fix is manual and per host: open **Hands → SSH** in the workshop, tap each host and then **Generate key**, copy the new public line into that server's `~/.ssh/authorized_keys`, and then **Verify fingerprint** again to re-pin the host key. Password hosts are the exception — the password is stored in `config.json`, so it comes back with the workspace and only the fingerprint needs re-accepting.
 
-The remote job registry is also left behind on purpose: `.jenny/ssh_jobs/**` is excluded from snapshots and backups (see below), so pending `ssh_job` entries do not survive a restore.
+The remote job registry is also left behind on purpose: `.jafta/ssh_jobs/**` is excluded from snapshots and backups (see below), so pending `ssh_job` entries do not survive a restore.
 
 ## Local snapshots
 
-Snapshots are an automatic, content-addressed version history of your workspace. They exist so a bad edit — by you or by Jenny — is never final, and they require no action from you day to day. They live outside the workspace tree itself, which is exactly why restoring from one is always safe to undo: the history isn't wiped out by the restore that reads from it.
+Snapshots are an automatic, content-addressed version history of your workspace. They exist so a bad edit — by you or by Jafta — is never final, and they require no action from you day to day. They live outside the workspace tree itself, which is exactly why restoring from one is always safe to undo: the history isn't wiped out by the restore that reads from it.
 
 ### When a snapshot is taken
 
@@ -124,16 +124,16 @@ If nothing changed since the last snapshot, no new one is created — you get a 
 
 Snapshots never capture the UI bundle, log files, temporary files, `__pycache__`, or the snapshot store itself. Symlinks are always skipped, unconditionally — if a path in your workspace is a symlink, it simply isn't included in any snapshot or backup.
 
-`.jenny/ssh_jobs/**`, the registry of remote jobs started with `ssh_job`, is excluded too, for two separate reasons. It is throwaway operational state — ids, byte cursors and process ids belonging to a machine that isn't this phone, meaningless after a restore. And it holds the full text of every command sent to a server plus the server-side log paths, which would otherwise be the one SSH trace that leaves the device inside an exported `.jbk`, while the private key (outside the workspace) does not.
+`.jafta/ssh_jobs/**`, the registry of remote jobs started with `ssh_job`, is excluded too, for two separate reasons. It is throwaway operational state — ids, byte cursors and process ids belonging to a machine that isn't this phone, meaningless after a restore. And it holds the full text of every command sent to a server plus the server-side log paths, which would otherwise be the one SSH trace that leaves the device inside an exported `.jbk`, while the private key (outside the workspace) does not.
 
 And, as covered above, the SSH key directory is outside the workspace entirely, so it is not "excluded" so much as never in scope.
 
 ### Restoring from a snapshot
 
-Open **Memory → Local history** in the workshop and tap any entry in the list. You'll be asked to confirm: *"Bring Jenny back to its state from {date}? A snapshot of the current state is saved first, so you can undo this."* Like the `.jbk` import, this applies at the next app restart, and — because the snapshot history lives outside the workspace — a restore from a snapshot is always reversible: you can always step forward again afterward.
+Open **Memory → Local history** in the workshop and tap any entry in the list. You'll be asked to confirm: *"Bring Jafta back to its state from {date}? A snapshot of the current state is saved first, so you can undo this."* Like the `.jbk` import, this applies at the next app restart, and — because the snapshot history lives outside the workspace — a restore from a snapshot is always reversible: you can always step forward again afterward.
 
 ## APK updates, uninstalling, and signature mismatches
 
 - **Updating the APK preserves your workspace.** Reinstalling a new build with the same signing key keeps everything — memory, conversations, config, uploads, wiki, mini-apps. The one thing that always gets refreshed on every app start, update or not, is the UI bundle and the built-in skills; those are re-extracted from whatever APK is currently installed, overwriting any local changes to them.
 - **Uninstalling deletes everything**, workspace included. This is standard Android behavior for private app storage, and neither snapshots nor anything else in the app protects you from it — snapshots live in the same storage that uninstalling wipes out. The only thing that survives an uninstall is a `.jbk` file you've already exported and moved off the device.
-- **A debug build and a release build (or two release builds signed with different keystores) are, to Android, different apps that happen to share a package name.** Installing one over the other is refused; Android forces you to uninstall the old one first, which erases the workspace. If you ever need to switch between a debug and a release build of Jenny — or re-sign a release build with a new keystore — **export a `.jbk` backup first**. There's no way around the uninstall once the signatures don't match.
+- **A debug build and a release build (or two release builds signed with different keystores) are, to Android, different apps that happen to share a package name.** Installing one over the other is refused; Android forces you to uninstall the old one first, which erases the workspace. If you ever need to switch between a debug and a release build of Jafta — or re-sign a release build with a new keystore — **export a `.jbk` backup first**. There's no way around the uninstall once the signatures don't match.

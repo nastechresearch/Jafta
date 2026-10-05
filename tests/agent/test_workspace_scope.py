@@ -2,10 +2,10 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.tools.filesystem import ReadFileTool, WriteFileTool
-from jenny.agent.tools.message import MessageTool
-from jenny.agent.tools.spawn import SpawnTool
-from jenny.security.workspace_access import (
+from jafta.agent.tools.filesystem import ReadFileTool, WriteFileTool
+from jafta.agent.tools.message import MessageTool
+from jafta.agent.tools.spawn import SpawnTool
+from jafta.security.workspace_access import (
     WORKSPACE_SCOPE_METADATA_KEY,
     WorkspaceScopeError,
     bind_workspace_scope,

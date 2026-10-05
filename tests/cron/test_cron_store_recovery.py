@@ -14,9 +14,9 @@ from pathlib import Path
 
 import pytest
 
-from jenny.cron.service import CronService
-from jenny.cron.types import CronJob, CronPayload, CronSchedule
-from jenny.runtime.context import get_runtime_context
+from jafta.cron.service import CronService
+from jafta.cron.types import CronJob, CronPayload, CronSchedule
+from jafta.runtime.context import get_runtime_context
 
 _HOUR_MS = 3_600_000
 _BROKEN = "{ questo non e' JSON "

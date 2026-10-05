@@ -23,7 +23,7 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.memory_archive import list_archived, read_archived
+from jafta.agent.memory_archive import list_archived, read_archived
 
 
 def _write(memory_dir: Path, name: str, text: str) -> Path:

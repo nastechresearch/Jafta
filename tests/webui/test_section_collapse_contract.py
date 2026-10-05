@@ -33,7 +33,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 
 
 def _src(name: str) -> str:
@@ -85,7 +85,7 @@ def test_home_dismounts_the_editor_without_navigating() -> None:
 
 def test_open_chat_is_one_behaviour_in_one_place() -> None:
     """Il tocco su un avviso porta alla chat personale, e nell'officina quella
-    chat non c'e': si va a casa, come la pillola «⌂ Jenny», con un indirizzo e
+    chat non c'e': si va a casa, come la pillola «⌂ Jafta», con un indirizzo e
     non componendo cambi di vista. Aggiornato il 29/09/2026: prima apriva la
     Console, cioe' l'ultima vista usata (collaudo del 27/09).
 

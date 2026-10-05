@@ -1,27 +1,27 @@
 # Security model
 
-Jenny's containment is four independent layers stacked on top of each other, and the outermost one — the Android app sandbox — is the only one that is a real, OS-enforced boundary; the other three are application-level guards that a sufficiently motivated adversary (or a misbehaving model) can defeat from inside the app's own process.
+Jafta's containment is four independent layers stacked on top of each other, and the outermost one — the Android app sandbox — is the only one that is a real, OS-enforced boundary; the other three are application-level guards that a sufficiently motivated adversary (or a misbehaving model) can defeat from inside the app's own process.
 
 ## The four levels
 
 ### Level 1 — Android app sandbox (the real fence)
 
-This is the only level enforced by the operating system, not by Jenny's own code. Jenny runs as an ordinary Android app under its own UID, in its own private storage (`<filesDir>/workspace`), with no shared storage permission and no way to touch another app's data.
+This is the only level enforced by the operating system, not by Jafta's own code. Jafta runs as an ordinary Android app under its own UID, in its own private storage (`<filesDir>/workspace`), with no shared storage permission and no way to touch another app's data.
 
 Concretely, this means the agent:
 
 - **cannot** read or write any other app's files or data,
-- **cannot** access the camera directly (photo capture is delegated to the system camera app via an intent; Jenny never holds the `CAMERA` permission),
+- **cannot** access the camera directly (photo capture is delegated to the system camera app via an intent; Jafta never holds the `CAMERA` permission),
 - **cannot** read contacts, SMS, or call logs (no permission is ever requested for them),
 - **cannot** access shared/external storage except through user-initiated actions (`share`, `save to Downloads`) that go through Android's own share sheet or Storage Access Framework.
 
 Location and notifications *are* requested at runtime (`ACCESS_FINE_LOCATION`/`ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`), but both are optional, user-facing toggles — see [Location](../using/location.md). They are not the only permissions the manifest declares: the floating mascot (`SYSTEM_ALERT_WINDOW`), reminders that fire on time (`SCHEDULE_EXACT_ALARM`, `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`, `WAKE_LOCK`), restarting after a reboot (`RECEIVE_BOOT_COMPLETED`), the foreground service (`FOREGROUND_SERVICE*`) and installing updates each have theirs, granted at install or through a system settings screen. [Android permissions](../reference/android-permissions.md) lists every one and what happens if you refuse it.
 
-Everything below this line is Jenny's own code running *inside* that sandbox. None of it can widen the sandbox; it can only narrow what the agent is allowed to do within it.
+Everything below this line is Jafta's own code running *inside* that sandbox. None of it can widen the sandbox; it can only narrow what the agent is allowed to do within it.
 
 ### Level 2 — Workspace policy (fail-closed)
 
-File tools (`read_file`, `write_file`, `edit_file`, `list_dir`, `find_files`, `grep`, `apply_patch`) are constrained to the workspace directory when `security.restrictToWorkspace` is `true` (the default). The enforcement point is `resolve_allowed_path()` in `jenny/security/workspace_policy.py`, and it is deliberately **fail-closed**: if a caller doesn't pass an explicit allowed root or file allowlist, the path is rejected outright rather than defaulting to permissive. Symlinks are resolved before the containment check, so a symlink pointing outside the workspace does not bypass the boundary.
+File tools (`read_file`, `write_file`, `edit_file`, `list_dir`, `find_files`, `grep`, `apply_patch`) are constrained to the workspace directory when `security.restrictToWorkspace` is `true` (the default). The enforcement point is `resolve_allowed_path()` in `jafta/security/workspace_policy.py`, and it is deliberately **fail-closed**: if a caller doesn't pass an explicit allowed root or file allowlist, the path is rejected outright rather than defaulting to permissive. Symlinks are resolved before the containment check, so a symlink pointing outside the workspace does not bypass the boundary.
 
 When a path falls outside the boundary, the tool raises an error whose message says, verbatim:
 
@@ -31,7 +31,7 @@ That phrasing is intentional — it's written to stop the model from treating a 
 
 That roster of seven is the full set across all agents; no single agent holds it. With `agents.defaults.orchestratorMode` at its default of `true`, the agent you talk to gets only `read_file`, `list_dir` and `grep` — and its `grep` is an **index**: it returns matching file paths or per-file match counts, never the matching lines, capped at 60 files. `find_files` is not in the orchestrator's scope at all. Everything that writes goes to a subagent. This is a context-budget decision rather than a security one — a subagent's tool output doesn't stay in your conversation — but it does mean the write path and the boundary above apply to a different agent than the one you're typing to.
 
-One deliberate exception: Jenny's own Python source (`jenny/`) is exposed **read-only** to the agent when `tools.file.exposePackageSource` is `true` (default), so it can inspect the framework it runs on. It is never writable through this path.
+One deliberate exception: Jafta's own Python source (`jafta/`) is exposed **read-only** to the agent when `tools.file.exposePackageSource` is `true` (default), so it can inspect the framework it runs on. It is never writable through this path.
 
 The boundary also works in the other direction, to keep things *out*. The SSH private keys and `known_hosts` live in `<filesDir>/ssh`, **beside** the workspace rather than inside it, precisely so that no file tool can reach them — unlike `config.json`, which sits in the workspace and which the agent can therefore already read. The cost is paid by the user, not by the model: snapshots and encrypted backups only walk the workspace root, so a restore brings back the host list without the keys (see [SSH access](../using/ssh.md)).
 
@@ -57,9 +57,9 @@ An address that carries an IPv4 inside it — IPv4-mapped (`::ffff:a.b.c.d`), we
 
 `security.ssrfWhitelist` (default `[]`) lists CIDR ranges that are exempted from this block — the documented use case is a Tailscale range like `100.64.0.0/10` so the agent's tools can reach a self-hosted service over your own VPN.
 
-**This filter does not cover calls to your configured LLM provider.** Provider requests (the actual chat completions) go out through the HTTP client used by the provider integration, not through the tool-layer SSRF check. If you point a provider's `apiBase` at a LAN or VPN address, that call is not subject to the SSRF whitelist at all — reachability is what actually gates it, plus whatever Android's network security config (`network_security_config.xml`) enforces, which permits plaintext `http://` only to `127.0.0.1` and `localhost`. That config governs Java/Kotlin and WebView traffic; the provider client is Python `httpx` on the Chaquopy interpreter, and nothing in `jenny/providers/` checks the URL scheme itself, so treat the HTTPS requirement for a remote provider as a rule to follow rather than a wall Jenny is known to enforce for that path (a Jenny App's `http://` server, which goes through the same Python client, is a working example of a cleartext LAN call). See [Local models](../reference/local-models.md).
+**This filter does not cover calls to your configured LLM provider.** Provider requests (the actual chat completions) go out through the HTTP client used by the provider integration, not through the tool-layer SSRF check. If you point a provider's `apiBase` at a LAN or VPN address, that call is not subject to the SSRF whitelist at all — reachability is what actually gates it, plus whatever Android's network security config (`network_security_config.xml`) enforces, which permits plaintext `http://` only to `127.0.0.1` and `localhost`. That config governs Java/Kotlin and WebView traffic; the provider client is Python `httpx` on the Chaquopy interpreter, and nothing in `jafta/providers/` checks the URL scheme itself, so treat the HTTPS requirement for a remote provider as a rule to follow rather than a wall Jafta is known to enforce for that path (a Jafta App's `http://` server, which goes through the same Python client, is a working example of a cleartext LAN call). See [Local models](../reference/local-models.md).
 
-Jenny Apps get a separate, looser policy for their own outbound `http` actions: RFC1918, IPv6 ULA *and* the CGNAT range `100.64.0.0/10` are allowed there, since an app server is a LAN or Tailscale device the user named in the app's manifest. Loopback and link-local stay blocked, so an app manifest can't use the proxy as a back door into the gateway's own API, and redirects are never followed.
+Jafta Apps get a separate, looser policy for their own outbound `http` actions: RFC1918, IPv6 ULA *and* the CGNAT range `100.64.0.0/10` are allowed there, since an app server is a LAN or Tailscale device the user named in the app's manifest. Loopback and link-local stay blocked, so an app manifest can't use the proxy as a back door into the gateway's own API, and redirects are never followed.
 
 **SSH targets get a third policy, with the same room**: RFC1918, IPv6 ULA and CGNAT are allowed, because reaching a home server over Tailscale from a phone on mobile data is the case the feature exists for, and the alternative — listing that range in `security.ssrfWhitelist` — is global, so it would have opened CGNAT to `web_fetch`, that is, to the targets the model chooses. The criterion that separates the policies is **who names the address**: a person types an SSH host into Settings and accepts its fingerprint by hand before anything is sent, and declares an app server in a manifest they can read; in `web_fetch` the model picks it. Loopback and link-local/metadata stay blocked in every policy — those resolve to the phone itself, so the agent cannot SSH into its own device or use an SSH session as a bridge back to the gateway's own API. The check runs twice — once when the host is saved in Settings, and again at connection time, so a hostname that only later starts resolving to a blocked address (DNS rebinding) is still caught.
 
@@ -72,8 +72,8 @@ The allow/block module lists (`os`, `sys`, `pathlib`, `shutil`, and a few dozen 
 What actually contains `python_exec`, in order, is:
 
 1. the Android app sandbox (Level 1) — the code runs as this app's UID, nothing more,
-2. the workspace path policy (Level 2), to the extent guarded code goes through Jenny's own file helpers,
-3. the SSRF policy (Level 3), to the extent guarded code goes through Jenny's own HTTP helpers.
+2. the workspace path policy (Level 2), to the extent guarded code goes through Jafta's own file helpers,
+3. the SSRF policy (Level 3), to the extent guarded code goes through Jafta's own HTTP helpers.
 
 If code inside `python_exec` calls `os` or `shutil` directly, it can do anything the app's own UID can do on disk — which in practice is still confined to the app's private storage, because that's all the UID has access to.
 
@@ -99,13 +99,13 @@ A password gets the same treatment at every layer the tools touch — never in a
 
 **4. The capability is compartmentalized.** The four SSH tools live in a tool scope of their own (`remote`) that no agent loads by default. The main agent — the one you talk to — has no SSH at all: it delegates to a **`sysadmin` subagent**, the only type that requests that scope, and that type has neither the web tools nor `download_file` nor `python_exec`. This is the same rule the researcher/coder split follows, applied to a shorter and worse chain: whoever reads untrusted pages must not be whoever holds a shell on a production machine. Keeping the SSH tools out of the `subagent` scope is what stops the catch-all `operator` type — defined as "everything in that scope" — from inheriting a remote shell by accident.
 
-Two things this does **not** protect against, stated plainly: a command the agent runs on the server has whatever rights the account you gave it has, and Jenny's snapshots do not cover a remote machine. There is no undo on the other end.
+Two things this does **not** protect against, stated plainly: a command the agent runs on the server has whatever rights the account you gave it has, and Jafta's snapshots do not cover a remote machine. There is no undo on the other end.
 
 ## What the agent can and cannot do on the phone
 
-**Can:** (read this list as "Jenny, as a whole" — the agent you talk to is an **orchestrator** and does several of these only by delegating)
+**Can:** (read this list as "Jafta, as a whole" — the agent you talk to is an **orchestrator** and does several of these only by delegating)
 
-- Read files inside `workspace/` (and read Jenny's own source, read-only), and locate them with an index-only `grep`.
+- Read files inside `workspace/` (and read Jafta's own source, read-only), and locate them with an index-only `grep`.
 - Write, edit, and patch files inside `workspace/` — but with `agents.defaults.orchestratorMode` at its default of `true`, only through a subagent; the main agent has no write tool at all.
 - Download files from the web into `downloads/` under the turn's root (`workspace/downloads/`, or `<project>/downloads/` inside a notebook) — only through a subagent, for the same reason.
 - Search the web and fetch/read pages (through the hidden WebView — see [Tool reference](../reference/tools.md)) — only through a subagent, typically a `researcher`.
@@ -117,10 +117,10 @@ Two things this does **not** protect against, stated plainly: a command the agen
 - Run commands on a remote machine over SSH — but only on an alias you registered, only once you have accepted its host key (in both authentication modes), only through a `sysadmin` subagent, and only if you enabled `tools.ssh` (off by default).
 
 **Cannot:**
-- Read or write any other app's data — the Android sandbox stops this regardless of any Jenny-level toggle.
+- Read or write any other app's data — the Android sandbox stops this regardless of any Jafta-level toggle.
 - Use the camera directly, or read contacts, SMS, or call logs — these permissions are never requested.
 - Reach private/loopback/link-local network addresses with its web tools, unless you've added them to `security.ssrfWhitelist`.
-- Meaningfully resist a compromised or adversarial model once inside `python_exec` — that boundary is the Android sandbox, not Jenny's own guardrails.
+- Meaningfully resist a compromised or adversarial model once inside `python_exec` — that boundary is the Android sandbox, not Jafta's own guardrails.
 - Escape the workspace boundary through file tools when `security.restrictToWorkspace` is `true` — the fail-closed policy rejects paths outside it rather than silently widening scope.
 - SSH to a machine you didn't register, or accept a host key on your behalf — the alias is the only target it can name.
 - Read its own SSH private key, **while `security.restrictToWorkspace` is `true`** (the default): the key lives outside every path its tools can then resolve. Turn that setting off and `read_file` reaches it like any other file. (A host configured with `auth: "password"` is a gap that exists either way: the password is in `config.json`, inside the workspace, so the file tools can read it just as they can read the Telegram token and the API keys.)
@@ -136,7 +136,7 @@ Two things worth knowing:
 
 ## WebUI authentication
 
-Every WebUI API call and the WebSocket handshake require a per-install secret (`websocket.tokenIssueSecret`, generated once at first boot and stored in `config.json` with `chmod 600`). It's checked as an `Authorization: Bearer <secret>` or `X-Jenny-Auth: <secret>` header on HTTP requests, and as a `?token=` query parameter on the WebSocket handshake.
+Every WebUI API call and the WebSocket handshake require a per-install secret (`websocket.tokenIssueSecret`, generated once at first boot and stored in `config.json` with `chmod 600`). It's checked as an `Authorization: Bearer <secret>` or `X-Jafta-Auth: <secret>` header on HTTP requests, and as a `?token=` query parameter on the WebSocket handshake.
 
 Android hands this secret to the WebView as a **URL fragment** (`#bs=<secret>`), never as a query parameter — fragments aren't sent to the server and aren't logged the way query strings can be. The WebView's JavaScript reads the fragment locally and exchanges it once, over `/webui/bootstrap`, for the actual WebSocket URL.
 
@@ -164,7 +164,7 @@ refactor.
   `settings.provider.models` command calls `<apiBase>/models` without `validate_url_target`,
   on purpose: `apiBase` is typed by the user and may well be a local or LAN model server. It
   follows no redirects and reads only the list of model names. Any other outbound request from
-  a tool must go through `validate_url_target` (`jenny/security/network.py`); never add a bare
+  a tool must go through `validate_url_target` (`jafta/security/network.py`); never add a bare
   `httpx.get` to a tool.
 - **The agent browser's WebView.** Python never sees what a visited page loads, so the check
   lives in Kotlin: `shouldInterceptRequest` for HTTP, a document-start script
@@ -174,8 +174,8 @@ refactor.
   page-side check a name that is not cached waits at most 2 seconds for DNS, and a timeout
   counts as blocked; an HTTP request waits for the system resolver on a WebView worker thread,
   with no cap of its own, and a failed resolution counts as blocked. The address check
-  (`isBlockedAddress` in `JennyBrowserBridge.kt`) follows the Python blocklist
-  (`jenny/security/network.py`): besides the private, loopback and link-local ranges it refuses
+  (`isBlockedAddress` in `JaftaBrowserBridge.kt`) follows the Python blocklist
+  (`jafta/security/network.py`): besides the private, loopback and link-local ranges it refuses
   multicast, broadcast, `::/96`, the site-local `fec0::/10`, SIIT-translated `::ffff:0:0:0/96`
   and local-use NAT64 `64:ff9b:1::/48`, and it reads IPv4-mapped, NAT64 `64:ff9b::/96` and
   6to4 `2002::/16` addresses as the IPv4 they carry.
@@ -183,7 +183,7 @@ refactor.
   `WebSocket` inside a worker, DNS rebinding between the check and the connection, and WebViews
   too old for document-start scripts or multiple profiles. It stops an ordinary page, not one
   written against it.
-- **Jenny Apps.** An app runs in an iframe with `sandbox="allow-scripts"` only, and every
+- **Jafta Apps.** An app runs in an iframe with `sandbox="allow-scripts"` only, and every
   `/apps/<slug>/**` response carries `Content-Security-Policy: sandbox allow-scripts`, so an app
   page has an opaque origin in any frame. The frame gets a per-app token (an HMAC of the gateway
   secret over the slug) that opens that app's own routes and nothing else; every other route
@@ -192,8 +192,8 @@ refactor.
   them in the manifest), never loopback. An external view is served through a proxy bound to
   `127.0.0.1` that wants a 128-bit capability on its first request. A manifest that declares
   `server.auth` is rejected.
-- **The native bridge.** `JennyNativeInfo`, visible to every frame, carries only harmless reads.
-  Everything that writes, opens something or returns user data goes through `JennyNativePort`,
+- **The native bridge.** `JaftaNativeInfo`, visible to every frame, carries only harmless reads.
+  Everything that writes, opens something or returns user data goes through `JaftaNativePort`,
   which Chromium injects only into frames of the gateway's origin. The extra check that a
   message comes from the main frame is defence in depth, not a second wall: a same-origin frame
   can reach the parent's port.
@@ -205,8 +205,8 @@ refactor.
   nor the SSH private key can leave that way.
 - **Notifications.** The direct-reply `PendingIntent` is mutable, as Android's direct reply
   requires, so an app granted notification access can send it with text of its own, and that
-  text reaches Jenny as yours. Opening the chat from an alert (which also clears the unread
-  alerts) needs a 128-bit token only Jenny's own intents carry; any other app starting the
+  text reaches Jafta as yours. Opening the chat from an alert (which also clears the unread
+  alerts) needs a 128-bit token only Jafta's own intents carry; any other app starting the
   activity gets an ordinary launch.
 - **Telegram pairing.** The pairing code is accepted only from a private chat, and once paired
   a message must come from that same person (`from.id`). Outside an open pairing window the bot

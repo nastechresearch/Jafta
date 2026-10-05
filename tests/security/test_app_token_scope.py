@@ -1,4 +1,4 @@
-"""Il token di una Jenny App apre le route di quell'app, e nient'altro.
+"""Il token di una Jafta App apre le route di quell'app, e nient'altro.
 
 Fino a Sett 2026 la cornice di un'app riceveva in ``?token=`` il segreto del
 gateway: lo stesso che apre ogni route ``/api/`` e la WebSocket. Un'app — o
@@ -22,12 +22,12 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from support.gateway_http import AUTH_SECRET, make_handler, make_request
 
-from jenny.apps.token import app_token
-from jenny.channels.http_utils import check_app_secret
-from jenny.webui.ws_http import GatewayHTTPHandler
+from jafta.apps.token import app_token
+from jafta.channels.http_utils import check_app_secret
+from jafta.webui.ws_http import GatewayHTTPHandler
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 
 MANIFEST = {
     "name": "Note",
@@ -56,7 +56,7 @@ def gateway(tmp_path: Path):
     apps_on = MagicMock()
     apps_on.apps.enabled = True
     with patch.object(handler, "_get_workspace_root", return_value=_workspace(tmp_path)), \
-         patch("jenny.config.loader.load_config", return_value=apps_on):
+         patch("jafta.config.loader.load_config", return_value=apps_on):
         yield handler
 
 
@@ -155,18 +155,18 @@ async def test_an_app_cannot_mint_a_token_for_another(gateway) -> None:
 
 
 def test_the_websocket_refuses_the_app_token(tmp_path, monkeypatch) -> None:
-    from jenny.channels.websocket import WebSocketChannel, WebSocketConfig
-    from jenny.config.loader import save_config
-    from jenny.config.schema import Config
-    from jenny.runtime.context import get_runtime_context
-    from jenny.webui.gateway_services import build_gateway_services
+    from jafta.channels.websocket import WebSocketChannel, WebSocketConfig
+    from jafta.config.loader import save_config
+    from jafta.config.schema import Config
+    from jafta.runtime.context import get_runtime_context
+    from jafta.webui.gateway_services import build_gateway_services
 
     workspace = tmp_path / "ws"
     workspace.mkdir()
     config_path = tmp_path / "config.json"
     save_config(Config(), config_path)
     monkeypatch.setattr(get_runtime_context(), "config_path", config_path)
-    monkeypatch.setattr("jenny.config.paths.get_workspace_path", lambda: workspace)
+    monkeypatch.setattr("jafta.config.paths.get_workspace_path", lambda: workspace)
     bus = MagicMock()
     bus.publish_inbound = AsyncMock()
     for requires in (True, False):

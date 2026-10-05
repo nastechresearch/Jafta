@@ -24,7 +24,7 @@ from pathlib import Path
 from support.kotlin_source import read_source
 
 ROOT = Path(__file__).resolve().parents[2]
-CONTROLLER = ROOT / "android/app/src/main/java/com/flagdizero/jenny/FloatingOverlayController.kt"
+CONTROLLER = ROOT / "android/app/src/main/java/com/nastechresearch/jafta/FloatingOverlayController.kt"
 STRINGS_EN = ROOT / "android/app/src/main/res/values/strings.xml"
 STRINGS_IT = ROOT / "android/app/src/main/res/values-it/strings.xml"
 

@@ -17,7 +17,7 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-ROUTES = Path(__file__).resolve().parents[2] / "jenny" / "webui" / "workspace_routes.py"
+ROUTES = Path(__file__).resolve().parents[2] / "jafta" / "webui" / "workspace_routes.py"
 
 _LADDER_ARMS = {"ValueError", "FileNotFoundError", "PermissionError", "OSError"}
 

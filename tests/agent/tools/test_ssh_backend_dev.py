@@ -23,14 +23,14 @@ from typing import Any
 
 import pytest
 
-from jenny.agent.tools.ssh_backends.base import (
+from jafta.agent.tools.ssh_backends.base import (
     SshAuthError,
     SshHostKeyError,
     SshTarget,
     SshTimeoutError,
     SshTransportError,
 )
-from jenny.agent.tools.ssh_backends.dev import DevSshBackend, _known_hosts_entry
+from jafta.agent.tools.ssh_backends.dev import DevSshBackend, _known_hosts_entry
 
 # ``asyncssh`` non e una dipendenza runtime: su Android il client SSH e jsch
 # via bridge nativo, e il pacchetto non entra mai nei requirements del device
@@ -39,7 +39,7 @@ from jenny.agent.tools.ssh_backends.dev import DevSshBackend, _known_hosts_entry
 # *collection* su una macchina che non ce l'ha — come il runner della CI.
 asyncssh = pytest.importorskip("asyncssh")
 
-TEST_USER = "jenny"
+TEST_USER = "jafta"
 TEST_PASSWORD = "s3gr3t0-di-prova"
 
 
@@ -509,7 +509,7 @@ def test_pool_key_changes_with_connection_params(tmp_path):
     base = SshTarget(
         host="example.com",
         port=22,
-        username="jenny",
+        username="jafta",
         key_path=tmp_path / "id",
         known_hosts_path=tmp_path / "known_hosts",
     )
@@ -541,7 +541,7 @@ def test_pool_key_changes_between_key_and_password_auth(tmp_path):
     with_key = SshTarget(
         host="example.com",
         port=22,
-        username="jenny",
+        username="jafta",
         key_path=tmp_path / "id",
         known_hosts_path=tmp_path / "known_hosts",
     )
@@ -563,7 +563,7 @@ def test_password_is_not_in_the_pool_key_nor_in_the_repr(tmp_path):
     target = SshTarget(
         host="example.com",
         port=22,
-        username="jenny",
+        username="jafta",
         key_path=tmp_path / "id",
         known_hosts_path=tmp_path / "known_hosts",
         password="s3gr3t0",

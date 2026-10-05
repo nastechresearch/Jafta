@@ -26,15 +26,15 @@ from typing import Any
 
 import pytest
 
-from jenny.agent.tools.filesystem import EditFileTool, ReadFileTool, WriteFileTool
-from jenny.agent.tools.python_exec import PythonExecTool, PythonNamespace
-from jenny.agent.tools.python_exec_builtins import _register_builtin_functions
-from jenny.config.tool_schemas import PythonExecConfig
-from jenny.security.workspace_access import (
+from jafta.agent.tools.filesystem import EditFileTool, ReadFileTool, WriteFileTool
+from jafta.agent.tools.python_exec import PythonExecTool, PythonNamespace
+from jafta.agent.tools.python_exec_builtins import _register_builtin_functions
+from jafta.config.tool_schemas import PythonExecConfig
+from jafta.security.workspace_access import (
     build_workspace_scope,
     enter_workspace_scope,
 )
-from jenny.security.workspace_policy import ReadOnlyTurnError
+from jafta.security.workspace_policy import ReadOnlyTurnError
 
 _REFUSED = "read-only"
 
@@ -108,7 +108,7 @@ async def test_apply_patch_is_refused_but_its_dry_run_is_not(readonly: Path) -> 
     Prima passava da ``_resolve_write`` come la patch vera e veniva rifiutato:
     proprio l'anteprima che serve a descrivere «cosa avrei cambiato».
     """
-    from jenny.agent.tools.apply_patch import ApplyPatchTool
+    from jafta.agent.tools.apply_patch import ApplyPatchTool
 
     edits = [{
         "path": "modificabile.txt", "action": "replace", "old_text": "prima", "new_text": "dopo",
@@ -457,7 +457,7 @@ class TestTheFlagReachesTheThreadThatRuns:
         visto: dict[str, Any] = {}
 
         def _register() -> None:
-            from jenny.security.workspace_access import current_turn_is_readonly
+            from jafta.security.workspace_access import current_turn_is_readonly
 
             visto["thread"] = threading.get_ident()
             visto["readonly"] = current_turn_is_readonly()

@@ -16,9 +16,9 @@ from __future__ import annotations
 
 import asyncio
 
-from jenny.bus.events import OutboundMessage
-from jenny.runtime.delivery import ChannelDeliverer
-from jenny.session.keys import UNIFIED_SESSION_KEY
+from jafta.bus.events import OutboundMessage
+from jafta.runtime.delivery import ChannelDeliverer
+from jafta.session.keys import UNIFIED_SESSION_KEY
 
 ALERT = "pibox non è raggiungibile (Tailscale giù?) — controllo del backup non passato"
 
@@ -138,9 +138,9 @@ async def test_the_heartbeat_alert_reaches_the_unified_session_end_to_end(
         record_hook=lambda: loop.record_channel_delivery,
     )
 
-    from jenny.agent.tools.context import RequestContext
-    from jenny.agent.tools.message import MessageTool
-    from jenny.session.turn_visibility import silent_turn_metadata
+    from jafta.agent.tools.context import RequestContext
+    from jafta.agent.tools.message import MessageTool
+    from jafta.session.turn_visibility import silent_turn_metadata
 
     tool = MessageTool(send_callback=deliverer.deliver)
     tool.set_context(

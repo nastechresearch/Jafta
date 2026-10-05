@@ -9,7 +9,7 @@ verificava alcune precondizioni del "Definition of done":
 - Pass 10: cross-link oltre `index.md`.
 - Pass 11: ogni fonte in `raw/{articles,papers,notes}` ha un summary.
 
-Gli script della skill non fanno parte del package `jenny` importabile, quindi
+Gli script della skill non fanno parte del package `jafta` importabile, quindi
 la dir `scripts/` viene aggiunta a `sys.path`.
 """
 
@@ -24,7 +24,7 @@ import pytest
 
 _SCRIPTS_DIR = (
     Path(__file__).resolve().parents[3]
-    / "jenny"
+    / "jafta"
     / "skills"
     / "llm-wiki"
     / "scripts"
@@ -374,7 +374,7 @@ def test_the_ceiling_matches_the_one_the_prompt_uses(lint_wiki):
     così il giorno che uno cambia il test lo dice invece di lasciare un lint che
     avvisa alla soglia sbagliata."""
     source = (
-        Path(__file__).resolve().parents[3] / "jenny" / "agent" / "context.py"
+        Path(__file__).resolve().parents[3] / "jafta" / "agent" / "context.py"
     ).read_text(encoding="utf-8")
 
     assert f"_PROJECT_MAP_MAX_CHARS = {lint_wiki.MAP_MAX_CHARS}" in source
@@ -479,7 +479,7 @@ def test_the_page_ceiling_matches_the_budget_the_prompt_has(lint_wiki):
     file, e il confronto sta qui perché un lint che avvisa alla soglia sbagliata
     è un lint che manda a spezzare pagine che entravano."""
     source = (
-        Path(__file__).resolve().parents[3] / "jenny" / "agent" / "context.py"
+        Path(__file__).resolve().parents[3] / "jafta" / "agent" / "context.py"
     ).read_text(encoding="utf-8")
 
     assert f"_PROJECT_PAGES_MAX_CHARS = {lint_wiki.PAGE_MAX_CHARS}" in source
@@ -513,19 +513,19 @@ def test_the_first_run_records_a_baseline_instead_of_claiming_anything(
     _journal(root, "un fatto")
 
     assert "baseline recorded" in _run(lint_wiki, root, capsys)
-    assert (root / ".jenny" / "lint_journal.json").is_file()
+    assert (root / ".jafta" / "lint_journal.json").is_file()
 
 
 def test_the_state_lives_in_the_hidden_folder(lint_wiki, tmp_path, capsys):
     """Macchinario, non materiale dell'utente: come il cursore del giardiniere, e
-    per la stessa ragione — sotto ``.jenny/`` viste e grafo non
+    per la stessa ragione — sotto ``.jafta/`` viste e grafo non
     lo vedono."""
     root = _notebook(tmp_path)
     _journal(root, "un fatto")
     _run(lint_wiki, root, capsys)
 
     assert not list((root / "wiki").glob("*.json"))
-    assert (root / ".jenny" / "lint_journal.json").is_file()
+    assert (root / ".jafta" / "lint_journal.json").is_file()
 
 
 def test_appending_a_line_is_not_a_violation(lint_wiki, tmp_path, capsys):
@@ -575,7 +575,7 @@ def test_a_wiki_without_a_journal_says_nothing_about_one(lint_wiki, tmp_path, ca
     out = _run(lint_wiki, root, capsys)
 
     assert "Journal" not in out
-    assert not (root / ".jenny").exists()
+    assert not (root / ".jafta").exists()
 
 def test_a_link_the_app_resolves_is_not_reported_dead(lint_wiki, tmp_path, capsys):
     """**Misurato sul telefono il 23/08.** Chi risolve i link davvero
@@ -988,7 +988,7 @@ def test_the_lint_names_the_mode_it_chose(lint_wiki, tmp_path, capsys):
 
 
 def _lint_state(root: Path) -> Path:
-    return root / ".jenny" / "lint_journal.json"
+    return root / ".jafta" / "lint_journal.json"
 
 
 def test_the_third_run_still_reports_the_line_that_changed(lint_wiki, tmp_path, capsys):
@@ -1040,7 +1040,7 @@ def test_a_baseline_that_was_not_written_is_not_announced(lint_wiki, tmp_path, c
     lo stesso ``OSError`` per una via che non dipende dai permessi."""
     root = _notebook(tmp_path)
     _journal(root, "un fatto")
-    (root / ".jenny").write_text("non sono una cartella\n", encoding="utf-8")
+    (root / ".jafta").write_text("non sono una cartella\n", encoding="utf-8")
 
     out = _run(lint_wiki, root, capsys)
 
@@ -1050,7 +1050,7 @@ def test_a_baseline_that_was_not_written_is_not_announced(lint_wiki, tmp_path, c
 
 def test_a_failed_write_leaves_the_previous_state_intact(lint_wiki, tmp_path, capsys):
     """La scrittura è atomica: temp file più ``os.replace``, copia locale di
-    ``jenny/utils/path.py::atomic_write``. Qui il temp è occupato da una
+    ``jafta/utils/path.py::atomic_write``. Qui il temp è occupato da una
     cartella, quindi la scrittura muore *prima* di toccare il bersaglio — con un
     ``write_text`` secco lo stato di ieri sarebbe già troncato."""
     root = _notebook(tmp_path)
@@ -1058,7 +1058,7 @@ def test_a_failed_write_leaves_the_previous_state_intact(lint_wiki, tmp_path, ca
     _run(lint_wiki, root, capsys)
     baseline = _lint_state(root).read_bytes()
 
-    (root / ".jenny" / "lint_journal.json.tmp").mkdir()
+    (root / ".jafta" / "lint_journal.json.tmp").mkdir()
     with page.open("a", encoding="utf-8") as fh:
         fh.write("- 10:00 — secondo\n")
     out = _run(lint_wiki, root, capsys)
@@ -1073,7 +1073,7 @@ def test_a_successful_write_leaves_no_temp_file(lint_wiki, tmp_path, capsys):
 
     _run(lint_wiki, root, capsys)
 
-    assert sorted(p.name for p in (root / ".jenny").iterdir()) == ["lint_journal.json"]
+    assert sorted(p.name for p in (root / ".jafta").iterdir()) == ["lint_journal.json"]
 
 
 def test_digests_that_are_not_a_dict_do_not_crash_the_run(lint_wiki, tmp_path, capsys):
@@ -1432,7 +1432,7 @@ def test_two_namesakes_do_not_share_their_outbound_links(lint_wiki, tmp_path, ca
 def test_the_builtin_returns_the_error_and_not_the_words_no_output(tmp_path, monkeypatch):
     from typing import Any
 
-    from jenny.agent.tools import python_exec_builtins as builtins_mod
+    from jafta.agent.tools import python_exec_builtins as builtins_mod
 
     # Gli script veri: il builtin li legge dal pacchetto.
     workspace = tmp_path / "ws"
@@ -1644,7 +1644,7 @@ def test_the_builtin_returns_the_findings_it_already_had(tmp_path, monkeypatch):
     """
     from typing import Any
 
-    from jenny.agent.tools import python_exec_builtins as builtins_mod
+    from jafta.agent.tools import python_exec_builtins as builtins_mod
 
     workspace = tmp_path / "ws"
     workspace.mkdir()
@@ -1734,7 +1734,7 @@ def test_the_lint_and_the_app_resolve_a_link_the_same_way(lint_wiki, tmp_path):
     quello che diceva che andava bene. Qui i due verdetti si confrontano forma
     per forma, con l'esito atteso scritto in `_LINK_CASES`.
     """
-    from jenny.webui.wiki import resolve_wikilink
+    from jafta.webui.wiki import resolve_wikilink
 
     root = _split_wiki(tmp_path)
     pages_dir = root / "wiki"
@@ -1753,7 +1753,7 @@ def test_the_two_order_rules_are_the_same_rule(lint_wiki):
     """`suffix_rank` è copiato in due file perché lo script non può importare il
     package. Se uno dei due cambia, l'accordo si rompe in silenzio su una wiki
     con due pagine omonime — un caso che nessuna fixture piccola incontra."""
-    from jenny.webui.wiki import _suffix_rank
+    from jafta.webui.wiki import _suffix_rank
 
     for p in (Path("wiki/a/nota.md"), Path("wiki/nota.md"), Path("wiki/b/z/nota.md")):
         assert lint_wiki.suffix_rank(p) == _suffix_rank(p)
@@ -1790,7 +1790,7 @@ def test_a_multi_segment_link_the_app_cannot_open_is_reported_dead(lint_wiki, tm
 
 _ARTICLE_GUIDE = (
     Path(__file__).resolve().parents[3]
-    / "jenny" / "skills" / "llm-wiki" / "references" / "article-guide.md"
+    / "jafta" / "skills" / "llm-wiki" / "references" / "article-guide.md"
 )
 
 
@@ -1811,7 +1811,7 @@ def test_the_form_the_guide_gives_to_copy_is_a_form_both_sides_open(lint_wiki, t
     risolveva nell'app: la forma raccomandata rendeva un link morto sul telefono,
     e il lint — l'unico che poteva accorgersene — la accettava per stem.
     """
-    from jenny.webui.wiki import resolve_wikilink
+    from jafta.webui.wiki import resolve_wikilink
 
     links = _guide_split_example_links()
     assert links, "il blocco d'esempio della guida non contiene più wikilink"
@@ -1838,7 +1838,7 @@ def test_a_link_that_leaves_the_pages_dir_is_dead_and_the_lint_says_how_to_fix_i
     lint perché *esisteva* una pagina con quello stem (il summary stesso). Venti
     link di questa forma stanno sulle wiki vere. Ora si segnalano, con il rimedio.
     """
-    from jenny.webui.wiki import resolve_wikilink
+    from jafta.webui.wiki import resolve_wikilink
 
     root = _library(tmp_path)
     (root / "raw" / "notes").mkdir(parents=True)
@@ -1867,14 +1867,14 @@ def test_a_link_that_leaves_the_pages_dir_is_dead_and_the_lint_says_how_to_fix_i
 def test_the_lint_and_the_injector_agree_on_what_a_page_is(lint_wiki, tmp_path):
     """``is_injected_page`` è una copia dichiarata di ``is_wiki_page_rel``.
 
-    Il lint non può importare ``jenny`` — è un checkout della skill che gira
+    Il lint non può importare ``jafta`` — è un checkout della skill che gira
     anche fuori dall'app — quindi la copia resta, e quel che tiene le due parti
     uguali è questo confronto **funzionale**: si costruisce una wiki con un
     esemplare di ogni caso limite e si guarda se i due insiemi coincidono. È la
     stessa disciplina della coppia ``MAP_MAX_CHARS``/``_PROJECT_MAP_MAX_CHARS``
     (T3.12), un gradino più su: là si confrontano due numeri, qui due regole.
     """
-    from jenny.utils.wiki_paths import iter_wiki_pages
+    from jafta.utils.wiki_paths import iter_wiki_pages
 
     pages_dir = tmp_path / "wiki"
     for rel in (
@@ -2201,8 +2201,8 @@ def test_the_op_the_gardener_actually_writes_is_a_known_op(lint_wiki, tmp_path):
     mano proverebbe l'accordo fra sé stesso e l'elenco, non fra l'elenco e il
     codice.
     """
-    from jenny.agent.gardener import GardenerStore
-    from jenny.agent.gardener_state import JournalDelta
+    from jafta.agent.gardener import GardenerStore
+    from jafta.agent.gardener_state import JournalDelta
 
     project = tmp_path / "wikis" / "casa"
     (project / "wiki").mkdir(parents=True)
@@ -2269,7 +2269,7 @@ def test_an_op_nobody_authorised_is_still_flagged(lint_wiki, tmp_path, capsys):
 # difetto che non erano nemmeno d'accordo su quale riga guardare, cioè una pagina
 # potevano giudicarla in modo diverso.
 #
-# Questo script non importa `jenny` (gira anche fuori dall'app), quindi il codice
+# Questo script non importa `jafta` (gira anche fuori dall'app), quindi il codice
 # resta duplicato per forza. Quel che non deve restare duplicato è il *giudizio*: il
 # test qui sotto fa girare gli stessi casi nelle due implementazioni e chiede che
 # arrivino alla stessa conclusione. È la stessa forma di
@@ -2312,7 +2312,7 @@ def test_the_lint_and_the_gardener_read_the_same_line(lint_wiki, tmp_path, ancho
     # Il gemello vive in ``wiki_provenance`` dal 26/08 (estratto da ``gardener``
     # perché ora lo monta anche ``_FsTool``): il giardiniere resta un suo
     # consumatore, non più la sua casa.
-    from jenny.agent.wiki_provenance import _journal_line_provenance
+    from jafta.agent.wiki_provenance import _journal_line_provenance
 
     (tmp_path / "raw" / "journal").mkdir(parents=True)
     (tmp_path / "raw" / "journal" / "20260824.md").write_text(_MIXED_JOURNAL, encoding="utf-8")

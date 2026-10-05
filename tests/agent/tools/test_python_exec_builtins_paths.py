@@ -36,12 +36,12 @@ from typing import Any
 
 import pytest
 
-from jenny.agent.tools.python_exec import PythonNamespace
-from jenny.agent.tools.python_exec_builtins import _register_builtin_functions
-from jenny.config.tool_schemas import PythonExecConfig
+from jafta.agent.tools.python_exec import PythonNamespace
+from jafta.agent.tools.python_exec_builtins import _register_builtin_functions
+from jafta.config.tool_schemas import PythonExecConfig
 
 _REFUSED = "outside allowed directory"
-_GUARD_LOGGER = "jenny.agent.tools.python_exec"
+_GUARD_LOGGER = "jafta.agent.tools.python_exec"
 
 
 class _Recorder:
@@ -274,7 +274,7 @@ def wiki_workspace(tmp_path, monkeypatch):
     Gli script si leggono dal pacchetto, mai dal workspace:
     lo script finto si inietta lì, sostituendo la lettura.
     """
-    from jenny.agent.tools import python_exec_builtins as builtins_mod
+    from jafta.agent.tools import python_exec_builtins as builtins_mod
 
     ws = tmp_path / "ws"
     ws.mkdir()

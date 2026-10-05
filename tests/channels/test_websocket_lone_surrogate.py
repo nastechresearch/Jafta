@@ -14,14 +14,14 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.channels.websocket import WebSocketChannel, WebSocketConfig
-from jenny.webui.gateway_services import build_gateway_services
-from jenny.webui.transcript import read_transcript_lines
+from jafta.channels.websocket import WebSocketChannel, WebSocketConfig
+from jafta.webui.gateway_services import build_gateway_services
+from jafta.webui.transcript import read_transcript_lines
 
 
 @pytest.fixture(autouse=True)
 def isolate_webui_workspace_state(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
 
 
 def _make_channel() -> WebSocketChannel:

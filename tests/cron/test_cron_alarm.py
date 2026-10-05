@@ -20,9 +20,9 @@ import time
 import pytest
 from support.aio import wait_until
 
-from jenny.cron.service import CronService
-from jenny.cron.types import CronSchedule
-from jenny.runtime import power
+from jafta.cron.service import CronService
+from jafta.cron.types import CronSchedule
+from jafta.runtime import power
 
 
 def _bound_chat(chat_id: str = "chat-1") -> dict[str, str]:
@@ -391,20 +391,20 @@ async def test_disabled_alarm_driven_cron_falls_back_to_pure_asyncio(
 
 async def test_config_switch_is_read_through_the_real_power_gate(tmp_path, monkeypatch) -> None:
     """Il gate legge davvero ``config.power.alarm_driven_cron``, non un default."""
-    from jenny.config.schema import PowerConfig
+    from jafta.config.schema import PowerConfig
 
     class _Cfg:
         power = PowerConfig(alarm_driven_cron=False)
 
     monkeypatch.setattr(power, "get_android_context", lambda: object())
-    monkeypatch.setattr("jenny.config.loader.load_config", lambda *a, **k: _Cfg())
+    monkeypatch.setattr("jafta.config.loader.load_config", lambda *a, **k: _Cfg())
 
     assert power.alarm_driven_cron_enabled() is False
 
     class _CfgOn:
         power = PowerConfig(alarm_driven_cron=True)
 
-    monkeypatch.setattr("jenny.config.loader.load_config", lambda *a, **k: _CfgOn())
+    monkeypatch.setattr("jafta.config.loader.load_config", lambda *a, **k: _CfgOn())
     assert power.alarm_driven_cron_enabled() is True
 
     # Fuori da Android resta spento comunque: non c'è nessun AlarmManager.

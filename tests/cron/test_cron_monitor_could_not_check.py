@@ -30,18 +30,18 @@ from typing import Any
 import pytest
 from support.sessions import FakeSessions
 
-from jenny.agent.tools.registry import ToolRegistry
-from jenny.agent.turn_types import TurnOutcome
-from jenny.bus.events import InboundMessage
-from jenny.cron.bound_runner import (
+from jafta.agent.tools.registry import ToolRegistry
+from jafta.agent.turn_types import TurnOutcome
+from jafta.bus.events import InboundMessage
+from jafta.cron.bound_runner import (
     MONITOR_ESCALATE_AFTER_FAILURES,
     could_not_check_reason,
     run_bound_cron_job,
 )
-from jenny.cron.could_not_check import ESCALATION_ASK_LIMIT
-from jenny.cron.service import CronService
-from jenny.cron.types import CronJobState, CronSchedule
-from jenny.utils.prompt_templates import render_template
+from jafta.cron.could_not_check import ESCALATION_ASK_LIMIT
+from jafta.cron.service import CronService
+from jafta.cron.types import CronJobState, CronSchedule
+from jafta.utils.prompt_templates import render_template
 
 _MESSAGE = "controlla la pioggia nelle città e avvisami solo sopra il 70%"
 
@@ -584,7 +584,7 @@ class TestTheAskIsBoundedNotEndless:
     all'utente ogni mezz'ora. "Per sempre" non è un costo accettabile nemmeno
     nella direzione del rumore.
 
-    Dove la finestra finisce comincia ``jenny/cron/silence_watchdog.py``, che
+    Dove la finestra finisce comincia ``jafta/cron/silence_watchdog.py``, che
     l'allarme lo alza da sé — v. ``ESCALATION_ASK_LIMIT``.
     """
 
@@ -604,7 +604,7 @@ class TestTheAskIsBoundedNotEndless:
         """Le due finestre sono contigue: non resta un run scoperto."""
         alerts: list[str] = []
         monkeypatch.setattr(
-            "jenny.runtime.notifier.notify_delivery",
+            "jafta.runtime.notifier.notify_delivery",
             lambda content, metadata: alerts.append(content),
         )
         service, job_id, agent = _monitor(tmp_path, agent=_WarnsAndNeverDeclaresIt())

@@ -14,8 +14,8 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
-from jenny.agent.loop import AgentLoop
-from jenny.bus.events import InboundMessage, OutboundMessage
+from jafta.agent.loop import AgentLoop
+from jafta.bus.events import InboundMessage, OutboundMessage
 
 
 def _loop(*, running: bool = False):
@@ -55,16 +55,16 @@ async def test_a_command_at_rest_is_closed_after_its_reply() -> None:
     """`/status` e `/stop` a riposo: la risposta, poi `turn_end` e `idle`."""
     loop, log = _loop()
     await AgentLoop._dispatch_command_inline(loop, _msg("/status"), "websocket:c1", "/status",
-                                             _reply("jenny v0.11.0"))
-    assert log == ["reply:jenny v0.11.0", "turn_end", "goal_status:idle"]
+                                             _reply("jafta v0.11.0"))
+    assert log == ["reply:jafta v0.11.0", "turn_end", "goal_status:idle"]
 
 
 async def test_a_command_during_a_turn_leaves_the_closing_to_that_turn() -> None:
     """Un `turn_end` in piu' troncherebbe la risposta che sta ancora arrivando."""
     loop, log = _loop(running=True)
     await AgentLoop._dispatch_command_inline(loop, _msg("/status"), "websocket:c1", "/status",
-                                             _reply("jenny v0.11.0"))
-    assert log == ["reply:jenny v0.11.0"]
+                                             _reply("jafta v0.11.0"))
+    assert log == ["reply:jafta v0.11.0"]
 
 
 async def test_stop_answers_before_closing_the_turn_it_stopped() -> None:

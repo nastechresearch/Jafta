@@ -25,10 +25,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.config.schema import Config, ProviderConfig, ProvidersConfig
-from jenny.providers.base import GenerationSettings
-from jenny.providers.factory import provider_fingerprint
-from jenny.runtime.container import GatewayContainer
+from jafta.config.schema import Config, ProviderConfig, ProvidersConfig
+from jafta.providers.base import GenerationSettings
+from jafta.providers.factory import provider_fingerprint
+from jafta.runtime.container import GatewayContainer
 
 MODEL = "deepseek-v4-flash"
 
@@ -80,9 +80,9 @@ def _patch_reload(
     # I moduli si importano qui e si patcha l'oggetto, non il target come stringa:
     # ``_on_settings_changed`` importa entrambi dentro la funzione, quindi con la
     # forma a stringa il test passa o falla in base a chi ha già importato
-    # ``jenny.providers.factory`` prima di lui.
-    from jenny.config import loader as config_loader
-    from jenny.providers import factory as provider_factory
+    # ``jafta.providers.factory`` prima di lui.
+    from jafta.config import loader as config_loader
+    from jafta.providers import factory as provider_factory
 
     gen = generation or GenerationSettings(temperature=0.1, max_tokens=8192)
     monkeypatch.setattr(config_loader, "load_config", lambda *a, **k: config)
@@ -204,7 +204,7 @@ def test_context_window_change_is_applied(container_with_agent, monkeypatch) -> 
 
 def test_a_failed_rebuild_leaves_the_fingerprint_alone(container_with_agent, monkeypatch) -> None:
     """Se il provider nuovo non si costruisce, il prossimo salvataggio ritenta."""
-    from jenny.providers import factory as provider_factory
+    from jafta.providers import factory as provider_factory
 
     container, agent = container_with_agent
     before = container._provider_fingerprint
@@ -240,12 +240,12 @@ def test_fingerprint_without_an_active_provider() -> None:
 # letterale ``${...}`` come chiave, e l'impronta (calcolata all'avvio sul config
 # risolto) non coincideva mai: ogni salvataggio ricostruiva il provider rotto.
 
-_ENV_KEY = "JENNY_TEST_HOT_RELOAD_KEY"
+_ENV_KEY = "JAFTA_TEST_HOT_RELOAD_KEY"
 
 
 def _patch_reload_capturing(monkeypatch: pytest.MonkeyPatch, config: Config) -> list[Config]:
-    from jenny.config import loader as config_loader
-    from jenny.providers import factory as provider_factory
+    from jafta.config import loader as config_loader
+    from jafta.providers import factory as provider_factory
 
     built: list[Config] = []
 

@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from jenny.security.workspace_policy import is_path_within
+from jafta.security.workspace_policy import is_path_within
 
 
 def test_the_root_itself_and_its_children_are_inside(tmp_path: Path) -> None:

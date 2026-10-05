@@ -11,10 +11,10 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.config.loader import load_config, save_config
-from jenny.config.schema import Config
-from jenny.runtime.context import get_runtime_context
-from jenny.webui.settings_api import WebUISettingsError, update_agent_settings
+from jafta.config.loader import load_config, save_config
+from jafta.config.schema import Config
+from jafta.runtime.context import get_runtime_context
+from jafta.webui.settings_api import WebUISettingsError, update_agent_settings
 
 
 @pytest.fixture

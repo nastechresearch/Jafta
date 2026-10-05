@@ -10,7 +10,7 @@ niente. La forma del parametro e' quella dei doc DeepSeek (``thinking_mode``):
 
 from __future__ import annotations
 
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 MESSAGES = [{"role": "user", "content": "A or B?"}]
 

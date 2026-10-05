@@ -22,8 +22,8 @@ from pathlib import Path
 
 import pytest
 
-from jenny.utils.wiki_migration import migrate_wikis
-from jenny.utils.wiki_paths import (
+from jafta.utils.wiki_migration import migrate_wikis
+from jafta.utils.wiki_paths import (
     WIKI_ID_KEY,
     find_wiki_by_id,
     is_valid_wiki_id,
@@ -127,7 +127,7 @@ def test_a_seeded_scope_line_is_quoted_so_it_never_breaks_the_block(tmp_path: Pa
     """
     import yaml
 
-    from jenny.webui.project_create import _yaml_scalar
+    from jafta.webui.project_create import _yaml_scalar
 
     for seed in ("Prova del passo 7: la chat segue", 'con "virgolette"', "back\\slash", "# hash"):
         block = f"id: 3f9a2c1b7e04\nsummary: {_yaml_scalar(seed)}"
@@ -170,7 +170,7 @@ def test_the_scope_line_that_create_project_writes_round_trips(
     portava via l'intera frontmatter, quindi ``read_wiki_scope`` cadeva sul
     ripiego e l'id risultava assente.
     """
-    from jenny.webui.project_create import create_project
+    from jafta.webui.project_create import create_project
 
     wikis = tmp_path / "wikis"
     wikis.mkdir()
@@ -202,7 +202,7 @@ def test_the_scope_line_written_into_a_half_built_tree_round_trips_too(
     seconda chiamata a ``_yaml_scalar``, e un test sul primo ramo la lascia
     scoperta.
     """
-    from jenny.webui.project_create import create_project
+    from jafta.webui.project_create import create_project
 
     wikis = tmp_path / "wikis"
     (wikis / "morta-a-meta" / "wiki").mkdir(parents=True)
@@ -306,7 +306,7 @@ def test_a_wiki_with_no_instructions_file_gets_a_minimal_one(wikis: Path) -> Non
     # `summary` resta un segnaposto, non il nome della cartella: con il nome,
     # `wikis/_index.md` direbbe «acquari — acquari», che *sembra* una descrizione. La
     # voce di prima diceva «(no AGENTS.md)», cioè la verità.
-    from jenny.utils.wiki_paths import read_wiki_scope
+    from jafta.utils.wiki_paths import read_wiki_scope
 
     assert read_wiki_scope(project) == "(no scope set)"
 

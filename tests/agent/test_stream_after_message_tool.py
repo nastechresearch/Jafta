@@ -27,13 +27,13 @@ from unittest.mock import AsyncMock, MagicMock
 
 from support.aio import drain_nowait
 
-from jenny.agent.loop import AgentLoop
-from jenny.agent.tools.message import MessageTool
-from jenny.agent.turn_types import TurnOutcome
-from jenny.bus.events import InboundMessage, OutboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.providers.base import LLMResponse
-from jenny.session.keys import UNIFIED_SESSION_KEY
+from jafta.agent.loop import AgentLoop
+from jafta.agent.tools.message import MessageTool
+from jafta.agent.turn_types import TurnOutcome
+from jafta.bus.events import InboundMessage, OutboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.providers.base import LLMResponse
+from jafta.session.keys import UNIFIED_SESSION_KEY
 
 
 def _make_loop(tmp_path: Path) -> AgentLoop:

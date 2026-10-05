@@ -11,10 +11,10 @@ from types import SimpleNamespace
 import pytest
 from support.gateway_http import make_handler, make_request
 
-from jenny.config.schema import SnapshotConfig
-from jenny.snapshot.engine import SnapshotEngine
-from jenny.snapshot.locations import MARKER_FILE_NAME, STAGED_WORKSPACE_DIR_NAME
-from jenny.snapshot.service import SnapshotService
+from jafta.config.schema import SnapshotConfig
+from jafta.snapshot.engine import SnapshotEngine
+from jafta.snapshot.locations import MARKER_FILE_NAME, STAGED_WORKSPACE_DIR_NAME
+from jafta.snapshot.service import SnapshotService
 
 pytest.importorskip("cryptography")
 
@@ -26,7 +26,7 @@ def _make_request(path: str, payload: dict | None = None, token: str | None = _A
     headers = None
     if payload is not None:
         encoded = base64.b64encode(json.dumps(payload).encode("utf-8")).decode("ascii")
-        headers = [("X-Jenny-Backup-Data", encoded)]
+        headers = [("X-Jafta-Backup-Data", encoded)]
     return make_request(path, token, headers)
 
 
@@ -40,7 +40,7 @@ def env(tmp_path: Path, monkeypatch):
     (workspace / "memory" / "MEMORY.md").write_text("# memoria", encoding="utf-8")
 
     # get_workspace_path è usato dall'handler per gli asset statici.
-    from jenny.config import paths as paths_mod
+    from jafta.config import paths as paths_mod
 
     monkeypatch.setattr(paths_mod, "get_workspace_path", lambda: workspace)
 
@@ -70,7 +70,7 @@ async def test_unauthorized_without_token(env) -> None:
 
 
 async def test_unavailable_without_service(tmp_path: Path, monkeypatch) -> None:
-    from jenny.config import paths as paths_mod
+    from jafta.config import paths as paths_mod
 
     monkeypatch.setattr(paths_mod, "get_workspace_path", lambda: tmp_path)
     handler = make_handler(tmp_path / "skills", runtime_model_name=lambda: None)
@@ -103,9 +103,9 @@ async def test_retention_update_persists_and_applies(env, tmp_path, monkeypatch)
     # Config vera su file: la retention passa dal funnel di scrittura, quindi
     # un monkeypatch di load_config/save_config non intercetterebbe più nulla
     # (e non verificherebbe la persistenza reale).
-    from jenny.config.loader import load_config, save_config
-    from jenny.config.schema import Config
-    from jenny.runtime.context import get_runtime_context
+    from jafta.config.loader import load_config, save_config
+    from jafta.config.schema import Config
+    from jafta.runtime.context import get_runtime_context
 
     config_path = tmp_path / "retention-config.json"
     save_config(Config(), config_path)
@@ -188,7 +188,7 @@ async def test_export_then_import_roundtrip(env) -> None:
     assert (env.runtime_root / MARKER_FILE_NAME).is_file()
 
     # Lo swap al boot produce il workspace ripristinato.
-    from jenny.snapshot.restore_marker import apply_pending_restore
+    from jafta.snapshot.restore_marker import apply_pending_restore
 
     assert apply_pending_restore(env.runtime_root) is True
     assert (env.runtime_root / "workspace" / "SOUL.md").read_text("utf-8") == "anima"
@@ -280,8 +280,8 @@ async def test_snapshot_restore_unknown_id(env) -> None:
 
 def _break_crypto_backend(monkeypatch) -> None:
     """Simula l'assenza di un backend crypto utilizzabile."""
-    from jenny.snapshot import crypto as crypto_mod
-    from jenny.snapshot.crypto_backends.base import CryptoUnavailableError
+    from jafta.snapshot import crypto as crypto_mod
+    from jafta.snapshot.crypto_backends.base import CryptoUnavailableError
 
     def boom():
         raise CryptoUnavailableError("no crypto backend in this environment")
@@ -394,7 +394,7 @@ async def test_the_export_record_is_written_by_the_client_and_not_by_the_export(
     backup come fatto quando il container è pronto sarebbe falso proprio nel
     caso in cui l'utente ha detto di no.
     """
-    from jenny.config.loader import load_config
+    from jafta.config.loader import load_config
 
     # La fixture ha gia' puntato il workspace su tmp_path: `config.json` sta
     # li' dentro, ed e' quello che il funnel di `store.mutate` scrive.

@@ -25,9 +25,9 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.autocompact import AutoCompact
-from jenny.agent.memory import Consolidator, MemoryStore
-from jenny.session.manager import SessionManager
+from jafta.agent.autocompact import AutoCompact
+from jafta.agent.memory import Consolidator, MemoryStore
+from jafta.session.manager import SessionManager
 
 PROJECT = "project:palestra"
 PERSONAL = "unified:default"

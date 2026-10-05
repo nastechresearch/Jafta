@@ -20,7 +20,7 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from support.runner import empty_tools, make_spec
 
-from jenny.providers.base import LLMProvider, LLMResponse, ToolCallRequest
+from jafta.providers.base import LLMProvider, LLMResponse, ToolCallRequest
 
 
 def _tools() -> MagicMock:
@@ -47,7 +47,7 @@ def _goal_continue_messages(messages: list[dict]) -> list[dict]:
 @pytest.mark.asyncio
 async def test_runner_exits_normally_without_predicate():
     """Baseline: no predicate, runner exits with completed on final text."""
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     provider.chat_with_retry = AsyncMock(return_value=LLMResponse(
@@ -70,7 +70,7 @@ async def test_runner_exits_normally_without_predicate():
 @pytest.mark.asyncio
 async def test_runner_exits_normally_with_inactive_goal():
     """Predicate returns False, runner should exit normally."""
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     provider.chat_with_retry = AsyncMock(return_value=LLMResponse(
@@ -99,7 +99,7 @@ async def test_runner_forces_continue_after_real_tool_progress():
     commentare mentre il goal è ancora aperto. Al giro dopo, però, non c'è nuovo
     lavoro da cui ripartire, quindi il run si chiude invece di insistere.
     """
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     calls = {"n": 0}
@@ -136,7 +136,7 @@ async def test_runner_withholds_continuation_without_tool_progress():
     risponde solo a parole veniva spronato fino a ``max_iterations`` (200 di
     default). Ora un turno senza tool esce al primo giro.
     """
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     provider.chat_with_retry = AsyncMock(return_value=LLMResponse(
@@ -166,7 +166,7 @@ async def test_runner_withholds_continuation_when_answer_is_a_question():
     È la forma esatta di ``app-creator``: una domanda per turno. Nessuna
     continuation può rispondere al posto dell'utente.
     """
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     calls = {"n": 0}
@@ -201,8 +201,8 @@ async def test_runner_withholds_continuation_when_answer_is_a_question():
 @pytest.mark.asyncio
 async def test_runner_goal_continue_respects_per_run_cap(monkeypatch):
     """Even alternating tool/text work cannot nudge past _MAX_GOAL_CONTINUE_CYCLES."""
-    from jenny.agent import runner as runner_mod
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent import runner as runner_mod
+    from jafta.agent.runner import AgentRunner
 
     monkeypatch.setattr(runner_mod, "_MAX_GOAL_CONTINUE_CYCLES", 2)
     provider = MagicMock(spec=LLMProvider)
@@ -234,7 +234,7 @@ async def test_runner_goal_continue_respects_per_run_cap(monkeypatch):
 @pytest.mark.asyncio
 async def test_runner_goal_stalled_false_when_goal_inactive():
     """No goal, no parking: goal_stalled stays False on an ordinary run."""
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     provider.chat_with_retry = AsyncMock(return_value=LLMResponse(
@@ -260,7 +260,7 @@ async def test_runner_respects_max_iterations_even_with_active_goal():
     Il budget di iterazioni resta il tetto del turno: il fix tocca solo i nudge
     sintetici, non la libertà di un goal che sta davvero lavorando.
     """
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     provider.chat_with_retry = AsyncMock(return_value=_tool_response())
@@ -283,7 +283,7 @@ async def test_runner_respects_max_iterations_even_with_active_goal():
 @pytest.mark.asyncio
 async def test_runner_does_not_force_continue_on_error():
     """Even with active goal, an LLM error should exit with stop_reason="error"."""
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     provider.chat_with_retry = AsyncMock(return_value=LLMResponse(
@@ -307,7 +307,7 @@ async def test_runner_does_not_force_continue_on_error():
 @pytest.mark.asyncio
 async def test_runner_uses_custom_goal_continue_message():
     """Custom goal_continue_message should be injected instead of the default."""
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     calls = {"n": 0}
@@ -338,7 +338,7 @@ async def test_runner_uses_custom_goal_continue_message():
 @pytest.mark.asyncio
 async def test_runner_resolves_goal_continue_message_lazily():
     """The continuation text can depend on goal metadata created during the run."""
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     llm_calls = {"n": 0}
@@ -380,7 +380,7 @@ async def test_runner_withholds_the_nudge_while_delegated_work_runs():
     Il turno non aspetta piu' i subagent (02/10/2026): senza questa condizione un
     goal che ha appena delegato verrebbe spronato subito a «continua».
     """
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     calls = {"n": 0}

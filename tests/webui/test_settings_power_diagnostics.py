@@ -1,6 +1,6 @@
 """Il pannello che rende visibile un gateway ucciso dal gestore energetico.
 
-Quando Samsung, MIUI o PowerGenie chiudono Jenny in background il guasto non
+Quando Samsung, MIUI o PowerGenie chiudono Jafta in background il guasto non
 lascia niente dietro di sé: nessun errore, nessuna notifica, solo promemoria
 che smettono di arrivare e un utente che se ne accorge giorni dopo. Questo
 endpoint è l'unico posto in cui quel silenzio diventa una risposta, quindi il
@@ -24,21 +24,21 @@ from support.gateway_http import make_request
 from support.kotlin_source import read_source
 from websockets.http11 import Request as WsRequest
 
-from jenny.channels.http_utils import check_api_secret, http_error, http_json_response, parse_query
-from jenny.config.loader import save_config
-from jenny.config.paths import get_workspace_path, set_workspace_dir
-from jenny.config.schema import Config
-from jenny.runtime import gap_history, power
-from jenny.runtime.context import get_runtime_context
-from jenny.webui.settings_api import power_diagnostics_payload
-from jenny.webui.settings_routes import WebUISettingsRouter
+from jafta.channels.http_utils import check_api_secret, http_error, http_json_response, parse_query
+from jafta.config.loader import save_config
+from jafta.config.paths import get_workspace_path, set_workspace_dir
+from jafta.config.schema import Config
+from jafta.runtime import gap_history, power
+from jafta.runtime.context import get_runtime_context
+from jafta.webui.settings_api import power_diagnostics_payload
+from jafta.webui.settings_routes import WebUISettingsRouter
 
 _SECRET = "s3cr3t-diagnostics"
 
 ROOT = Path(__file__).resolve().parents[2]
-_UI_ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+_UI_ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 _MAIN_ACTIVITY = (
-    ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "flagdizero" / "jenny"
+    ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "nastechresearch" / "jafta"
     / "MainActivity.kt"
 )
 
@@ -61,7 +61,7 @@ def workspace(tmp_path, monkeypatch: pytest.MonkeyPatch) -> Path:
 def android(monkeypatch: pytest.MonkeyPatch) -> None:
     """Un telefono che risponde: bridge presente, permessi concessi.
 
-    ``power_diagnostics_payload`` importa da ``jenny.runtime.power`` dentro la
+    ``power_diagnostics_payload`` importa da ``jafta.runtime.power`` dentro la
     funzione, quindi i nomi si risolvono sul modulo a ogni chiamata ed è là che
     vanno sostituiti.
     """
@@ -194,7 +194,7 @@ async def test_route_maps_a_broken_bridge_to_500(
         raise RuntimeError("bridge gone")
 
     monkeypatch.setattr(
-        "jenny.webui.settings_routes.power_diagnostics_payload", _boom, raising=True
+        "jafta.webui.settings_routes.power_diagnostics_payload", _boom, raising=True
     )
 
     response = await _router().dispatch(_request(_PATH), _PATH)

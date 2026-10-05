@@ -24,12 +24,12 @@ from support.kotlin_source import read_source
 
 ROOT = Path(__file__).resolve().parents[2]
 ANDROID = ROOT / "android" / "app" / "src" / "main"
-JAVA = ANDROID / "java" / "com" / "flagdizero" / "jenny"
+JAVA = ANDROID / "java" / "com" / "nastechresearch" / "jafta"
 MANIFEST = ANDROID / "AndroidManifest.xml"
 MAIN_ACTIVITY = JAVA / "MainActivity.kt"
 NOTIFIER = JAVA / "NotifierBridge.kt"
 LAYOUT = ANDROID / "res" / "layout" / "activity_main.xml"
-UI_ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+UI_ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 
 
 def _main_activity() -> str:
@@ -153,7 +153,7 @@ def test_absorbing_color_mode_and_touchscreen_is_safe_because_no_resource_follow
 
 def test_absorbing_uimode_is_safe_because_nothing_native_follows_it() -> None:
     """Assorbire ``uiMode`` senza ricreare è sicuro solo se nessuna risorsa
-    dipende dalla modalità notte. Se un domani ``Theme.Jenny`` diventasse
+    dipende dalla modalità notte. Se un domani ``Theme.Jafta`` diventasse
     ``DayNight``, o il CSS della WebUI iniziasse a usare ``prefers-color-scheme``,
     l'app resterebbe coi colori vecchi fino al riavvio — e nessuno collegherebbe
     la cosa a questa riga di manifest.
@@ -447,16 +447,16 @@ def test_entering_the_chat_view_notifies_the_native_shell() -> None:
     vedere da sé: un cambio vista dentro la WebView non produce callback
     d'activity. La chiamata sta in ``ChatController.activate``, che è il punto in
     cui la sezione diventa attiva, ed è difesa perché fuori dal guscio
-    ``JennyNative`` non esiste."""
+    ``JaftaNative`` non esiste."""
     chat_js = (UI_ASSETS / "mobile-chat.js").read_text(encoding="utf-8")
     activate = re.search(r"\n  activate\(\)\s*\{(.*?)\n  \}", chat_js, re.S)
     assert activate, "activate() non trovato in mobile-chat.js"
     body = activate.group(1)
-    assert "JennyNative?.chatOpened?.()" in body
+    assert "JaftaNative?.chatOpened?.()" in body
     assert "try {" in body
     # Sta sulla porta dei comandi, che solo il frame principale della SPA
     # raggiunge (v. tests/security/test_native_bridge_origin.py): dall'iframe
-    # di una Jenny App non si cancellano gli avvisi dell'utente.
+    # di una Jafta App non si cancellano gli avvisi dell'utente.
     assert '"chatOpened" -> chatOpened()' in _main_activity()
     assert "'chatOpened'" in (UI_ASSETS / "shared" / "native-bridge.js").read_text("utf-8")
 
@@ -482,7 +482,7 @@ def test_every_event_the_shell_dispatches_has_a_listener() -> None:
 
     **Un evento senza ascoltatore non fallisce.** Non c'e' un errore, non c'e'
     una riga nel log: cade nel vuoto, e quel che doveva succedere semplicemente
-    non succede. E' andata cosi' per `jenny-subframe-error`, che il guscio manda
+    non succede. E' andata cosi' per `jafta-subframe-error`, che il guscio manda
     quando l'iframe di una mini-app non carica: l'ascolto stava nel costruttore
     della scheda «App», e quando quella schermata e' stata cancellata se n'e'
     andato con lei. Da allora una mini-app che non parte e' un riquadro bianco —

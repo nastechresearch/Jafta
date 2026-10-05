@@ -1,6 +1,6 @@
-from jenny.security.workspace_access import default_workspace_scope
-from jenny.session.manager import SessionManager
-from jenny.webui.workspaces import WebUIWorkspaceController
+from jafta.security.workspace_access import default_workspace_scope
+from jafta.session.manager import SessionManager
+from jafta.webui.workspaces import WebUIWorkspaceController
 
 
 def _seed_session_scope(sessions, chat_id: str, scope) -> None:

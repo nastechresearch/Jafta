@@ -1,6 +1,6 @@
 """Go rifiuta ``name`` sui messaggi, e nessun altro provider deve perderlo.
 
-``name`` è opzionale nello schema OpenAI e Jenny lo mette sui risultati dei tool
+``name`` è opzionale nello schema OpenAI e Jafta lo mette sui risultati dei tool
 (``agent/runner.py``). OpenCode Go non lo ignora: risponde ``HTTP 400 ...
 messages[N]: "name" is not supported by this endpoint``. Il guasto è tardivo e
 sembra peggiore di quello che è — la prima richiesta del turno passa, e il turno
@@ -20,8 +20,8 @@ from typing import Any
 
 import httpx
 
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
-from jenny.providers.opencode import message_keys
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.opencode import message_keys
 
 GO_BASE = "https://opencode.ai/zen/go/v1"
 

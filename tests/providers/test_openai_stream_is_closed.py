@@ -14,7 +14,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 MESSAGES = [{"role": "user", "content": "x"}]
 CONTENT = {"choices": [{"delta": {"content": "hi"}}]}
@@ -50,8 +50,8 @@ def _sse(*events: dict) -> list[str]:
 
 @pytest.fixture
 def fast_budgets(monkeypatch):
-    monkeypatch.setenv("JENNY_STREAM_IDLE_TIMEOUT_S", "0.05")
-    monkeypatch.setenv("JENNY_STREAM_FIRST_OUTPUT_TIMEOUT_S", "0.1")
+    monkeypatch.setenv("JAFTA_STREAM_IDLE_TIMEOUT_S", "0.05")
+    monkeypatch.setenv("JAFTA_STREAM_FIRST_OUTPUT_TIMEOUT_S", "0.1")
 
 
 async def _run_chat(provider, response, **kwargs):

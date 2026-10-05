@@ -7,10 +7,10 @@ Una conversazione lascia quattro tracce su disco, e ognuna nasce da un mapping
 
 | Traccia | Dove | Radice |
 | --- | --- | --- |
-| la sessione (quel che Jenny rilegge) | ``sessions/<stem>.jsonl`` | installazione |
-| la trascrizione (quel che vedi) | ``.jenny/webui/<stem>.jsonl`` + ``.segments/`` | installazione |
+| la sessione (quel che Jafta rilegge) | ``sessions/<stem>.jsonl`` | installazione |
+| la trascrizione (quel che vedi) | ``.jafta/webui/<stem>.jsonl`` + ``.segments/`` | installazione |
 | i record dei subagent | ``subagents/records/<stem>.jsonl`` | installazione |
-| i risultati dei tool troppo grandi | ``.jenny/tool-results/<stem>/`` | **turno** |
+| i risultati dei tool troppo grandi | ``.jafta/tool-results/<stem>/`` | **turno** |
 
 Quel mapping non è iniettivo: ``project:a/b``, ``project:a:b`` e ``project:a_b``
 finiscono tutti su ``project_a_b``. Due conversazioni sullo stesso file
@@ -30,15 +30,15 @@ from pathlib import Path
 
 import pytest
 
-from jenny.session.keys import (
+from jafta.session.keys import (
     PROJECT_SESSION_PREFIX,
     UNIFIED_SESSION_KEY,
     WEBUI_CHANNEL,
     is_valid_project_name,
     session_key_for_channel,
 )
-from jenny.session.manager import SessionManager
-from jenny.utils.helpers import safe_filename
+from jafta.session.manager import SessionManager
+from jafta.utils.helpers import safe_filename
 
 # I nomi che il validatore accetta, scelti per essere adiacenti fra loro: se il
 # mapping perdesse un carattere, due di questi finirebbero sullo stesso file.
@@ -152,7 +152,7 @@ def test_tool_results_live_inside_the_project_and_not_beside_it() -> None:
     progetto, e tenerlo nella radice personale sarebbe la stessa famiglia di
     difetti di ``downloads/`` e dello storage delle app (chiusi nel passo 6).
     """
-    src = Path("jenny/utils/helpers.py").read_text(encoding="utf-8")
+    src = Path("jafta/utils/helpers.py").read_text(encoding="utf-8")
     assert "root = ensure_dir(workspace / _TOOL_RESULTS_DIR)" in src, (
         "la radice dei tool-results deve venire dal workspace passato al chiamante, "
         "che dentro un progetto è la cartella del progetto"

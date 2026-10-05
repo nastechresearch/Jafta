@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.command.builtin import register_builtin_commands
-from jenny.command.router import CommandContext, CommandRouter
+from jafta.command.builtin import register_builtin_commands
+from jafta.command.router import CommandContext, CommandRouter
 
 
 class TestIsDispatchableCommand:

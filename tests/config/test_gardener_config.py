@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.config.schema import (
+from jafta.config.schema import (
     GARDENER_DISTANCE_HOURS_MAX,
     GARDENER_IDLE_MIN_MAX,
     GARDENER_INTERVAL_MIN_MAX,

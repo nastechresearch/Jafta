@@ -8,11 +8,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 from support.runner import empty_tools, make_spec
 
-from jenny.providers.base import LLMResponse, ToolCallRequest
+from jafta.providers.base import LLMResponse, ToolCallRequest
 
 
 async def test_runner_persists_large_tool_results_for_follow_up_calls(tmp_path):
-    from jenny.agent.runner import AgentRunner, AgentRunSpec
+    from jafta.agent.runner import AgentRunner, AgentRunSpec
 
     provider = MagicMock()
     captured_second_call: list[dict] = []
@@ -49,13 +49,13 @@ async def test_runner_persists_large_tool_results_for_follow_up_calls(tmp_path):
     tool_message = next(msg for msg in captured_second_call if msg.get("role") == "tool")
     assert "[tool output persisted]" in tool_message["content"]
     assert "tool-results" in tool_message["content"]
-    assert (tmp_path / ".jenny" / "tool-results" / "test_runner" / "call_big.txt").exists()
+    assert (tmp_path / ".jafta" / "tool-results" / "test_runner" / "call_big.txt").exists()
 
 
 def test_persist_tool_result_prunes_old_session_buckets(tmp_path):
-    from jenny.utils.helpers import maybe_persist_tool_result
+    from jafta.utils.helpers import maybe_persist_tool_result
 
-    root = tmp_path / ".jenny" / "tool-results"
+    root = tmp_path / ".jafta" / "tool-results"
     old_bucket = root / "old_session"
     recent_bucket = root / "recent_session"
     old_bucket.mkdir(parents=True)
@@ -82,9 +82,9 @@ def test_persist_tool_result_prunes_old_session_buckets(tmp_path):
 
 
 def test_persist_tool_result_leaves_no_temp_files(tmp_path):
-    from jenny.utils.helpers import maybe_persist_tool_result
+    from jafta.utils.helpers import maybe_persist_tool_result
 
-    root = tmp_path / ".jenny" / "tool-results"
+    root = tmp_path / ".jafta" / "tool-results"
     maybe_persist_tool_result(
         tmp_path,
         "current:session",
@@ -98,16 +98,16 @@ def test_persist_tool_result_leaves_no_temp_files(tmp_path):
 
 
 def test_persist_tool_result_logs_cleanup_failures(monkeypatch, tmp_path):
-    from jenny.utils.helpers import maybe_persist_tool_result
+    from jafta.utils.helpers import maybe_persist_tool_result
 
     warnings: list[str] = []
 
     monkeypatch.setattr(
-        "jenny.utils.helpers._cleanup_tool_result_buckets",
+        "jafta.utils.helpers._cleanup_tool_result_buckets",
         lambda *_args, **_kwargs: (_ for _ in ()).throw(OSError("busy")),
     )
     monkeypatch.setattr(
-        "jenny.utils.helpers.logger.exception",
+        "jafta.utils.helpers.logger.exception",
         lambda message, *args: warnings.append(message.format(*args)),
     )
 
@@ -125,7 +125,7 @@ def test_persist_tool_result_logs_cleanup_failures(monkeypatch, tmp_path):
 
 async def test_read_file_result_is_not_offloaded(tmp_path):
     """read_file must not trigger generic offloading (prevents persist->read->persist loops)."""
-    from jenny.agent.runner import AgentRunner, AgentRunSpec
+    from jafta.agent.runner import AgentRunner, AgentRunSpec
 
     provider = MagicMock()
     captured_second_call: list[dict] = []
@@ -165,12 +165,12 @@ async def test_read_file_result_is_not_offloaded(tmp_path):
     # read_file manages its own size; generic truncation must NOT apply
     assert len(tool_message["content"]) == 20_000
     # no file should have been written for this read_file call
-    offload_dir = tmp_path / ".jenny" / "tool-results"
+    offload_dir = tmp_path / ".jafta" / "tool-results"
     assert not any(offload_dir.rglob("call_rf.txt")) if offload_dir.exists() else True
 
 
 async def test_runner_keeps_going_when_tool_result_persistence_fails():
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock()
     captured_second_call: list[dict] = []
@@ -191,7 +191,7 @@ async def test_runner_keeps_going_when_tool_result_persistence_fails():
     tools = empty_tools()
 
     runner = AgentRunner(provider)
-    with patch("jenny.agent.runner.maybe_persist_tool_result", side_effect=RuntimeError("disk full")):
+    with patch("jafta.agent.runner.maybe_persist_tool_result", side_effect=RuntimeError("disk full")):
         result = await runner.run(make_spec(
             initial_messages=[{"role": "user", "content": "do task"}],
             tools=tools,
@@ -216,7 +216,7 @@ def test_persisted_reference_states_the_line_count_and_where_to_resume(tmp_path)
     inevitabile per chiunque voglia "il resto". Il conteggio delle righe e la riga
     da cui riprendere sono esattamente cio che serve a non tirare a indovinare.
     """
-    from jenny.utils.helpers import maybe_persist_tool_result
+    from jafta.utils.helpers import maybe_persist_tool_result
 
     payload = "\n".join(f"line {i}" for i in range(1, 501))
     persisted = maybe_persist_tool_result(
@@ -227,7 +227,7 @@ def test_persisted_reference_states_the_line_count_and_where_to_resume(tmp_path)
     assert "500 lines" in persisted
     # La preview e tagliata a 1200 caratteri, quindi l'offset di ripresa cade
     # dentro il file e non oltre la fine.
-    stored = (tmp_path / ".jenny" / "tool-results" / "current_session" / "call_big.txt")
+    stored = (tmp_path / ".jafta" / "tool-results" / "current_session" / "call_big.txt")
     total = len(stored.read_text(encoding="utf-8").splitlines())
     assert total == 500
     offset = int(persisted.split("offset=")[1].split(")")[0])
@@ -243,14 +243,14 @@ def test_persisted_reference_line_count_describes_the_written_file(tmp_path):
     Il conteggio deve descrivere il file che il modello aprirebbe; e per lo stesso
     motivo l'offset di ripresa, che si riferisce alla preview, qui non viene dato.
     """
-    from jenny.utils.helpers import maybe_persist_tool_result
+    from jafta.utils.helpers import maybe_persist_tool_result
 
     blocks = [{"type": "text", "text": "x" * 4000}]
     persisted = maybe_persist_tool_result(
         tmp_path, "current:session", "call_blocks", blocks, max_chars=64,
     )
 
-    stored = tmp_path / ".jenny" / "tool-results" / "current_session" / "call_blocks.json"
+    stored = tmp_path / ".jafta" / "tool-results" / "current_session" / "call_blocks.json"
     expected = len(stored.read_text(encoding="utf-8").splitlines())
     assert f"{expected} lines" in persisted
     assert "offset=" not in persisted
@@ -258,7 +258,7 @@ def test_persisted_reference_line_count_describes_the_written_file(tmp_path):
 
 def test_persisted_reference_without_a_cut_preview_still_reports_lines(tmp_path):
     """Anche senza taglio il conteggio c'e: e il campo, non l'avviso, a informare."""
-    from jenny.utils.helpers import maybe_persist_tool_result
+    from jafta.utils.helpers import maybe_persist_tool_result
 
     payload = "\n".join(["short"] * 20)
     persisted = maybe_persist_tool_result(

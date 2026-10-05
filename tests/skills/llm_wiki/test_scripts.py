@@ -1,14 +1,14 @@
 """Test degli script della skill llm-wiki: scaffold, registry, lint, audit.
 
-Veniva da ``jenny/skills/llm-wiki/scripts/tests/test_scripts.py``, e da la'
+Veniva da ``jafta/skills/llm-wiki/scripts/tests/test_scripts.py``, e da la'
 **non lo eseguiva nessuno**: ``pyproject.toml`` fissa ``testpaths = ["tests"]``,
 quindi ``pytest -q`` restava verde con tre test rossi dentro. Spostarlo qui,
 accanto a ``test_lint_wiki.py`` e ``test_scaffold_topup.py`` che provano gli
 stessi script, e' la strada che non chiede niente a ``pyproject.toml`` (file
-condiviso) e che ha un secondo effetto concreto: solo ``jenny/`` finisce
+condiviso) e che ha un secondo effetto concreto: solo ``jafta/`` finisce
 nell'APK, quindi il codice di test non viaggia piu' sul telefono.
 
-Gli script della skill non fanno parte del package ``jenny`` importabile, quindi
+Gli script della skill non fanno parte del package ``jafta`` importabile, quindi
 la dir ``scripts/`` viene aggiunta a ``sys.path`` — e va aggiunta comunque,
 perche' i tre script si importano ``reindex_wikis`` a vicenda.
 """
@@ -21,7 +21,7 @@ import unittest
 from pathlib import Path
 
 _SCRIPTS_DIR = (
-    Path(__file__).resolve().parents[3] / "jenny" / "skills" / "llm-wiki" / "scripts"
+    Path(__file__).resolve().parents[3] / "jafta" / "skills" / "llm-wiki" / "scripts"
 )
 sys.path.insert(0, str(_SCRIPTS_DIR))
 

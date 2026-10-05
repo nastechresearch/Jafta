@@ -46,7 +46,7 @@ const setVisible = (v) => {
 };
 let opened = 0;
 globalThis.window = globalThis;
-globalThis.JennyNative = {
+globalThis.JaftaNative = {
   importBackup() { opened += 1; }, exportBackup() { opened += 1; }, restartApp() {},
 };
 const flow = await import('./shared/backup-flow.js');
@@ -82,7 +82,7 @@ def test_a_silent_picker_is_a_cancel_once_back_on_the_page() -> None:
         const second = flow.runImportFlow();
         await settle();
         assert.equal(opened, 2);
-        window.jennyBackup.onImportPicked(false);
+        window.jaftaBackup.onImportPicked(false);
         assert.equal(await second, false);
         """
     )
@@ -95,10 +95,10 @@ def test_an_answer_before_the_grace_wins_and_a_late_one_does_nothing() -> None:
         await settle();
         setVisible(false);
         setVisible(true);
-        window.jennyBackup.onImportPicked(false);
+        window.jaftaBackup.onImportPicked(false);
         assert.equal(await p, false);
         fire();                     // la cintura scaduta dopo non tocca niente
-        window.jennyBackup.onImportPicked(true);   // tardiva, senza padrone
+        window.jaftaBackup.onImportPicked(true);   // tardiva, senza padrone
         """
     )
 

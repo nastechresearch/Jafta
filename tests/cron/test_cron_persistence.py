@@ -1,4 +1,4 @@
-"""Persistence tests for ``jenny.cron.service.CronService``.
+"""Persistence tests for ``jafta.cron.service.CronService``.
 
 These tests target the specific failure mode where a corrupt or partially
 written ``jobs.json`` would silently turn into an empty job list on the next
@@ -13,8 +13,8 @@ from pathlib import Path
 
 import pytest
 
-from jenny.cron.service import CronService
-from jenny.cron.types import CronSchedule
+from jafta.cron.service import CronService
+from jafta.cron.types import CronSchedule
 
 
 def _seeded_store(tmp_path: Path) -> tuple[CronService, Path]:

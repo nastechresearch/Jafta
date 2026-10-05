@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from jenny.snapshot.crypto import (
+from jafta.snapshot.crypto import (
     MAGIC,
     MAX_SEGMENT_SIZE,
     SEGMENTED_FORMAT_VERSION,
@@ -23,11 +23,11 @@ from jenny.snapshot.crypto import (
     encrypt_container,
     encrypt_file,
 )
-from jenny.snapshot.crypto_backends.base import CryptoAuthError
+from jafta.snapshot.crypto_backends.base import CryptoAuthError
 
 pytest.importorskip("cryptography")
 
-from jenny.snapshot.crypto_backends.dev import DevAesGcmBackend  # noqa: E402
+from jafta.snapshot.crypto_backends.dev import DevAesGcmBackend  # noqa: E402
 
 _BACKEND = DevAesGcmBackend()
 _ITER = 1000

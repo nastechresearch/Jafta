@@ -2,7 +2,7 @@
 
 Prima la casa i rifiuti non li ascoltava affatto: il telefono disegnava la
 bolla, il gateway diceva no, e non succedeva più niente. Da fuori era identico a
-Jenny che ti ignora.
+Jafta che ti ignora.
 
 Le parole e la famiglia le decide il modulo condiviso con l'officina, che ha i
 suoi test; qui si misura la parte che la casa fa per conto suo — la bolla che se
@@ -19,7 +19,7 @@ from pathlib import Path
 from support.js_harness import member, requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 HOME_CHAT_JS = ASSETS / "home-chat.js"
 HOME_APP_JS = ASSETS / "home-app.js"
 WIRE_ERROR_JS = ASSETS / "shared" / "wire-error.js"
@@ -206,7 +206,7 @@ def test_the_thread_keeps_its_bottom_when_the_rows_below_it_grow() -> None:
     finiva **sotto il bordo**, cioè fuori schermo proprio nel momento in cui
     serviva leggerla. La striscia degli allegati è *fratello* del composer, non
     figlio, quindi il `ResizeObserver` che c'era — messo solo sul composer per
-    la geometria di Jenny — non la vedeva.
+    la geometria di Jafta — non la vedeva.
 
     Vale anche per l'ultimo messaggio quando alleghi una foto, e c'era da
     sempre: la nota l'ha solo reso visibile.

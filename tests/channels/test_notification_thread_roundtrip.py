@@ -19,14 +19,14 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.loop import AgentLoop
-from jenny.bus.events import NOTIFICATION_CHANNEL, InboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.channels import notification as nc
-from jenny.channels.notification import REPLY_THREAD_TAG, NotificationChannel
-from jenny.providers.base import LLMResponse
-from jenny.runtime.native_input import NATIVE_SOURCE_KEY, NATIVE_THREAD_KEY
-from jenny.session.keys import UNIFIED_SESSION_KEY
+from jafta.agent.loop import AgentLoop
+from jafta.bus.events import NOTIFICATION_CHANNEL, InboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.channels import notification as nc
+from jafta.channels.notification import REPLY_THREAD_TAG, NotificationChannel
+from jafta.providers.base import LLMResponse
+from jafta.runtime.native_input import NATIVE_SOURCE_KEY, NATIVE_THREAD_KEY
+from jafta.session.keys import UNIFIED_SESSION_KEY
 
 
 class _Alerts:

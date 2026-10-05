@@ -5,8 +5,8 @@ from __future__ import annotations
 import json
 import os
 
-from jenny.agent.tools.app_actions import AppActionTool, AppToolsSyncer
-from jenny.agent.tools.registry import ToolRegistry
+from jafta.agent.tools.app_actions import AppActionTool, AppToolsSyncer
+from jafta.agent.tools.registry import ToolRegistry
 
 
 def _write_manifest(workspace, slug="note", actions=None):

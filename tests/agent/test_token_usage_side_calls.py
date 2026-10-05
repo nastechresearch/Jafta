@@ -12,14 +12,14 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-from jenny.agent import token_usage
-from jenny.agent.consolidator import Consolidator
-from jenny.agent.memory import MemoryStore
-from jenny.agent.subagent import SubagentManager
-from jenny.agent.token_usage import TokenUsageHook
-from jenny.bus.queue import MessageBus
-from jenny.providers.base import LLMResponse
-from jenny.session.manager import SessionManager
+from jafta.agent import token_usage
+from jafta.agent.consolidator import Consolidator
+from jafta.agent.memory import MemoryStore
+from jafta.agent.subagent import SubagentManager
+from jafta.agent.token_usage import TokenUsageHook
+from jafta.bus.queue import MessageBus
+from jafta.providers.base import LLMResponse
+from jafta.session.manager import SessionManager
 from tests.support.agent import make_loop, make_provider
 from tests.support.aio import wait_until
 from tests.support.subagent_provider_fakes import fake_provider

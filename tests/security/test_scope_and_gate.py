@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.security.workspace_access import (
+from jafta.security.workspace_access import (
     current_workspace_scope,
     enter_workspace_scope,
 )
-from jenny.webui.workspace_files import validate_path
+from jafta.webui.workspace_files import validate_path
 
 
 class _Scope:

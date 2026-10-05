@@ -1,4 +1,4 @@
-"""La vista esterna di una Jenny App non si porta sull'origine del gateway.
+"""La vista esterna di una Jafta App non si porta sull'origine del gateway.
 
 La vista esterna e' un iframe ``allow-scripts allow-same-origin`` sull'origine
 del proxy (``127.0.0.1:<porta effimera>``): all'apertura e' un'altra origine e
@@ -8,7 +8,7 @@ documento girerebbe con l'origine del gateway **e** con ``allow-same-origin`` â€
 ``parent.document``, lo storage, il token.
 
 Due chiusure, una per tipo di documento: la WebUI rifiuta le navigazioni che non
-partono dal gateway o dal guscio nativo (Fetch Metadata), e una pagina di Jenny
+partono dal gateway o dal guscio nativo (Fetch Metadata), e una pagina di Jafta
 App porta il proprio sandbox nella risposta (CSP ``sandbox``), cosi' resta opaca
 in qualunque cornice.
 """
@@ -22,7 +22,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from support.gateway_http import make_handler, make_request
 
-from jenny.webui.ws_http import GatewayHTTPHandler
+from jafta.webui.ws_http import GatewayHTTPHandler
 
 
 def _handler(tmp_path: Path) -> GatewayHTTPHandler:
@@ -65,7 +65,7 @@ async def test_the_shell_and_the_spa_still_navigate(tmp_path, site, dest):
 
 async def test_subresources_from_an_app_frame_still_load(tmp_path):
     """Il kit e l'SDK li carica una cornice opaca: ``cross-site``, ma non una
-    navigazione. Rifiutarli spegnerebbe ogni Jenny App."""
+    navigazione. Rifiutarli spegnerebbe ogni Jafta App."""
     headers = [("Sec-Fetch-Mode", "no-cors"), ("Sec-Fetch-Site", "cross-site"),
                ("Sec-Fetch-Dest", "script")]
     response = await _get(_handler(tmp_path), "/html-mobile/index.html", headers)
@@ -89,7 +89,7 @@ def test_an_app_page_carries_its_own_sandbox(tmp_path):
     apps_on = MagicMock()
     apps_on.apps.enabled = True
     with patch.object(handler, "_get_workspace_root", return_value=workspace), \
-         patch("jenny.config.loader.load_config", return_value=apps_on):
+         patch("jafta.config.loader.load_config", return_value=apps_on):
         response = handler.apps_routes._static(
             make_request("/apps/note/index.html"), "/apps/note/index.html"
         )

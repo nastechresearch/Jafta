@@ -8,14 +8,14 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.subagent_records import (
+from jafta.agent.subagent_records import (
     MAX_RECORDS_PER_SESSION,
     RECORD_TTL_S,
     SubagentRecord,
     SubagentRecordStore,
     SubagentSpec,
 )
-from jenny.security.workspace_access import (
+from jafta.security.workspace_access import (
     WorkspaceScope,
     workspace_sandbox_status,
 )

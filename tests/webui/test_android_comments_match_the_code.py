@@ -15,7 +15,7 @@ lega il commento al codice che descrive, così una prossima deriva si vede.
   ``collapse`` la chiusura dell'arena, che fa ``restGrip``.
 - ``MainActivity.saveToDownloads``: «Titan 2, Android 11» e «thread binder del
   bridge» (gira su ``nativeExecutor`` e risponde con una Promise).
-- ``JennyApplication``: citava un ``configChanges`` di tre voci.
+- ``JaftaApplication``: citava un ``configChanges`` di tre voci.
 - Manifest: «le sue tre stringhe» di ``activity_main.xml``.
 """
 
@@ -61,8 +61,8 @@ def test_save_to_downloads_names_its_thread() -> None:
     assert "thread binder" not in comments
 
 
-def test_jenny_application_does_not_quote_a_stale_config_changes() -> None:
-    comments = read_comments("JennyApplication")
+def test_jafta_application_does_not_quote_a_stale_config_changes() -> None:
+    comments = read_comments("JaftaApplication")
     assert 'configChanges="orientation|screenSize|keyboardHidden"' not in comments
 
 

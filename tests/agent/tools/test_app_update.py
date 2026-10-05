@@ -1,4 +1,4 @@
-"""Test dei tool di aggiornamento (``jenny/agent/tools/app_update.py``).
+"""Test dei tool di aggiornamento (``jafta/agent/tools/app_update.py``).
 
 L'affaccio LLM non contiene logica: quello che si verifica è che i due tool
 esistano solo dentro l'app Android, che la lettura resti davvero una lettura, e
@@ -14,16 +14,16 @@ from typing import Any
 
 import pytest
 
-from jenny.agent.tools.app_update import InstallUpdateTool, UpdateStatusTool
-from jenny.agent.tools.loader import ToolLoader
-from jenny.runtime import update_check, update_install
-from jenny.runtime.update_check import UpdateInfo
-from jenny.runtime.update_install import InstallResult
+from jafta.agent.tools.app_update import InstallUpdateTool, UpdateStatusTool
+from jafta.agent.tools.loader import ToolLoader
+from jafta.runtime import update_check, update_install
+from jafta.runtime.update_check import UpdateInfo
+from jafta.runtime.update_install import InstallResult
 
 _INFO = UpdateInfo(
     version_code=9,
     version_name="0.7.0",
-    apk_url="https://example.invalid/jenny-0.7.0.apk",
+    apk_url="https://example.invalid/jafta-0.7.0.apk",
     sha256="b" * 64,
     size=48210944,
     notes_url="https://example.invalid/notes",

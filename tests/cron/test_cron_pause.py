@@ -1,7 +1,7 @@
 """Un job dell'utente si mette in pausa e si riprende dall'officina.
 
 Fino al 26/09/2026 l'unico modo di fermare un promemoria che dava fastidio era
-convincere Jenny a cancellarlo. La pausa e' un terzo stato accanto ai due in cui
+convincere Jafta a cancellarlo. La pausa e' un terzo stato accanto ai due in cui
 un job e' gia' ``enabled = False`` — un ``at`` eseguito e un job senza sessione —
 e per questo ha un campo suo, ``paused_at_ms``: senza, «in pausa» e «concluso»
 sarebbero indistinguibili, e «Riprendi» su un promemoria gia' consegnato lo
@@ -16,8 +16,8 @@ import time
 
 import pytest
 
-from jenny.cron.service import CronService
-from jenny.cron.types import CronJob, CronPayload, CronSchedule
+from jafta.cron.service import CronService
+from jafta.cron.types import CronJob, CronPayload, CronSchedule
 
 _HOUR = 3_600_000
 

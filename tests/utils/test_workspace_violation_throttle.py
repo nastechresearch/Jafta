@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from jenny.utils.runtime import (
+from jafta.utils.runtime import (
     repeated_workspace_violation_error,
     workspace_violation_signature,
 )

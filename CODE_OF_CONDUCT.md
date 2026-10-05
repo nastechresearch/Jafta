@@ -1,6 +1,6 @@
 # Code of Conduct
 
-Jenny is maintained by one person in their spare time. This document is short on
+Jafta is maintained by one person in their spare time. This document is short on
 purpose: it says what is expected, what is not, and what happens if that line is
 crossed.
 

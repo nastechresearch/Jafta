@@ -1,11 +1,11 @@
 # Changelog
 
-What changed in each release of Jenny, written for the person holding the phone. The
+What changed in each release of Jafta, written for the person holding the phone. The
 version numbers follow [Semantic Versioning](https://semver.org/): from 1.0 on, a change that
 breaks something you rely on gets a new major number.
 
 Releases before 1.0 are described only on their
-[GitHub release pages](https://github.com/flagdizero/jenny-android-ai-agent/releases).
+[GitHub release pages](https://github.com/nastechresearch/jafta-android-ai-agent/releases).
 
 ## [1.0.0] — 2026-10-02
 
@@ -14,12 +14,12 @@ screen built around the conversation, and the old interface becomes the workshop
 
 ### Highlights
 
-- **A new home.** Jenny opens on a home of swipeable pages: Apps, Jenny (the chat),
+- **A new home.** Jafta opens on a home of swipeable pages: Apps, Jafta (the chat),
   Notebooks and Settings. A row of page names at the top replaces the drawer button and the
-  dots. You can pin a Jenny App or a notebook as a page of its own, from where it lives.
+  dots. You can pin a Jafta App or a notebook as a page of its own, from where it lives.
 - **The workshop.** The previous interface lives on behind Settings, regrouped into four
   drawers: Console, Brain, Hands and Memory.
-- **Jenny outside the app.** She can float above other apps and you can talk to her there,
+- **Jafta outside the app.** She can float above other apps and you can talk to her there,
   in a short conversation with rendered Markdown. You can also reply to her straight from the
   notification shade, and the shade shows the exchange as one conversation.
 - **Notebooks in the home.** A notebook opens on its own chat, its pages and its map. From
@@ -36,10 +36,10 @@ screen built around the conversation, and the old interface becomes the workshop
   language, instead of disappearing.
 - Videos are recognised as videos before they are sent.
 - The minichat opens wherever the chat is not on screen, in both shells.
-- The status bar and the working line wear Jenny's flower, and the working line stays lit
+- The status bar and the working line wear Jafta's flower, and the working line stays lit
   through tool runs and subagent waits.
-- Jenny's mood comes from the emoji in her reply. The model is not asked for it.
-- The assistant carries the name you gave her. The app itself stays Jenny.
+- Jafta's mood comes from the emoji in her reply. The model is not asked for it.
+- The assistant carries the name you gave her. The app itself stays Jafta.
 
 ### Themes and look
 
@@ -52,7 +52,7 @@ screen built around the conversation, and the old interface becomes the workshop
 
 - Creating a notebook asks for its name and then for one line on what it is about. A wrong
   name keeps the dialog open and says the rule first.
-- A notebook can be renamed or deleted from its sheet. Both are refused while Jenny is
+- A notebook can be renamed or deleted from its sheet. Both are refused while Jafta is
   still working in it, and the refusal says so in your language.
 - The map keeps a dot where you drag it, follows a notebook's rename and leaves with its
   deletion.
@@ -62,7 +62,7 @@ screen built around the conversation, and the old interface becomes the workshop
 
 - **Brain** holds the providers as brands with their models. One tap on a model makes it
   answer.
-- **Hands** shows what Jenny does for you: skills, scheduled jobs, Telegram and SSH. A
+- **Hands** shows what Jafta does for you: skills, scheduled jobs, Telegram and SSH. A
   scheduled job of yours can be paused, resumed or removed from there.
 - **Memory** holds the file manager. Delete, rename and copy run as WebSocket commands and
   never overwrite.
@@ -87,7 +87,7 @@ screen built around the conversation, and the old interface becomes the workshop
 - Dream reads every diary entry whole, keeps up when the chat and a notebook take turns,
   and no longer loses the conversation when a consolidation call fails.
 - After `/stop` or a crash the history keeps the whole turn.
-- Rules you give Jenny survive the night. Dream no longer erases them or counts them
+- Rules you give Jafta survive the night. Dream no longer erases them or counts them
   against its budget.
 - Each conversation has its own `python_exec` globals, and waiting on a `python_exec`
   session no longer freezes the gateway.
@@ -95,7 +95,7 @@ screen built around the conversation, and the old interface becomes the workshop
 
 ### Telegram, SSH and the browser
 
-- Attachments sent on Telegram reach Jenny.
+- Attachments sent on Telegram reach Jafta.
 - Telegram pairs only from a private chat, and after pairing it listens only to that
   person. Unpairing asks first.
 - SSH works with ECDSA and large RSA host keys. Downloads stop at the byte limit and never
@@ -127,7 +127,7 @@ screen built around the conversation, and the old interface becomes the workshop
   remembered.
 - **Built-in skills cannot be switched off.** Skills now say whether they ship with the
   app.
-- **Cron expressions are evaluated by Jenny itself.** The `croniter` dependency is gone. An
+- **Cron expressions are evaluated by Jafta itself.** The `croniter` dependency is gone. An
   expression that would never fire is refused when the job is added, and an interval of zero
   or less is refused too.
 - **The all-notebooks graph is gone.** The `/api/graph` route now needs a notebook name.

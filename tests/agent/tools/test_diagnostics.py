@@ -13,8 +13,8 @@ from __future__ import annotations
 import pytest
 from loguru import logger
 
-from jenny.agent.tools import diagnostics
-from jenny.agent.tools.diagnostics import GetRecentLogsTool, install_log_buffer
+from jafta.agent.tools import diagnostics
+from jafta.agent.tools.diagnostics import GetRecentLogsTool, install_log_buffer
 
 
 @pytest.fixture(autouse=True)

@@ -2,7 +2,7 @@
 
 ``HomeApp._askSettings`` chiede ``/api/settings`` una volta e ne tiene la
 promessa: ogni apertura delle Impostazioni la rilegge e passa ``floating`` a
-``HomeJenny.setFloating``. Toccato l'interruttore, la stanza sapeva il valore
+``HomeJafta.setFloating``. Toccato l'interruttore, la stanza sapeva il valore
 nuovo e la cache quello vecchio, e alla riapertura vinceva la cache:
 l'interruttore si ridisegnava spento con la finestra accesa (visto sul telefono
 il 25/09). ``_keepFloating`` scrive nella cache com'e' finita.
@@ -17,7 +17,7 @@ from pathlib import Path
 
 from support.js_harness import member, requires_node, run_js
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 APP_JS = ASSETS / "home-app.js"
 
 pytestmark = requires_node
@@ -74,7 +74,7 @@ def test_nothing_to_keep_when_nothing_was_read() -> None:
 
 def test_the_room_is_wired_to_the_cache() -> None:
     """Grep, non comportamento: il comportamento dei due capi sta qui sopra e in
-    ``test_home_jenny_client.py``; qui si tiene fermo il filo fra i due."""
+    ``test_home_jafta_client.py``; qui si tiene fermo il filo fra i due."""
     src = APP_JS.read_text(encoding="utf-8")
     assert "onFloating: (floating) => this._keepFloating(floating)" in src
 
@@ -100,7 +100,7 @@ const api = {{
     reads += 1;
     if (hold) await hold;
     if (failNext) {{ failNext = false; throw new Error('rete'); }}
-    return {{ version: {{ current: version }}, agent: {{ bot_name: 'Jenny' }} }};
+    return {{ version: {{ current: version }}, agent: {{ bot_name: 'Jafta' }} }};
   }},
 }};
 console.warn = () => {{}};
@@ -114,8 +114,8 @@ class Home {{
   constructor() {{
     this._settings = null;
     this._settingsGen = 0;
-    this.you = {{ open() {{}}, sayJenny() {{}}, sayModel() {{}}, sayUpdates() {{}}, sayBackup() {{}} }};
-    this.jennyRoom = room('j');
+    this.you = {{ open() {{}}, sayJafta() {{}}, sayModel() {{}}, sayUpdates() {{}}, sayBackup() {{}} }};
+    this.jaftaRoom = room('j');
     this.modelRoom = room('m');
     this.updatesRoom = room('u');
     this.backupRoom = room('b');

@@ -3,7 +3,7 @@
 """Prepara una release: allinea i file di versione e genera ``latest.json``.
 
 La versione vive in più posti che vanno tenuti in pari a mano (pyproject, il
-fallback hardcoded in ``jenny/__init__.py``, ``versionCode``/``versionName``
+fallback hardcoded in ``jafta/__init__.py``, ``versionCode``/``versionName``
 del build Gradle) e con il manifest dell'updater ne arriva un altro ancora.
 Questo script è l'unico punto in cui quei valori si toccano insieme.
 
@@ -42,7 +42,7 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 #: Slug del repository GitHub su cui vivono le release (override con ``--repo``).
-DEFAULT_REPO = "flagdizero/jenny-android-ai-agent"
+DEFAULT_REPO = "nastechresearch/jafta-android-ai-agent"
 
 #: Il client legge il manifest da ``releases/latest/download/latest.json``:
 #: quell'URL funziona solo se l'asset si chiama esattamente così.
@@ -83,7 +83,7 @@ class VersionFiles:
         """Risolve i tre percorsi a partire dalla radice del repo."""
         return cls(
             pyproject=root / "pyproject.toml",
-            init_py=root / "jenny" / "__init__.py",
+            init_py=root / "jafta" / "__init__.py",
             gradle=root / "android" / "app" / "build.gradle.kts",
         )
 
@@ -278,7 +278,7 @@ def hash_apk(path: Path) -> tuple[str, int]:
 
 def apk_asset_name(version: str) -> str:
     """Nome con cui l'APK va allegato alla release."""
-    return f"jenny-{version}.apk"
+    return f"jafta-{version}.apk"
 
 
 def build_manifest(
@@ -389,7 +389,7 @@ def verification_block(*, version: str, sha256: str, size: int) -> str:
         "```\n"
         "\n"
         "The certificate is the same one published with\n"
-        "[0.3.0](https://github.com/flagdizero/jenny-android-ai-agent/releases/tag/v0.3.0) — if it\n"
+        "[0.3.0](https://github.com/nastechresearch/jafta-android-ai-agent/releases/tag/v0.3.0) — if it\n"
         "ever differs, the build did not come from this project.\n"
     )
 
@@ -418,7 +418,7 @@ def print_publish_commands(
         f"    {quoted_apk} \\\n"
         f"    {quoted_manifest} \\\n"
         f"    --repo {quoted_repo} \\\n"
-        f"    --title {shlex.quote(f'Jenny {version}')} \\\n"
+        f"    --title {shlex.quote(f'Jafta {version}')} \\\n"
         f"    --notes {shlex.quote(notes)}"
     )
     print("\n# Re-upload the manifest after editing it (rollout change, kill switch):")
@@ -580,7 +580,7 @@ def run(args: argparse.Namespace) -> int:
         repo=args.repo,
     )
 
-    # L'asset deve chiamarsi jenny-<version>.apk: GitHub usa il nome del file
+    # L'asset deve chiamarsi jafta-<version>.apk: GitHub usa il nome del file
     # caricato, non l'etichetta, quindi se serve si stage una copia rinominata.
     asset_name = apk_asset_name(version)
     staged_apk = apk_source

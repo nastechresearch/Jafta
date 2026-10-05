@@ -1,4 +1,4 @@
-"""«Tu e Jenny»: la striscia dei temi, e la riga della versione.
+"""«Tu e Jafta»: la striscia dei temi, e la riga della versione.
 
 Il tema e' l'unica impostazione della casa il cui effetto e' tutto a schermo,
 e per questo non apre una stanza: si tocca e c'e'. Le due cose che qui si
@@ -29,7 +29,7 @@ from pathlib import Path
 from support.js_harness import function, member, requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 YOU_JS = ASSETS / "home-you.js"
 THEME_JS = ASSETS / "shared" / "theme.js"
 I18N_JS = ASSETS / "shared" / "i18n.js"
@@ -51,7 +51,7 @@ import assert from 'node:assert/strict';
 const TRANSLATIONS = __TRANSLATIONS__;
 const i18n = { locale: 'it', translations: TRANSLATIONS, __T__ };
 /* Il nome di lei (`shared/bot-name.js`): qui quello di partenza. */
-const botName = { get: () => 'Jenny', set() {}, onChange() { return () => {}; } };
+const botName = { get: () => 'Jafta', set() {}, onChange() { return () => {}; } };
 
 function makeEl(tag) {
   const el = {
@@ -117,7 +117,7 @@ class HomeYou {
   __MARK_THEME__
   __SAY_THEME__
   __SHOW_VERSION__
-  __SAY_JENNY__
+  __SAY_JAFTA__
 }
 
 function room() {
@@ -148,7 +148,7 @@ def _harness() -> str:
         .replace("__MARK_THEME__", member(src, "_markTheme"))
         .replace("__SAY_THEME__", member(src, "_sayTheme"))
         .replace("__SHOW_VERSION__", member(src, "sayUpdates"))
-        .replace("__SAY_JENNY__", member(src, "sayJenny"))
+        .replace("__SAY_JAFTA__", member(src, "sayJafta"))
     )
 
 
@@ -230,7 +230,7 @@ def test_picking_a_theme_moves_the_ring_without_redrawing_the_strip() -> None:
       assert.equal(litOnes.length, 1);
       assert.equal(litOnes[0].dataset.theme, 'y2k', 'l\\u2019anello e\\u2019 rimasto sul tema di prima');
 
-      /* E nemmeno riaprendo la stanza: da «Tu e Jenny» ci si torna a ogni
+      /* E nemmeno riaprendo la stanza: da «Tu e Jafta» ci si torna a ogni
          giro, e senza la guardia le sette pastiglie diventano quattordici —
          un secondo elenco identico in coda al primo. */
       you.open();
@@ -242,7 +242,7 @@ def test_picking_a_theme_moves_the_ring_without_redrawing_the_strip() -> None:
 
 
 def test_the_name_and_the_phrase_follow_the_theme_that_is_on() -> None:
-    """Il nome non si traduce — «Jenny Kyoto» e' un nome — ma la frase che lo
+    """Il nome non si traduce — «Jafta Kyoto» e' un nome — ma la frase che lo
     racconta si', ed e' quella dell'officina: gia' tradotta, e una sola."""
     _run_js("""
       const you = room();
@@ -269,12 +269,12 @@ def test_the_words_come_back_when_the_language_changes() -> None:
       you.workshopName.textContent = '';
       you.workshopHint.textContent = '';
       you.themeDesc.textContent = '';
-      you.jennyLabel.textContent = '';
+      you.jaftaLabel.textContent = '';
       you.applyTranslations();
       assert.equal(you.themeLabel.textContent, i18n.t('settings.themeLabel'));
       assert.equal(you.workshopName.textContent, i18n.t('home.workshop'));
       assert.equal(you.workshopHint.textContent, i18n.t('home.you.workshopHint'));
-      assert.equal(you.jennyLabel.textContent, i18n.t('home.jenny.title', { name: 'Jenny' }));
+      assert.equal(you.jaftaLabel.textContent, i18n.t('home.jafta.title', { name: 'Jafta' }));
       assert.equal(you.themeDesc.textContent, i18n.t('themes.chanel.desc'));
     """)
 
@@ -283,20 +283,20 @@ def test_the_words_come_back_when_the_language_changes() -> None:
 
 
 def test_the_pill_keeps_the_word_that_tells_the_themes_apart() -> None:
-    """Sei nomi su sette cominciano per «Jenny»: in una fila di pastiglie larghe
+    """Sei nomi su sette cominciano per «Jafta»: in una fila di pastiglie larghe
     56 px quella parola mangia il posto di quella che distingue, e a schermo
-    restavano «Jenny Ky…», «Jenny Sti…», «Jenny Fu…» — tre pastiglie diverse
+    restavano «Jafta Ky…», «Jafta Sti…», «Jafta Fu…» — tre pastiglie diverse
     che dicono la stessa cosa. Il nome intero resta nelle schede larghe
     dell'officina."""
     _run_js("""
-      assert.equal(shortThemeName('Jenny Kyoto'), 'Kyoto');
+      assert.equal(shortThemeName('Jafta Kyoto'), 'Kyoto');
       assert.equal(shortThemeName("Synthwave '84"), 'Synthwave', 'l\u2019anno e\u2019 la coda del nome');
-      assert.equal(shortThemeName('Chanel'), 'Chanel', 'un nome senza «Jenny» resta intero');
+      assert.equal(shortThemeName('Chanel'), 'Chanel', 'un nome senza «Jafta» resta intero');
       const short = THEMES.map((t) => shortThemeName(t.label));
       assert.equal(new Set(short).size, THEMES.length, 'due temi con lo stesso nome corto');
       for (const name of short) {
         assert.ok(name.length <= 9, 'non ci sta nella pastiglia: ' + name);
-        assert.ok(!name.startsWith('Jenny'), 'e\u2019 rimasto il nome di lei: ' + name);
+        assert.ok(!name.startsWith('Jafta'), 'e\u2019 rimasto il nome di lei: ' + name);
       }
     """)
 
@@ -328,8 +328,8 @@ def test_the_row_that_leads_to_her_says_how_she_is_now() -> None:
     arrivi a schermo, e che svuotarlo non lasci a mezz'aria quello di prima."""
     _run_js("""
       const you = room();
-      you.sayJenny('piccola \u00b7 flottante');
-      assert.equal(you.jennyValue.textContent, 'piccola \u00b7 flottante');
-      you.sayJenny(undefined);
-      assert.equal(you.jennyValue.textContent, '', 'il valore di prima e\u2019 rimasto');
+      you.sayJafta('piccola \u00b7 flottante');
+      assert.equal(you.jaftaValue.textContent, 'piccola \u00b7 flottante');
+      you.sayJafta(undefined);
+      assert.equal(you.jaftaValue.textContent, '', 'il valore di prima e\u2019 rimasto');
     """)

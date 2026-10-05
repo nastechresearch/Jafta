@@ -2,7 +2,7 @@
 <!-- Path esposti dal FileProvider. Il provider non è esportato: un file esce
      solo con un permesso concesso da noi in un Intent.
 
-     workspace: i file che JennyNative.openFile/shareFile/saveToDownloads
+     workspace: i file che JaftaNative.openFile/shareFile/saveToDownloads
      passano al viewer o allo share sheet di sistema. Solo il workspace, non
      tutto filesDir: fuori ci sono la chiave privata SSH (ssh/), lo store degli
      snapshot e lo staging dei backup. Dentro il workspace config.json (chiavi

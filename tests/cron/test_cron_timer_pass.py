@@ -16,8 +16,8 @@ from pathlib import Path
 
 from support.aio import wait_until
 
-from jenny.cron.service import CronService
-from jenny.cron.types import CronSchedule
+from jafta.cron.service import CronService
+from jafta.cron.types import CronSchedule
 
 _HOUR = 3_600_000
 _wait_until = functools.partial(wait_until, timeout=2.0)

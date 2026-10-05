@@ -2,8 +2,8 @@
 
 Con una sessione interattiva Python l'indirizzo di un link non lo vede mai: il
 modello clicca, Chromium naviga, e l'unico strato che vede dove porta un click,
-un redirect o una sottorisorsa e' ``JennyBrowserBridge.isBlockedAddress``. Le sue
-reti devono essere quelle di ``jenny/security/network.py::_BLOCKED_NETWORKS``;
+un redirect o una sottorisorsa e' ``JaftaBrowserBridge.isBlockedAddress``. Le sue
+reti devono essere quelle di ``jafta/security/network.py::_BLOCKED_NETWORKS``;
 la versione Kotlin era rimasta indietro e lasciava passare ``::127.0.0.1``
 (IPv4-compatibile, che ``isLoopbackAddress`` non riconosce), il multicast, il
 broadcast, e un IPv4 locale dentro un NAT64 (``64:ff9b::/96``) o un 6to4
@@ -20,7 +20,7 @@ import re
 
 from support.kotlin_source import function_body, read_code, read_source
 
-from jenny.security import network
+from jafta.security import network
 
 # Come il Kotlin copre ogni rete IPv6 di Python: l'API di InetAddress o un
 # controllo sui byte. Una rete nuova in Python senza voce qui fa fallire il test:
@@ -44,7 +44,7 @@ _V6_COVERAGE = {
 
 
 def _blocked_v4_in_kotlin() -> set[ipaddress.IPv4Network]:
-    src = read_source("JennyBrowserBridge")
+    src = read_source("JaftaBrowserBridge")
     block = src[src.index("private val BLOCKED_V4 = listOf(") :]
     block = block[: block.index("\n        )")]
     return {
@@ -54,7 +54,7 @@ def _blocked_v4_in_kotlin() -> set[ipaddress.IPv4Network]:
 
 
 def _guard() -> str:
-    code = read_code("JennyBrowserBridge")
+    code = read_code("JaftaBrowserBridge")
     return function_body(code, "isBlockedAddress") + function_body(code, "embeddedIpv4")
 
 
@@ -95,7 +95,7 @@ def test_the_forms_that_carry_an_ipv4_are_judged_by_that_ipv4() -> None:
         "embeddedIpv4(b)?.let { return isBlockedAddress(InetAddress.getByAddress(it)) }",
     ):
         assert needle in guard, needle
-    embedded = function_body(read_code("JennyBrowserBridge"), "embeddedIpv4")
+    embedded = function_body(read_code("JaftaBrowserBridge"), "embeddedIpv4")
     # mapped (::ffff:a.b.c.d) e NAT64 (64:ff9b::a.b.c.d): gli ultimi 4 byte.
     assert embedded.count("b.copyOfRange(12, 16)") == 2
     assert "b[10] == 0xFF.toByte() && b[11] == 0xFF.toByte()" in embedded

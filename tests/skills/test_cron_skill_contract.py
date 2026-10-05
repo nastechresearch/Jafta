@@ -1,7 +1,7 @@
 """La skill `cron` è il manuale: sintassi, fusi orari, esempi, semantica di ``list``.
 
 Nasce come rimedio a un'asimmetria — le skill si ri-estraggono a OGNI avvio senza
-``skip_existing`` (``jenny/utils/helpers.py``), ``AGENTS.md`` è in
+``skip_existing`` (``jafta/utils/helpers.py``), ``AGENTS.md`` è in
 ``_USER_OWNED_TEMPLATES`` e si crea una volta sola, quindi una regola scritta solo
 lì non raggiungeva mai un'installazione esistente. Il difetto è sopravvissuto
 proprio così: la skill descriveva ancora "Three Modes" (una tassonomia che precede
@@ -9,7 +9,7 @@ il parametro ``mode``) e portava come esempio l'anti-pattern esatto, mentre la
 guida corretta viveva in un file mai aggiornato sul telefono dell'utente.
 
 Quel rimedio non serve più. La regola di *instradamento* — quale delle tre
-destinazioni — sta in ``jenny/templates/agent/scheduling.md``, che è codice e si
+destinazioni — sta in ``jafta/templates/agent/scheduling.md``, che è codice e si
 riscrive a ogni boot; ``AGENTS.md`` non la contiene più affatto. Le asserzioni qui
 sotto restano, ma cambiano di mestiere: non presidiano più una scorciatoia, tengono
 fermo il posto della skill nel confine fra prompt di sistema e manuale.
@@ -23,10 +23,10 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from jenny.agent.tools.cron import _JOB_MODES
-from jenny.utils.android_assets import _SKILLS_MANIFEST, _USER_OWNED_TEMPLATES
+from jafta.agent.tools.cron import _JOB_MODES
+from jafta.utils.android_assets import _SKILLS_MANIFEST, _USER_OWNED_TEMPLATES
 
-SKILL = Path(__file__).resolve().parents[2] / "jenny" / "skills" / "cron" / "SKILL.md"
+SKILL = Path(__file__).resolve().parents[2] / "jafta" / "skills" / "cron" / "SKILL.md"
 
 
 def _skill() -> str:

@@ -30,7 +30,7 @@ import pytest
 from support.js_harness import NODE, member, requires_node, run_js, run_module
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 MARKDOWN_JS = ASSETS / "shared" / "markdown.js"
 CONTENT_LINK_JS = ASSETS / "shared" / "content-link.js"
 PURIFY = ASSETS / "vendor" / "dompurify@3" / "purify.min.js"

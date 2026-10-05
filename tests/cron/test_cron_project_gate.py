@@ -13,7 +13,7 @@ non c'è nessuno, e sembra riuscito.
 blocco se la guadagna la regola che sbatteresti addosso di continuo e che ti
 costringe a ripianificare — è il caso del confine di scrittura; un promemoria è
 raro e sta in piedi da solo. Quindi questo rifiuto è *l'unico* posto in cui
-Jenny lo viene a sapere, ed è il motivo per cui
+Jafta lo viene a sapere, ed è il motivo per cui
 ``test_the_refusal_says_where_reminders_do_live`` non è un test sul wording:
 senza quella frase, il turno finisce in un "non posso" che manda via a mani
 vuote invece che nella chat personale.
@@ -29,9 +29,9 @@ from typing import Any
 
 import pytest
 
-from jenny.agent.tools.context import RequestContext
-from jenny.agent.tools.cron import CronTool
-from jenny.cron.types import CronJob, CronSchedule
+from jafta.agent.tools.context import RequestContext
+from jafta.agent.tools.cron import CronTool
+from jafta.cron.types import CronJob, CronSchedule
 
 
 class _RecordingCronService:
@@ -108,11 +108,11 @@ async def test_list_does_not_leak_the_personal_schedule() -> None:
 
 def test_the_refusal_says_where_reminders_do_live() -> None:
     """Nessuna riga nel prompt lo dice: se non lo dice qui, non lo dice nessuno."""
-    from jenny.agent.tools.cron import _PROJECT_REFUSAL
+    from jafta.agent.tools.cron import _PROJECT_REFUSAL
 
     lowered = _PROJECT_REFUSAL.lower()
     assert "personal chat" in lowered, (
-        "il rifiuto deve indirizzare, non solo negare: è l'unico posto in cui Jenny impara "
+        "il rifiuto deve indirizzare, non solo negare: è l'unico posto in cui Jafta impara "
         "dove i promemoria si fanno, e da cui lo ridice all'utente"
     )
 

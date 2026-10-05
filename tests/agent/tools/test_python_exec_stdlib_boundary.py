@@ -37,13 +37,13 @@ import threading
 
 import pytest
 
-from jenny.agent.tools.python_exec import PythonNamespace, _real_builtins_open
-from jenny.agent.tools.python_exec_builtins import _register_builtin_functions
-from jenny.config.tool_schemas import PythonExecConfig
+from jafta.agent.tools.python_exec import PythonNamespace, _real_builtins_open
+from jafta.agent.tools.python_exec_builtins import _register_builtin_functions
+from jafta.config.tool_schemas import PythonExecConfig
 
 _REFUSED = "outside allowed directory"
 _BLOCKED = "not available on this platform"
-_GUARD_LOGGER = "jenny.agent.tools.python_exec"
+_GUARD_LOGGER = "jafta.agent.tools.python_exec"
 
 
 def _namespace(workspace, *, restrict: bool = True, builtins_too: bool = False) -> PythonNamespace:
@@ -267,7 +267,7 @@ def test_io_fileio_is_untouched_for_host_code(sandbox) -> None:
     assert stderr == ""
     assert host_io.FileIO(outside / "secret.txt").read() == b"secret"
     assert not hasattr(
-        getattr(host_io.FileIO, "_jenny_real_fileio"), "_jenny_real_fileio"
+        getattr(host_io.FileIO, "_jafta_real_fileio"), "_jafta_real_fileio"
     )
 
 
@@ -556,8 +556,8 @@ def test_the_builtins_open_patch_is_idempotent(sandbox) -> None:
         _, stderr = _run(ns, "1 + 1")
         assert stderr == ""
     real = _real_builtins_open()
-    assert not hasattr(real, "_jenny_real_open")
-    assert builtins.open._jenny_real_open is real  # type: ignore[attr-defined]
+    assert not hasattr(real, "_jafta_real_open")
+    assert builtins.open._jafta_real_open is real  # type: ignore[attr-defined]
     # E il vero ``open`` è ancora quello: il codice host lo usa senza saperlo.
     assert real(workspace / "inside.txt").read() == "inside"
 
@@ -569,7 +569,7 @@ def test_the_builtins_open_patch_is_idempotent(sandbox) -> None:
 
 def test_a_user_exception_renders_without_refusal_spam(sandbox, caplog) -> None:
     """``traceback`` e ``linecache`` aprono i sorgenti dei frame — stdlib e
-    jenny, tutti fuori dal workspace. Con ``builtins.open`` patchato, un fix
+    jafta, tutti fuori dal workspace. Con ``builtins.open`` patchato, un fix
     sbagliato qui trasforma ogni eccezione in una raffica di rifiuti."""
     workspace, _ = sandbox
     ns = _namespace(workspace)

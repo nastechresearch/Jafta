@@ -29,7 +29,7 @@ from pathlib import Path
 from support.js_harness import function, member, requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 MODEL_JS = ASSETS / "home-model.js"
 BRAND_JS = ASSETS / "shared" / "provider-brand.js"
 I18N_JS = ASSETS / "shared" / "i18n.js"
@@ -552,7 +552,7 @@ def test_the_list_is_titled_with_the_brand_you_are_reading() -> None:
       assert.equal(nodi['home-models-label'].textContent,
         i18n.t('home.model.models', { provider: shortBrand(getProviderBrand('anthropic').label) }),
         'il titolo nomina chi risponde invece di chi stai guardando');
-      /* E la riga di «Tu e Jenny» continua a dire chi risponde: sono due
+      /* E la riga di «Tu e Jafta» continua a dire chi risponde: sono due
          domande diverse, e una sola risposta non puo' servirle entrambe. */
       assert.equal(s.value(), getProviderBrand('opencode_go').label);
     """)

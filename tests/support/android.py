@@ -14,7 +14,7 @@ from typing import Any
 
 import pytest
 
-from jenny.runtime.context import get_runtime_context
+from jafta.runtime.context import get_runtime_context
 
 
 def force_android_context(monkeypatch: pytest.MonkeyPatch, context: Any | None = None) -> Any:

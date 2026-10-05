@@ -22,15 +22,15 @@ from typing import Any
 
 import pytest
 
-from jenny.agent.dream_cycle import DreamOutcome, DreamPrologue, run_dream_turn
-from jenny.agent.memory import MemoryStore
-from jenny.agent.memory_budget import make_write_size_guard
+from jafta.agent.dream_cycle import DreamOutcome, DreamPrologue, run_dream_turn
+from jafta.agent.memory import MemoryStore
+from jafta.agent.memory_budget import make_write_size_guard
 
 PERSONAL = "unified:default"
 PROJECT = "project:esempio"
 CRON = "cron:job-1"
 
-pytestmark = pytest.mark.usefixtures("_configure_jenny_workspace")
+pytestmark = pytest.mark.usefixtures("_configure_jafta_workspace")
 
 
 def _alternate(store: MemoryStore, pairs: int) -> None:

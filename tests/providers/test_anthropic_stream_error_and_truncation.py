@@ -16,8 +16,8 @@ from dataclasses import replace
 import httpx
 import pytest
 
-from jenny.providers.anthropic_provider import AnthropicProvider
-from jenny.providers.retry_policy import is_transient_response
+from jafta.providers.anthropic_provider import AnthropicProvider
+from jafta.providers.retry_policy import is_transient_response
 
 MESSAGES = [{"role": "user", "content": "ciao"}]
 
@@ -96,7 +96,7 @@ async def test_an_overloaded_error_before_any_output_is_retried(monkeypatch) -> 
     async def _no_sleep(_delay: float) -> None:
         return None
 
-    monkeypatch.setattr("jenny.providers.base.asyncio.sleep", _no_sleep)
+    monkeypatch.setattr("jafta.providers.base.asyncio.sleep", _no_sleep)
     provider, calls = _provider(
         _sse(START, _error("overloaded_error", "Overloaded")),
         _sse(START, TEXT_START, _text("ok"), *END),

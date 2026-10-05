@@ -7,7 +7,7 @@ del frame WebSocket — con ``since`` onorato e ``gap`` che sopravvive al filo:
 senza quest'ultimo il percorso pensato per chiudere un buco ne aprirebbe uno.
 
 Stesso pattern di ``test_subagent_routes.py``: handler reale, manager doppio, e
-nessun import di ``jenny/agent`` dalla parte della route. Il log invece è quello
+nessun import di ``jafta/agent`` dalla parte della route. Il log invece è quello
 vero, perché è lui a produrre ``seq``, ``dropped`` e ``gap``.
 """
 
@@ -24,9 +24,9 @@ import pytest
 from support.gateway_http import AUTH_SECRET, make_handler, make_request
 from websockets.http11 import Request as WsRequest
 
-from jenny.agent.subagent_activity import SubagentActivityLog, build_digest
-from jenny.channels.subagent_activity_wire import MAX_HTTP_EVENTS
-from jenny.webui.ws_http import GatewayHTTPHandler
+from jafta.agent.subagent_activity import SubagentActivityLog, build_digest
+from jafta.channels.subagent_activity_wire import MAX_HTTP_EVENTS
+from jafta.webui.ws_http import GatewayHTTPHandler
 
 _TASK = "d2ee4342"
 

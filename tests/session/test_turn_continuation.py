@@ -7,9 +7,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from jenny.bus.events import InboundMessage
-from jenny.session.goal_state import GOAL_STATE_KEY
-from jenny.session.turn_continuation import (
+from jafta.bus.events import InboundMessage
+from jafta.session.goal_state import GOAL_STATE_KEY
+from jafta.session.turn_continuation import (
     INTERNAL_CONTINUATION_META,
     INTERNAL_CONTINUATION_PENDING_META,
     INTERNAL_CONTINUATION_RUN_STARTED_AT_META,
@@ -207,7 +207,7 @@ def test_save_skip_unchanged_for_standalone_current_message():
 
 def test_no_internal_continuation_while_goal_awaits_the_user():
     """Un goal in attesa non accoda turni di continuazione (fino a 12) a vuoto."""
-    from jenny.session.turn_continuation import _continuation_available
+    from jafta.session.turn_continuation import _continuation_available
 
     metadata = {
         GOAL_STATE_KEY: {

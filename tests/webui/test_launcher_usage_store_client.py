@@ -4,7 +4,7 @@
 il ricordo di quel che apri di piu' stava nel ``localStorage`` della WebView,
 che Chromium persiste in modo asincrono e che **non sopravvive a un kill del
 processo** — mentre le SharedPreferences si' (lo dice gia' un commento di
-``MainActivity.kt``, scritto per tutt'altro). Jenny e' il launcher del telefono
+``MainActivity.kt``, scritto per tutt'altro). Jafta e' il launcher del telefono
 e il sistema la uccide di routine: l'ordine «piu' usate» si sbriciolava da se',
 poco alla volta, e un cassetto in ordine sbagliato non sembra rotto — sembra
 solo che il ranking non serva a niente.
@@ -26,7 +26,7 @@ from support.js_harness import requires_node, run_js
 
 STORE_JS = (
     Path(__file__).resolve().parents[2]
-    / "jenny" / "templates" / "ui" / "assets" / "shared" / "launcher-usage-store.js"
+    / "jafta" / "templates" / "ui" / "assets" / "shared" / "launcher-usage-store.js"
 )
 RANK_JS = STORE_JS.parent / "launcher-rank.js"
 
@@ -229,7 +229,7 @@ await store.ready;
 await null;   // `_adoptLoaded` gira nel microtask dopo `ready`
 usage.record('android:com.example.a', 1000);
 usage.record('android:com.example.a', 2000);
-usage.record('jenny:note', 1500);
+usage.record('jafta:note', 1500);
 
 // Un nuovo processo: stesso ponte, istanza nuova.
 const rebornStore = nativeStore(native);
@@ -238,7 +238,7 @@ await rebornStore.ready;
 await null;
 assert.equal(reborn.get('android:com.example.a').count, 2);
 assert.equal(reborn.get('android:com.example.a').last, 2000);
-assert.equal(reborn.get('jenny:note').count, 1);
+assert.equal(reborn.get('jafta:note').count, 1);
 console.log('ok');
 """, with_rank=True)
     assert "ok" in out

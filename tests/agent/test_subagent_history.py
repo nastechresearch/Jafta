@@ -6,17 +6,17 @@ import json
 import time
 from pathlib import Path
 
-from jenny.agent.subagent_history import (
+from jafta.agent.subagent_history import (
     HISTORY_TTL_S,
     MAX_HISTORY_PER_ORIGIN,
     SubagentHistoryStore,
 )
-from jenny.session.keys import (
+from jafta.session.keys import (
     SUBAGENT_SESSION_PREFIX,
     is_internal_session_key,
     subagent_session_key,
 )
-from jenny.session.manager import SessionManager
+from jafta.session.manager import SessionManager
 
 _MESSAGES = [
     {"role": "system", "content": "you are a subagent"},
@@ -177,7 +177,7 @@ class TestKeys:
         di progetto e' una conversazione — ma il lato che conta e' lo stesso:
         nessuna chiave interna passa.
         """
-        from jenny.webui.ws_http import _is_webui_readable_session_key
+        from jafta.webui.ws_http import _is_webui_readable_session_key
 
         assert _is_webui_readable_session_key(subagent_session_key("L1")) is False
         assert _is_webui_readable_session_key("cron:job-1") is False
@@ -188,7 +188,7 @@ class TestKeys:
     def test_dream_prune_glob_does_not_match_subagent_histories(
         self, tmp_path: Path
     ) -> None:
-        from jenny.agent.memory import MemoryStore
+        from jafta.agent.memory import MemoryStore
 
         store, sessions = _store(tmp_path)
         store.save("L1", "o", _MESSAGES)

@@ -10,11 +10,11 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from support.aio import wait_until
 
-from jenny.agent.hook import AgentHookContext
-from jenny.agent.runner import AgentRunResult
-from jenny.agent.subagent import SubagentManager, SubagentStatus, _SubagentHook
-from jenny.bus.queue import MessageBus
-from jenny.providers.base import LLMProvider
+from jafta.agent.hook import AgentHookContext
+from jafta.agent.runner import AgentRunResult
+from jafta.agent.subagent import SubagentManager, SubagentStatus, _SubagentHook
+from jafta.bus.queue import MessageBus
+from jafta.providers.base import LLMProvider
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -303,7 +303,7 @@ class TestWatchdogTask:
         await _settle(sm, block)
 
     def test_threshold_default_comes_from_agent_defaults(self, tmp_path: Path):
-        from jenny.config.schema import AgentDefaults
+        from jafta.config.schema import AgentDefaults
 
         sm = _manager(tmp_path, stall_threshold_s=None)
         assert sm.stall_threshold_s == float(AgentDefaults().subagent_stall_threshold_seconds)

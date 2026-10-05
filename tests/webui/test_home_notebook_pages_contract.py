@@ -13,10 +13,10 @@ import json
 import re
 from pathlib import Path
 
-from jenny.utils.android_assets import _UI_MANIFEST
+from jafta.utils.android_assets import _UI_MANIFEST
 
 ROOT = Path(__file__).resolve().parents[2]
-UI = ROOT / "jenny" / "templates" / "ui"
+UI = ROOT / "jafta" / "templates" / "ui"
 INDEX = UI / "index.html"
 WORKSHOP = UI / "workshop.html"
 ASSETS = UI / "assets"
@@ -186,7 +186,7 @@ def test_the_groups_are_the_three_the_server_actually_sends() -> None:
     Questo banco esiste perche' l'errore l'ho fatto: avevo aggiunto la parola e
     una quarta riga alla legenda, "riparando" un conto che era giusto.
     """
-    from jenny.utils.wiki_paths import WIKI_PAGES_SKIP_DIRS
+    from jafta.utils.wiki_paths import WIKI_PAGES_SKIP_DIRS
 
     assert "summaries" in WIKI_PAGES_SKIP_DIRS, (
         "la regola e' cambiata: allora i gruppi diventano quattro e questo "

@@ -1,11 +1,11 @@
 from types import SimpleNamespace
 
-from jenny.agent.tools.context import ToolContext
-from jenny.agent.tools.file_state import FileStates
-from jenny.agent.tools.filesystem import FileToolsConfig, ReadFileTool
-from jenny.agent.tools.loader import ToolLoader
-from jenny.agent.tools.registry import ToolRegistry
-from jenny.config.schema import Config, ToolsConfig
+from jafta.agent.tools.context import ToolContext
+from jafta.agent.tools.file_state import FileStates
+from jafta.agent.tools.filesystem import FileToolsConfig, ReadFileTool
+from jafta.agent.tools.loader import ToolLoader
+from jafta.agent.tools.registry import ToolRegistry
+from jafta.config.schema import Config, ToolsConfig
 
 FILE_TOOL_NAMES = {
     "apply_patch",

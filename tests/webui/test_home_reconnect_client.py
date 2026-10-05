@@ -4,7 +4,7 @@ Al ``chat:open`` la casa faceva solo ``_setWire(true)``. L'officina invece
 rilegge il thread (``_resyncThreadAfterReconnect``), e il gateway, all'``attach``,
 rimanda ``goal_status: running`` solo se un turno e' vivo — mai ``idle``. Quindi
 con il gateway ripartito a meta' turno la casa restava col bottone Ferma acceso,
-la riga di lavoro e il fiore che giravano e Jenny a pensare, per sempre; e una
+la riga di lavoro e il fiore che giravano e Jafta a pensare, per sempre; e una
 caduta breve lasciava a schermo una risposta tronca.
 
 I metodi si ritagliano da ``home-app.js`` e girano in node su un guscio finto.
@@ -17,7 +17,7 @@ from pathlib import Path
 from support.js_harness import member, requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-APP_JS = ROOT / "jenny" / "templates" / "ui" / "assets" / "home-app.js"
+APP_JS = ROOT / "jafta" / "templates" / "ui" / "assets" / "home-app.js"
 
 pytestmark = requires_node
 
@@ -35,7 +35,7 @@ class App {
     this._threadReads = 0;
     this.activity = { stop: () => this.log.push('activity.stop') };
     this.subagents = { load: () => this.log.push('subagents.load') };
-    this.jenny = { _releaseTrackedTurn: () => this.log.push('jenny.release') };
+    this.jafta = { _releaseTrackedTurn: () => this.log.push('jafta.release') };
     this.gate = null;
     this.chat = {
       following: true,
@@ -98,7 +98,7 @@ def test_a_reconnect_releases_the_turn_and_reloads_the_thread() -> None:
       await tick();
       assert.equal(app._running, false, 'Ferma resta acceso su un turno morto');
       assert.ok(app.log.includes('activity.stop'), 'la riga di lavoro e il fiore girano ancora');
-      assert.ok(app.log.includes('jenny.release'), 'Jenny resta a pensare');
+      assert.ok(app.log.includes('jafta.release'), 'Jafta resta a pensare');
       assert.equal(app.log.filter((x) => x === 'reload').length, 1, app.log.join(','));
       assert.ok(app.log.indexOf('activity.stop') < app.log.indexOf('reload'));
     """)

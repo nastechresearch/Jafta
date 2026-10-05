@@ -16,16 +16,16 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from jenny.agent.loop import AgentLoop
-from jenny.bus.queue import MessageBus
-from jenny.providers.base import LLMProvider
+from jafta.agent.loop import AgentLoop
+from jafta.bus.queue import MessageBus
+from jafta.providers.base import LLMProvider
 
 # Quel che ``patch_deps=True`` sostituisce: un workspace senza file veri non
 # regge il costruttore di queste tre.
 DEFAULT_PATCHES = (
-    "jenny.agent.loop.ContextBuilder",
-    "jenny.agent.loop.SessionManager",
-    "jenny.agent.loop.SubagentManager",
+    "jafta.agent.loop.ContextBuilder",
+    "jafta.agent.loop.SessionManager",
+    "jafta.agent.loop.SubagentManager",
 )
 
 

@@ -25,14 +25,14 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from support.agent import make_loop, make_provider
 
-from jenny.agent.tools import nothing_to_report as ntr
-from jenny.agent.tools.context import RequestContext
-from jenny.agent.tools.message import MessageTool
-from jenny.agent.tools.nothing_to_report import NothingToReportTool, declared_marker_lines
-from jenny.bus.events import InboundMessage, OutboundMessage
-from jenny.providers.base import LLMResponse, ToolCallRequest
-from jenny.session.keys import HEARTBEAT_SESSION_KEY
-from jenny.session.turn_visibility import TurnVisibility, silent_turn_metadata
+from jafta.agent.tools import nothing_to_report as ntr
+from jafta.agent.tools.context import RequestContext
+from jafta.agent.tools.message import MessageTool
+from jafta.agent.tools.nothing_to_report import NothingToReportTool, declared_marker_lines
+from jafta.bus.events import InboundMessage, OutboundMessage
+from jafta.providers.base import LLMResponse, ToolCallRequest
+from jafta.session.keys import HEARTBEAT_SESSION_KEY
+from jafta.session.turn_visibility import TurnVisibility, silent_turn_metadata
 
 
 def _tool(*, silent: bool) -> NothingToReportTool:
@@ -344,7 +344,7 @@ def test_the_tool_description_does_not_teach_the_routing_rule() -> None:
 
 
 def test_the_module_is_registered_in_the_loader_list() -> None:
-    from jenny.agent.tools.loader import _HARDCODED_TOOL_MODULES
+    from jafta.agent.tools.loader import _HARDCODED_TOOL_MODULES
 
     assert "nothing_to_report" in _HARDCODED_TOOL_MODULES
 

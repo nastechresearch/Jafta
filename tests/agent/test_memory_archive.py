@@ -11,9 +11,9 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
-from jenny.agent import memory as memory_module
-from jenny.agent.memory import MemoryStore
-from jenny.agent.memory_archive import (
+from jafta.agent import memory as memory_module
+from jafta.agent.memory import MemoryStore
+from jafta.agent.memory_archive import (
     ArchivedEntry,
     archive_dir,
     archive_entry,
@@ -22,12 +22,12 @@ from jenny.agent.memory_archive import (
     list_archived,
     render_archived,
 )
-from jenny.agent.tools.memory_entries import (
+from jafta.agent.tools.memory_entries import (
     entry_id,
     make_entry_archiver,
     parse_entries,
 )
-from jenny.agent.tools.memory_recall import MemoryRecallTool
+from jafta.agent.tools.memory_recall import MemoryRecallTool
 
 _ENTRY = ArchivedEntry(
     id="a1b2c3d4",
@@ -320,7 +320,7 @@ class TestTheFileBoundaryArchiver:
         salvare si conosce con certezza."""
         archiver, hot = self._archiver(tmp_path)
         monkeypatch.setattr(
-            "jenny.agent.tools.memory_entries.archive_entry",
+            "jafta.agent.tools.memory_entries.archive_entry",
             lambda *a, **k: (_ for _ in ()).throw(OSError("disco pieno")),
         )
 
@@ -340,7 +340,7 @@ Odia le riunioni del venerdì.
 ## History
 
 1. Ha cominciato con un Titan 2
-2. Poi ci ha messo Jenny
+2. Poi ci ha messo Jafta
 """
 
 
@@ -374,9 +374,9 @@ class TestItProtectsProseAndNotOnlyBullets:
     def test_a_numbered_item_is_saved_too(self, tmp_path: Path):
         archiver, hot = self._archiver(tmp_path)
 
-        archiver(hot, _PROSE.replace("2. Poi ci ha messo Jenny\n", ""))
+        archiver(hot, _PROSE.replace("2. Poi ci ha messo Jafta\n", ""))
 
-        assert any("Poi ci ha messo Jenny" in b for b in self._bodies(tmp_path))
+        assert any("Poi ci ha messo Jafta" in b for b in self._bodies(tmp_path))
 
     def test_a_heading_is_structure_and_is_not_archived(self, tmp_path: Path):
         """Riorganizzare le sezioni è il mestiere del review pass. Un

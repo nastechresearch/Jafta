@@ -1,6 +1,6 @@
 """Tests for LLMProvider._enforce_role_alternation."""
 
-from jenny.providers.base import _SYNTHETIC_USER_CONTENT, LLMProvider
+from jafta.providers.base import _SYNTHETIC_USER_CONTENT, LLMProvider
 
 
 class TestEnforceRoleAlternation:
@@ -341,7 +341,7 @@ def test_recovering_the_only_turn_is_not_logged_as_a_drop():
 
 
 def test_anthropic_logs_the_same_drop():
-    from jenny.providers.anthropic_conversion import AnthropicConversionMixin
+    from jafta.providers.anthropic_conversion import AnthropicConversionMixin
 
     msgs = [
         {"role": "user", "content": "is it done?"},

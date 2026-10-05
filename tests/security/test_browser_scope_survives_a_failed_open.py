@@ -1,6 +1,6 @@
 """Un ``browser_open`` fallito non lascia la pagina precedente senza recinto.
 
-``JennyBrowserBridge.open`` azzerava ``scopeDomain`` all'inizio e lo ripiantava
+``JaftaBrowserBridge.open`` azzerava ``scopeDomain`` all'inizio e lo ripiantava
 solo a successo: ogni ritorno d'errore (pagina non partita, blocco della
 guardia, errore di rete) lasciava la pagina di prima caricata e **senza
 perimetro**, cioè libera di portare la sessione ovunque con un click. Durante
@@ -18,7 +18,7 @@ from support.kotlin_source import function_body, read_code
 
 
 def _open_body() -> str:
-    return function_body(read_code("JennyBrowserBridge"), "open")
+    return function_body(read_code("JaftaBrowserBridge"), "open")
 
 
 def test_open_never_clears_the_scope() -> None:

@@ -29,7 +29,7 @@ from pathlib import Path
 from support.js_harness import function, locale, member, requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 WHO_JS = ASSETS / "home-who.js"
 LIST_JS = ASSETS / "shared" / "conversation-list.js"
 I18N_JS = ASSETS / "shared" / "i18n.js"
@@ -110,7 +110,7 @@ function keep(row) {
 
 class Panel {
   constructor() {
-    this._personalName = () => 'Jenny';
+    this._personalName = () => 'Jafta';
     this._currentProject = () => null;
     /* Cosa e' successo e in che ordine. Dal 23/09/2026 e' una pagina: non c'e'
        niente da chiudere prima di cambiare conversazione. */
@@ -229,7 +229,7 @@ def test_the_panel_opens_on_the_conversation_you_are_in() -> None:
       const panel = await open(LIST);
       const rows = readout(panel);
       assert.equal(rows[0], 'etichetta: Con chi parli');
-      assert.equal(rows[1], 'io ✿ · Jenny · personale');
+      assert.equal(rows[1], 'io ✿ · Jafta · personale');
     """)
 
 
@@ -467,8 +467,8 @@ def test_a_blocked_row_has_no_colour_at_all() -> None:
 # ── Il fiore, e il comando in fondo ─────────────────────────────────────────
 
 
-def test_the_house_row_carries_jennys_flower() -> None:
-    """Non è un colore assegnato a un nome: è il segno che Jenny ha già nel dock
+def test_the_house_row_carries_jaftas_flower() -> None:
+    """Non è un colore assegnato a un nome: è il segno che Jafta ha già nel dock
     e nella riga d'identità dell'officina. Per questo la riga personale non ha
     un pallino — non è un quaderno fra i quaderni."""
     _run_js("""

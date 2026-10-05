@@ -1,4 +1,4 @@
-"""Test SSRF aggiuntivi per jenny.security.network, complementari a
+"""Test SSRF aggiuntivi per jafta.security.network, complementari a
 ``test_security_network.py`` (24 casi esistenti): qui casi NON coperti là —
 IPv6 aggiuntivi (link-local, unique-local, forme mappate meno comuni),
 notazioni IP alternative (comportamento reale, non presunto), schemi/URL
@@ -16,7 +16,7 @@ from unittest.mock import patch
 
 import pytest
 
-from jenny.security.network import (
+from jafta.security.network import (
     configure_ssrf_whitelist,
     validate_app_server_target,
     validate_ssh_target,
@@ -48,7 +48,7 @@ def _fake_resolve(host: str, results: list[str]):
 
 def test_blocks_ipv6_link_local_fe80():
     """fe80::/10 (link-local v6) è nel blocklist strict e deve essere bloccato."""
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("evil.com", ["fe80::1"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("evil.com", ["fe80::1"])):
         ok, err = validate_url_target("http://evil.com/")
         assert not ok
         assert "blocked" in err.lower()
@@ -56,14 +56,14 @@ def test_blocks_ipv6_link_local_fe80():
 
 def test_blocks_ipv6_unique_local_fc00():
     """fc00::/7 (unique local address, l'analogo IPv6 di RFC1918) è bloccato per url_target."""
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("evil.com", ["fc00::1"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("evil.com", ["fc00::1"])):
         ok, _ = validate_url_target("http://evil.com/")
         assert not ok
 
 
 def test_blocks_ipv6_unique_local_fd_prefix():
     """fd00::/8 è un sottoinsieme di fc00::/7 (bit locale settato): deve restare bloccato."""
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("evil.com", ["fd12:3456::1"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("evil.com", ["fd12:3456::1"])):
         ok, _ = validate_url_target("http://evil.com/")
         assert not ok
 
@@ -73,7 +73,7 @@ def test_blocks_ipv6_mapped_cgnat_without_whitelist():
     senza whitelist attiva (la suite esistente copre solo il caso IPv4 puro e il
     caso mappato *con* whitelist)."""
     resolver = _fake_resolve("ts.local", ["::ffff:100.100.1.1"])
-    with patch("jenny.security.network.socket.getaddrinfo", resolver):
+    with patch("jafta.security.network.socket.getaddrinfo", resolver):
         ok, _ = validate_url_target("http://ts.local/api")
         assert not ok
 
@@ -82,13 +82,13 @@ def test_allows_bracketed_ipv6_literal_public_address():
     """Un URL con literal IPv6 tra parentesi (``http://[::]:port/``) deve
     risolvere l'hostname correttamente e passare se l'indirizzo è pubblico."""
     resolver = _fake_resolve("2606:4700::1111", ["2606:4700::1111"])
-    with patch("jenny.security.network.socket.getaddrinfo", resolver):
+    with patch("jafta.security.network.socket.getaddrinfo", resolver):
         ok, err = validate_url_target("http://[2606:4700::1111]/")
         assert ok, f"Should allow public IPv6 literal, got: {err}"
 
 
 def test_blocks_bracketed_ipv6_loopback_literal():
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("::1", ["::1"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("::1", ["::1"])):
         ok, _ = validate_url_target("http://[::1]:8080/")
         assert not ok
 
@@ -102,14 +102,14 @@ def test_app_server_allows_ipv6_unique_local():
     """A differenza di validate_url_target, la policy app-server (LAN
     dichiarata dall'utente) ammette esplicitamente l'IPv6 ULA (fc00::/7):
     non è nel blocklist di ``_APP_SERVER_BLOCKED_NETWORKS``."""
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("srv.lan", ["fc00::1"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("srv.lan", ["fc00::1"])):
         ok, err = validate_app_server_target("http://srv.lan/x")
         assert ok, f"App policy should allow IPv6 ULA, got: {err}"
 
 
 def test_app_server_still_blocks_ipv6_link_local():
     """fe80::/10 resta bloccato anche per la policy app-server (è nel blocklist ridotto)."""
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("srv.lan", ["fe80::1"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("srv.lan", ["fe80::1"])):
         ok, _ = validate_app_server_target("http://srv.lan/x")
         assert not ok
 
@@ -118,7 +118,7 @@ def test_app_server_allows_ipv6_mapped_rfc1918():
     """::ffff:192.168.1.50 (RFC1918 mappato IPv6) deve essere ammesso dalla
     policy app-server, esattamente come la sua forma IPv4 pura."""
     resolver = _fake_resolve("srv.lan", ["::ffff:192.168.1.50"])
-    with patch("jenny.security.network.socket.getaddrinfo", resolver):
+    with patch("jafta.security.network.socket.getaddrinfo", resolver):
         ok, err = validate_app_server_target("http://srv.lan/x")
         assert ok, f"App policy should allow mapped RFC1918, got: {err}"
 
@@ -141,7 +141,7 @@ def test_decimal_notation_hostname_blocked_via_resolved_canonical_ip():
     127.0.0.1) e restituisce l'IP canonico, il blocco scatta regolarmente:
     la protezione è basata sull'IP risolto, non sulla stringa dell'hostname."""
     resolver = _fake_resolve("2130706433", ["127.0.0.1"])
-    with patch("jenny.security.network.socket.getaddrinfo", resolver):
+    with patch("jafta.security.network.socket.getaddrinfo", resolver):
         ok, err = validate_url_target("http://2130706433/admin")
         assert not ok, f"Should block decimal-notation loopback bypass, got: {err}"
 
@@ -161,7 +161,7 @@ def test_malformed_resolved_address_string_is_silently_skipped():
     def resolver(hostname, port, family=0, type_=0):
         return [(socket.AF_INET, socket.SOCK_STREAM, 0, "", ("2130706433", 0))]
 
-    with patch("jenny.security.network.socket.getaddrinfo", resolver):
+    with patch("jafta.security.network.socket.getaddrinfo", resolver):
         ok, _ = validate_url_target("http://weird.example/")
         assert ok  # comportamento reale attuale: nessun indirizzo valido -> non bloccato
 
@@ -195,7 +195,7 @@ def test_rejects_hostname_that_fails_to_resolve():
     def resolver(hostname, port, family=0, type_=0):
         raise socket.gaierror("nodename nor servname provided")
 
-    with patch("jenny.security.network.socket.getaddrinfo", resolver):
+    with patch("jafta.security.network.socket.getaddrinfo", resolver):
         ok, err = validate_url_target("http://this-does-not-exist.invalid/")
         assert not ok
         assert "cannot resolve" in err.lower()
@@ -204,7 +204,7 @@ def test_rejects_hostname_that_fails_to_resolve():
 def test_port_is_not_part_of_the_security_boundary():
     """Le porte non sono validate: solo scheme e IP risolto contano. Una
     porta insolita su un host pubblico non deve essere bloccata."""
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("example.com", ["93.184.216.34"])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("example.com", ["93.184.216.34"])):
         ok, err = validate_url_target("http://example.com:65000/")
         assert ok, f"Port should not affect the SSRF decision, got: {err}"
 
@@ -230,7 +230,7 @@ def test_port_is_not_part_of_the_security_boundary():
 def test_policy_divergence_table(ip, url_target_ok, app_server_ok, label):
     """Tabella esplicita di divergenza tra le due policy per lo stesso IP: per
     design devono restare separate, non appiattite."""
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("host.example", [ip])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("host.example", [ip])):
         ok_url, _ = validate_url_target("http://host.example/x")
         ok_app, _ = validate_app_server_target("http://host.example/x")
         assert ok_url is url_target_ok, label
@@ -257,7 +257,7 @@ def test_ssh_policy_table(ip, ssh_ok, label):
     mano: le due cose insieme reggono quel che altrove regge il blocco delle
     reti private. Quel che resta bloccato punta al telefono, non a un server.
     """
-    with patch("jenny.security.network.socket.getaddrinfo", _fake_resolve("host.example", [ip])):
+    with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("host.example", [ip])):
         ok, err = validate_ssh_target("host.example")
         assert ok is ssh_ok, f"{label} — {err}"
 
@@ -276,7 +276,7 @@ def test_tailscale_allowed_where_the_user_names_the_target_never_where_the_model
     """
     configure_ssrf_whitelist([])
     with patch(
-        "jenny.security.network.socket.getaddrinfo",
+        "jafta.security.network.socket.getaddrinfo",
         _fake_resolve("ts.example", ["100.100.6.6"]),
     ):
         assert validate_ssh_target("ts.example")[0], "host digitato dall'utente"
@@ -290,7 +290,7 @@ def test_ssrf_whitelist_applies_identically_to_both_policies():
     configure_ssrf_whitelist(["100.64.0.0/10"])
     try:
         with patch(
-            "jenny.security.network.socket.getaddrinfo",
+            "jafta.security.network.socket.getaddrinfo",
             _fake_resolve("ts.example", ["100.100.1.1"]),
         ):
             ok_url, _ = validate_url_target("http://ts.example/x")
@@ -310,7 +310,7 @@ def test_app_server_policy_never_grants_loopback_even_with_lan_whitelist():
     configure_ssrf_whitelist(["127.0.0.0/8"])
     try:
         with patch(
-            "jenny.security.network.socket.getaddrinfo",
+            "jafta.security.network.socket.getaddrinfo",
             _fake_resolve("self.example", ["127.0.0.1"]),
         ):
             ok, err = validate_app_server_target("http://self.example/x")
@@ -334,7 +334,7 @@ def test_the_whitelist_cannot_open_the_phone_to_ssh():
     configure_ssrf_whitelist(["127.0.0.0/8", "100.64.0.0/10"])
     try:
         with patch(
-            "jenny.security.network.socket.getaddrinfo",
+            "jafta.security.network.socket.getaddrinfo",
             _fake_resolve("me.example", ["127.0.0.1"]),
         ):
             ok, err = validate_ssh_target("me.example")
@@ -344,7 +344,7 @@ def test_the_whitelist_cannot_open_the_phone_to_ssh():
         # La stessa whitelist, nella stessa chiamata, continua a valere dove
         # deve: il pavimento riguarda il loopback, non la whitelist in se.
         with patch(
-            "jenny.security.network.socket.getaddrinfo",
+            "jafta.security.network.socket.getaddrinfo",
             _fake_resolve("ts.example", ["100.100.1.1"]),
         ):
             assert validate_url_target("http://ts.example/x")[0]
@@ -356,7 +356,7 @@ def test_ipv6_loopback_is_covered_by_the_same_floor():
     configure_ssrf_whitelist(["::/0"])
     try:
         with patch(
-            "jenny.security.network.socket.getaddrinfo",
+            "jafta.security.network.socket.getaddrinfo",
             _fake_resolve("me6.example", ["::1"]),
         ):
             assert not validate_ssh_target("me6.example")[0]

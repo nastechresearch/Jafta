@@ -30,7 +30,7 @@ def _inner(code: str, start: int) -> str | None:
 
 MAIN_HOP = (
     Path(__file__).resolve().parents[2]
-    / "android/app/src/main/java/com/flagdizero/jenny/MainHop.kt"
+    / "android/app/src/main/java/com/nastechresearch/jafta/MainHop.kt"
 )
 
 # ``block()`` dentro un ``try``, con un ``catch (e: Throwable)`` subito dopo: un
@@ -99,10 +99,10 @@ def test_only_the_browser_close_asks_to_run_late() -> None:
     """La pulizia di ``close`` deve arrivare anche in ritardo: è l'unico salto
     che lo chiede, e lo chiede per nome."""
     callers = []
-    for name in ("FloatingBridge", "JennyBrowserBridge", "AgenticSearchBridge"):
+    for name in ("FloatingBridge", "JaftaBrowserBridge", "AgenticSearchBridge"):
         path = MAIN_HOP.with_name(f"{name}.kt")
         if path.is_file():
             code = code_only(path.read_text(encoding="utf-8"))
             callers += [(name, c) for c in re.findall(r"MainHop\.call\(([^)]*)\)", code)]
     late = [c for c in callers if "runLate" in c[1]]
-    assert late == [("JennyBrowserBridge", "10_000L, Unit, TAG, runLate = true")], late
+    assert late == [("JaftaBrowserBridge", "10_000L, Unit, TAG, runLate = true")], late

@@ -20,8 +20,8 @@ from typing import Any
 
 import httpx
 
-from jenny.providers.anthropic_provider import AnthropicProvider
-from jenny.utils.helpers import build_assistant_message, extract_reasoning
+from jafta.providers.anthropic_provider import AnthropicProvider
+from jafta.utils.helpers import build_assistant_message, extract_reasoning
 
 
 def _sse(*events: tuple[str, dict[str, Any]]) -> bytes:

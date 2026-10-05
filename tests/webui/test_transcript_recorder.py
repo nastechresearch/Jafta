@@ -1,4 +1,4 @@
-"""Test unitari per ``jenny.webui.transcript_recorder``.
+"""Test unitari per ``jafta.webui.transcript_recorder``.
 
 `test_webui_transcript.py` copre gia il replay e lo storage ad alto livello;
 qui si copre il recorder (`WebUITranscriptRecorder`) che non ha ancora
@@ -8,8 +8,8 @@ e robustezza a input malformati.
 
 from __future__ import annotations
 
-from jenny.webui.metadata import WEBUI_TURN_METADATA_KEY
-from jenny.webui.transcript_recorder import (
+from jafta.webui.metadata import WEBUI_TURN_METADATA_KEY
+from jafta.webui.transcript_recorder import (
     WebUITranscriptRecorder,
     _build_user_transcript_event,
     _normalize_webui_turn_id,
@@ -17,7 +17,7 @@ from jenny.webui.transcript_recorder import (
 
 
 def _configure_workspace(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
 
 
 # --- _normalize_webui_turn_id ------------------------------------------------
@@ -174,7 +174,7 @@ def test_prepare_and_append_persists_event_with_overrides(tmp_path, monkeypatch)
         transcript_overrides={"latency_ms": 42},
     )
 
-    from jenny.webui.transcript_store import read_transcript_lines
+    from jafta.webui.transcript_store import read_transcript_lines
 
     lines = read_transcript_lines("websocket:chat-1")
     assert len(lines) == 1
@@ -191,7 +191,7 @@ def test_append_user_message_skips_bare_stop_command(tmp_path, monkeypatch) -> N
     recorder = WebUITranscriptRecorder(log=_NullLog())
     recorder.append_user_message("chat-1", "/stop", metadata={})
 
-    from jenny.webui.transcript_store import read_transcript_lines
+    from jafta.webui.transcript_store import read_transcript_lines
 
     assert read_transcript_lines("websocket:chat-1") == []
 
@@ -209,7 +209,7 @@ def test_append_user_message_skips_bare_new_command(tmp_path, monkeypatch) -> No
     recorder = WebUITranscriptRecorder(log=_NullLog())
     recorder.append_user_message("chat-1", "/new", metadata={})
 
-    from jenny.webui.transcript_store import read_transcript_lines
+    from jafta.webui.transcript_store import read_transcript_lines
 
     assert read_transcript_lines("websocket:chat-1") == []
 
@@ -220,7 +220,7 @@ def test_append_user_message_keeps_the_commands_that_are_decisions(tmp_path, mon
     recorder = WebUITranscriptRecorder(log=_NullLog())
     recorder.append_user_message("chat-1", "/model fast", metadata={})
 
-    from jenny.webui.transcript_store import read_transcript_lines
+    from jafta.webui.transcript_store import read_transcript_lines
 
     lines = read_transcript_lines("websocket:chat-1")
     assert len(lines) == 1
@@ -232,7 +232,7 @@ def test_append_user_message_persists_stop_when_media_attached(tmp_path, monkeyp
     recorder = WebUITranscriptRecorder(log=_NullLog())
     recorder.append_user_message("chat-1", "/stop", metadata={}, media_paths=["/a.png"])
 
-    from jenny.webui.transcript_store import read_transcript_lines
+    from jafta.webui.transcript_store import read_transcript_lines
 
     lines = read_transcript_lines("websocket:chat-1")
     assert len(lines) == 1
@@ -244,7 +244,7 @@ def test_append_user_message_skips_empty_payload(tmp_path, monkeypatch) -> None:
     recorder = WebUITranscriptRecorder(log=_NullLog())
     recorder.append_user_message("chat-1", "", metadata={})
 
-    from jenny.webui.transcript_store import read_transcript_lines
+    from jafta.webui.transcript_store import read_transcript_lines
 
     assert read_transcript_lines("websocket:chat-1") == []
 
@@ -258,7 +258,7 @@ def test_append_user_message_annotates_turn_when_metadata_present(tmp_path, monk
         metadata={WEBUI_TURN_METADATA_KEY: "t9"},
     )
 
-    from jenny.webui.transcript_store import read_transcript_lines
+    from jafta.webui.transcript_store import read_transcript_lines
 
     lines = read_transcript_lines("websocket:chat-1")
     assert lines[0]["turn_id"] == "t9"
@@ -282,7 +282,7 @@ def test_append_swallows_non_serializable_payload(tmp_path, monkeypatch) -> None
 
     assert len(log.warnings) == 1
 
-    from jenny.webui.transcript_store import read_transcript_lines
+    from jafta.webui.transcript_store import read_transcript_lines
 
     assert read_transcript_lines("websocket:chat-1") == []
 
@@ -294,7 +294,7 @@ def test_append_persists_a_deep_copy_not_a_reference(tmp_path, monkeypatch) -> N
     recorder.append("chat-1", event)
     event["text"] = "mutated-after-append"
 
-    from jenny.webui.transcript_store import read_transcript_lines
+    from jafta.webui.transcript_store import read_transcript_lines
 
     lines = read_transcript_lines("websocket:chat-1")
     assert lines[0]["text"] == "original"

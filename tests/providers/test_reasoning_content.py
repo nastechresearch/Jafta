@@ -4,8 +4,8 @@ Covers non-streaming (_parse) and streaming (_parse_chunks) paths for
 providers that return a reasoning_content field (e.g. MiMo, DeepSeek-R1).
 """
 
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
-from jenny.utils.helpers import build_assistant_message
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.utils.helpers import build_assistant_message
 
 # ── _parse: non-streaming ─────────────────────────────────────────────────
 
@@ -120,7 +120,7 @@ def test_assistant_message_drops_none_reasoning_content() -> None:
 
 
 def test_extract_reasoning_from_inline_think_tags() -> None:
-    from jenny.utils.helpers import extract_reasoning
+    from jafta.utils.helpers import extract_reasoning
 
     reasoning, cleaned = extract_reasoning(None, None, "<think>secret plan</think>hi")
 

@@ -16,12 +16,12 @@ from types import SimpleNamespace
 
 import pytest
 
-from jenny.agent.tools.memory_recall import (
+from jafta.agent.tools.memory_recall import (
     _INDEX_MAX_CHARS,
     HistoryRecallTool,
     MemoryRecallTool,
 )
-from jenny.security.workspace_access import enter_workspace_scope
+from jafta.security.workspace_access import enter_workspace_scope
 
 
 @dataclass

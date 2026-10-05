@@ -1,11 +1,11 @@
-"""I due ancoraggi di Jenny esistono una volta sola.
+"""I due ancoraggi di Jafta esistono una volta sola.
 
 «Al bordo» e «venuta fuori» sono due frazioni del suo quadrato, e fino al
 19/09/2026 erano scritte in tre posti: due volte nel foglio dell'officina, una
 nel JS che decide dove far finire la camminata di rientro dopo un lancio. La
 casa stava per aggiungerne altre due.
 
-Una copia sbagliata qui non si vede come un errore: si vede come **una Jenny
+Una copia sbagliata qui non si vede come un errore: si vede come **una Jafta
 che scivola oltre il punto in cui doveva fermarsi**, o che torna a piedi verso
 un bordo che il CSS ha spostato. Non c'e' un test di comportamento che possa
 prenderla — la fisica gira a rAF su rettangoli veri — e sullo schermo sembra
@@ -23,7 +23,7 @@ from pathlib import Path
 
 from support.js_harness import requires_node, run_js
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 MASCOT_JS = ASSETS / "shared" / "mascot.js"
 DRAG_JS = ASSETS / "shared" / "mascot-drag.js"
 SHEETS = {
@@ -32,14 +32,14 @@ SHEETS = {
 }
 
 
-ANCHOR = re.compile(r"(?:left|right):\s*calc\([^;]*--jenny-size[^;]*\);")
-SPRITE = (r"\.jenny-duo",)
+ANCHOR = re.compile(r"(?:left|right):\s*calc\([^;]*--jafta-size[^;]*\);")
+SPRITE = (r"\.jafta-duo",)
 
 
 def _anchors(css: str) -> list[str]:
     """Le dichiarazioni di ancoraggio *della mascotte*.
 
-    Scritte cosi' e non con una grep sul file intero perche' --jenny-size la
+    Scritte cosi' e non con una grep sul file intero perche' --jafta-size la
     legge anche chi le deve lasciare spazio: il bottone di rientro della chat
     si posiziona sulla sua taglia, e quello non e' un ancoraggio da tenere
     allineato — e' un margine.
@@ -75,9 +75,9 @@ def test_the_two_anchors_live_in_the_shared_module() -> None:
 def test_the_anchors_reach_the_css_before_any_sprite_exists() -> None:
     """All'import, e non da un costruttore.
 
-    `mobile-jenny.js` attacca lo sprite al documento **prima** di chiamare
+    `mobile-jafta.js` attacca lo sprite al documento **prima** di chiamare
     `applyMascotSize()`: un `calc()` con una variabile non ancora definita non
-    e' il valore di prima, e' una dichiarazione invalida. Jenny comparirebbe
+    e' il valore di prima, e' una dichiarazione invalida. Jafta comparirebbe
     per un frame dove la mette il flusso invece che sul bordo.
 
     Il modulo si importa davvero e non si chiama niente: e' l'unico modo di
@@ -92,7 +92,7 @@ globalThis.localStorage = { getItem: () => null, setItem() {}, removeItem() {} }
 import assert from 'node:assert/strict';
 const mod = await import(__URL__);
 assert.deepEqual(
-  [written.get('--jenny-dock'), written.get('--jenny-out'), written.get('--jenny-art-h')],
+  [written.get('--jafta-dock'), written.get('--jafta-out'), written.get('--jafta-art-h')],
   [String(mod.DOCK_RATIO), String(mod.OUT_RATIO), String(mod.ART_HEIGHT_RATIO)],
   'i rapporti non sono arrivati al documento importando il modulo: ' +
     JSON.stringify([...written]),
@@ -105,26 +105,26 @@ def test_no_stylesheet_spells_the_ratio_out_again() -> None:
     """Ogni ancoraggio della mascotte nomina la variabile. Un `-0.469`
     riapparso qui e' la copia numero due.
 
-    Dal 24/09/2026 lo sprite e' uno solo (`.jenny-duo`, `shared/jenny-mascot.js`)
+    Dal 24/09/2026 lo sprite e' uno solo (`.jafta-duo`, `shared/jafta-mascot.js`)
     e i suoi ancoraggi stanno in un foglio solo, quello dell'officina, che la
     casa carica. La casa non ne dichiara nessuno: se ne ricomparisse uno li',
-    sarebbe un secondo posto dove Jenny si ancora — cioe' di nuovo due Jenny."""
+    sarebbe un secondo posto dove Jafta si ancora — cioe' di nuovo due Jafta."""
     anchors = _anchors(SHEETS["workshop"].read_text(encoding="utf-8"))
-    # Un bordo solo dal 24/09/2026 (Jenny sta sempre a destra): due ancoraggi,
+    # Un bordo solo dal 24/09/2026 (Jafta sta sempre a destra): due ancoraggi,
     # al dock e fuori.
     assert len(anchors) >= 2, (
         f"mi aspetto i due ancoraggi del bordo destro, ne trovo {len(anchors)}"
     )
     for decl in anchors:
-        assert "--jenny-dock" in decl or "--jenny-out" in decl, (
+        assert "--jafta-dock" in decl or "--jafta-out" in decl, (
             f"ancoraggio con un numero suo invece della variabile: {decl}"
         )
-    used = {v for v in ("--jenny-dock", "--jenny-out") if any(v in d for d in anchors)}
-    assert used == {"--jenny-dock", "--jenny-out"}, (
+    used = {v for v in ("--jafta-dock", "--jafta-out") if any(v in d for d in anchors)}
+    assert used == {"--jafta-dock", "--jafta-out"}, (
         f"usa solo {used or 'nessuno'} — uno dei due stati non e' piu' ancorato"
     )
     assert not _anchors(SHEETS["home"].read_text(encoding="utf-8")), (
-        "la casa ancora Jenny per conto suo: fra i due gusci deve cambiare solo il pavimento"
+        "la casa ancora Jafta per conto suo: fra i due gusci deve cambiare solo il pavimento"
     )
 
 
@@ -151,7 +151,7 @@ def test_neither_shell_is_the_exception_any_more() -> None:
     """`hasOut` esisteva per dire «in casa lo stato non c'e'». Adesso c'e' in
     tutti e due, e un interruttore con un valore solo e' un ramo morto che il
     prossimo lettore prende per una possibilita' vera."""
-    for f in (DRAG_JS, ASSETS / "mobile-jenny.js", ASSETS / "shared" / "jenny-mascot.js"):
+    for f in (DRAG_JS, ASSETS / "mobile-jafta.js", ASSETS / "shared" / "jafta-mascot.js"):
         body = "\n".join(
             row for row in f.read_text(encoding="utf-8").splitlines()
             if "hasOut" in row and not row.lstrip().startswith((" *", "*", "//", "/*"))
@@ -167,17 +167,17 @@ def test_both_shells_answer_the_tap() -> None:
     La risposta al tocco sta nella mascotte condivisa, e i due gusci l'hanno
     perche' usano quella, con sopra la stessa minichat: l'officina la estende,
     la casa la crea."""
-    src = (ASSETS / "shared" / "jenny-mascot.js").read_text(encoding="utf-8")
+    src = (ASSETS / "shared" / "jafta-mascot.js").read_text(encoding="utf-8")
     assert re.search(r"onTap:.*'out'", src), "la mascotte non gira piu' lo stato al tocco"
     assert "isOut:" in src and "setOut:" in src, "la mascotte non dichiara piu' lo stato"
-    minichat = (ASSETS / "shared" / "jenny-minichat.js").read_text(encoding="utf-8")
-    assert "class JennyWithMinichat extends JennyMascot" in minichat
-    workshop = (ASSETS / "mobile-jenny.js").read_text(encoding="utf-8")
-    assert "class JennyCompanion extends JennyWithMinichat" in workshop
+    minichat = (ASSETS / "shared" / "jafta-minichat.js").read_text(encoding="utf-8")
+    assert "class JaftaWithMinichat extends JaftaMascot" in minichat
+    workshop = (ASSETS / "mobile-jafta.js").read_text(encoding="utf-8")
+    assert "class JaftaCompanion extends JaftaWithMinichat" in workshop
     for name, text in (("l'officina", workshop), ("la minichat", minichat)):
         assert "bindMascotDrag" not in text, f"{name} lega di nuovo la fisica per conto suo"
     home = (ASSETS / "home-app.js").read_text(encoding="utf-8")
-    assert "new JennyWithMinichat(" in home
+    assert "new JaftaWithMinichat(" in home
     assert not (ASSETS / "casa-mascot.js").exists(), "e' tornata la seconda mascotte"
 
 
@@ -194,8 +194,8 @@ def test_the_room_that_leaves_her_space_uses_her_height_and_not_her_width() -> N
     css = (ASSETS / "home-style.css").read_text(encoding="utf-8")
     m = re.search(r"\.home-you-scroll \{[^}]*?padding: [^;]*;", css, re.S)
     assert m, "il fondo della stanza non c'e' piu'"
-    assert "var(--jenny-art-h)" in m.group(0), (
+    assert "var(--jafta-art-h)" in m.group(0), (
         f"il fondo non nomina l'altezza dell'arte: {m.group(0)}"
     )
     assert "0.73" not in m.group(0), "il rapporto e' stato riscritto a mano"
-    assert "var(--jenny-size)" in m.group(0), "il fondo non segue piu' la taglia"
+    assert "var(--jafta-size)" in m.group(0), "il fondo non segue piu' la taglia"

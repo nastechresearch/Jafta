@@ -24,7 +24,7 @@ from pathlib import Path
 
 import pytest
 
-UI = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui"
+UI = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui"
 WORKSPACE_JS = UI / "assets" / "mobile-workspace.js"
 WORKSHOP_HTML = UI / "workshop.html"
 MODE_DIR = UI / "assets" / "vendor" / "codemirror@5.65.16" / "mode"

@@ -14,12 +14,12 @@ from typing import Any
 
 import pytest
 
-from jenny.bus.queue import MessageBus
-from jenny.channels.telegram import _LOCATION_TURN_MARKER, TelegramChannel
-from jenny.config.paths import set_workspace_dir
-from jenny.config.schema import Config, TelegramConfig
-from jenny.runtime import location
-from jenny.runtime.context import get_runtime_context
+from jafta.bus.queue import MessageBus
+from jafta.channels.telegram import _LOCATION_TURN_MARKER, TelegramChannel
+from jafta.config.paths import set_workspace_dir
+from jafta.config.schema import Config, TelegramConfig
+from jafta.runtime import location
+from jafta.runtime.context import get_runtime_context
 
 
 class FakeAPI:
@@ -96,7 +96,7 @@ async def test_venue_uses_title_and_address_as_place() -> None:
 
 
 async def test_toggle_off_falls_back_to_service_reply(monkeypatch) -> None:
-    import jenny.config.loader as loader
+    import jafta.config.loader as loader
 
     cfg = Config()
     cfg.tools.location.enable = False

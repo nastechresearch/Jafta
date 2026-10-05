@@ -12,11 +12,11 @@ import builtins
 import importlib
 import os
 
-from jenny.agent.tools.python_exec import (
+from jafta.agent.tools.python_exec import (
     PythonNamespace,
     _register_builtin_functions,
 )
-from jenny.config.tool_schemas import PythonExecConfig
+from jafta.config.tool_schemas import PythonExecConfig
 
 
 def _restricted_namespace(workspace: str) -> PythonNamespace:
@@ -35,14 +35,14 @@ def _restricted_namespace(workspace: str) -> PythonNamespace:
 
 def test_importing_python_exec_does_not_patch_global_import_hooks() -> None:
     # Import (idempotente) del modulo tool.
-    import jenny.agent.tools.python_exec  # noqa: F401
+    import jafta.agent.tools.python_exec  # noqa: F401
 
     # I callable globali devono essere quelli reali dell'interprete, non wrapper
     # definiti in python_exec.
     for fn in (builtins.__import__, importlib.import_module, importlib.reload):
         module_name = getattr(fn, "__module__", "") or ""
-        assert not module_name.startswith("jenny"), (
-            f"{fn!r} risulta ancora monkeypatchato da jenny ({module_name})"
+        assert not module_name.startswith("jafta"), (
+            f"{fn!r} risulta ancora monkeypatchato da jafta ({module_name})"
         )
 
     # E un import normale funziona senza passare da un guard.

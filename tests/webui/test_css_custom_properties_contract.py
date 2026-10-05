@@ -8,7 +8,7 @@ di vedere dei token.
 
 Una variabile e' definita se un foglio la dichiara (`--x:` in una regola) o se
 il JS/HTML la scrive per nome (`setProperty('--x', …)`, `style="--x: …"`):
-`--vv-height`, `--jenny-size` e compagnia vengono da li'.
+`--vv-height`, `--jafta-size` e compagnia vengono da li'.
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-UI = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui"
+UI = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui"
 ASSETS = UI / "assets"
 SHEETS = ("mobile-style.css", "home-style.css")
 

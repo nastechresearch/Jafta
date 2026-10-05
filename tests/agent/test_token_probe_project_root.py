@@ -29,12 +29,12 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.agent.consolidator import Consolidator
-from jenny.agent.context import ContextBuilder
-from jenny.agent.memory import MemoryStore
-from jenny.security.workspace_access import WorkspaceScopeResolver
-from jenny.session.manager import SessionManager
-from jenny.utils.helpers import estimate_prompt_tokens_chain
+from jafta.agent.consolidator import Consolidator
+from jafta.agent.context import ContextBuilder
+from jafta.agent.memory import MemoryStore
+from jafta.security.workspace_access import WorkspaceScopeResolver
+from jafta.session.manager import SessionManager
+from jafta.utils.helpers import estimate_prompt_tokens_chain
 
 PROJECT = "casa"
 PROJECT_KEY = f"project:{PROJECT}"
@@ -257,11 +257,11 @@ async def test_status_reports_the_project_aware_figure(tmp_path) -> None:
     possibili: cosi' l'asserzione dice quale delle due la riga porta, e non
     ripete quel che la sonda ha risposto.
     """
-    from jenny.agent.loop import AgentLoop
-    from jenny.bus.events import InboundMessage
-    from jenny.bus.queue import MessageBus
-    from jenny.command.builtin import cmd_status
-    from jenny.command.router import CommandContext
+    from jafta.agent.loop import AgentLoop
+    from jafta.bus.events import InboundMessage
+    from jafta.bus.queue import MessageBus
+    from jafta.command.builtin import cmd_status
+    from jafta.command.router import CommandContext
 
     project = _empty_project(tmp_path)
     _fill(project)

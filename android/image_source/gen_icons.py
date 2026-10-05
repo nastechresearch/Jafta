@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate all Android launcher + notification icons from icon.png.
 
-Source `icon.png` is the Jenny mascot: an opaque white face with black line-art
+Source `icon.png` is the Jafta mascot: an opaque white face with black line-art
 details on a transparent background. On a black background the mascot reads as-is
 (white face floats on black, dark features sit on top of the white fill), so the
 launcher/large icons need no colour inversion.
@@ -11,7 +11,7 @@ Outputs (all under app/src/main/res/):
   C) drawable-nodpi/ic_notification_large.png  black bg + mascot (expanded notif)
 
 B is gone: the status-bar icon is no longer the mascot but the flower, a
-hand-kept vector in drawable/ic_stat_jenny.xml (see the comment there). At 24dp
+hand-kept vector in drawable/ic_stat_jafta.xml (see the comment there). At 24dp
 the mascot's silhouette read as noise. Do not bring the PNGs back: a
 drawable-<dpi> PNG would win over the vector and restore the old icon.
 

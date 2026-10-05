@@ -1,7 +1,7 @@
 """Il lavoro in coda sul main thread non tocca la pagina dopo un «no».
 
 Un tetto scaduto non toglie un blocco dalla coda del main: gira dopo. In
-``JennyBrowserBridge.open`` un cancello decide già chi vince; due buchi restavano:
+``JaftaBrowserBridge.open`` un cancello decide già chi vince; due buchi restavano:
 
 - ``evaluate`` (quindi ``act``) non aveva cancello: dopo il «timeout» detto al
   modello, il blocco in ritardo eseguiva lo script — un **click tardivo**;
@@ -21,7 +21,7 @@ from support.kotlin_source import block_after, block_at, function_body, read_cod
 
 
 def _code() -> str:
-    return read_code("JennyBrowserBridge")
+    return read_code("JaftaBrowserBridge")
 
 
 def test_evaluate_takes_the_gate_before_touching_the_page() -> None:

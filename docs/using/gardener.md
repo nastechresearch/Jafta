@@ -29,7 +29,7 @@ On top of that:
 - **A notebook with a turn in flight is skipped outright**, whatever the silence setting says.
 - **One pass per notebook at a time.** A second pass on the same notebook is *refused*, not queued — two passes would overwrite each other's pages.
 - **You always win.** The pass re-checks whether you are active in that notebook before *every* write. If you come back mid-pass it stands down, keeps whatever pages already landed, and leaves the journal marked unread so the next pass sees those lines again. (`/stop` in the notebook chat does not cancel a pass — the pass runs under its own session key. Coming back is the mechanism.)
-- Being a periodic job, it only runs while Jenny is running — see [Scheduling and proactivity](./scheduling.md).
+- Being a periodic job, it only runs while Jafta is running — see [Scheduling and proactivity](./scheduling.md).
 
 There is a **second reason** a pass can start, with no new journal lines at all: the notebook's map has grown past its 2,000-character ceiling *and* is bigger than the last pass left it. Then the gardener goes in for the map alone, moving prose out to the pages it belongs to. If a prune leaves the map still over the ceiling, it is not retried until the map grows again — a reason that stays true after a pass would otherwise loop forever.
 
@@ -56,9 +56,9 @@ And these rules govern what it does inside `wiki/`:
 
 ## What a pass can see
 
-A pass is given: the unread journal lines, the map, the list of pages that exist (marked with which of them are already over the page budget), your recent messages in that notebook's conversation, and Jenny's identity files (`SOUL.md`, `USER.md`, `memory/MEMORY.md`).
+A pass is given: the unread journal lines, the map, the list of pages that exist (marked with which of them are already over the page budget), your recent messages in that notebook's conversation, and Jafta's identity files (`SOUL.md`, `USER.md`, `memory/MEMORY.md`).
 
-It is **not** given the list of your other wikis (the `## Wikis` block) or the tail of your personal conversation. Both used to arrive and were closed deliberately: the choice of notebook has already been made, and a maintenance pass with no user to talk to has no business carrying either your private life or an inventory of your other notebooks into a page you will read. Jenny's identity stays, because the pass writes prose you read and the alternative is the one actor with no idea who it is writing for.
+It is **not** given the list of your other wikis (the `## Wikis` block) or the tail of your personal conversation. Both used to arrive and were closed deliberately: the choice of notebook has already been made, and a maintenance pass with no user to talk to has no business carrying either your private life or an inventory of your other notebooks into a page you will read. Jafta's identity stays, because the pass writes prose you read and the alternative is the one actor with no idea who it is writing for.
 
 The transcript it sees is a window — the recent stretch, capped — not the whole record.
 

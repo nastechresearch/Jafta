@@ -12,8 +12,8 @@ import asyncio
 
 import pytest
 
-from jenny.agent.tools import ssh_jobs
-from jenny.channels import subagent_activity_wire, ui_query, ws_rpc
+from jafta.agent.tools import ssh_jobs
+from jafta.channels import subagent_activity_wire, ui_query, ws_rpc
 
 
 @pytest.mark.parametrize("bad", ["abc\n", "abc\r\n", "a\nb", "", "a" * 65, "a/b", "a b", "a:b"])

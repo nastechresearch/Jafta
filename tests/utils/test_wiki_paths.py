@@ -1,4 +1,4 @@
-"""Discovery delle wiki (``jenny/utils/wiki_paths.py``).
+"""Discovery delle wiki (``jafta/utils/wiki_paths.py``).
 
 Quel che il picker, il blocco ``## Wikis`` del prompt e il giardiniere leggono
 per sapere quali wiki esistono e come si presentano. I due confini che questi
@@ -10,7 +10,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from jenny.utils.wiki_paths import (
+from jafta.utils.wiki_paths import (
     discover_wiki_roots,
     discover_wikis,
     is_wiki_page_rel,
@@ -137,7 +137,7 @@ class TestWhichInstructionsFile:
 
     def test_but_the_id_of_an_unmigrated_wiki_still_reads(self, tmp_path):
         """Altrimenti un rinomino la perderebbe proprio prima della migrazione."""
-        from jenny.utils.wiki_paths import wiki_id
+        from jafta.utils.wiki_paths import wiki_id
 
         root = _make_wiki(tmp_path / "wikis", "main")
         (root / "AGENTS.md").unlink()
@@ -338,7 +338,7 @@ class TestWhatIsAPage:
         L'unica differenza legittima è l'indice, e va nel verso giusto: per il
         prompt la mappa è un blocco a sé, per chi navigherà è il nodo centrale.
         """
-        from jenny.webui.wiki import iter_page_files
+        from jafta.webui.wiki import iter_page_files
 
         pages = self._wiki(tmp_path) / "wiki"
 
@@ -369,11 +369,11 @@ class TestTheIndexFilenameHasOneDefinition:
 
     @staticmethod
     def _move_the_name(monkeypatch, new_name: str) -> None:
-        from jenny.agent import context as context_mod
-        from jenny.agent import gardener as gardener_mod
-        from jenny.utils import wiki_paths as wiki_paths_mod
-        from jenny.webui import project_scaffold as scaffold_mod
-        from jenny.webui import wiki_routes as routes_mod
+        from jafta.agent import context as context_mod
+        from jafta.agent import gardener as gardener_mod
+        from jafta.utils import wiki_paths as wiki_paths_mod
+        from jafta.webui import project_scaffold as scaffold_mod
+        from jafta.webui import wiki_routes as routes_mod
 
         for mod in (wiki_paths_mod, context_mod, gardener_mod, scaffold_mod, routes_mod):
             monkeypatch.setattr(mod, "WIKI_INDEX_FILENAME", new_name)
@@ -389,7 +389,7 @@ class TestTheIndexFilenameHasOneDefinition:
         return root
 
     def test_the_injector_reads_the_map_the_constant_names(self, tmp_path, monkeypatch):
-        from jenny.agent.context import _read_map_source
+        from jafta.agent.context import _read_map_source
 
         root = self._project(tmp_path)
 
@@ -400,7 +400,7 @@ class TestTheIndexFilenameHasOneDefinition:
         assert "La mappa nuova" in _read_map_source(root)
 
     def test_the_gardener_writes_the_map_the_constant_names(self, tmp_path, monkeypatch):
-        from jenny.agent.gardener import GardenerStore
+        from jafta.agent.gardener import GardenerStore
 
         root = self._project(tmp_path)
         store = GardenerStore(root, tmp_path)
@@ -422,7 +422,7 @@ class TestTheIndexFilenameHasOneDefinition:
 
     def test_the_scaffolder_creates_the_map_the_constant_names(self, tmp_path, monkeypatch):
         """Il consumatore che **scrive** il file, non uno che lo legge (T6.13)."""
-        from jenny.webui.project_scaffold import scaffold_project
+        from jafta.webui.project_scaffold import scaffold_project
 
         root = tmp_path / "wikis" / "orto"
         root.mkdir(parents=True)
@@ -447,7 +447,7 @@ class TestTheIndexFilenameHasOneDefinition:
         quella che dice la costante (T6.13). La route completa è provata in
         ``tests/webui/test_wiki_routes_server_scope.py``; qui basta il cancello
         che decide il nome."""
-        from jenny.utils.wiki_paths import safe_wiki_page_path
+        from jafta.utils.wiki_paths import safe_wiki_page_path
 
         assert safe_wiki_page_path("") == "index.md"
 
@@ -477,10 +477,10 @@ class TestTheIndexFilenameHasOneDefinition:
         repo = Path(__file__).resolve().parents[2]
         joins = re.compile(r'/\s*"index\.md"')
         literals = re.compile(r'"(?:[^"\n]*/)?index\.md"')
-        for rel in ("jenny/agent/context.py", "jenny/agent/gardener.py"):
+        for rel in ("jafta/agent/context.py", "jafta/agent/gardener.py"):
             source = (repo / rel).read_text(encoding="utf-8")
             assert not joins.search(source), f"{rel} costruisce il percorso della mappa a mano"
-        for rel in ("jenny/webui/project_scaffold.py", "jenny/webui/wiki_routes.py"):
+        for rel in ("jafta/webui/project_scaffold.py", "jafta/webui/wiki_routes.py"):
             source = (repo / rel).read_text(encoding="utf-8")
             found = literals.findall(source)
             assert not found, f"{rel} nomina la mappa a mano: {found}"

@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pytest
 
-from jenny.webui.workspace_files import copy_path
+from jafta.webui.workspace_files import copy_path
 
 
 @pytest.fixture

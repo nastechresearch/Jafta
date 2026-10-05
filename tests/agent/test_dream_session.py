@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from jenny.agent.memory import MemoryStore
+from jafta.agent.memory import MemoryStore
 
 
 class TestDreamSessionKey:
@@ -32,7 +32,7 @@ class TestDreamSessionKey:
         ``dream_cycle.claim_dream_cycle``.
         """
         now = datetime(2026, 5, 28, 10, 0, 0)
-        with patch("jenny.agent.memory.datetime") as mock_dt:
+        with patch("jafta.agent.memory.datetime") as mock_dt:
             mock_dt.now.side_effect = [now, now + timedelta(seconds=1)]
             k1 = MemoryStore.dream_session_key()
             k2 = MemoryStore.dream_session_key()
@@ -118,9 +118,9 @@ class TestEvictPrunedSessions:
     """
 
     def _make_loop(self, tmp_path):
-        from jenny.agent.loop import AgentLoop
-        from jenny.bus.queue import MessageBus
-        from jenny.session.manager import SessionManager
+        from jafta.agent.loop import AgentLoop
+        from jafta.bus.queue import MessageBus
+        from jafta.session.manager import SessionManager
 
         bus = MessageBus()
         provider = MagicMock()
@@ -129,8 +129,8 @@ class TestEvictPrunedSessions:
         workspace.__truediv__ = MagicMock(return_value=MagicMock())
         sessions = SessionManager(tmp_path)
 
-        with patch("jenny.agent.loop.ContextBuilder"), \
-             patch("jenny.agent.loop.SubagentManager") as mock_sub_mgr:
+        with patch("jafta.agent.loop.ContextBuilder"), \
+             patch("jafta.agent.loop.SubagentManager") as mock_sub_mgr:
             mock_sub_mgr.return_value.cancel_by_session = AsyncMock(return_value=0)
             loop = AgentLoop(
                 bus=bus, provider=provider, workspace=workspace, session_manager=sessions,

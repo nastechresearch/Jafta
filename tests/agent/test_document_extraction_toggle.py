@@ -4,10 +4,10 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.loop import AgentLoop, TurnContext, TurnState
-from jenny.bus.events import InboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.providers.base import LLMResponse
+from jafta.agent.loop import AgentLoop, TurnContext, TurnState
+from jafta.bus.events import InboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.providers.base import LLMResponse
 
 
 def _make_loop(tmp_path: Path, extract_document_text: bool = True) -> AgentLoop:
@@ -87,7 +87,7 @@ async def test_state_restore_extracts_documents_by_default(
         calls.append((content, media))
         return f"{content}\n\n[File: report.txt]\nQuarterly revenue is $5M", []
 
-    monkeypatch.setattr("jenny.agent.turn_states.extract_documents", fake_extract_documents)
+    monkeypatch.setattr("jafta.agent.turn_states.extract_documents", fake_extract_documents)
 
     ctx = TurnContext(
         msg=InboundMessage(
@@ -131,7 +131,7 @@ async def test_pending_followup_extracts_documents(
     def tracking_extract_documents(content: str, media: list[str]) -> tuple[str, list[str]]:
         return f"{content}\n\n[File: followup.txt]\nDo not inject this file body", []
 
-    monkeypatch.setattr("jenny.agent.turn_states.extract_documents", tracking_extract_documents)
+    monkeypatch.setattr("jafta.agent.turn_states.extract_documents", tracking_extract_documents)
 
     pending_queue: asyncio.Queue[InboundMessage] = asyncio.Queue()
     await pending_queue.put(
@@ -166,7 +166,7 @@ def test_extract_documents_references_non_extractable_binary(tmp_path: Path) -> 
     """I binari non estraibili (archivi, backup, …) non vanno scartati in
     silenzio: l'agente deve ricevere un riferimento [Attachment:] per leggerli
     on-demand (regressione: .jbk allegato risultava invisibile)."""
-    from jenny.utils.document import extract_documents
+    from jafta.utils.document import extract_documents
 
     blob = tmp_path / "backup.jbk"
     blob.write_bytes(b"\x00\x01\x02binary-blob")
@@ -183,7 +183,7 @@ def test_extract_documents_references_non_extractable_binary(tmp_path: Path) -> 
 
 def test_extract_documents_references_oversized_file(tmp_path: Path) -> None:
     """File oltre soglia: riferimento invece di scarto silenzioso."""
-    from jenny.utils.document import extract_documents
+    from jafta.utils.document import extract_documents
 
     big = tmp_path / "big.txt"
     big.write_text("x" * 2048, encoding="utf-8")

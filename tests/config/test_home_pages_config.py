@@ -15,9 +15,9 @@ import json
 
 import pytest
 
-from jenny.config.loader import load_config, load_config_with_raw, save_config
-from jenny.config.schema import PAGE_KINDS, HomeConfig
-from jenny.runtime.context import get_runtime_context
+from jafta.config.loader import load_config, load_config_with_raw, save_config
+from jafta.config.schema import PAGE_KINDS, HomeConfig
+from jafta.runtime.context import get_runtime_context
 
 
 def _reset_recovery_flags() -> None:
@@ -118,7 +118,7 @@ def test_a_page_that_cannot_be_drawn_does_not_cost_the_file(tmp_path, crooked) -
 def test_each_row_is_validated_once(monkeypatch) -> None:
     """``_drawable_pages`` valida ogni riga per vagliarla: la pagina
     che ne esce e' quella che il campo tiene, senza una seconda validazione."""
-    from jenny.config.schema import HomePageConfig
+    from jafta.config.schema import HomePageConfig
 
     calls: list[object] = []
     vera = HomePageConfig.model_validate.__func__
@@ -150,7 +150,7 @@ def test_a_dropped_page_is_reported_once_not_at_every_read(monkeypatch) -> None:
     lettura, piu' volte per turno."""
     from loguru import logger
 
-    from jenny.config import schema
+    from jafta.config import schema
 
     monkeypatch.setattr(schema, "_DROPPED_PAGES_WARNED", set())
     seen: list[str] = []
@@ -174,7 +174,7 @@ def test_a_room_can_no_longer_be_saved() -> None:
     rotta valida ogni riga come `HomePageConfig`, quindi li' una stanza e'
     una specie sconosciuta come un'altra.
     """
-    from jenny.config.schema import HomePageConfig
+    from jafta.config.schema import HomePageConfig
 
     with pytest.raises(ValueError):
         HomePageConfig(id="p1", kind="room", ref="backup")
@@ -203,7 +203,7 @@ def test_the_dropped_room_does_not_come_back_on_the_next_write(tmp_path) -> None
 # un campo a parte, e la sua regola e' la stessa della migrazione qui sopra:
 # **mai un errore**, perche' un errore costa il file intero.
 
-from jenny.config.schema import FIXED_PAGES, normalize_order  # noqa: E402
+from jafta.config.schema import FIXED_PAGES, normalize_order  # noqa: E402
 
 TODO = {"id": "p1", "kind": "app", "ref": "todo"}
 GARDEN = {"id": "p2", "kind": "app", "ref": "orto"}
@@ -214,7 +214,7 @@ def test_the_fixed_pages_are_the_four_the_user_named() -> None:
 
 
 def test_someone_who_never_moved_anything_starts_from_the_default() -> None:
-    """App · Jenny · <le aggiunte> · Quaderni · Impostazioni."""
+    """App · Jafta · <le aggiunte> · Quaderni · Impostazioni."""
     assert HomeConfig().order == ["app", "chat", "notebooks", "settings"]
     assert HomeConfig(pages=[TODO, GARDEN]).order == [
         "app", "chat", "p1", "p2", "notebooks", "settings",
@@ -352,7 +352,7 @@ def test_the_old_casa_block_loads_under_home_translated(tmp_path) -> None:
 
 async def test_after_a_write_the_file_has_home_and_no_casa(tmp_path) -> None:
     """La chiave vecchia e' ritirata: ``store.mutate`` scrive ``home`` e basta."""
-    from jenny.config import store
+    from jafta.config import store
 
     path = _old_file(tmp_path)
     await store.mutate(lambda _config: None, config_path=path)

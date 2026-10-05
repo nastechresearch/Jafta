@@ -4,14 +4,14 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.memory import (
+from jafta.agent.memory import (
     _ARCHIVE_SUMMARY_MAX_CHARS,
     Consolidator,
     MemoryStore,
 )
-from jenny.providers.base import LLMResponse
-from jenny.session.manager import Session
-from jenny.utils.prompt_templates import render_template
+from jafta.providers.base import LLMResponse
+from jafta.session.manager import Session
+from jafta.utils.prompt_templates import render_template
 
 
 @pytest.fixture
@@ -124,8 +124,8 @@ class TestConsolidatorSummarize:
 
 class TestConsolidatorPromptContract:
     def test_archive_prompt_outputs_attribute_tags_without_missing_context_claims(self, tmp_path, monkeypatch):
-        from jenny.utils.helpers import sync_workspace_templates
-        from jenny.utils.prompt_templates import _environment
+        from jafta.utils.helpers import sync_workspace_templates
+        from jafta.utils.prompt_templates import _environment
 
         workspace = tmp_path / "workspace"
         workspace.mkdir(parents=True)
@@ -406,8 +406,8 @@ class TestConsolidatorTokenBudget:
         """
         import re
 
-        from jenny.agent.tools.context import bind_turn_id, reset_turn_id
-        from jenny.session.manager import SessionManager
+        from jafta.agent.tools.context import bind_turn_id, reset_turn_id
+        from jafta.session.manager import SessionManager
 
         store = MemoryStore(tmp_path)
         provider = MagicMock()
@@ -543,7 +543,7 @@ class TestCompactIdleSession:
     @pytest.fixture
     def real_consolidator(self, store, mock_provider):
         """Create a Consolidator with a real SessionManager (not a mock)."""
-        from jenny.session.manager import SessionManager
+        from jafta.session.manager import SessionManager
 
         sessions = SessionManager(store.workspace)
         return Consolidator(
@@ -681,7 +681,7 @@ class TestCompactIdleSession:
         Il riassunto della compattazione copre anche la coda tenuta, quindi
         quella coda è già nella coda del diario.
         """
-        from jenny.session.manager import DIARY_HARVEST_METADATA_KEY
+        from jafta.session.manager import DIARY_HARVEST_METADATA_KEY
 
         mock_provider.chat_with_retry.return_value = MagicMock(
             content="- [durable] riassunto", finish_reason="stop"
@@ -705,7 +705,7 @@ class TestCompactIdleSession:
         self, real_consolidator, mock_provider,
     ):
         """Niente da riassumere, ma il prefisso consolidato esce: l'indice scorre."""
-        from jenny.session.manager import DIARY_HARVEST_METADATA_KEY
+        from jafta.session.manager import DIARY_HARVEST_METADATA_KEY
 
         sessions = real_consolidator.sessions
         session = sessions.get_or_create("project:esempio")
@@ -893,8 +893,8 @@ class TestConsolidatorSessionRefresh:
     @pytest.mark.asyncio
     async def test_reloads_before_empty_session_guard(self, tmp_path):
         """A stale empty reference must not skip a non-empty cached session."""
-        from jenny.agent.memory import Consolidator, MemoryStore
-        from jenny.session.manager import Session, SessionManager
+        from jafta.agent.memory import Consolidator, MemoryStore
+        from jafta.session.manager import Session, SessionManager
 
         store = MemoryStore(tmp_path)
         provider = MagicMock()
@@ -936,8 +936,8 @@ class TestConsolidatorSessionRefresh:
         """After compact_idle_session replaces the session, a concurrent
         maybe_consolidate_by_tokens with the old reference should use the
         fresh session from cache instead of overwriting."""
-        from jenny.agent.memory import Consolidator, MemoryStore
-        from jenny.session.manager import SessionManager
+        from jafta.agent.memory import Consolidator, MemoryStore
+        from jafta.session.manager import SessionManager
 
         store = MemoryStore(tmp_path)
         provider = MagicMock()

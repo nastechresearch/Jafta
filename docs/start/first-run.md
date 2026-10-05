@@ -1,10 +1,10 @@
 # First run
 
-The first time you open Jenny after installing the APK, you go through a slow boot and then a short setup wizard — this page walks through exactly what happens and what you'll see.
+The first time you open Jafta after installing the APK, you go through a slow boot and then a short setup wizard — this page walks through exactly what happens and what you'll see.
 
 ## The first boot is slow, and that's normal
 
-Jenny bundles its own Python 3.11 runtime (via Chaquopy) inside the APK — there's nothing else to install, but on the very first launch that runtime has to be unpacked onto the device before the app can do anything. You'll see a loading screen while this happens. The app polls the local gateway for up to **90 seconds** before giving up, so if the loading screen sits there for a while, it's usually still working, not frozen.
+Jafta bundles its own Python 3.11 runtime (via Chaquopy) inside the APK — there's nothing else to install, but on the very first launch that runtime has to be unpacked onto the device before the app can do anything. You'll see a loading screen while this happens. The app polls the local gateway for up to **90 seconds** before giving up, so if the loading screen sits there for a while, it's usually still working, not frozen.
 
 Subsequent launches are fast: the Python runtime is already extracted, and the app only has to start the gateway process.
 
@@ -21,7 +21,7 @@ Before you see the setup wizard, the app has already:
 
 Nothing about this step requires action from you; it's what happens between tapping the app icon and seeing the wizard.
 
-While this happens Android asks for two permissions, one after the other: first **notifications** (for Jenny's alerts and the "Jenny is running" notification), then **location** — precise or approximate, whichever you prefer. Both can be refused: Jenny works without them, and location can be allowed later from the workshop's **Hands → Location**.
+While this happens Android asks for two permissions, one after the other: first **notifications** (for Jafta's alerts and the "Jafta is running" notification), then **location** — precise or approximate, whichever you prefer. Both can be refused: Jafta works without them, and location can be allowed later from the workshop's **Hands → Location**.
 
 ## The setup wizard
 
@@ -46,7 +46,7 @@ Three fields:
 
 - **Provider name** — a free-form label to identify this provider: it's the name you'll see in Settings. Required.
 - **API Key** — required. This is the only thing that authenticates you to the LLM provider; it is stored in `config.json` on the device and is never sent anywhere except to that provider's API.
-- **Base URL** — optional. If you leave it empty, Jenny uses the format's default: `https://api.openai.com/v1` for OpenAI Compatible, `https://api.anthropic.com` for Anthropic Compatible. Change this if you're pointing at OpenRouter, Groq, DeepSeek, a self-hosted Ollama/vLLM instance, or any other compatible endpoint — see [Providers and models](../reference/providers.md) and [Local models](../reference/local-models.md) for details. It must be a web address starting with `http://` or `https://`: anything else is refused with a message before the wizard moves on, and a capitalized scheme such as `Http://` is corrected to `http://`.
+- **Base URL** — optional. If you leave it empty, Jafta uses the format's default: `https://api.openai.com/v1` for OpenAI Compatible, `https://api.anthropic.com` for Anthropic Compatible. Change this if you're pointing at OpenRouter, Groq, DeepSeek, a self-hosted Ollama/vLLM instance, or any other compatible endpoint — see [Providers and models](../reference/providers.md) and [Local models](../reference/local-models.md) for details. It must be a web address starting with `http://` or `https://`: anything else is refused with a message before the wizard moves on, and a capitalized scheme such as `Http://` is corrected to `http://`.
 
 The Next button only enables once both the provider name and the API key are non-empty. If you come back to this step with **Back**, what you typed is still there and Next is already on.
 
@@ -56,7 +56,7 @@ This step tries to fetch the live list of models straight from the provider's `/
 
 - If the fetch succeeds, you get a searchable list — type in the **Search models** box to filter it. There's no manual field in this case.
 - If the fetch fails, the list comes back empty, or the provider doesn't expose a `/models` endpoint, the reason is shown where the list would be, and an **Or type a custom model name** field appears below it so you can enter the model ID by hand.
-- This step also has an **Assistant name** field for what you want Jenny to call herself (default "Jenny"). You can change it later in the home's **Settings → Jenny → Her name** (up to 40 characters; changing it erases no memory).
+- This step also has an **Assistant name** field for what you want Jafta to call herself (default "Jafta"). You can change it later in the home's **Settings → Jafta → Her name** (up to 40 characters; changing it erases no memory).
 
 Once a model is selected (from the list or typed manually), the **Launch** button enables. The choice belongs to the provider you entered: if you go back and change the format, the key or the base URL, the model is cleared and you pick it again from the new list.
 
@@ -64,11 +64,11 @@ Once a model is selected (from the list or typed manually), the **Launch** butto
 
 ### Step 4 — Connect Telegram (optional)
 
-After Launch succeeds, a final, skippable step offers to pair a Telegram bot so you can talk to Jenny from Telegram as well as the WebUI. Tap **Skip for now** to finish onboarding without it — you can pair Telegram later at any time, from the workshop's **Hands → Telegram**. If you do pair it here, a *Telegram paired!* toast confirms it and the button becomes **Done**. See [Telegram bridge](../using/telegram.md) for the full pairing flow.
+After Launch succeeds, a final, skippable step offers to pair a Telegram bot so you can talk to Jafta from Telegram as well as the WebUI. Tap **Skip for now** to finish onboarding without it — you can pair Telegram later at any time, from the workshop's **Hands → Telegram**. If you do pair it here, a *Telegram paired!* toast confirms it and the button becomes **Done**. See [Telegram bridge](../using/telegram.md) for the full pairing flow.
 
-If Android is still optimizing Jenny's battery use, the same step shows a card with **Exempt from battery**: without the exemption, scheduled work, reminders and proactive checks arrive late or not at all while the screen is off. The card disappears once the exemption is granted.
+If Android is still optimizing Jafta's battery use, the same step shows a card with **Exempt from battery**: without the exemption, scheduled work, reminders and proactive checks arrive late or not at all while the screen is off. The card disappears once the exemption is granted.
 
-Either button takes you to the home, on Jenny's page, with her welcome message.
+Either button takes you to the home, on Jafta's page, with her welcome message.
 
 ## What "Launch" actually does
 
@@ -82,11 +82,11 @@ Pressing **Launch** does the following, in order:
 ## Interrupting the wizard
 
 - **Before pressing Launch on step 3**: nothing has been persisted yet. The phone's Back button moves one step back (and closes the restore passphrase dialog first, if it's open), but it never leaves the wizard: the only way out is closing the app, and reopening it lands you back at step 1 — you start over from scratch.
-- **After Launch, during the optional Telegram step**: the provider, model, and assistant name are already saved and the agent is running. If you close the app here, the next launch goes straight to the home, on Jenny's page (Telegram can still be paired later from the workshop's **Hands → Telegram**).
+- **After Launch, during the optional Telegram step**: the provider, model, and assistant name are already saved and the agent is running. If you close the app here, the next launch goes straight to the home, on Jafta's page (Telegram can still be paired later from the workshop's **Hands → Telegram**).
 
 ## Restoring from a backup instead
 
-If you've used Jenny before and have an encrypted `.jbk` backup file, tap **Restore from backup** on step 1 instead of going through the wizard. This opens the same import flow used from the home's **Settings → Backup → Restore from a file**: pick the file via the Android system picker, enter the backup passphrase, and confirm. The restore is staged, not applied immediately — the app then prompts you to restart, and the actual restore happens at that restart, before anything else touches the workspace. Once restored, the app boots straight into the home, on Jenny's page, with your old provider, history, and memory already in place — the wizard is skipped because a provider is already configured. See [Backup and restore](../using/backup.md) for the full mechanics.
+If you've used Jafta before and have an encrypted `.jbk` backup file, tap **Restore from backup** on step 1 instead of going through the wizard. This opens the same import flow used from the home's **Settings → Backup → Restore from a file**: pick the file via the Android system picker, enter the backup passphrase, and confirm. The restore is staged, not applied immediately — the app then prompts you to restart, and the actual restore happens at that restart, before anything else touches the workspace. Once restored, the app boots straight into the home, on Jafta's page, with your old provider, history, and memory already in place — the wizard is skipped because a provider is already configured. See [Backup and restore](../using/backup.md) for the full mechanics.
 
 ## Things to know that aren't obvious
 
@@ -96,4 +96,4 @@ If you've used Jenny before and have an encrypted `.jbk` backup file, tap **Rest
 
 ## What's next
 
-Once onboarding is done, take the [Tour of the WebUI](../using/webui-tour.md) or jump straight into [Chat basics](../using/chat.md). If you want Jenny available from your home screen, see [Set it as your launcher](launcher-setup.md).
+Once onboarding is done, take the [Tour of the WebUI](../using/webui-tour.md) or jump straight into [Chat basics](../using/chat.md). If you want Jafta available from your home screen, see [Set it as your launcher](launcher-setup.md).

@@ -3,7 +3,7 @@
 La prigione di una sessione-progetto è **sulla scrittura**. In lettura non serve
 e costava caro: fuori dalla directory privata dell'app non si arriva comunque
 (il permesso di storage non ce l'abbiamo, il confine vero lo mette Android),
-mentre restringere le letture toglieva a Jenny la possibilità di leggere la
+mentre restringere le letture toglieva a Jafta la possibilità di leggere la
 propria skill dentro un progetto — `SkillsLoader` le passa il percorso di
 `SKILL.md` perché se lo legga da sé, e sotto scope stretto quel percorso veniva
 poi negato. Il caricamento progressivo moriva dentro ogni progetto.
@@ -34,11 +34,11 @@ from typing import Any
 
 import pytest
 
-from jenny.agent.tools.filesystem import ReadFileTool, WriteFileTool
-from jenny.agent.tools.python_exec import PythonExecTool, PythonNamespace
-from jenny.agent.tools.python_exec_builtins import _register_builtin_functions
-from jenny.config.tool_schemas import PythonExecConfig
-from jenny.security.workspace_access import (
+from jafta.agent.tools.filesystem import ReadFileTool, WriteFileTool
+from jafta.agent.tools.python_exec import PythonExecTool, PythonNamespace
+from jafta.agent.tools.python_exec_builtins import _register_builtin_functions
+from jafta.config.tool_schemas import PythonExecConfig
+from jafta.security.workspace_access import (
     bind_workspace_scope,
     reset_workspace_scope,
     validate_workspace_scope_payload,
@@ -138,7 +138,7 @@ class TestToolFile:
         assert _REFUSED in await tool.execute(path=str(other / "rubato.md"), content="no")
         assert not (other / "rubato.md").exists()
 
-    async def test_does_not_rewrite_who_jenny_is(self, scoped):
+    async def test_does_not_rewrite_who_jafta_is(self, scoped):
         """`SOUL.md` e `USER.md` stanno fuori dalla cartella legata, ed è quello
         che li protegge: nessuna allowlist da mantenere."""
         ws, _project, _other, _skill = scoped
@@ -308,7 +308,7 @@ class TestAsyncOsSurface:
             target = other  # la wiki di un ALTRO progetto
             assert target.is_dir()
         else:
-            target = ws / "SOUL.md"  # chi è Jenny, fuori da ogni progetto
+            target = ws / "SOUL.md"  # chi è Jafta, fuori da ogni progetto
 
         out = await _tool(ws).execute(
             code=code.format(p=str(target), d=str(target) + ".spostato")
@@ -373,7 +373,7 @@ class TestTheTurnContextReachesTheWorker:
         visto: dict[str, Any] = {}
 
         def _register() -> None:
-            from jenny.security.workspace_access import current_workspace_scope
+            from jafta.security.workspace_access import current_workspace_scope
 
             scope = current_workspace_scope()
             visto["thread"] = threading.get_ident()

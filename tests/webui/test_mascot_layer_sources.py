@@ -20,7 +20,7 @@ from pathlib import Path
 
 import pytest
 
-from jenny.utils.android_assets import _UI_MANIFEST
+from jafta.utils.android_assets import _UI_MANIFEST
 
 pytest.importorskip("PIL", reason="Pillow non è una dipendenza del progetto")
 
@@ -28,7 +28,7 @@ from PIL import Image, ImageChops  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "android" / "image_source"
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 CANVAS = 3000
 EXPORT_SIZE = 768
 
@@ -95,10 +95,10 @@ def test_every_layer_source_is_a_transparent_3000_square() -> None:
 
 def test_the_exported_layers_are_exactly_the_ones_in_the_manifest() -> None:
     """Tabella del generatore, file su disco e manifest dicono la stessa cosa."""
-    expected = {f"assets/jenny-{stem.replace('_', '-')}.webp" for stem in _layers()}
+    expected = {f"assets/jafta-{stem.replace('_', '-')}.webp" for stem in _layers()}
     listed = {
         e for e in _UI_MANIFEST
-        if e.startswith(("assets/jenny-body-", "assets/jenny-face-"))
+        if e.startswith(("assets/jafta-body-", "assets/jafta-face-"))
     }
     assert listed == expected, f"manifest e LAYERS divergono: {sorted(listed ^ expected)}"
     for entry in sorted(expected):
@@ -119,7 +119,7 @@ def test_the_reserve_is_kept_as_a_source_and_never_shipped() -> None:
     reserve = {p.stem for p in _sources()} - set(_layers())
     assert len(reserve) == 10, sorted(reserve)
     for stem in sorted(reserve):
-        asset = f"jenny-{stem.replace('_', '-')}.webp"
+        asset = f"jafta-{stem.replace('_', '-')}.webp"
         assert not (ASSETS / asset).exists(), f"{stem}: esportato ma non usato"
         assert f"assets/{asset}" not in _UI_MANIFEST, f"{stem}: nel manifest ma non usato"
 

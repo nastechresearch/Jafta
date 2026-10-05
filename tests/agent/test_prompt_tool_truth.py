@@ -1,6 +1,6 @@
 """Il prompt non deve insegnare tool che non esistono in quello scope.
 
-Sul telefono Jenny ha chiamato ``grep`` in modalita orchestratore, dove non
+Sul telefono Jafta ha chiamato ``grep`` in modalita orchestratore, dove non
 c'era. Non se l'era inventato: glielo dicevano ``identity.md`` e la skill
 ``memory``, che ha ``always: true`` e quindi entra in *ogni* prompt con cinque
 esempi. A sette righe di distanza il contratto dei tool dichiarava il contrario.
@@ -19,8 +19,8 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.context import ContextBuilder
-from jenny.agent.tools.loader import ToolLoader, declared_tool_name
+from jafta.agent.context import ContextBuilder
+from jafta.agent.tools.loader import ToolLoader, declared_tool_name
 
 # Nomi che il prompt cita *per vietarli* o per descrivere un altrove: la
 # citazione e voluta, e toglierla peggiorerebbe il prompt. Ogni voce va
@@ -79,9 +79,9 @@ def _prompt(workspace: Path, *, orchestrator: bool) -> str:
 @pytest.fixture
 def workspace(tmp_path: Path):
     """Workspace vero: i template e le skill si leggono da li, non dal package."""
-    from jenny.config import paths as paths_mod
-    from jenny.runtime.context import get_runtime_context
-    from jenny.utils.helpers import sync_workspace_templates
+    from jafta.config import paths as paths_mod
+    from jafta.runtime.context import get_runtime_context
+    from jafta.utils.helpers import sync_workspace_templates
 
     previous = get_runtime_context().workspace_dir
     root = tmp_path / "workspace"

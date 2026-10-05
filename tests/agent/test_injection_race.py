@@ -12,7 +12,7 @@ from __future__ import annotations
 import asyncio
 from contextlib import suppress
 
-from jenny.bus.events import InboundMessage
+from jafta.bus.events import InboundMessage
 
 
 def _msg(content: str) -> InboundMessage:

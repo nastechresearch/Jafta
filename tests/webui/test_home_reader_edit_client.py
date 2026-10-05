@@ -1,4 +1,4 @@
-"""Modifica una pagina dal lettore: il salvataggio, e il conflitto con Jenny.
+"""Modifica una pagina dal lettore: il salvataggio, e il conflitto con Jafta.
 
 Queste pagine le scrive **anche lei**, con gli strumenti file di sempre. Fra il
 momento in cui l'editor si apre e quello in cui si salva, il file puo' essere
@@ -23,7 +23,7 @@ from pathlib import Path
 
 from support.js_harness import member, requires_node, run_js
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 READER_JS = ASSETS / "home-reader.js"
 APP_JS = ASSETS / "home-app.js"
 
@@ -98,7 +98,7 @@ def test_the_base_sent_is_the_loaded_source_not_the_edited_text() -> None:
 
     Se `base` fosse `editEl.value` il confronto lato server sarebbe vero per
     costruzione, il `conflict` non scatterebbe mai, e una pagina riscritta da
-    Jenny verrebbe cancellata in silenzio a ogni salvataggio.
+    Jafta verrebbe cancellata in silenzio a ogni salvataggio.
     """
     _run("""
       const r = new Reader();
@@ -165,7 +165,7 @@ def test_a_failed_save_keeps_the_editor_open() -> None:
 
 
 def test_a_conflict_refused_keeps_the_text_and_does_not_reload() -> None:
-    """Jenny ha riscritto la pagina, e chi ha scritto dice di no.
+    """Jafta ha riscritto la pagina, e chi ha scritto dice di no.
 
     L'editor resta aperto col suo testo dentro: e' l'unica copia rimasta, e
     ricaricare al posto suo la butterebbe via per decidere una cosa che non ci

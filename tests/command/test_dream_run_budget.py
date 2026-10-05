@@ -24,15 +24,15 @@ from typing import Any
 
 import pytest
 
-from jenny.agent.memory import MemoryStore
-from jenny.bus.events import InboundMessage
-from jenny.command.builtin import register_builtin_commands
-from jenny.command.router import CommandContext, CommandRouter
-from jenny.config.loader import load_config, save_config
-from jenny.config.schema import Config
-from jenny.utils.helpers import sync_workspace_templates
+from jafta.agent.memory import MemoryStore
+from jafta.bus.events import InboundMessage
+from jafta.command.builtin import register_builtin_commands
+from jafta.command.router import CommandContext, CommandRouter
+from jafta.config.loader import load_config, save_config
+from jafta.config.schema import Config
+from jafta.utils.helpers import sync_workspace_templates
 
-_REVIEW_TARGET = "jenny.agent.dream_review.run_dream_review"
+_REVIEW_TARGET = "jafta.agent.dream_review.run_dream_review"
 
 # Il seme di MEMORY.md è ciò che il "modello" sostituisce nei test di scrittura:
 # ``edit_file`` rifiuta ``old_text=""`` su un file non vuoto, quindi serve un
@@ -56,8 +56,8 @@ def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     ``get_workspace_path()``, non dal package, e l'ambiente Jinja è memoizzato
     per processo.
     """
-    from jenny.runtime.context import get_runtime_context
-    from jenny.utils import prompt_templates
+    from jafta.runtime.context import get_runtime_context
+    from jafta.utils import prompt_templates
 
     ws = tmp_path / "workspace"
     ws.mkdir(parents=True)
@@ -455,7 +455,7 @@ class TestReviewPass:
         """Un rifiuto aperto è la sola metà dell'esito su cui l'utente possa agire.
 
         ``unresolved_refusals`` esisteva, era valorizzato su ogni percorso e non lo
-        leggeva nessuno in ``jenny/``: la review che lasciava un fatto fuori da
+        leggeva nessuno in ``jafta/``: la review che lasciava un fatto fuori da
         tutti i file riferiva "nothing was freed" — vero come numero, muto sul
         fatto che una scrittura era stata *bloccata*. A differenza di una
         degradazione, questa non si ripara con ``recall``: si ripara alzando il

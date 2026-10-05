@@ -20,10 +20,10 @@ import pytest
 import websockets
 from port_alloc import free_port
 
-from jenny.bus.events import OutboundMessage
-from jenny.channels.websocket import WebSocketChannel, WebSocketConfig
-from jenny.webui.gateway_services import build_gateway_services
-from jenny.webui.metadata import WEBUI_DEFAULT_CHAT_ID
+from jafta.bus.events import OutboundMessage
+from jafta.channels.websocket import WebSocketChannel, WebSocketConfig
+from jafta.webui.gateway_services import build_gateway_services
+from jafta.webui.metadata import WEBUI_DEFAULT_CHAT_ID
 
 
 def _channel(port: int | None = None) -> WebSocketChannel:
@@ -54,7 +54,7 @@ def _events(conn: AsyncMock) -> list[dict]:
 
 @pytest.fixture(autouse=True)
 def _isolate_data_dir(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
 
 
 async def test_detach_unsubscribes_the_connection_from_that_notebook() -> None:

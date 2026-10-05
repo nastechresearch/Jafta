@@ -4,7 +4,7 @@ Most new providers need zero code — this page covers when you actually need to
 
 ## The two existing wire formats
 
-Jenny has no built-in provider catalog. A provider is a user-defined entry under `providers.providers` in `config.json` (`ProviderConfig` in `jenny/config/schema.py`):
+Jafta has no built-in provider catalog. A provider is a user-defined entry under `providers.providers` in `config.json` (`ProviderConfig` in `jafta/config/schema.py`):
 
 ```json
 {
@@ -31,14 +31,14 @@ Jenny has no built-in provider catalog. A provider is a user-defined entry under
 | `apiKey` | string or null | Credential. Supports `${ENV_VAR}` interpolation, resolved at config load time. If the variable is missing, loading raises `ValueError` rather than silently leaving the key blank. |
 | `apiBase` | string or null | Base URL of the endpoint. |
 | `apiType` | `"auto"` \| `"chat_completions"` \| `"responses"` | OpenAI-compatible endpoints only; `"auto"` probes for Responses API support with a circuit breaker that falls back to Chat Completions after repeated failures. |
-| `caBundle` | string or null | Path to a PEM certificate to trust *in addition to* the default roots, for a server whose certificate is signed by your own CA (relative paths start at the workspace; see `jenny/providers/tls.py`). See [Self-signed certificates](../reference/providers.md#self-signed-certificates). |
+| `caBundle` | string or null | Path to a PEM certificate to trust *in addition to* the default roots, for a server whose certificate is signed by your own CA (relative paths start at the workspace; see `jafta/providers/tls.py`). See [Self-signed certificates](../reference/providers.md#self-signed-certificates). |
 | `extraHeaders` / `extraBody` / `extraQuery` | dict or null | Extra request headers, JSON body fields, and query params merged into every request to this provider. |
 
 If your target speaks either the Anthropic Messages API or an OpenAI-compatible Chat Completions/Responses API — which covers the overwhelming majority of hosted and self-hosted LLM servers, including most "OpenAI-compatible" gateways, OpenRouter, and local runners like Ollama/LM Studio — **you don't write any Python.** You add a `providers.providers[]` entry with `format: "openai_compat"` (or `"anthropic"`) and you're done. This page is for the genuinely new-wire-format case.
 
 ## When you actually need a new class
 
-`jenny/providers/factory.py` is the only place that dispatches on `format` to pick a provider *class* (the literal is spelled out in a few other places, listed under [Wiring it into the factory](#wiring-it-into-the-factory)):
+`jafta/providers/factory.py` is the only place that dispatches on `format` to pick a provider *class* (the literal is spelled out in a few other places, listed under [Wiring it into the factory](#wiring-it-into-the-factory)):
 
 ```python
 if backend == "anthropic":
@@ -51,7 +51,7 @@ There are exactly two branches. If the endpoint you want to support doesn't spea
 
 ## Subclassing `LLMProvider`
 
-`jenny/providers/base.py::LLMProvider` is the abstract base every provider (including the two built-in ones) implements. It has exactly two abstract methods:
+`jafta/providers/base.py::LLMProvider` is the abstract base every provider (including the two built-in ones) implements. It has exactly two abstract methods:
 
 ```python
 @abstractmethod
@@ -76,17 +76,17 @@ def get_default_model(self) -> str:
 - **`get_default_model()`** returns the model identifier to use when none is set explicitly.
 - **`chat_stream()`** is *not* abstract — the base class provides a default that just calls `chat()` once and delivers the whole response through `on_content_delta` as a single chunk. Override it only if your endpoint has real token-by-token streaming and you want the UI to show it incrementally; otherwise the fallback is a correct (if non-streaming-looking) implementation for free.
 
-`LLMProvider` also gives you, for free, without touching them: retry with backoff (`chat_with_retry`/`chat_stream_with_retry`), a streaming idle timeout (`JENNY_STREAM_IDLE_TIMEOUT_S`, default 90 s, capped at 3600 s) and a separate, longer budget for the wait before the model's first output (`resolve_first_output_timeout_s`, 300 s, or 600 s on a loopback endpoint) — a new provider that streams should apply the second one until it sees its first delta and the first one after that, message-list repair helpers (role alternation, empty-content sanitization, image stripping) in `jenny/providers/message_repair.py`, and transient/persistent error classification in `jenny/providers/retry_policy.py`. Look at `AnthropicProvider` (`jenny/providers/anthropic_provider.py`) for a from-scratch implementation, or `OpenAICompatProvider` (`jenny/providers/openai_compat_provider.py`) for one that also handles the OpenAI Responses API variant (`jenny/providers/openai_responses/`) behind the same class via `api_type`.
+`LLMProvider` also gives you, for free, without touching them: retry with backoff (`chat_with_retry`/`chat_stream_with_retry`), a streaming idle timeout (`JAFTA_STREAM_IDLE_TIMEOUT_S`, default 90 s, capped at 3600 s) and a separate, longer budget for the wait before the model's first output (`resolve_first_output_timeout_s`, 300 s, or 600 s on a loopback endpoint) — a new provider that streams should apply the second one until it sees its first delta and the first one after that, message-list repair helpers (role alternation, empty-content sanitization, image stripping) in `jafta/providers/message_repair.py`, and transient/persistent error classification in `jafta/providers/retry_policy.py`. Look at `AnthropicProvider` (`jafta/providers/anthropic_provider.py`) for a from-scratch implementation, or `OpenAICompatProvider` (`jafta/providers/openai_compat_provider.py`) for one that also handles the OpenAI Responses API variant (`jafta/providers/openai_responses/`) behind the same class via `api_type`.
 
 ## Wiring it into the factory
 
 Once your class exists:
 
-1. Add a new literal value to `ProviderConfig.format` in `jenny/config/schema.py` (currently `Literal["openai_compat", "anthropic"]`).
-2. Add a branch in `_make_provider_core()` (`jenny/providers/factory.py`) that constructs your class from the active `ProviderConfig` entry.
-3. Check `provider_fingerprint()` (`jenny/providers/factory.py`). It is what `GatewayContainer._on_settings_changed()` compares to decide whether a Settings save needs a new provider. It summarizes the active entry with `model_dump()`, so a new `ProviderConfig` field is covered automatically; it only needs a look if your provider reads something that is *not* on the entry or in `agents.defaults` (then it has to go into the fingerprint, or a change to it will not hot-reload).
+1. Add a new literal value to `ProviderConfig.format` in `jafta/config/schema.py` (currently `Literal["openai_compat", "anthropic"]`).
+2. Add a branch in `_make_provider_core()` (`jafta/providers/factory.py`) that constructs your class from the active `ProviderConfig` entry.
+3. Check `provider_fingerprint()` (`jafta/providers/factory.py`). It is what `GatewayContainer._on_settings_changed()` compares to decide whether a Settings save needs a new provider. It summarizes the active entry with `model_dump()`, so a new `ProviderConfig` field is covered automatically; it only needs a look if your provider reads something that is *not* on the entry or in `agents.defaults` (then it has to go into the fingerprint, or a change to it will not hot-reload).
 4. Apply the shared `GenerationSettings` (`temperature`, `max_tokens`, `reasoning_effort` from `config.agents.defaults`) the same way the existing branches do — `factory.py` sets `provider.generation` after construction, not inside the constructor.
-5. Update the other places that spell the `format` literal out, none of which follow from the schema: the check `fmt not in ("openai_compat", "anthropic")` in `jenny/webui/settings_api.py` (the API refuses an unknown format), and the provider pickers in the WebUI — the format cards and default base URLs in `onboarding-wizard.js`, and the provider label map and `<select>` in `mobile-settings.js` (with their i18n strings in `it.json` and `en.json`).
+5. Update the other places that spell the `format` literal out, none of which follow from the schema: the check `fmt not in ("openai_compat", "anthropic")` in `jafta/webui/settings_api.py` (the API refuses an unknown format), and the provider pickers in the WebUI — the format cards and default base URLs in `onboarding-wizard.js`, and the provider label map and `<select>` in `mobile-settings.js` (with their i18n strings in `it.json` and `en.json`).
 
 ## Testing
 

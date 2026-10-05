@@ -25,8 +25,8 @@ from pathlib import Path
 from support.js_harness import member, requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-WORKSPACE_JS = ROOT / "jenny" / "templates" / "ui" / "assets" / "mobile-workspace.js"
-I18N_DIR = ROOT / "jenny" / "templates" / "ui" / "assets" / "i18n"
+WORKSPACE_JS = ROOT / "jafta" / "templates" / "ui" / "assets" / "mobile-workspace.js"
+I18N_DIR = ROOT / "jafta" / "templates" / "ui" / "assets" / "i18n"
 
 pytestmark = requires_node
 
@@ -337,12 +337,12 @@ assert.ok(!/href="\\/api\\/workspace\\/download/.test(c.viewerEl.innerHTML),
 
 // Col ponte: la stessa strada del «Salva in Download» del foglio azioni.
 const saved = [];
-window.JennyNative = { saveToDownloads: async (p) => { saved.push(p); return true; } };
+window.JaftaNative = { saveToDownloads: async (p) => { saved.push(p); return true; } };
 await c._downloadBinary('dir/pacco.zip', 'pacco.zip');
 assert.deepEqual(saved, ['dir/pacco.zip']);
 
 // Senza ponte: blob letto col token, poi un link locale.
-delete window.JennyNative;
+delete window.JaftaNative;
 await c._downloadBinary('dir/pacco.zip', 'pacco.zip');
 assert.deepEqual(fetchedUrls, ['dir/pacco.zip']);
 assert.deepEqual(clicks, [{ href: 'blob:finto', download: 'pacco.zip' }]);

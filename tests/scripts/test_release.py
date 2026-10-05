@@ -4,7 +4,7 @@ Tutto gira su un finto albero di repo dentro ``tmp_path``: i file di versione
 veri del repository non vengono mai toccati.
 
 L'ultima sezione è di *round-trip*: il manifest che lo script produce viene dato
-al validatore vero del client (``jenny/runtime/update_check.py``). Le due metà
+al validatore vero del client (``jafta/runtime/update_check.py``). Le due metà
 del sistema di aggiornamento sono state scritte l'una contro la descrizione
 dell'altra, e questo è il solo posto dove si incontrano prima di una release
 pubblicata.
@@ -21,7 +21,7 @@ from types import ModuleType
 
 import pytest
 
-from jenny.runtime import update_check
+from jafta.runtime import update_check
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT_PATH = REPO_ROOT / "scripts" / "release.py"
@@ -29,7 +29,7 @@ SCRIPT_PATH = REPO_ROOT / "scripts" / "release.py"
 
 def _load_release_module() -> ModuleType:
     """Carica lo script per path: ``scripts/`` non è un package importabile."""
-    spec = importlib.util.spec_from_file_location("jenny_release_script", SCRIPT_PATH)
+    spec = importlib.util.spec_from_file_location("jafta_release_script", SCRIPT_PATH)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
@@ -42,9 +42,9 @@ release = _load_release_module()
 
 PYPROJECT = """\
 [project]
-name = "jenny"
+name = "jafta"
 version = "0.6.6"
-description = "Jenny"
+description = "Jafta"
 
 [tool.ruff]
 line-length = 100
@@ -53,7 +53,7 @@ line-length = 100
 INIT_PY = '''\
 def _version() -> str:
     try:
-        return metadata.version("jenny")
+        return metadata.version("jafta")
     except Exception:
         return _read_pyproject_version() or "0.6.6"
 '''
@@ -61,7 +61,7 @@ def _version() -> str:
 GRADLE = """\
 android {
     defaultConfig {
-        applicationId = "com.flagdizero.jenny"
+        applicationId = "com.nastechresearch.jafta"
         minSdk = 26
         // versionCode must increase monotonically on every published build.
         versionCode = 8
@@ -75,8 +75,8 @@ android {
 def repo(tmp_path: Path) -> Path:
     """Finto albero di repo con i tre file di versione."""
     (tmp_path / "pyproject.toml").write_text(PYPROJECT, encoding="utf-8")
-    (tmp_path / "jenny").mkdir()
-    (tmp_path / "jenny" / "__init__.py").write_text(INIT_PY, encoding="utf-8")
+    (tmp_path / "jafta").mkdir()
+    (tmp_path / "jafta" / "__init__.py").write_text(INIT_PY, encoding="utf-8")
     gradle_dir = tmp_path / "android" / "app"
     gradle_dir.mkdir(parents=True)
     (gradle_dir / "build.gradle.kts").write_text(GRADLE, encoding="utf-8")
@@ -103,7 +103,7 @@ def _manifest_argv(apk: Path, out: Path, *extra: str) -> list[str]:
 def _files(repo: Path) -> dict[str, str]:
     return {
         "pyproject": (repo / "pyproject.toml").read_text(encoding="utf-8"),
-        "init": (repo / "jenny" / "__init__.py").read_text(encoding="utf-8"),
+        "init": (repo / "jafta" / "__init__.py").read_text(encoding="utf-8"),
         "gradle": (repo / "android" / "app" / "build.gradle.kts").read_text(encoding="utf-8"),
     }
 
@@ -127,10 +127,10 @@ def test_bump_preserves_the_rest_of_each_file(repo: Path) -> None:
     assert _run(repo, "0.7.0") == 0
 
     content = _files(repo)
-    assert 'name = "jenny"' in content["pyproject"]
+    assert 'name = "jafta"' in content["pyproject"]
     assert "line-length = 100" in content["pyproject"]
     assert "versionCode must increase monotonically" in content["gradle"]
-    assert 'applicationId = "com.flagdizero.jenny"' in content["gradle"]
+    assert 'applicationId = "com.nastechresearch.jafta"' in content["gradle"]
 
 
 def test_version_code_increments_by_one(repo: Path) -> None:
@@ -164,7 +164,7 @@ def dev_repo(repo: Path) -> Path:
     """Lo stesso albero, ma in sviluppo su ``0.7.0-dev``."""
     for path, old in (
         (repo / "pyproject.toml", 'version = "0.6.6"'),
-        (repo / "jenny" / "__init__.py", 'or "0.6.6"'),
+        (repo / "jafta" / "__init__.py", 'or "0.6.6"'),
         (repo / "android" / "app" / "build.gradle.kts", 'versionName = "0.6.6"'),
     ):
         text = path.read_text(encoding="utf-8")
@@ -254,7 +254,7 @@ def test_duplicate_pattern_aborts_without_writing(repo: Path, capsys) -> None:
 
 
 def test_version_files_out_of_sync_are_refused(repo: Path, capsys) -> None:
-    init = repo / "jenny" / "__init__.py"
+    init = repo / "jafta" / "__init__.py"
     init.write_text(INIT_PY.replace('or "0.6.6"', 'or "0.5.0"'), encoding="utf-8")
     before = _files(repo)
 
@@ -311,7 +311,7 @@ def test_manifest_matches_the_agreed_schema(repo: Path, apk: Path, tmp_path: Pat
             "--summary-en",
             "Automatic updates.",
             "--repo",
-            "flagdizero/jenny-android-ai-agent",
+            "nastechresearch/jafta-android-ai-agent",
         )
         == 0
     )
@@ -337,11 +337,11 @@ def test_manifest_matches_the_agreed_schema(repo: Path, apk: Path, tmp_path: Pat
     assert manifest["version_code"] == 9
     assert manifest["version_name"] == "0.7.0"
     assert manifest["apk_url"] == (
-        "https://github.com/flagdizero/jenny-android-ai-agent/releases/download/"
-        "v0.7.0/jenny-0.7.0.apk"
+        "https://github.com/nastechresearch/jafta-android-ai-agent/releases/download/"
+        "v0.7.0/jafta-0.7.0.apk"
     )
     assert manifest["notes_url"] == (
-        "https://github.com/flagdizero/jenny-android-ai-agent/releases/tag/v0.7.0"
+        "https://github.com/nastechresearch/jafta-android-ai-agent/releases/tag/v0.7.0"
     )
     assert manifest["sha256"] == hashlib.sha256(apk.read_bytes()).hexdigest()
     assert manifest["size"] == apk.stat().st_size
@@ -354,7 +354,7 @@ def test_manifest_matches_the_agreed_schema(repo: Path, apk: Path, tmp_path: Pat
 
 def test_manifest_is_always_named_latest_json(repo: Path, apk: Path, tmp_path: Path) -> None:
     """L'URL stabile del client punta a ``latest.json``: altri nomi si rifiutano."""
-    out = tmp_path / "out" / "jenny-update.json"
+    out = tmp_path / "out" / "jafta-update.json"
 
     assert _run(repo, "0.7.0", *_manifest_argv(apk, out)) == 1
     assert not out.exists()
@@ -364,7 +364,7 @@ def test_apk_is_staged_under_the_asset_name(repo: Path, apk: Path, tmp_path: Pat
     out = tmp_path / "out"
     _run(repo, "0.7.0", *_manifest_argv(apk, out))
 
-    staged = out / "jenny-0.7.0.apk"
+    staged = out / "jafta-0.7.0.apk"
     assert staged.is_file()
     assert staged.read_bytes() == apk.read_bytes()
 
@@ -457,7 +457,7 @@ def test_dry_run_prints_the_publish_commands(repo: Path, apk: Path, tmp_path: Pa
 
     stdout = capsys.readouterr().out
     assert "gh release create v0.7.0" in stdout
-    assert "jenny-0.7.0.apk" in stdout
+    assert "jafta-0.7.0.apk" in stdout
     assert "latest.json" in stdout
     assert "--clobber" in stdout
 
@@ -477,7 +477,7 @@ def test_the_publish_notes_carry_the_hash(repo: Path, apk: Path, tmp_path: Path,
     stdout = capsys.readouterr().out
     assert expected in stdout.split("Publish (run these yourself")[1]
     assert f"{apk.stat().st_size} bytes" in stdout
-    assert "shasum -a 256 jenny-0.7.0.apk" in stdout
+    assert "shasum -a 256 jafta-0.7.0.apk" in stdout
     assert "apksigner verify --print-certs" in stdout
 
 
@@ -495,7 +495,7 @@ def test_bump_without_an_apk_explains_the_next_step(repo: Path, capsys) -> None:
 #
 # I test qui sopra descrivono il manifest a parole ("deve avere questi campi").
 # Quelli qui sotto lo danno in pasto al **vero** validatore del client
-# (``jenny.runtime.update_check``), che è stato scritto contro la stessa
+# (``jafta.runtime.update_check``), che è stato scritto contro la stessa
 # specifica a parole ma da un'altra parte dell'albero. È l'unico punto in cui i
 # due lati si toccano davvero, e senza questa giunzione una divergenza — un
 # campo rinominato, uno ``schema`` alzato da un lato solo, un tipo che si

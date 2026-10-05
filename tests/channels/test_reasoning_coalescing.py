@@ -16,7 +16,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.webui.transcript_replay import replay_transcript_to_ui_messages
+from jafta.webui.transcript_replay import replay_transcript_to_ui_messages
 
 
 class _RecordingTranscripts:
@@ -34,7 +34,7 @@ class _RecordingTranscripts:
 
 @pytest.fixture
 def channel():
-    from jenny.channels.websocket import WebSocketChannel
+    from jafta.channels.websocket import WebSocketChannel
 
     bus = MagicMock()
     bus.publish_inbound = AsyncMock()

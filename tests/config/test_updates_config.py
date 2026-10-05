@@ -13,9 +13,9 @@ from pathlib import Path
 
 import pytest
 
-from jenny.config.schema import Config, UpdatesConfig
-from jenny.pydantic_compat import ValidationError
-from jenny.runtime.update_check import DEFAULT_MANIFEST_URL
+from jafta.config.schema import Config, UpdatesConfig
+from jafta.pydantic_compat import ValidationError
+from jafta.runtime.update_check import DEFAULT_MANIFEST_URL
 
 
 def test_updates_config_defaults() -> None:
@@ -84,7 +84,7 @@ def test_interval_boundaries_are_accepted(hours: int) -> None:
 
 def test_the_manifest_url_has_a_single_definition() -> None:
     """Lo schema e l'updater devono leggere la *stessa* costante, non due copie."""
-    from jenny.runtime import update_check, update_manifest
+    from jafta.runtime import update_check, update_manifest
 
     assert UpdatesConfig().manifest_url is update_manifest.DEFAULT_MANIFEST_URL
     assert update_check.DEFAULT_MANIFEST_URL is update_manifest.DEFAULT_MANIFEST_URL
@@ -100,8 +100,8 @@ def test_importing_the_schema_does_not_drag_in_the_updater() -> None:
     stati importati da qualcun altro.
     """
     probe = (
-        "import sys, jenny.config.schema;"
-        "print(','.join(m for m in ('httpx', 'jenny.runtime.update_check')"
+        "import sys, jafta.config.schema;"
+        "print(','.join(m for m in ('httpx', 'jafta.runtime.update_check')"
         " if m in sys.modules))"
     )
     repo_root = Path(__file__).resolve().parents[2]

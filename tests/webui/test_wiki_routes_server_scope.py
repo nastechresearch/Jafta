@@ -53,7 +53,7 @@ _AUTH_SECRET = "test-secret"
 @pytest.fixture
 def handler(tmp_path: Path, monkeypatch):
     """GatewayHTTPHandler reale su un workspace di tmp_path (v. test_wiki_search)."""
-    from jenny.config import paths as paths_mod
+    from jafta.config import paths as paths_mod
 
     workspace = tmp_path / "data" / "workspace"
     workspace.mkdir(parents=True)
@@ -246,7 +246,7 @@ class TestAHugePageIsNotAReply:
     async def test_beyond_the_cap_is_a_413_not_a_half_reply(
         self, handler, two_projects, monkeypatch
     ) -> None:
-        monkeypatch.setattr("jenny.webui.wiki_routes._PAGE_MAX_BYTES", 64)
+        monkeypatch.setattr("jafta.webui.wiki_routes._PAGE_MAX_BYTES", 64)
         pages = two_projects / "wikis" / "etna" / "wiki"
         (pages / "enorme.md").write_text("# Grossa\n" + "x" * 200, encoding="utf-8")
 
@@ -262,7 +262,7 @@ class TestAHugePageIsNotAReply:
         rifiuto: al confine esatto la pagina si serve, e il ``raw`` è tutto il
         file — l'ancoraggio degli audit ci conta.
         """
-        monkeypatch.setattr("jenny.webui.wiki_routes._PAGE_MAX_BYTES", 64)
+        monkeypatch.setattr("jafta.webui.wiki_routes._PAGE_MAX_BYTES", 64)
         body = "# Piccola\n" + "y" * 54
         assert len(body.encode("utf-8")) == 64
         pages = two_projects / "wikis" / "etna" / "wiki"

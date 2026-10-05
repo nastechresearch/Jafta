@@ -1,26 +1,26 @@
 <resources>
-    <string name="gateway_notification_title">Jenny è attiva</string>
+    <string name="gateway_notification_title">Jafta è attiva</string>
     <string name="gateway_notification_text">Pronta a rispondere e a eseguire le attività programmate</string>
     <string name="gateway_channel_name">Servizio in background</string>
-    <string name="gateway_channel_description">Mostrata mentre Jenny è attiva in background. Android la richiede e resta finché Jenny non viene fermata. Toccala per aprire Jenny.</string>
+    <string name="gateway_channel_description">Mostrata mentre Jafta è attiva in background. Android la richiede e resta finché Jafta non viene fermata. Toccala per aprire Jafta.</string>
 
     <string name="restart_channel_name">Riavvio necessario</string>
-    <string name="restart_channel_description">Compare quando Android ha fermato Jenny in background e non le permette di ripartire da sola. Toccala per riavviarla.</string>
-    <string name="restart_notice_title">Jenny è ferma</string>
+    <string name="restart_channel_description">Compare quando Android ha fermato Jafta in background e non le permette di ripartire da sola. Toccala per riavviarla.</string>
+    <string name="restart_notice_title">Jafta è ferma</string>
     <string name="restart_notice_text">Tocca per riavviarla</string>
 
     <string name="alerts_channel_name">Avvisi</string>
-    <string name="alerts_channel_description">Promemoria e messaggi che Jenny manda di sua iniziativa</string>
+    <string name="alerts_channel_description">Promemoria e messaggi che Jafta manda di sua iniziativa</string>
 
     <string name="reply_action_label">Rispondi</string>
-    <string name="reply_input_hint">Scrivi a Jenny…</string>
-    <string name="reply_failed_title">Jenny non ha ricevuto il messaggio</string>
+    <string name="reply_input_hint">Scrivi a Jafta…</string>
+    <string name="reply_failed_title">Jafta non ha ricevuto il messaggio</string>
     <string name="reply_failed_text">Non era attiva. Tocca per rimandarlo.</string>
     <string name="reply_retry_label">Rimanda</string>
     <string name="reply_user_name">Tu</string>
 
-    <string name="floating_input_hint">Chiedi a Jenny…</string>
-    <string name="floating_not_running">Jenny non è attiva in questo momento.</string>
+    <string name="floating_input_hint">Chiedi a Jafta…</string>
+    <string name="floating_not_running">Jafta non è attiva in questo momento.</string>
     <string name="floating_no_reply">Nessuna risposta. Apri la chat per vedere com\'è andata.</string>
     <string name="floating_send">Invia</string>
     <string name="floating_open_app">Apri l’app</string>
@@ -29,5 +29,5 @@
     <string name="update_channel_name">Aggiornamenti dell\'app</string>
     <string name="update_channel_description">Mostrata quando un aggiornamento già scaricato aspetta la tua conferma per installarsi</string>
     <string name="update_notification_title">Aggiornamento pronto da installare</string>
-    <string name="update_notification_text">Tocca per confermare — poi Jenny riparte da sola</string>
+    <string name="update_notification_text">Tocca per confermare — poi Jafta riparte da sola</string>
 </resources>

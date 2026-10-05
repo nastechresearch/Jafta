@@ -1,4 +1,4 @@
-"""Test per jenny/runtime/notifier.py (alert di sistema Android).
+"""Test per jafta/runtime/notifier.py (alert di sistema Android).
 
 Il bridge Chaquopy non esiste nei test desktop: si verifica la derivazione
 pura dei campi (``alert_fields``), il no-op senza contesto Android e il
@@ -10,8 +10,8 @@ from __future__ import annotations
 import asyncio
 from typing import Any
 
-from jenny.runtime import notifier
-from jenny.webui.metadata import WEBUI_MESSAGE_SOURCE_METADATA_KEY
+from jafta.runtime import notifier
+from jafta.webui.metadata import WEBUI_MESSAGE_SOURCE_METADATA_KEY
 
 
 class _FakeBridge:
@@ -34,43 +34,43 @@ def _meta(kind: str, label: str | None = None) -> dict[str, Any]:
 class TestAlertFields:
     def test_cron_with_label(self):
         title, body, tag = notifier.alert_fields("ricordati il pane", _meta("cron", "spesa"))
-        assert title == "Jenny ⏰ spesa"
+        assert title == "Jafta ⏰ spesa"
         assert tag == "cron:spesa"
         assert body == "ricordati il pane"
 
     def test_cron_without_label(self):
         title, _, tag = notifier.alert_fields("ping", _meta("cron"))
-        assert title == "Jenny ⏰ promemoria"
+        assert title == "Jafta ⏰ promemoria"
         assert tag == "cron"
 
     def test_cron_blank_label_falls_back(self):
         title, _, tag = notifier.alert_fields("ping", _meta("cron", "   "))
-        assert title == "Jenny ⏰ promemoria"
+        assert title == "Jafta ⏰ promemoria"
         assert tag == "cron"
 
     def test_heartbeat(self):
         title, _, tag = notifier.alert_fields("evento X accaduto", _meta("heartbeat"))
-        assert title == "Jenny · monitoraggio"
+        assert title == "Jafta · monitoraggio"
         assert tag == "heartbeat"
 
     def test_update(self):
         # Tag dedicato: l'annuncio in chat e l'alert esplicito di un update
         # critico coalizzano invece di suonare due volte.
         title, _, tag = notifier.alert_fields("nuova versione 0.7.0", _meta("update"))
-        assert title == "Jenny · aggiornamento"
+        assert title == "Jafta · aggiornamento"
         assert tag == "update"
 
     def test_plain_message_defaults(self):
         for metadata in (None, {}, {"latency_ms": 3}):
             title, _, tag = notifier.alert_fields("ciao", metadata)
-            assert title == "Jenny"
+            assert title == "Jafta"
             assert tag == "message"
 
     def test_malformed_source_is_ignored(self):
         title, _, tag = notifier.alert_fields(
             "ciao", {WEBUI_MESSAGE_SOURCE_METADATA_KEY: "cron"}
         )
-        assert title == "Jenny"
+        assert title == "Jafta"
         assert tag == "message"
 
     def test_body_collapses_whitespace_and_truncates(self):
@@ -100,7 +100,7 @@ class TestPostAlert:
         monkeypatch.setattr(notifier, "_get_bridge", fake_get_bridge)
         ok = await notifier.post_alert("ricordati il pane", _meta("cron", "spesa"))
         assert ok is True
-        assert bridge.calls == [("Jenny ⏰ spesa", "ricordati il pane", "cron:spesa")]
+        assert bridge.calls == [("Jafta ⏰ spesa", "ricordati il pane", "cron:spesa")]
 
     async def test_thread_overrides_the_tag_and_leaves_the_title(self, monkeypatch):
         """Il canale della tendina passa un thread unico.
@@ -118,7 +118,7 @@ class TestPostAlert:
 
         monkeypatch.setattr(notifier, "_get_bridge", fake_get_bridge)
         await notifier.post_alert("ecco", _meta("cron", "spesa"), thread="chat")
-        assert bridge.calls == [("Jenny ⏰ spesa", "ecco", "chat")]
+        assert bridge.calls == [("Jafta ⏰ spesa", "ecco", "chat")]
 
     async def test_without_thread_nothing_changes(self, monkeypatch):
         """Gli avvisi proattivi tengono i loro tag distinti."""
@@ -159,5 +159,5 @@ class TestNotifyDelivery:
         notifier.notify_delivery("evento X", _meta("heartbeat"))
         assert notifier._TASKS
         await asyncio.gather(*notifier._TASKS)
-        assert bridge.calls == [("Jenny · monitoraggio", "evento X", "heartbeat")]
+        assert bridge.calls == [("Jafta · monitoraggio", "evento X", "heartbeat")]
         assert not notifier._TASKS

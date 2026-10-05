@@ -1,6 +1,6 @@
 """``browser_open`` non risponde «ok» se la pagina non è mai partita.
 
-``JennyBrowserBridge.open`` crea la WebView e lancia ``loadUrl`` con un salto
+``JaftaBrowserBridge.open`` crea la WebView e lancia ``loadUrl`` con un salto
 sul main thread (``MainHop.call``). Quel salto torna il *fallback* se il blocco
 solleva — il costruttore della WebView, mentre Android aggiorna il provider — o
 se il main thread non risponde in tempo. Con ``Unit`` come esito, ``open`` non
@@ -22,7 +22,7 @@ from support.kotlin_source import read_source
 
 BRIDGE = (
     Path(__file__).resolve().parents[2]
-    / "android/app/src/main/java/com/flagdizero/jenny/JennyBrowserBridge.kt"
+    / "android/app/src/main/java/com/nastechresearch/jafta/JaftaBrowserBridge.kt"
 )
 
 
@@ -31,7 +31,7 @@ def _open_body() -> str:
         pytest.skip("sorgente Android non presente in questo checkout")
     src = read_source(BRIDGE)
     m = re.search(r"\n    fun open\(url: String.*?\n    \}\n", src, re.S)
-    assert m, "JennyBrowserBridge.open non trovato"
+    assert m, "JaftaBrowserBridge.open non trovato"
     return m.group(0)
 
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from jenny.agent.tools.context import ContextAware, RequestContext
+from jafta.agent.tools.context import ContextAware, RequestContext
 
 
 class _ContextTool:

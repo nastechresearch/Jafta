@@ -24,10 +24,10 @@ from pathlib import Path
 
 import pytest
 
-from jenny.config import paths as paths_mod
-from jenny.config.schema import Config
-from jenny.cron.types import CronJob
-from jenny.runtime.container import GatewayContainer
+from jafta.config import paths as paths_mod
+from jafta.config.schema import Config
+from jafta.cron.types import CronJob
+from jafta.runtime.container import GatewayContainer
 
 _MINUTE_MS = 60_000
 _HOUR_MS = 3_600_000

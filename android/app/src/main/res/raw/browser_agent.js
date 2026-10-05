@@ -3,7 +3,7 @@
 // Kotlin lo inietta con evaluateJavascript sostituendo il segnaposto in fondo
 // al file con un oggetto JSON. La sostituzione e' testuale e globale, quindi
 // il segnaposto deve comparire **una volta sola**: nominarlo qui sopra lo
-// farebbe sostituire anche dentro questo commento. Vive nella pagina, quindi `window.__jenny` sopravvive fra una chiamata e
+// farebbe sostituire anche dentro questo commento. Vive nella pagina, quindi `window.__jafta` sopravvive fra una chiamata e
 // l'altra ma **muore a ogni navigazione**: è esattamente ciò che rende un
 // riferimento vecchio un errore invece di un click sull'elemento sbagliato.
 //
@@ -11,7 +11,7 @@
 // bridge il danno è già fatto — nessuno tronca il risultato di un tool a valle
 // (context_governor taglia la cronologia, non la singola risposta).
 (function (ARGS) {
-  var J = (window.__jenny = window.__jenny || { v: 0, n: 0, refs: {}, prev: null });
+  var J = (window.__jafta = window.__jafta || { v: 0, n: 0, refs: {}, prev: null });
 
   // ---------------------------------------------------------------- visibilità
 

@@ -1,8 +1,8 @@
 """La casa risponde a ``ui_query``: «cosa vedi?» funziona anche dal guscio di default.
 
 Il gateway lega ogni messaggio alla connessione che l'ha mandato
-(``metadata["conn_id"]`` in ``jenny/channels/websocket.py``) e ``ui_view``
-interroga **quella**. Solo l'officina rispondeva: scrivendo dalla casa Jenny
+(``metadata["conn_id"]`` in ``jafta/channels/websocket.py``) e ``ui_view``
+interroga **quella**. Solo l'officina rispondeva: scrivendo dalla casa Jafta
 aspettava sei secondi e poi diceva che l'app era in background.
 
 Qui girano i moduli veri — ``home-ui-query.js`` e ``shared/ui-query.js`` — con
@@ -19,7 +19,7 @@ from pathlib import Path
 
 from support.js_harness import requires_node, run_module
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 pytestmark = requires_node
 
 _FAKE_WS = """
@@ -62,12 +62,12 @@ const entries = {
   notebooks: { id: 'notebooks', kind: 'notebooks', fixed: true },
   s1: { id: 's1', kind: 'app', ref: 'spesa', fixed: false },
 };
-/* La cornice dell'app appesa: risponde come fa `jenny-sdk.js`. */
+/* La cornice dell'app appesa: risponde come fa `jafta-sdk.js`. */
 const frame = {
   answer: true,
   postMessage(msg) {
-    if (msg.type !== 'jenny:ui-query' || !this.answer) return;
-    queueMicrotask(() => post(frame, { type: 'jenny:ui-result', nonce: msg.nonce, html: '<ul><li>latte</li></ul>' }));
+    if (msg.type !== 'jafta:ui-query' || !this.answer) return;
+    queueMicrotask(() => post(frame, { type: 'jafta:ui-result', nonce: msg.nonce, html: '<ul><li>latte</li></ul>' }));
   },
 };
 const app = {
@@ -161,7 +161,7 @@ def test_the_app_over_everything_wins() -> None:
 
 
 def test_a_failed_collect_is_said_on_the_wire() -> None:
-    """Una raccolta che esplode non lascia Jenny ad aspettare sei secondi."""
+    """Una raccolta che esplode non lascia Jafta ad aspettare sei secondi."""
     _run("""
       console.error = () => {};
       app.homePages.entry = () => { throw new Error('boom'); };
@@ -178,8 +178,8 @@ def test_a_frame_answer_is_taken_only_from_that_frame_and_nonce() -> None:
         postMessage(msg) {
           // Una risposta da un'altra finestra, e una col nonce sbagliato: niente.
           queueMicrotask(() => {
-            post(other, { type: 'jenny:ui-result', nonce: msg.nonce, html: 'intruso' });
-            post(quiet, { type: 'jenny:ui-result', nonce: 'altro', html: 'intruso' });
+            post(other, { type: 'jafta:ui-result', nonce: msg.nonce, html: 'intruso' });
+            post(quiet, { type: 'jafta:ui-result', nonce: 'altro', html: 'intruso' });
           });
         },
       };

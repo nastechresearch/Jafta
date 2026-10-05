@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from jenny.snapshot.engine import SnapshotEngine
-from jenny.snapshot.store import iter_blob_hashes, object_path
+from jafta.snapshot.engine import SnapshotEngine
+from jafta.snapshot.store import iter_blob_hashes, object_path
 
 DAY_MS = 86_400_000
 
@@ -13,7 +13,7 @@ DAY_MS = 86_400_000
 def _engine(root: Path) -> SnapshotEngine:
     root.mkdir(exist_ok=True)
     (root / "file.txt").write_text("v0", encoding="utf-8")
-    return SnapshotEngine(root, root / ".jenny" / "snapshots")
+    return SnapshotEngine(root, root / ".jafta" / "snapshots")
 
 
 def _snap(engine: SnapshotEngine, root: Path, version: int, now_ms: int) -> str:

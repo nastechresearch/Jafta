@@ -8,13 +8,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from jenny.agent.tools.apply_patch import ApplyPatchTool
-from jenny.agent.tools.context import ToolContext
-from jenny.agent.tools.file_state import FileStates
-from jenny.agent.tools.filesystem import EditFileTool, WriteFileTool, WriteSizeGuard
-from jenny.agent.tools.loader import ToolLoader
-from jenny.agent.tools.registry import ToolRegistry
-from jenny.config.schema import ToolsConfig
+from jafta.agent.tools.apply_patch import ApplyPatchTool
+from jafta.agent.tools.context import ToolContext
+from jafta.agent.tools.file_state import FileStates
+from jafta.agent.tools.filesystem import EditFileTool, WriteFileTool, WriteSizeGuard
+from jafta.agent.tools.loader import ToolLoader
+from jafta.agent.tools.registry import ToolRegistry
+from jafta.config.schema import ToolsConfig
 
 
 def _refuse_over(limit: int, seen: list[tuple[Path, str]] | None = None) -> WriteSizeGuard:

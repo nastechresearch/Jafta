@@ -1,6 +1,6 @@
 """Il chip degli agenti al lavoro, nella casa vera.
 
-Un turno non aspetta piu' i subagent che lancia (02/10/2026): Jenny risponde e
+Un turno non aspetta piu' i subagent che lancia (02/10/2026): Jafta risponde e
 il turno finisce, il lavoro no. Il 02/10 sul telefono la riga di lavoro si era
 spenta col `turn_end` e il quaderno «Piante» non diceva piu' niente per i
 minuti in cui un subagent scriveva sei pagine. Qui si prova che il chip dice

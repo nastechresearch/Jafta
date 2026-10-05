@@ -17,11 +17,11 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from support.aio import queue_idle, wait_until
 
-from jenny.bus.events import OutboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.channels.dispatcher import WebSocketDispatcher
-from jenny.channels.websocket import WebSocketChannel
-from jenny.config.schema import Config
+from jafta.bus.events import OutboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.channels.dispatcher import WebSocketDispatcher
+from jafta.channels.websocket import WebSocketChannel
+from jafta.config.schema import Config
 
 
 def _mock_gateway() -> MagicMock:

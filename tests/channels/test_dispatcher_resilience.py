@@ -16,12 +16,12 @@ from unittest.mock import MagicMock
 
 from support.aio import wait_until
 
-import jenny.channels.ws_sender as ws_sender
-from jenny.bus.events import OutboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.channels.dispatcher import WebSocketDispatcher
-from jenny.channels.ws_sender import OutboundSenderMixin
-from jenny.config.schema import Config
+import jafta.channels.ws_sender as ws_sender
+from jafta.bus.events import OutboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.channels.dispatcher import WebSocketDispatcher
+from jafta.channels.ws_sender import OutboundSenderMixin
+from jafta.config.schema import Config
 
 
 async def test_pump_survives_poison_message_and_delivers_next() -> None:

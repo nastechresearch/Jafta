@@ -7,9 +7,9 @@ import pytest
 from support.aio import other_tasks, settle_tasks, wait_until
 from support.cron import disable_job
 
-from jenny.cron.service import CronJobSkippedError, CronService
-from jenny.cron.types import CronJob, CronJobSilencedError, CronPayload, CronSchedule
-from jenny.session.keys import UNIFIED_SESSION_KEY
+from jafta.cron.service import CronJobSkippedError, CronService
+from jafta.cron.types import CronJob, CronJobSilencedError, CronPayload, CronSchedule
+from jafta.session.keys import UNIFIED_SESSION_KEY
 
 # La scadenza di questo file: un secondo.
 _wait_until = functools.partial(wait_until, timeout=1.0)
@@ -64,7 +64,7 @@ def test_validation_and_scheduling_read_the_same_timezone(monkeypatch) -> None:
     from datetime import datetime
     from zoneinfo import ZoneInfo
 
-    from jenny.cron import service as service_mod
+    from jafta.cron import service as service_mod
 
     requested: list[str | None] = []
 
@@ -102,8 +102,8 @@ def test_add_job_rejects_an_interval_that_would_never_fire(tmp_path, every_ms) -
 def test_the_cron_tool_reports_a_non_positive_interval_as_an_error(
     tmp_path, every_seconds
 ) -> None:
-    from jenny.agent.tools.context import RequestContext
-    from jenny.agent.tools.cron import CronTool
+    from jafta.agent.tools.context import RequestContext
+    from jafta.agent.tools.cron import CronTool
 
     tool = CronTool(CronService(tmp_path / "cron" / "jobs.json"), default_timezone="Europe/Rome")
     tool.set_context(
@@ -116,8 +116,8 @@ def test_the_cron_tool_reports_a_non_positive_interval_as_an_error(
 
 
 def test_the_cron_tool_reports_a_bad_expression_as_an_error(tmp_path) -> None:
-    from jenny.agent.tools.context import RequestContext
-    from jenny.agent.tools.cron import CronTool
+    from jafta.agent.tools.context import RequestContext
+    from jafta.agent.tools.cron import CronTool
 
     tool = CronTool(CronService(tmp_path / "cron" / "jobs.json"), default_timezone="Europe/Rome")
     tool.set_context(
@@ -987,7 +987,7 @@ def test_a_stale_cron_lock_does_not_hang_the_store(tmp_path, monkeypatch):
     ``with`` lo lascia li', e senza timeout ``_load_store`` — sincrono, chiamato
     da ``register_system_job`` al boot — bloccava l'event loop intero.
     """
-    from jenny.cron import service as service_module
+    from jafta.cron import service as service_module
 
     monkeypatch.setattr(service_module, "_LOCK_TIMEOUT_S", 0.2)
     store_path = tmp_path / "cron" / "jobs.json"

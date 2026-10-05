@@ -2,12 +2,12 @@ import json
 
 import pytest
 
-from jenny.config.loader import (
+from jafta.config.loader import (
     load_config,
     resolve_config_env_vars,
     save_config,
 )
-from jenny.pydantic_compat import BaseModel, Field
+from jafta.pydantic_compat import BaseModel, Field
 
 
 class _EnvModel(BaseModel):

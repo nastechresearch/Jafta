@@ -12,7 +12,7 @@ import json
 import re
 from pathlib import Path
 
-_I18N_DIR = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets" / "i18n"
+_I18N_DIR = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets" / "i18n"
 
 
 def _flatten(value: dict, prefix: str = "") -> set[str]:
@@ -209,10 +209,10 @@ def test_a_notebook_is_never_called_a_project_on_screen() -> None:
 
 
 def test_no_text_sends_to_a_screen_that_no_longer_exists() -> None:
-    """«Tu e Jenny» / «You and Jenny» era la pagina delle impostazioni della
+    """«Tu e Jafta» / «You and Jafta» era la pagina delle impostazioni della
     casa; oggi il backup sta in Impostazioni › Backup, e il testo di «Local
     history» mandava ancora là (collaudo del 27/09/2026)."""
-    gone = re.compile(r"Tu e Jenny|You and Jenny")
+    gone = re.compile(r"Tu e Jafta|You and Jafta")
     for locale in ("it", "en"):
         for key, text in _leaves(_load(locale)):
-            assert not gone.search(str(text)), f"{locale}: {key} manda a «Tu e Jenny»"
+            assert not gone.search(str(text)), f"{locale}: {key} manda a «Tu e Jafta»"

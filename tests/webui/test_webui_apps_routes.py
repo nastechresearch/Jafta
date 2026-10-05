@@ -1,4 +1,4 @@
-"""Tests for the Jenny Apps gateway routes (list, actions, static)."""
+"""Tests for the Jafta Apps gateway routes (list, actions, static)."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from unittest.mock import patch
 from support.gateway_http import AUTH_SECRET, make_handler, make_request
 from websockets.http11 import Request as WsRequest
 
-from jenny.webui.ws_http import GatewayHTTPHandler
+from jafta.webui.ws_http import GatewayHTTPHandler
 
 NOTE_MANIFEST = {
     "name": "Note",
@@ -230,7 +230,7 @@ class TestAppsGateFailsClosed:
         def boom():
             raise ValueError("config.json is not valid JSON")
 
-        with patch("jenny.config.loader.load_config", side_effect=boom), \
+        with patch("jafta.config.loader.load_config", side_effect=boom), \
                 patch.object(handler, "_get_workspace_root", return_value=workspace):
             static = handler.apps_routes._static(
                 _make_request("/apps/note/index.html"), "/apps/note/index.html")
@@ -246,7 +246,7 @@ class TestAppsGateFailsClosed:
         handler = _make_handler(tmp_path)
         apps_off = SimpleNamespace(enabled=False, http_timeout_s=20.0, max_collection_bytes=1)
 
-        with patch("jenny.config.loader.load_config",
+        with patch("jafta.config.loader.load_config",
                    return_value=SimpleNamespace(apps=apps_off)):
             response = handler.apps_routes._list(_make_request("/api/webui/apps"))
 
@@ -282,7 +282,7 @@ class TestExternalView:
         workspace = _make_workspace(tmp_path)
         _add_view_app(workspace)
         with patch.object(handler, "_get_workspace_root", return_value=workspace), \
-             patch("jenny.apps.proxy.validate_app_server_target", return_value=(True, "")):
+             patch("jafta.apps.proxy.validate_app_server_target", return_value=(True, "")):
             response = await handler.apps_routes._view(
                 _make_request("/api/webui/apps/telecomando/view"), "telecomando")
             try:
@@ -303,7 +303,7 @@ class TestExternalView:
         workspace = _make_workspace(tmp_path)
         _add_view_app(workspace)
         with patch.object(handler, "_get_workspace_root", return_value=workspace), \
-             patch("jenny.apps.proxy.validate_app_server_target", return_value=(True, "")):
+             patch("jafta.apps.proxy.validate_app_server_target", return_value=(True, "")):
             try:
                 first = _body(await handler.apps_routes._view(
                     _make_request("/api/webui/apps/telecomando/view"), "telecomando"))["url"]
@@ -320,7 +320,7 @@ class TestExternalView:
         workspace = _make_workspace(tmp_path)
         _add_view_app(workspace)
         with patch.object(handler, "_get_workspace_root", return_value=workspace), \
-             patch("jenny.apps.proxy.validate_app_server_target", return_value=(True, "")):
+             patch("jafta.apps.proxy.validate_app_server_target", return_value=(True, "")):
             await handler.apps_routes._view(
                 _make_request("/api/webui/apps/telecomando/view"), "telecomando")
             assert handler.apps_routes._view_proxies
@@ -365,7 +365,7 @@ class TestExternalView:
         workspace = _make_workspace(tmp_path)
         _add_view_app(workspace)
         with patch.object(handler, "_get_workspace_root", return_value=workspace), \
-             patch("jenny.apps.proxy.validate_app_server_target", return_value=(True, "")):
+             patch("jafta.apps.proxy.validate_app_server_target", return_value=(True, "")):
             try:
                 opened = await handler.apps_routes.dispatch(
                     _make_request("/api/webui/apps/telecomando/view"),

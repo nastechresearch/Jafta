@@ -11,9 +11,9 @@ from __future__ import annotations
 
 import asyncio
 
-from jenny.bus.queue import MessageBus
-from jenny.channels.dispatcher import WebSocketDispatcher
-from jenny.config.schema import Config
+from jafta.bus.queue import MessageBus
+from jafta.channels.dispatcher import WebSocketDispatcher
+from jafta.config.schema import Config
 
 TOKEN = "123456789:AAtestTOKENtestTOKENtestTOKEN"
 
@@ -41,8 +41,8 @@ def _config() -> Config:
 
 async def test_concurrent_reloads_leave_exactly_one_live_channel(monkeypatch) -> None:
     _FakeTelegram.instances = []
-    monkeypatch.setattr("jenny.channels.telegram.TelegramChannel", _FakeTelegram)
-    monkeypatch.setattr("jenny.config.loader.load_config", _config)
+    monkeypatch.setattr("jafta.channels.telegram.TelegramChannel", _FakeTelegram)
+    monkeypatch.setattr("jafta.config.loader.load_config", _config)
     dispatcher = WebSocketDispatcher(_config(), MessageBus())
     assert isinstance(dispatcher.channels["telegram"], _FakeTelegram)
 
@@ -60,8 +60,8 @@ async def test_a_failing_stop_still_lets_the_reload_proceed(monkeypatch) -> None
             raise RuntimeError("boom")
 
     _FakeTelegram.instances = []
-    monkeypatch.setattr("jenny.channels.telegram.TelegramChannel", _Broken)
-    monkeypatch.setattr("jenny.config.loader.load_config", _config)
+    monkeypatch.setattr("jafta.channels.telegram.TelegramChannel", _Broken)
+    monkeypatch.setattr("jafta.config.loader.load_config", _config)
     dispatcher = WebSocketDispatcher(_config(), MessageBus())
     old = dispatcher.channels["telegram"]
 
@@ -72,8 +72,8 @@ async def test_a_failing_stop_still_lets_the_reload_proceed(monkeypatch) -> None
 
 async def test_stop_cancels_the_poller_even_if_typing_fails() -> None:
     """Un'eccezione nello stop del typing lasciava vivo il long polling."""
-    from jenny.channels.telegram import TelegramChannel
-    from jenny.config.schema import TelegramConfig
+    from jafta.channels.telegram import TelegramChannel
+    from jafta.config.schema import TelegramConfig
 
     class _API:
         closed = False

@@ -25,7 +25,7 @@ from support.home_dom import requires_jsdom, run_home
 from support.js_harness import member, requires_node, run_js, run_module
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 
 pytestmark = requires_node
 
@@ -283,7 +283,7 @@ def test_the_sheet_is_in_the_page_and_shipped() -> None:
     for id_ in ("home-notebook-sheet", "home-notebook-sheet-title",
                 "home-notebook-sheet-actions", "home-notebook-sheet-cancel"):
         assert f'id="{id_}"' in html, id_
-    manifest = (ROOT / "jenny" / "utils" / "android_assets.py").read_text(encoding="utf-8")
+    manifest = (ROOT / "jafta" / "utils" / "android_assets.py").read_text(encoding="utf-8")
     assert '"assets/home-notebook.js"' in manifest
 
 
@@ -422,7 +422,7 @@ def test_a_refused_rename_changes_nothing_at_home() -> None:
     )
 
 
-def test_a_rename_refused_while_jenny_works_there_is_said_in_the_readers_language() -> None:
+def test_a_rename_refused_while_jafta_works_there_is_said_in_the_readers_language() -> None:
     """Il rifiuto ``conflict`` (un turno, un subagent, una passata del giardiniere
     in corso) e' una condizione attesa: la sua frase sta nell'i18n, non nel testo
     inglese del server. Un altro errore resta quello di sempre, col motivo."""
@@ -507,12 +507,12 @@ const pin = document.querySelector('[data-action="pin"]');
 assert.ok(pin, document.body.innerHTML.slice(0, 400));
 assert.equal(pin.disabled, true, 'con le pagine piene si puo\\u2019 ancora appendere');
 
-// La scheda di una Jenny App e' quella di `shared/apps-actions.js`: e' li' che
+// La scheda di una Jafta App e' quella di `shared/apps-actions.js`: e' li' che
 // il nome diverso spegneva il cancello.
-app.appsSource().jennyApps = [{ slug: 'garden', name: 'Garden' }];
-app.appsActions().showJennyAppSheet('garden');
-const appPin = document.querySelector('#jenny-app-sheet-actions [data-action="pin"]');
-assert.ok(appPin, document.getElementById('jenny-app-sheet-actions')?.innerHTML);
+app.appsSource().jaftaApps = [{ slug: 'garden', name: 'Garden' }];
+app.appsActions().showJaftaAppSheet('garden');
+const appPin = document.querySelector('#jafta-app-sheet-actions [data-action="pin"]');
+assert.ok(appPin, document.getElementById('jafta-app-sheet-actions')?.innerHTML);
 assert.equal(appPin.disabled, true, 'la scheda di una app appende a casa piena');
 """
     )

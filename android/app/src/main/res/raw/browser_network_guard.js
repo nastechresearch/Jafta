@@ -2,14 +2,14 @@
 //
 // Kotlin la registra con WebViewCompat.addDocumentStartJavaScript: gira in ogni
 // frame http/https **prima** degli script della pagina. Esiste perché
-// shouldInterceptRequest (JennyBrowserBridge.sessionClient) vede le richieste
+// shouldInterceptRequest (JaftaBrowserBridge.sessionClient) vede le richieste
 // HTTP ma non le connessioni WebSocket, WebTransport e WebRTC: una pagina
 // visitata dall'agente poteva aprire `ws://192.168.1.1` e parlare coi servizi
 // della rete di casa senza passare da nessun filtro.
 //
 // Cosa fa:
 // - WebSocket, WebSocketStream e WebTransport: prima di aprire chiede al nativo
-//   (`JennyBrowserGuard.blocked`) lo stesso verdetto che vale per l'HTTP — reti
+//   (`JaftaBrowserGuard.blocked`) lo stesso verdetto che vale per l'HTTP — reti
 //   private, loopback, link-local, CGNAT, oppure nome irrisolvibile — e se è
 //   bloccato solleva SecurityError invece di connettersi;
 // - RTCPeerConnection: non si costruisce affatto. L'agente non ha motivo di
@@ -27,8 +27,8 @@
   'use strict';
 
   // Presi adesso, prima che giri la pagina: una pagina che riscrivesse
-  // `JennyBrowserGuard.blocked` dopo non cambia il metodo che si chiama qui.
-  var guard = window.JennyBrowserGuard;
+  // `JaftaBrowserGuard.blocked` dopo non cambia il metodo che si chiama qui.
+  var guard = window.JaftaBrowserGuard;
   var blocked = guard && guard.blocked;
 
   function hostOf(url) {
@@ -57,7 +57,7 @@
 
   function refusal(kind) {
     return new DOMException(
-      'Jenny: ' + kind + ' to a private or local address refused', 'SecurityError');
+      'Jafta: ' + kind + ' to a private or local address refused', 'SecurityError');
   }
 
   // Sostituisce window[name] con un costruttore che controlla l'URL, tenendo
@@ -90,7 +90,7 @@
     var Native = window[name];
     if (typeof Native !== 'function') return;
     var Forbidden = function () {
-      throw new DOMException('Jenny: ' + name + ' is disabled in this browser', 'NotSupportedError');
+      throw new DOMException('Jafta: ' + name + ' is disabled in this browser', 'NotSupportedError');
     };
     Forbidden.prototype = Native.prototype;
     try {

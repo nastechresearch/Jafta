@@ -1,7 +1,7 @@
 """Tests for _is_local_endpoint detection and keepalive configuration."""
 
 
-from jenny.providers.openai_compat_provider import (
+from jafta.providers.openai_compat_provider import (
     OpenAICompatProvider,
     _is_local_endpoint,
 )

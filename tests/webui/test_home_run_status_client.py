@@ -17,7 +17,7 @@ from pathlib import Path
 from support.js_harness import member, requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-APP_JS = ROOT / "jenny" / "templates" / "ui" / "assets" / "home-app.js"
+APP_JS = ROOT / "jafta" / "templates" / "ui" / "assets" / "home-app.js"
 
 pytestmark = requires_node
 

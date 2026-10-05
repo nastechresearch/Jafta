@@ -9,7 +9,7 @@ zero, mai una sequenza ereditata dal task sbagliato).
 
 from __future__ import annotations
 
-from jenny.cron.could_not_check import (
+from jafta.cron.could_not_check import (
     ESCALATE_AFTER_FAILURES,
     ESCALATION_ASK_LIMIT,
     CouldNotCheckMark,
@@ -20,7 +20,7 @@ from jenny.cron.could_not_check import (
     parse_ok_marks,
     parse_warned_marks,
 )
-from jenny.cron.heartbeat_tasks import (
+from jafta.cron.heartbeat_tasks import (
     HeartbeatTask,
     already_warned_block,
     attribute_marks,
@@ -35,7 +35,7 @@ from jenny.cron.heartbeat_tasks import (
     tasks_already_warned,
     tasks_due_for_escalation,
 )
-from jenny.cron.types import CronJobState, CronTaskCheckState
+from jafta.cron.types import CronJobState, CronTaskCheckState
 
 _RAINCHECK = (
     "- Ogni ciclo, controlla la pioggia nelle città e avvisami solo sopra il 70%. "
@@ -608,7 +608,7 @@ class TestOneFaultIsOneWarning:
         quindi al giro dopo gli verrà chiesto di nuovo e l'utente sentirà la
         stessa cosa due volte. È il costo scelto: rumore recuperabile invece di
         un guasto zittito per sempre, ed è anche la direzione che
-        ``jenny/cron/silence_watchdog.py`` presidia dall'altro lato.
+        ``jafta/cron/silence_watchdog.py`` presidia dall'altro lato.
         """
         tasks = parse_heartbeat_tasks(_file(_RAINCHECK))
         state = CronJobState(
@@ -1041,7 +1041,7 @@ class TestTheAskStopsInsteadOfRepeatingForever:
     la scrive mai non fa mai scattare ``already_warned``: senza limite il blocco
     di escalation tornerebbe nel prompt a ogni run per sempre, e con lui un
     messaggio all'utente ogni mezz'ora. Dove la finestra finisce comincia
-    ``jenny/cron/silence_watchdog.py``, che non passa dal modello.
+    ``jafta/cron/silence_watchdog.py``, che non passa dal modello.
     """
 
     def _state_at(self, task_id: str, streak: int) -> CronJobState:
@@ -1062,6 +1062,6 @@ class TestTheAskStopsInsteadOfRepeatingForever:
 
     def test_the_window_hands_over_to_the_watchdog_with_no_gap(self) -> None:
         """Le due finestre sono contigue, e questo test è ciò che le tiene tali."""
-        from jenny.cron.silence_watchdog import WATCHDOG_AFTER_FAILURES
+        from jafta.cron.silence_watchdog import WATCHDOG_AFTER_FAILURES
 
         assert ESCALATE_AFTER_FAILURES - 1 + ESCALATION_ASK_LIMIT == WATCHDOG_AFTER_FAILURES - 1

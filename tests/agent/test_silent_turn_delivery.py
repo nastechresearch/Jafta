@@ -23,14 +23,14 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from support.aio import drain_nowait
 
-from jenny.agent.loop import AgentLoop
-from jenny.agent.turn_types import TurnDisposition
-from jenny.bus.events import InboundMessage, OutboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.providers.base import LLMResponse
-from jenny.session.keys import HEARTBEAT_SESSION_KEY, UNIFIED_SESSION_KEY
-from jenny.session.turn_visibility import silent_turn_metadata
-from jenny.webui.metadata import WEBUI_TURN_METADATA_KEY
+from jafta.agent.loop import AgentLoop
+from jafta.agent.turn_types import TurnDisposition
+from jafta.bus.events import InboundMessage, OutboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.providers.base import LLMResponse
+from jafta.session.keys import HEARTBEAT_SESSION_KEY, UNIFIED_SESSION_KEY
+from jafta.session.turn_visibility import silent_turn_metadata
+from jafta.webui.metadata import WEBUI_TURN_METADATA_KEY
 
 
 def _make_loop(tmp_path: Path) -> AgentLoop:
@@ -196,7 +196,7 @@ class TestSilentTurnsDoNotStream:
 
         async def capture(msg, *, on_stream=None, on_stream_end=None, **_kwargs):
             seen["on_stream"] = on_stream
-            from jenny.agent.turn_types import TurnOutcome
+            from jafta.agent.turn_types import TurnOutcome
 
             return TurnOutcome.silent()
 
@@ -230,7 +230,7 @@ class TestTheOnlyWayOutIsTheMessageTool:
     ) -> None:
         """Il segnale che il cron runner legge per distinguere "ho avvisato" da
         "non c'era niente da dire"."""
-        from jenny.agent.tools.message import MessageTool
+        from jafta.agent.tools.message import MessageTool
 
         loop = _make_loop(tmp_path)
         tool = loop.tools.get("message")
@@ -280,9 +280,9 @@ class TestTheOnlyWayOutIsTheMessageTool:
         interno e consegna alla WebUI). Nel secondo il tool non eredita i
         metadata del turno d'origine, e la visibilità deve arrivare comunque.
         """
-        from jenny.agent.tools.context import RequestContext
-        from jenny.agent.tools.message import MessageTool
-        from jenny.runtime.delivery import ChannelDeliverer
+        from jafta.agent.tools.context import RequestContext
+        from jafta.agent.tools.message import MessageTool
+        from jafta.runtime.delivery import ChannelDeliverer
 
         bus = MessageBus()
         deliverer = ChannelDeliverer(bus=bus, session_manager=MagicMock())
@@ -322,7 +322,7 @@ class TestTheAnnouncePromptFollowsTheVisibility:
     """
 
     def _rendered(self, *, silent: bool) -> str:
-        from jenny.utils.prompt_templates import render_template
+        from jafta.utils.prompt_templates import render_template
 
         return render_template(
             "agent/subagent_announce.md",

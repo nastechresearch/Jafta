@@ -9,7 +9,7 @@ tolgono l'elemento né dalla tab order né dall'albero di accessibilità:
   nascosto con ``opacity: 0`` + ``pointer-events: none``: una tappa Tab cieca
   (l'anello di fuoco è invisibile) e un "Chiudi minichat, pulsante" letto da
   TalkBack su OGNI schermata. Che il problema fosse noto lo dimostra il
-  ``tabindex="-1"`` messo sul ``.jenny-duo`` accanto, che è lo stesso tipo di
+  ``tabindex="-1"`` messo sul ``.jafta-duo`` accanto, che è lo stesso tipo di
   elemento;
 * i ``.drawer`` sono fuori schermo per solo ``transform``, e il loro markup è
   statico in tutte le sezioni (sono apribili solo nella wiki): da chiusi
@@ -32,7 +32,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 CSS = ASSETS / "mobile-style.css"
 
 
@@ -70,20 +70,20 @@ def test_the_minichat_scrim_is_not_a_blind_tab_stop() -> None:
     la focalizzabilità: il ``<button>`` restava una tappa Tab su ogni schermata,
     con l'anello di fuoco invisibile, e un nodo letto ad alta voce.
     """
-    base = _css_rule(".jenny-scrim")
+    base = _css_rule(".jafta-scrim")
     assert "visibility: hidden" in base, "lo scrim chiuso resta focalizzabile e leggibile"
-    opened = _css_rule(".jenny-scrim.open")
+    opened = _css_rule(".jafta-scrim.open")
     assert "visibility: visible" in opened, "aperto lo scrim deve tornare visibile e cliccabile"
 
 
 def test_hiding_the_scrim_does_not_eat_its_fade_out() -> None:
     """La ``visibility`` non si interpola: senza ritardo, alla chiusura lo scrim
     scomparirebbe di colpo invece di dissolversi."""
-    base = _css_rule(".jenny-scrim")
+    base = _css_rule(".jafta-scrim")
     assert re.search(r"visibility 0s linear 0\.25s", base), (
         "la visibility deve cambiare solo a dissolvenza finita"
     )
-    assert re.search(r"visibility 0s linear 0s", _css_rule(".jenny-scrim.open")), (
+    assert re.search(r"visibility 0s linear 0s", _css_rule(".jafta-scrim.open")), (
         "in apertura invece deve essere immediata, o non si vedrebbe nemmeno l'entrata"
     )
 

@@ -4,13 +4,13 @@ import asyncio
 
 import pytest
 
-from jenny.agent.loop import AgentLoop
-from jenny.agent.tools.context import RequestContext
-from jenny.agent.tools.cron import CronTool
-from jenny.agent.tools.message import MessageTool
-from jenny.agent.tools.spawn import SpawnTool
-from jenny.cron.service import CronService
-from jenny.session.keys import UNIFIED_SESSION_KEY
+from jafta.agent.loop import AgentLoop
+from jafta.agent.tools.context import RequestContext
+from jafta.agent.tools.cron import CronTool
+from jafta.agent.tools.message import MessageTool
+from jafta.agent.tools.spawn import SpawnTool
+from jafta.cron.service import CronService
+from jafta.session.keys import UNIFIED_SESSION_KEY
 
 
 async def _race(tool, first: RequestContext, second: RequestContext, run_first, run_second):

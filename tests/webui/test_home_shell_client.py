@@ -4,7 +4,7 @@
 chiama `window.mobileApp.onPackageChanged(kind, pkg)` a ogni broadcast di
 sistema. In casa il metodo era vuoto (il cassetto era «una tavola del giro
 dopo»), e quando il cassetto e' diventato la pagina App nessuno l'ha collegato:
-con Jenny come launcher, un'app appena presa dal Play Store non si trovava fino
+con Jafta come launcher, un'app appena presa dal Play Store non si trovava fino
 al riavvio.
 
 **La mappa nasce una volta sola**, anche se la sua linguetta si tocca due volte
@@ -20,7 +20,7 @@ from pathlib import Path
 from support.js_harness import member, requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-APP_JS = ROOT / "jenny" / "templates" / "ui" / "assets" / "home-app.js"
+APP_JS = ROOT / "jafta" / "templates" / "ui" / "assets" / "home-app.js"
 
 pytestmark = requires_node
 
@@ -38,7 +38,7 @@ def _run_packages(script: str) -> None:
 
 def test_an_installed_app_reaches_the_apps_page() -> None:
     """Il metodo era vuoto: un'app presa dal Play Store non compariva nella
-    pagina App fino al riavvio — con Jenny come launcher, un'app che non si
+    pagina App fino al riavvio — con Jafta come launcher, un'app che non si
     trova."""
     _run_packages("""
       const app = new App();

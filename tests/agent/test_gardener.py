@@ -24,26 +24,26 @@ from types import SimpleNamespace
 
 import pytest
 
-from jenny.agent.gardener import (
+from jafta.agent.gardener import (
     MAP_TARGET_CHARS,
     GardenerStore,
     page_ceiling,
     run_gardener,
 )
-from jenny.agent.gardener_state import (
+from jafta.agent.gardener_state import (
     MAX_DELTA_LINES,
     GardenerState,
     read_journal_delta,
     read_state,
 )
-from jenny.agent.tools.file_state import FileStates
-from jenny.security.workspace_access import (
+from jafta.agent.tools.file_state import FileStates
+from jafta.security.workspace_access import (
     bind_workspace_scope,
     default_workspace_scope,
     reset_workspace_scope,
 )
 
-pytestmark = pytest.mark.usefixtures("_configure_jenny_workspace")
+pytestmark = pytest.mark.usefixtures("_configure_jafta_workspace")
 
 _DAY = date(2026, 8, 23)
 
@@ -407,10 +407,10 @@ class TestTheToolbox:
         assert "# viaggio" not in theirs
 
     @pytest.mark.parametrize("tool,call", [
-        ("read_file", {"path": ".jenny/media/segreto.md"}),
-        ("list_dir", {"path": ".jenny/media"}),
-        ("grep", {"pattern": "personale", "path": ".jenny/media"}),
-        ("find_files", {"pattern": "*.md", "path": ".jenny/media"}),
+        ("read_file", {"path": ".jafta/media/segreto.md"}),
+        ("list_dir", {"path": ".jafta/media"}),
+        ("grep", {"pattern": "personale", "path": ".jafta/media"}),
+        ("find_files", {"pattern": "*.md", "path": ".jafta/media"}),
     ])
     async def test_the_shared_media_dir_is_not_inside_the_project(
         self, tmp_path, tool, call
@@ -418,7 +418,7 @@ class TestTheToolbox:
         """La cartella dei media **non** è dentro il progetto, e fino al
         24/08/2026 la cassetta la leggeva.
 
-        ``_FsTool._resolve_read`` metteva ``<workspace>/.jenny/media`` fra le
+        ``_FsTool._resolve_read`` metteva ``<workspace>/.jafta/media`` fra le
         radici ammesse per ogni tool di lettura, e quella cartella la condividono
         *tutte* le conversazioni. Non è una via d'uscita — la scrittura resta
         rifiutata — ma è il verso rovesciato di T7.8: un artefatto personale di
@@ -435,7 +435,7 @@ class TestTheToolbox:
         """
         import shutil
 
-        from jenny.config.paths import get_media_dir, get_workspace_path
+        from jafta.config.paths import get_media_dir, get_workspace_path
 
         workspace = get_workspace_path()
         root = workspace / "wikis" / "media-probe"
@@ -715,7 +715,7 @@ class TestThePagesThatAreTooLong:
         allunga una riga e ne aggiunge una sola in fondo, quindi non può spingere
         una pagina fuori dall'elenco. Se lo facesse, il rimedio a «non so quali
         pagine sono lunghe» sarebbe «non so quali pagine esistono»."""
-        from jenny.agent.gardener import _MAX_INVENTORY_ENTRIES
+        from jafta.agent.gardener import _MAX_INVENTORY_ENTRIES
 
         root = _project(tmp_path)
         ceiling = page_ceiling()
@@ -741,7 +741,7 @@ class TestThePagesThatAreTooLong:
         sposta l'annotazione, che è la sola prova che non è una quarta copia in
         attesa di divergere. Con una copia, questo test resterebbe verde mentre la
         passata segnala a una soglia che il turno non usa."""
-        from jenny.agent import context
+        from jafta.agent import context
 
         root = _project(tmp_path)
         _page_of(root, "media.md", 3000)
@@ -762,11 +762,11 @@ class TestThePagesThatAreTooLong:
         un test suo; questo chiude il triangolo, perché un lint che avvisa a una
         soglia e una passata che spezza a un'altra è lavoro fatto e pagina ancora
         invisibile."""
-        from jenny.agent.context import _PROJECT_PAGES_MAX_CHARS
+        from jafta.agent.context import _PROJECT_PAGES_MAX_CHARS
 
         source = (
             Path(__file__).resolve().parents[2]
-            / "jenny" / "skills" / "llm-wiki" / "scripts" / "lint_wiki.py"
+            / "jafta" / "skills" / "llm-wiki" / "scripts" / "lint_wiki.py"
         ).read_text(encoding="utf-8")
 
         assert page_ceiling() == _PROJECT_PAGES_MAX_CHARS
@@ -908,7 +908,7 @@ class TestPruningTheMap:
         confronto, come già fa il lint della wiki. Se divergono, la passata pota
         verso una soglia che il turno non usa: lavoro fatto e mappa ancora
         tagliata."""
-        from jenny.agent.context import _PROJECT_MAP_MAX_CHARS
+        from jafta.agent.context import _PROJECT_MAP_MAX_CHARS
 
         assert MAP_TARGET_CHARS == _PROJECT_MAP_MAX_CHARS
 
@@ -1134,7 +1134,7 @@ class TestTheRun:
         def _full_disk(*_args, **_kwargs):
             raise OSError("no space left on device")
 
-        monkeypatch.setattr("jenny.agent.gardener.write_state", _full_disk)
+        monkeypatch.setattr("jafta.agent.gardener.write_state", _full_disk)
         errors: list[str] = []
         handler_id = loguru_logger.add(errors.append, level="ERROR", format="{message}")
         try:
@@ -1217,7 +1217,7 @@ class TestTheRun:
         assert agent.calls[0]["ephemeral"] is True
 
     async def test_the_state_file_is_not_a_wiki_page(self, tmp_path):
-        """Il cursore sta sotto ``.jenny/``: fuori dalle viste, fuori dal grafo,
+        """Il cursore sta sotto ``.jafta/``: fuori dalle viste, fuori dal grafo,
         fuori dal prompt — e senza che nessuno dei tre lo impari."""
         root = _project(tmp_path)
 
@@ -1225,7 +1225,7 @@ class TestTheRun:
             _store(tmp_path), _states(attempted=1, ok=1)
         ))
 
-        assert (root / ".jenny" / "gardener.json").is_file()
+        assert (root / ".jafta" / "gardener.json").is_file()
         assert not list((root / "wiki").glob(".*"))
 
 
@@ -1300,7 +1300,7 @@ def _no_passes_left_in_flight():
     fa cadere *quel* test, fa cadere il prossimo che tocca lo stesso nome — cioè
     il modo peggiore di rompersi.
     """
-    from jenny.agent.gardener import _PASSES_IN_FLIGHT
+    from jafta.agent.gardener import _PASSES_IN_FLIGHT
 
     _PASSES_IN_FLIGHT.clear()
     yield
@@ -1411,7 +1411,7 @@ class TestOnePassAtATime:
         stessa: una voce che resta non fa cadere questa passata, rende quel
         progetto non giardinabile **fino al riavvio del processo**.
         """
-        from jenny.agent.gardener import _PASSES_IN_FLIGHT
+        from jafta.agent.gardener import _PASSES_IN_FLIGHT
 
         _project(tmp_path)
         agent = (
@@ -1435,7 +1435,7 @@ class TestOnePassAtATime:
         sintomo non è un'eccezione — è un giardiniere che da lì in poi risponde
         «già in volo» a ogni richiesta su quel progetto.
         """
-        from jenny.agent.gardener import _PASSES_IN_FLIGHT
+        from jafta.agent.gardener import _PASSES_IN_FLIGHT
 
         _project(tmp_path)
         broken = _store(tmp_path)
@@ -1631,7 +1631,7 @@ class TestTheFlag:
         ("FLAG:", None),
     ])
     def test_the_marker_is_read_and_prose_is_not(self, reply, expected):
-        from jenny.agent.gardener import extract_flag
+        from jafta.agent.gardener import extract_flag
 
         assert extract_flag(SimpleNamespace(content=reply)) == expected
 
@@ -1654,7 +1654,7 @@ class TestTheFlag:
         proposito «niente da segnalare», quindi il report di una contraddizione
         non arrivava a nessuno e nessun log diceva che era esistito.
         """
-        from jenny.agent.gardener import extract_flag
+        from jafta.agent.gardener import extract_flag
 
         assert extract_flag(SimpleNamespace(content=reply)) == "due pagine litigano"
 
@@ -1663,7 +1663,7 @@ class TestTheFlag:
         FLAG**`` non riconosciuto lascia la scansione dal fondo a proseguire
         verso l'alto, dove può incontrare la riga in cui il modello *cita* il
         contratto — cioè inventare una segnalazione che non c'è."""
-        from jenny.agent.gardener import extract_flag
+        from jafta.agent.gardener import extract_flag
 
         cited = "FLAG: is for what I cannot settle.\nQui le pagine concordano.\n**NOTHING TO FLAG**"
 
@@ -1673,7 +1673,7 @@ class TestTheFlag:
         """Gli asterischi attaccati ai due punti sono la chiusura del grassetto
         del marcatore; quelli dopo uno spazio sono del messaggio, e mangiarli
         vorrebbe dire riscrivere quel che una persona deve leggere."""
-        from jenny.agent.gardener import extract_flag
+        from jafta.agent.gardener import extract_flag
 
         flag = extract_flag(SimpleNamespace(content="FLAG: **treno.md** e tappe.md"))
 
@@ -1690,7 +1690,7 @@ class TestTheFlag:
         in mezzo alla riga le due direzioni danno lo stesso risultato e il test
         non prova niente — era la prima stesura.
         """
-        from jenny.agent.gardener import extract_flag
+        from jafta.agent.gardener import extract_flag
 
         quoting_then_clearing = (
             "FLAG: is for things I cannot settle on my own.\n"
@@ -1710,14 +1710,14 @@ class TestTheFlag:
     def test_a_long_flag_is_cut_not_dropped(self):
         """Il log è «una riga per operazione»: un paragrafo lo rende illeggibile,
         ed è l'unico registro che c'è. Ma tagliare è meglio che perdere."""
-        from jenny.agent.gardener import extract_flag
+        from jafta.agent.gardener import extract_flag
 
         flag = extract_flag(SimpleNamespace(content="FLAG: " + "x" * 500))
 
         assert flag is not None and len(flag) == 300
 
     def test_a_reply_with_no_content_is_not_an_error(self):
-        from jenny.agent.gardener import extract_flag
+        from jafta.agent.gardener import extract_flag
 
         assert extract_flag(None) is None
         assert extract_flag(SimpleNamespace(metadata={})) is None
@@ -1787,7 +1787,7 @@ class TestTheClosingContract:
 
 
 def _transcript_path(name: str) -> Path:
-    from jenny.config.paths import get_webui_dir
+    from jafta.config.paths import get_webui_dir
 
     return get_webui_dir() / f"websocket_project_{name}.jsonl"
 
@@ -1856,7 +1856,7 @@ class TestReadingWhatWasSaid:
     """
 
     def test_it_reads_only_the_user_turns(self, tmp_path):
-        from jenny.agent.gardener import read_recent_user_messages
+        from jafta.agent.gardener import read_recent_user_messages
 
         _transcript(tmp_path, "orto", "primo messaggio", "secondo messaggio")
 
@@ -1866,14 +1866,14 @@ class TestReadingWhatWasSaid:
         assert truncated is False
 
     def test_a_project_that_never_talked_gives_nothing(self, tmp_path):
-        from jenny.agent.gardener import read_recent_user_messages
+        from jafta.agent.gardener import read_recent_user_messages
 
         assert read_recent_user_messages("mai-parlato") == ([], False)
 
     def test_it_keeps_the_tail_and_says_it_cut(self, tmp_path):
         """Taglia **dalla testa**: i messaggi più recenti sono quelli che la
         cattura può aver mancato adesso."""
-        from jenny.agent.gardener import read_recent_user_messages
+        from jafta.agent.gardener import read_recent_user_messages
 
         _transcript(tmp_path, "orto", *[f"messaggio {i}" for i in range(10)])
 
@@ -1883,7 +1883,7 @@ class TestReadingWhatWasSaid:
         assert truncated is True
 
     def test_the_char_ceiling_also_cuts_from_the_head(self, tmp_path):
-        from jenny.agent.gardener import read_recent_user_messages
+        from jafta.agent.gardener import read_recent_user_messages
 
         _transcript(tmp_path, "orto", "x" * 100, "y" * 100, "z" * 100)
 
@@ -1901,7 +1901,7 @@ class TestReadingWhatWasSaid:
         conversazione stava in un altro file: la rete del controllo incrociato
         era lossy *e* muta.
         """
-        from jenny.agent.gardener import read_recent_user_messages
+        from jafta.agent.gardener import read_recent_user_messages
 
         _transcript(tmp_path, "orto", "primo", "secondo", "terzo")
         segments = _transcript_path("orto").with_suffix(".segments")
@@ -1927,7 +1927,7 @@ class TestReadingWhatWasSaid:
         tutte le righe che nominano l'utente; dal fondo sono quelle della coda più
         una.
         """
-        import jenny.agent.gardener as gmod
+        import jafta.agent.gardener as gmod
 
         _transcript(tmp_path, "orto", *[f"messaggio {i}" for i in range(200)])
         parsed = []
@@ -1945,8 +1945,8 @@ class TestReadingWhatWasSaid:
         assert len(parsed) < 30, len(parsed)
 
     def test_a_broken_line_does_not_stop_the_rest(self, tmp_path):
-        from jenny.agent.gardener import read_recent_user_messages
-        from jenny.config.paths import get_webui_dir
+        from jafta.agent.gardener import read_recent_user_messages
+        from jafta.config.paths import get_webui_dir
 
         path = _transcript(tmp_path, "orto", "buono")
         with path.open("a", encoding="utf-8") as fh:
@@ -2130,7 +2130,7 @@ class TestTheRecordedSideOfTheCrossCheck:
     """
 
     def test_the_whole_block_has_a_ceiling_and_it_drops_the_older_days(self, tmp_path):
-        from jenny.agent.gardener import _MAX_JOURNAL_BLOCK_CHARS
+        from jafta.agent.gardener import _MAX_JOURNAL_BLOCK_CHARS
 
         root = _project(tmp_path, "orto")
         for day in range(1, 11):
@@ -2181,7 +2181,7 @@ class TestTheRecordedSideOfTheCrossCheck:
         conversazione, quindi a parità di budget copre già più giorni: il doppio è
         il margine.
         """
-        from jenny.agent.gardener import (
+        from jafta.agent.gardener import (
             _MAX_JOURNAL_BLOCK_CHARS,
             _MAX_JOURNAL_CHARS,
             _MAX_TRANSCRIPT_CHARS,
@@ -2224,7 +2224,7 @@ class TestTheRecordedSideOfTheCrossCheck:
         diario stesso») vale solo se il diario che si vede copre la coda che si
         vede.
         """
-        from jenny.agent.gardener import RECOVERED_MARKER
+        from jafta.agent.gardener import RECOVERED_MARKER
 
         root = _project(tmp_path, "orto")
         with (root / "raw" / "journal" / "20260822.md").open("a", encoding="utf-8") as fh:
@@ -2246,7 +2246,7 @@ class TestRecovering:
         """Il marcatore sta nel **codice** e non nel prompt, perché è l'unico modo
         che ha di non essere dimenticato: una riga di diario senza origine è
         indistinguibile da una detta a voce quel giorno."""
-        from jenny.agent.gardener import RECOVERED_MARKER
+        from jafta.agent.gardener import RECOVERED_MARKER
 
         root = _project(tmp_path, "orto")
         token = bind_workspace_scope(default_workspace_scope(tmp_path, True))
@@ -2377,7 +2377,7 @@ class TestTheMapAloneIsAReasonToRun:
         appartiene."""
         root = _project(tmp_path, journal=False)
         _oversized_map(root)
-        from jenny.agent import gardener as gmod
+        from jafta.agent import gardener as gmod
 
         monkeypatch.setattr(
             gmod, "read_recent_user_messages", lambda *_a, **_k: (["ho detto una cosa"], False)
@@ -2411,7 +2411,7 @@ class TestTheMapAloneIsAReasonToRun:
         freno fosse il solo timbro del tentativo, questa passata tornerebbe ogni
         sei ore, con lo stesso prompt e lo stesso esito, per sempre.
         """
-        from jenny.agent.gardener_schedule import pick_project
+        from jafta.agent.gardener_schedule import pick_project
 
         root = _project(tmp_path, journal=False)
         chars = _oversized_map(root)
@@ -2431,7 +2431,7 @@ class TestTheMapAloneIsAReasonToRun:
     async def test_a_map_that_grew_past_it_comes_back(self, tmp_path):
         """L'altro verso, senza il quale il freno è un blocco definitivo: una mappa
         che *ricresce* è lavoro nuovo, non lo stesso lavoro rifatto."""
-        from jenny.agent.gardener_schedule import pick_project
+        from jafta.agent.gardener_schedule import pick_project
 
         root = _project(tmp_path, journal=False)
         _oversized_map(root)
@@ -2519,7 +2519,7 @@ class TestTheDeltaIsReadOnce:
         zero letture, cioè misurando niente. Per questo si asserisce **esattamente
         una** apertura per file e non «al massimo una».
         """
-        from jenny.agent.gardener_schedule import pick_project
+        from jafta.agent.gardener_schedule import pick_project
 
         _project(tmp_path)
         store_states = _states(attempted=1, ok=1)
@@ -2578,7 +2578,7 @@ class TestTheDeltaIsReadOnce:
         """Il conto della guardia di T2.3, riletto da qui: una passata rifiutata
         perché un'altra è in volo non deve pagare l'apertura dei diari. Vale anche
         per ``/gardener``, che è chi la lettura la farebbe."""
-        from jenny.agent.gardener import _PASSES_IN_FLIGHT
+        from jafta.agent.gardener import _PASSES_IN_FLIGHT
 
         _project(tmp_path)
         store = _with_states(_store(tmp_path), _states(attempted=1, ok=1))
@@ -2611,8 +2611,8 @@ class _RegistryAgent(_FakeAgent):
 
     def __init__(self, sessions_dir: Path) -> None:
         super().__init__(sessions_dir)
-        from jenny.agent.session_locks import SessionLocks
-        from jenny.agent.tools.file_state import FileStateStore
+        from jafta.agent.session_locks import SessionLocks
+        from jafta.agent.tools.file_state import FileStateStore
 
         self._session_locks = SessionLocks()
         self._file_state_store = FileStateStore()
@@ -2638,8 +2638,8 @@ class _RegistryAgent(_FakeAgent):
 
 def _borrow_eviction(cls) -> None:
     """Mette sul fake i due metodi di sgombero **veri** di ``AgentLoop``."""
-    from jenny.agent.loop import AgentLoop
-    from jenny.agent.loop_tasks import LoopTasksMixin
+    from jafta.agent.loop import AgentLoop
+    from jafta.agent.loop_tasks import LoopTasksMixin
 
     cls.evict_pruned_sessions = LoopTasksMixin.evict_pruned_sessions
     cls.forget_file_reads = AgentLoop.forget_file_reads
@@ -2703,7 +2703,7 @@ class TestTheKeySpaceStopsGrowing:
             def now(cls, tz=None):  # noqa: ARG003 — la firma è quella di datetime
                 return real_now + timedelta(minutes=next(ticks))
 
-        monkeypatch.setattr("jenny.agent.gardener.datetime", _Clock)
+        monkeypatch.setattr("jafta.agent.gardener.datetime", _Clock)
         agent = _RegistryAgent(tmp_path)
         forgotten: list[str] = []
         real = agent.forget_file_reads
@@ -2743,8 +2743,8 @@ def test_the_borrowed_eviction_is_the_real_one() -> None:
     smettesse di sgomberare ``FileStateStore``, i test qui sopra passerebbero
     comunque — starebbero misurando un fake. Questo legge il metodo vero.
     """
-    from jenny.agent.loop import AgentLoop
-    from jenny.agent.tools.file_state import FileStateStore
+    from jafta.agent.loop import AgentLoop
+    from jafta.agent.tools.file_state import FileStateStore
 
     holder = SimpleNamespace(_file_state_store=FileStateStore())
     holder._file_state_store.for_session("gardener:x-1")
@@ -2801,7 +2801,7 @@ class TestTheProductionCaps:
 
     def test_the_inventory_cap_binds_with_a_corpus_that_does_not_scale(self, tmp_path):
         """500 pagine, un numero scritto qui e non derivato dal tetto."""
-        from jenny.agent.gardener import _MAX_INVENTORY_ENTRIES
+        from jafta.agent.gardener import _MAX_INVENTORY_ENTRIES
 
         root = _project(tmp_path)
         for i in range(500):
@@ -2852,7 +2852,7 @@ def _two_zones() -> tuple[str, str]:
     """
     from datetime import timezone as _tz
 
-    from jenny.utils.helpers import safe_zoneinfo
+    from jafta.utils.helpers import safe_zoneinfo
 
     east, west = "Pacific/Kiritimati", "Pacific/Niue"
     now = datetime.now(_tz.utc)

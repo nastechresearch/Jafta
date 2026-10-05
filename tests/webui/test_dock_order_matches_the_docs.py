@@ -18,7 +18,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-WORKSHOP_HTML = ROOT / "jenny" / "templates" / "ui" / "workshop.html"
+WORKSHOP_HTML = ROOT / "jafta" / "templates" / "ui" / "workshop.html"
 TOUR_DOC = ROOT / "docs" / "using" / "webui-tour.md"
 
 # Slot del dock che la tabella non elenca. Era ``onboarding``, la voce nascosta

@@ -13,9 +13,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from jenny.webui import commands
-from jenny.webui import project_delete as module
-from jenny.webui.commands import CommandError
+from jafta.webui import commands
+from jafta.webui import project_delete as module
+from jafta.webui.commands import CommandError
 
 
 async def test_the_command_refuses_while_someone_writes_there(
@@ -38,7 +38,7 @@ async def test_the_command_refuses_while_someone_writes_there(
 async def test_another_notebook_busy_does_not_stop_the_delete(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from jenny.webui import home_pages
+    from jafta.webui import home_pages
 
     async def _no_page(kind, ref):
         return 0
@@ -59,7 +59,7 @@ async def test_a_page_that_cannot_be_taken_does_not_undo_the_notebook_delete(
 ) -> None:
     """Lo stesso involucro tollerante della cancellazione di un'app
     (``home_pages.detach_pages_quietly``): il quaderno e' gia' cancellato."""
-    from jenny.webui import home_pages
+    from jafta.webui import home_pages
 
     async def _broken(kind, ref):
         raise RuntimeError("disco pieno")
@@ -107,7 +107,7 @@ def test_the_commands_do_not_import_http_routes() -> None:
     da ``home_pages``, il modulo neutro, non da ``home_routes``."""
     import inspect
 
-    from jenny.webui import apps_routes
+    from jafta.webui import apps_routes
 
     assert "home_routes" not in inspect.getsource(commands)
     assert not hasattr(apps_routes, "_stacca_la_pagina")

@@ -26,12 +26,12 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.tools.filesystem import ReadFileTool, WriteFileTool
-from jenny.config.paths import get_media_dir, set_workspace_dir
-from jenny.config.schema import AgentDefaults, ToolsConfig
-from jenny.runtime.context import get_runtime_context
-from jenny.security.workspace_access import build_workspace_scope
-from jenny.utils.helpers import sync_workspace_templates
+from jafta.agent.tools.filesystem import ReadFileTool, WriteFileTool
+from jafta.config.paths import get_media_dir, set_workspace_dir
+from jafta.config.schema import AgentDefaults, ToolsConfig
+from jafta.runtime.context import get_runtime_context
+from jafta.security.workspace_access import build_workspace_scope
+from jafta.utils.helpers import sync_workspace_templates
 
 _MAX_TOOL_RESULT_CHARS = AgentDefaults().max_tool_result_chars
 
@@ -74,8 +74,8 @@ async def _tools_inside(project: Path, *, writable: bool = True) -> dict[str, An
     dentro ``enter_workspace_scope``, quindi le letture e le scritture si fanno
     qui, dal fake ``runner.run``.
     """
-    from jenny.agent.subagent import SubagentManager, SubagentSpec, SubagentStatus
-    from jenny.bus.queue import MessageBus
+    from jafta.agent.subagent import SubagentManager, SubagentSpec, SubagentStatus
+    from jafta.bus.queue import MessageBus
 
     provider = MagicMock()
     provider.get_default_model.return_value = "test-model"
@@ -159,7 +159,7 @@ async def test_the_media_dir_is_inside_what_the_widening_already_opens(install: 
     """``_resolve_read(include_media_dir=True)``: la domanda posta dal passo T4.5.
 
     Risposta misurata: la cartella dei media **e' dentro l'installazione**
-    (``<workspace>/.jenny/media``, v. ``get_data_dir``), quindi per un tool
+    (``<workspace>/.jafta/media``, v. ``get_data_dir``), quindi per un tool
     costruito da ``create()`` quel flag e' ora ridondante — non e' una seconda
     radice, e' un pezzo della prima. Resta necessario per chi ha una restrizione
     esplicita del costruttore piu' stretta (i tool di lettura del
@@ -211,7 +211,7 @@ def test_the_write_boundary_cannot_see_the_read_only_extra_dirs() -> None:
     import ast
     import inspect
 
-    from jenny.agent.tools import filesystem as fs_mod
+    from jafta.agent.tools import filesystem as fs_mod
 
     tree = ast.parse(inspect.getsource(fs_mod))
     writers = {"_resolve_write", "_commit_write"}
@@ -247,8 +247,8 @@ async def test_readonly_subagent_still_cannot_write_anywhere(install: Any) -> No
 
 async def test_main_agent_tools_are_unchanged(install: Any) -> None:
     """Il ctx dell'agente principale ha ``workspace`` = radice: nessun extra nuovo."""
-    from jenny.agent.tools.context import ToolContext
-    from jenny.agent.tools.file_state import FileStates
+    from jafta.agent.tools.context import ToolContext
+    from jafta.agent.tools.file_state import FileStates
 
     ctx = ToolContext(
         config=ToolsConfig(restrict_to_workspace=True),

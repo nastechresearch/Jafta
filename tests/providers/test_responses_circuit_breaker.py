@@ -4,7 +4,7 @@ import time
 
 import pytest
 
-from jenny.providers.openai_compat_provider import (
+from jafta.providers.openai_compat_provider import (
     _RESPONSES_FAILURE_THRESHOLD,
     _RESPONSES_PROBE_INTERVAL_S,
     OpenAICompatProvider,

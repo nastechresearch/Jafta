@@ -18,7 +18,7 @@ from pathlib import Path
 from support.js_harness import requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 WIRE_ERROR_JS = ASSETS / "shared" / "wire-error.js"
 I18N = ASSETS / "i18n"
 
@@ -153,7 +153,7 @@ def test_the_server_codes_are_all_covered() -> None:
     Un `reason` nuovo aggiunto nel gateway senza una parola qui cadrebbe sul
     ripiego generico — che è accettabile a runtime e non lo è a mente fredda.
     """
-    ws = (ROOT / "jenny" / "channels" / "websocket.py").read_text(encoding="utf-8")
+    ws = (ROOT / "jafta" / "channels" / "websocket.py").read_text(encoding="utf-8")
     server_codes = set(re.findall(r'reason="([a-z_]+)"', ws))
     server_codes |= set(re.findall(r'_REASON = "([a-z_]+)"', ws))
     server_codes |= set(re.findall(r'return \[\], "([a-z_]+)"', ws))

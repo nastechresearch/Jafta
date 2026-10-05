@@ -1,4 +1,4 @@
-"""Il proxy su loopback per la vista esterna di una Jenny App.
+"""Il proxy su loopback per la vista esterna di una Jafta App.
 
 Esiste perche' la policy di rete dell'APK rifiuta un iframe verso un ``http://``
 non-loopback (``ERR_CLEARTEXT_NOT_PERMITTED``), e perche' il gateway non puo'
@@ -21,8 +21,8 @@ import asyncio
 import pytest
 from support.aio import wait_until
 
-from jenny.apps import proxy as proxy_mod
-from jenny.apps.proxy import COOKIE_NAME, AppViewProxy, AppViewProxyError
+from jafta.apps import proxy as proxy_mod
+from jafta.apps.proxy import COOKIE_NAME, AppViewProxy, AppViewProxyError
 
 # ── il cancello ──────────────────────────────────────────────────────────
 

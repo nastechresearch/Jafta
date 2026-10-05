@@ -27,7 +27,7 @@ from pathlib import Path
 
 from loguru import logger
 
-from jenny.agent.gardener_state import (
+from jafta.agent.gardener_state import (
     GardenerState,
     gardener_state_file,
     read_journal_delta,
@@ -447,7 +447,7 @@ def test_a_journal_line_is_what_wc_l_counts(tmp_path) -> None:
     conta una riga in più (l'elemento vuoto dopo l'ultimo ``\\n``), cioè rompe la
     stessa proprietà in tutti i casi invece che in uno raro.
     """
-    from jenny.agent.gardener_state import journal_lines
+    from jafta.agent.gardener_state import journal_lines
 
     assert journal_lines("uno\ndue\ntre\n") == ["uno", "due", "tre"]
     assert journal_lines("uno\ndue\ntre") == ["uno", "due", "tre"]
@@ -566,13 +566,13 @@ def test_the_state_round_trips(tmp_path) -> None:
 
 
 def test_the_state_lives_in_the_hidden_folder(tmp_path) -> None:
-    """Sotto ``.jenny/``, cioè fuori dalle viste e
+    """Sotto ``.jafta/``, cioè fuori dalle viste e
     fuori dal prompt — senza che nessuno di quei tre debba imparare niente. Il
     quaderno è materiale umano, il cursore è macchinario."""
     project = _project(tmp_path)
     write_state(project, GardenerState())
 
-    assert gardener_state_file(project) == project / ".jenny" / "gardener.json"
+    assert gardener_state_file(project) == project / ".jafta" / "gardener.json"
     assert gardener_state_file(project).is_file()
     assert not list((project / "wiki").rglob("*"))
 
@@ -743,7 +743,7 @@ def test_a_nonsense_failure_count_is_dropped_not_trusted(tmp_path) -> None:
 def test_recording_an_attempt_counts_the_series_on_disk(tmp_path) -> None:
     """Il contatore vive nel file, non in memoria: fra due tick non c'è nessun
     processo che si ricordi niente."""
-    from jenny.agent.gardener_state import record_attempt
+    from jafta.agent.gardener_state import record_attempt
 
     project = _project(tmp_path)
     _journal(project, "20260822", "una voce")
@@ -807,7 +807,7 @@ def test_a_pass_that_did_not_look_at_the_map_keeps_the_measure(tmp_path) -> None
     _journal(project, "20260822", "una voce")
     write_state(project, GardenerState(map_left_at=9000))
 
-    from jenny.agent.gardener_state import record_attempt
+    from jafta.agent.gardener_state import record_attempt
 
     record_attempt(project)
     assert read_state(project).map_left_at == 9000

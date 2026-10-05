@@ -1,7 +1,7 @@
 """Stati di un job cron che la produzione crea da sé, costruiti per un test.
 
 ``CronService.enable_job`` e ``update_job`` non esistono più (24/09/2026): nessuna
-superficie di Jenny li chiamava — il tool ``cron`` fa add/list/remove, le rotte
+superficie di Jafta li chiamava — il tool ``cron`` fa add/list/remove, le rotte
 WebUI sono in sola lettura per scelta — e i test li usavano soprattutto per
 *preparare* uno stato. Gli stati invece esistono davvero: un job spento è quello
 che resta di un ``at`` già eseguito, e una scadenza passata a processo morto è

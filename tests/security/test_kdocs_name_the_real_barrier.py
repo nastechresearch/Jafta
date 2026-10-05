@@ -8,7 +8,7 @@ cercare.
 - ``NativeCommandListener`` esige ``isMainFrame`` «perché nessuna
   cornice — nemmeno della stessa origine — ha motivo di parlare col nativo».
   Una cornice della stessa origine non ne ha bisogno: raggiunge
-  ``parent.JennyNativePort`` e lo chiama da lì, col frame principale come
+  ``parent.JaftaNativePort`` e lo chiama da lì, col frame principale come
   mittente. La barriera è l'origine; il frame principale è difesa in profondità.
 - ``ReplyReceiver`` «lo raggiunge solo il nostro PendingIntent, che
   porta la nostra identità». Quello della risposta è mutabile: un'app con
@@ -30,7 +30,7 @@ MANIFEST = Path(__file__).resolve().parents[2] / "android/app/src/main/AndroidMa
 def test_the_main_frame_check_is_called_defence_in_depth() -> None:
     comments = read_comments("MainActivity")
     assert "difesa in profondità" in comments
-    assert "parent.JennyNativePort" in comments
+    assert "parent.JaftaNativePort" in comments
     assert "nemmeno una della stessa origine" not in comments, (
         "il KDoc torna a dire che isMainFrame ferma una cornice della stessa origine"
     )

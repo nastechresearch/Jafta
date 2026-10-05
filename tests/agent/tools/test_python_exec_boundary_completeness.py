@@ -38,13 +38,13 @@ from contextlib import contextmanager
 
 import pytest
 
-from jenny.agent.tools.python_exec import (
+from jafta.agent.tools.python_exec import (
     PythonNamespace,
     _discover_runtime_path_prefixes,
     _effective_runtime_prefixes,
     _reset_runtime_path_prefixes,
 )
-from jenny.config.tool_schemas import PythonExecConfig
+from jafta.config.tool_schemas import PythonExecConfig
 
 _REFUSED = "outside allowed directory"
 
@@ -90,7 +90,7 @@ def _runtime_prefix(root):
     class _FakeAssetFinder:
         extract_root = str(root)
 
-    key = f"__jenny_test_asset_finder__{root}"
+    key = f"__jafta_test_asset_finder__{root}"
     sys.path_importer_cache[key] = _FakeAssetFinder()
     _reset_runtime_path_prefixes()
     try:
@@ -181,12 +181,12 @@ def test_cold_import_of_a_runtime_module_is_refused_without_the_exemption(
 ) -> None:
     """Il bug R11, nella sua forma riproducibile su CI."""
     workspace, outside = sandbox
-    _write_native_shaped_module(outside, "jenny_fake_native_a")
-    sys.modules.pop("jenny_fake_native_a", None)
-    ns = _namespace(workspace, extra_modules=["jenny_fake_native_a"])
+    _write_native_shaped_module(outside, "jafta_fake_native_a")
+    sys.modules.pop("jafta_fake_native_a", None)
+    ns = _namespace(workspace, extra_modules=["jafta_fake_native_a"])
     with _importable(outside):
-        _, stderr = _run(ns, "import jenny_fake_native_a")
-    sys.modules.pop("jenny_fake_native_a", None)
+        _, stderr = _run(ns, "import jafta_fake_native_a")
+    sys.modules.pop("jafta_fake_native_a", None)
     assert _REFUSED in stderr
 
 
@@ -199,17 +199,17 @@ def test_cold_import_of_a_runtime_module_works_with_the_exemption(sandbox) -> No
     devono passare il confine sono le stesse.
     """
     workspace, outside = sandbox
-    _write_native_shaped_module(outside, "jenny_fake_native_b")
-    sys.modules.pop("jenny_fake_native_b", None)
-    ns = _namespace(workspace, extra_modules=["jenny_fake_native_b"])
+    _write_native_shaped_module(outside, "jafta_fake_native_b")
+    sys.modules.pop("jafta_fake_native_b", None)
+    ns = _namespace(workspace, extra_modules=["jafta_fake_native_b"])
     # `_importable` per primo: `importlib.invalidate_caches()` ripulisce
     # `sys.path_importer_cache`, cioè proprio dove `_runtime_prefix` registra
     # il finder finto.
     with _importable(outside), _runtime_prefix(outside):
         stdout, stderr = _run(
-            ns, "import jenny_fake_native_b as m; print(m.SIZE, m.HEAD)"
+            ns, "import jafta_fake_native_b as m; print(m.SIZE, m.HEAD)"
         )
-    sys.modules.pop("jenny_fake_native_b", None)
+    sys.modules.pop("jafta_fake_native_b", None)
     assert stderr == ""
     assert "b'\\x7fELF'" in stdout
 
@@ -291,7 +291,7 @@ def test_the_exemption_is_off_outside_a_guarded_exec(sandbox) -> None:
     ns = _namespace(workspace)
     with _runtime_prefix(outside):
         _run(ns, "1 + 1")
-    from jenny.agent.tools.python_exec import _is_runtime_path
+    from jafta.agent.tools.python_exec import _is_runtime_path
 
     assert not _is_runtime_path(str(outside / "secret.txt"))
 

@@ -23,9 +23,9 @@ from typing import Any
 
 import httpx
 
-from jenny.providers.anthropic_provider import AnthropicProvider
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
-from jenny.providers.opencode import (
+from jafta.providers.anthropic_provider import AnthropicProvider
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.opencode import (
     SESSION_HEADER,
     conversation_scope,
     session_headers,
@@ -179,7 +179,7 @@ class TestOpenAICompatTowardOpenCode:
             await provider.chat([{"role": "user", "content": "ciao"}])
         assert len(seen) == 1
         assert seen[0].headers[SESSION_HEADER]
-        assert seen[0].headers["user-agent"].startswith("jenny/")
+        assert seen[0].headers["user-agent"].startswith("jafta/")
 
     async def test_two_turns_of_the_same_conversation_have_the_same_id(self) -> None:
         provider = _openai(GO_BASE)
@@ -242,7 +242,7 @@ class TestOpenAICompatTowardTheOthers:
         with conversation_scope("unified:default"):
             await provider.chat([{"role": "user", "content": "ciao"}])
         assert SESSION_HEADER not in seen[0].headers
-        assert "jenny/" not in seen[0].headers.get("user-agent", "")
+        assert "jafta/" not in seen[0].headers.get("user-agent", "")
 
     async def test_groq_receives_nothing_from_opencode(self) -> None:
         provider = _openai("https://api.groq.com/openai/v1")
@@ -265,8 +265,8 @@ class TestOpenAICompatTowardTheOthers:
             await provider.chat([{"role": "user", "content": "ciao"}])
         headers = seen[0].headers
         assert SESSION_HEADER not in headers
-        assert headers["http-referer"] == "https://github.com/flagdizero/jenny-android-ai-agent"
-        assert headers["x-openrouter-title"] == "Jenny"
+        assert headers["http-referer"] == "https://github.com/nastechresearch/jafta-android-ai-agent"
+        assert headers["x-openrouter-title"] == "Jafta"
         assert headers["x-openrouter-categories"] == "android-agent,personal-agent"
 
     async def test_x_session_affinity_stays_on_all(self) -> None:
@@ -299,7 +299,7 @@ class TestAnthropicTowardOpenCode:
             await provider.chat([{"role": "user", "content": "ciao"}])
         assert seen[0].url.path.endswith("/v1/messages")
         assert seen[0].headers[SESSION_HEADER]
-        assert seen[0].headers["user-agent"].startswith("jenny/")
+        assert seen[0].headers["user-agent"].startswith("jafta/")
 
     async def test_the_streaming_request_carries_the_session(self) -> None:
         events = (
@@ -377,4 +377,4 @@ class TestAnthropicTowardTheOthers:
         with conversation_scope("unified:default"):
             await provider.chat([{"role": "user", "content": "ciao"}])
         assert SESSION_HEADER not in seen[0].headers
-        assert "jenny/" not in seen[0].headers.get("user-agent", "")
+        assert "jafta/" not in seen[0].headers.get("user-agent", "")

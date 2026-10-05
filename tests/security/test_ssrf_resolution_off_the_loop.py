@@ -19,7 +19,7 @@ from types import SimpleNamespace
 import httpx
 import pytest
 
-from jenny.security import network
+from jafta.security import network
 
 _DELAY_S = 0.4
 _MIN_TICKS = 4  # 400 ms a 50 ms fanno ~8 giri
@@ -77,7 +77,7 @@ async def test_the_async_validators(slow_dns) -> None:
 
 
 async def test_the_validated_stream_of_downloads_and_updates(slow_dns) -> None:
-    from jenny.security.fetch import open_validated_stream
+    from jafta.security.fetch import open_validated_stream
 
     transport = httpx.MockTransport(lambda request: httpx.Response(200, content=b"ok"))
 
@@ -92,7 +92,7 @@ async def test_the_validated_stream_of_downloads_and_updates(slow_dns) -> None:
 
 
 async def test_web_fetch(slow_dns, monkeypatch) -> None:
-    from jenny.agent.tools import android_web
+    from jafta.agent.tools import android_web
 
     async def _fetch(ctx, url, timeout=None):
         return "<html><body><h1>ciao</h1></body></html>", "https://box.example/"
@@ -106,8 +106,8 @@ async def test_web_fetch(slow_dns, monkeypatch) -> None:
 
 
 async def test_browser_open(slow_dns, monkeypatch) -> None:
-    from jenny.agent.tools import browser
-    from jenny.agent.tools.browser import BrowserOpenTool
+    from jafta.agent.tools import browser
+    from jafta.agent.tools.browser import BrowserOpenTool
     from tests.agent.tools.test_browser import _install, _tool
 
     browser.reset_browser_state()
@@ -121,8 +121,8 @@ async def test_browser_open(slow_dns, monkeypatch) -> None:
 
 
 async def test_an_app_http_action(slow_dns, monkeypatch) -> None:
-    import jenny.apps.http as apps_http
-    from jenny.apps.manifest import AppAction, AppManifest
+    import jafta.apps.http as apps_http
+    from jafta.apps.manifest import AppAction, AppManifest
 
     real_client = httpx.AsyncClient
     transport = httpx.MockTransport(lambda request: httpx.Response(200, json={"ok": True}))
@@ -138,7 +138,7 @@ async def test_an_app_http_action(slow_dns, monkeypatch) -> None:
 
 
 async def test_the_app_view_proxy(slow_dns) -> None:
-    from jenny.apps.proxy import AppViewProxy
+    from jafta.apps.proxy import AppViewProxy
 
     proxy = AppViewProxy("piante", "http://box.example:8080")
     try:
@@ -149,10 +149,10 @@ async def test_the_app_view_proxy(slow_dns) -> None:
 
 
 async def test_an_ssh_tool(slow_dns, monkeypatch) -> None:
-    from jenny.agent.tools.ssh import SshExecTool
-    from jenny.config import loader as loader_mod
-    from jenny.config.schema import Config
-    from jenny.config.tool_schemas import SshHostConfig
+    from jafta.agent.tools.ssh import SshExecTool
+    from jafta.config import loader as loader_mod
+    from jafta.config.schema import Config
+    from jafta.config.tool_schemas import SshHostConfig
 
     config = Config()
     config.tools.ssh.enable = True

@@ -8,9 +8,9 @@ files on disk mutually consistent, and enforce Phase-1 CSS invariants.
 import re
 from pathlib import Path
 
-from jenny.utils.android_assets import _UI_MANIFEST
+from jafta.utils.android_assets import _UI_MANIFEST
 
-UI_DIR = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui"
+UI_DIR = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui"
 
 # Tokens removed by the token rationalization: any reference is a regression.
 DEAD_TOKENS = [
@@ -178,19 +178,19 @@ def test_css_url_refs_are_in_manifest():
 
 def test_the_css_guard_reads_every_sheet():
     """Prima il banco leggeva due fogli scelti a mano: `home-style.css` e
-    `jenny-kit.css` restavano fuori. Ora li legge tutti: togliere dal manifest
-    il foglio che `jenny-kit.css` importa deve far fallire il banco."""
+    `jafta-kit.css` restavano fuori. Ora li legge tutti: togliere dal manifest
+    il foglio che `jafta-kit.css` importa deve far fallire il banco."""
     victim = "assets/vendor/fonts/google-fonts.css"
-    kit = (UI_DIR / "assets/apps/jenny-kit.css").read_text()
+    kit = (UI_DIR / "assets/apps/jafta-kit.css").read_text()
     assert f"/html-mobile/{victim}" in kit, "il kit non importa piu' quel foglio: cambia vittima"
     problems = _css_url_problems(set(_UI_MANIFEST) - {victim})
-    assert any(p.startswith("assets/apps/jenny-kit.css ->") for p in problems), problems
+    assert any(p.startswith("assets/apps/jafta-kit.css ->") for p in problems), problems
 
 
 def test_backdrop_filter_only_on_the_drawer_scrim():
     """Il divieto resta, con **una** eccezione dichiarata.
 
-    Il divieto totale e\' del 01/08/2026 (`8833b94`, "Jenny 0.3.0"), e la
+    Il divieto totale e\' del 01/08/2026 (`8833b94`, "Jafta 0.3.0"), e la
     ragione scritta allora era «Android WebView performance». Accanto, su
     `.swipe-scrim`, un commento della stessa data ne da\' un\'altra: il WebView
     rendeva **nere** le zone trasparenti, cioe\' le icone.

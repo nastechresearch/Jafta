@@ -1,6 +1,6 @@
 """Un testo precompilato nel composer non si porta via la bozza.
 
-«Chiedi a Jenny» dalle altre viste
+«Chiedi a Jafta» dalle altre viste
 (``MobileApp.sendInChat``) e i comandi con un argomento (``runCommand`` con
 ``arg_hint``) **riscrivevano** il composer: la domanda che stavi scrivendo
 spariva. ``_sendCommandLine`` invece la rimetteva. Ora i due passano da
@@ -83,7 +83,7 @@ def test_a_command_with_an_argument_keeps_the_draft_for_after() -> None:
     )
 
 
-def test_ask_jenny_from_another_view_keeps_the_draft() -> None:
+def test_ask_jafta_from_another_view_keeps_the_draft() -> None:
     run_js(
         _HARNESS
         + "class Shell {\n"

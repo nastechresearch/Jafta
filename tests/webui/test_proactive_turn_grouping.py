@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.webui.transcript import append_transcript_object, build_webui_thread_response
+from jafta.webui.transcript import append_transcript_object, build_webui_thread_response
 
 KEY = "websocket:default"
 NOTICES = (
@@ -36,7 +36,7 @@ NOTICES = (
 
 @pytest.fixture
 def data_dir(tmp_path, monkeypatch):
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     return tmp_path
 
 

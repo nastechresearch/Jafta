@@ -10,9 +10,9 @@ plugins {
 // Never stored in the repo. Read from the environment (CI) or, failing that,
 // from a gitignored `android/keystore.properties` (local release builds):
 //
-//   storeFile=/absolute/path/to/jenny-release.jks
+//   storeFile=/absolute/path/to/jafta-release.jks
 //   storePassword=...
-//   keyAlias=jenny
+//   keyAlias=jafta
 //   keyPassword=...
 //
 // If neither source provides a full set, the release build is left UNSIGNED
@@ -28,10 +28,10 @@ val keystoreProps = Properties().apply {
 fun signingCredential(envName: String, propName: String): String? =
     (System.getenv(envName) ?: keystoreProps.getProperty(propName))?.takeIf { it.isNotBlank() }
 
-val releaseStoreFile = signingCredential("JENNY_KEYSTORE_PATH", "storeFile")
-val releaseStorePassword = signingCredential("JENNY_KEYSTORE_PASSWORD", "storePassword")
-val releaseKeyAlias = signingCredential("JENNY_KEY_ALIAS", "keyAlias")
-val releaseKeyPassword = signingCredential("JENNY_KEY_PASSWORD", "keyPassword")
+val releaseStoreFile = signingCredential("JAFTA_KEYSTORE_PATH", "storeFile")
+val releaseStorePassword = signingCredential("JAFTA_KEYSTORE_PASSWORD", "storePassword")
+val releaseKeyAlias = signingCredential("JAFTA_KEY_ALIAS", "keyAlias")
+val releaseKeyPassword = signingCredential("JAFTA_KEY_PASSWORD", "keyPassword")
 
 val hasReleaseSigning = releaseStoreFile != null &&
     releaseStorePassword != null &&
@@ -40,11 +40,11 @@ val hasReleaseSigning = releaseStoreFile != null &&
     file(releaseStoreFile!!).exists()
 
 android {
-    namespace = "com.flagdizero.jenny"
+    namespace = "com.nastechresearch.jafta"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.flagdizero.jenny"
+        applicationId = "com.nastechresearch.jafta"
         minSdk = 26
         targetSdk = 34
         // versionCode must increase monotonically on every published build.
@@ -151,7 +151,7 @@ chaquopy {
     sourceSets {
         maybeCreate("main").apply {
             srcDir("../../")
-            include("jenny/**")
+            include("jafta/**")
         }
     }
 }
@@ -176,10 +176,10 @@ gradle.taskGraph.whenReady {
     val buildingRelease = allTasks.any { it.name.contains("Release") }
     if (buildingRelease && !hasReleaseSigning) {
         logger.warn(
-            "\n[jenny] WARNING: release signing credentials not found — the APK " +
+            "\n[jafta] WARNING: release signing credentials not found — the APK " +
                 "will be UNSIGNED and cannot be installed on a device.\n" +
-                "[jenny] Set JENNY_KEYSTORE_PATH / JENNY_KEYSTORE_PASSWORD / " +
-                "JENNY_KEY_ALIAS / JENNY_KEY_PASSWORD, or create " +
+                "[jafta] Set JAFTA_KEYSTORE_PATH / JAFTA_KEYSTORE_PASSWORD / " +
+                "JAFTA_KEY_ALIAS / JAFTA_KEY_PASSWORD, or create " +
                 "android/keystore.properties (see app/build.gradle.kts).\n"
         )
     }
@@ -200,11 +200,11 @@ gradle.taskGraph.whenReady {
     if (buildingRelease && !workingTreeDirt.isNullOrEmpty()) {
         val files = workingTreeDirt.lines().size
         logger.warn(
-            "\n[jenny] WARNING: release build from a DIRTY working tree " +
+            "\n[jafta] WARNING: release build from a DIRTY working tree " +
                 "($files file(s) modified or untracked).\n" +
-                "[jenny] Chaquopy packages the working tree, not HEAD, so this APK " +
+                "[jafta] Chaquopy packages the working tree, not HEAD, so this APK " +
                 "corresponds to no commit and cannot be reproduced from git.\n" +
-                "[jenny] Fine for verifying a change; for anything you install and " +
+                "[jafta] Fine for verifying a change; for anything you install and " +
                 "keep, commit first and build from a detached worktree at that SHA.\n"
         )
     }
@@ -214,21 +214,21 @@ gradle.taskGraph.whenReady {
 // into .imy, making them unreadable via importlib.resources. By also
 // mirroring them as assets, scripts remain extractable at runtime.)
 val copyScriptAssets by tasks.registering(Sync::class) {
-    from("../../jenny/skills") {
+    from("../../jafta/skills") {
         include("**/scripts/*.py")
     }
     into("$buildDir/generated/assets/skills")
 }
 
-// Mirror the whole jenny package as plain .py assets so the agent can
+// Mirror the whole jafta package as plain .py assets so the agent can
 // read its own source on-device (extracted at gateway startup by
-// jenny.utils.android_assets.extract_jenny_source).
+// jafta.utils.android_assets.extract_jafta_source).
 val copyPackageSourceAssets by tasks.registering(Sync::class) {
-    from("../../jenny") {
+    from("../../jafta") {
         include("**/*.py")
         exclude("**/__pycache__/**")
     }
-    into("$buildDir/generated/assets/jenny_src/jenny")
+    into("$buildDir/generated/assets/jafta_src/jafta")
 }
 
 // I due Copy sopra devono girare prima di QUALUNQUE consumatore della cartella

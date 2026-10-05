@@ -2,12 +2,12 @@ from unittest.mock import patch, sentinel
 
 import pytest
 
-from jenny.providers.endpoint_budget import read_timeout_s
-from jenny.providers.openai_compat_helpers import (
+from jafta.providers.endpoint_budget import read_timeout_s
+from jafta.providers.openai_compat_helpers import (
     _LOCAL_REQUEST_TIMEOUT_S,
     _OPENAI_COMPAT_REQUEST_TIMEOUT_S,
 )
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 
 async def test_openai_compat_provider_defers_http_client_until_first_use() -> None:
@@ -59,7 +59,7 @@ async def test_openai_compat_provider_keeps_the_tight_timeout_for_remote() -> No
 
 
 async def test_openai_compat_provider_timeout_can_be_overridden_by_env(monkeypatch) -> None:
-    monkeypatch.setenv("JENNY_OPENAI_COMPAT_TIMEOUT_S", "45")
+    monkeypatch.setenv("JAFTA_OPENAI_COMPAT_TIMEOUT_S", "45")
 
     provider = OpenAICompatProvider(
         api_key="test-key", api_base="https://example.com/v1", default_model="test"
@@ -74,7 +74,7 @@ async def test_openai_compat_provider_timeout_can_be_overridden_by_env(monkeypat
 
 async def test_the_shared_env_name_also_applies_here(monkeypatch) -> None:
     """Il knob è del trasporto, non di un provider: vale su entrambi i rami."""
-    monkeypatch.setenv("JENNY_LLM_HTTP_TIMEOUT_S", "450")
+    monkeypatch.setenv("JAFTA_LLM_HTTP_TIMEOUT_S", "450")
 
     provider = OpenAICompatProvider(
         api_key="test-key", api_base="https://example.com/v1", default_model="test"
@@ -87,7 +87,7 @@ async def test_the_shared_env_name_also_applies_here(monkeypatch) -> None:
 @pytest.mark.parametrize("bad", ["0", "-5", "abc"])
 async def test_a_malformed_timeout_falls_back_to_the_default(monkeypatch, bad: str) -> None:
     """Zero non disabilita il timeout: httpx lo prende alla lettera."""
-    monkeypatch.setenv("JENNY_OPENAI_COMPAT_TIMEOUT_S", bad)
+    monkeypatch.setenv("JAFTA_OPENAI_COMPAT_TIMEOUT_S", bad)
 
     provider = OpenAICompatProvider(
         api_key="test-key", api_base="https://example.com/v1", default_model="test"

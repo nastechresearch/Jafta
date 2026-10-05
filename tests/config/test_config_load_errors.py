@@ -9,9 +9,9 @@ backup, poi si mette da parte il file rotto e si riparte dai default.
 
 import json
 
-from jenny.config.loader import _backup_path, load_config, save_config
-from jenny.config.schema import Config, ProviderConfig
-from jenny.runtime.context import get_runtime_context
+from jafta.config.loader import _backup_path, load_config, save_config
+from jafta.config.schema import Config, ProviderConfig
+from jafta.runtime.context import get_runtime_context
 
 
 def _reset_recovery_flags() -> None:

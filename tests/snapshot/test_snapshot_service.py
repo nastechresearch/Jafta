@@ -9,9 +9,9 @@ from pathlib import Path
 
 from support.aio import wait_until
 
-from jenny.config.schema import SnapshotConfig
-from jenny.snapshot.engine import SnapshotEngine
-from jenny.snapshot.service import SnapshotService
+from jafta.config.schema import SnapshotConfig
+from jafta.snapshot.engine import SnapshotEngine
+from jafta.snapshot.service import SnapshotService
 
 # Timeout largo: il predicato esce subito quando è vero, ma sotto carico
 # esterno (CPU satura) i timer sub-secondo del servizio possono slittare.
@@ -39,7 +39,7 @@ def _setup(tmp_path: Path, **cfg_kwargs) -> tuple[SnapshotEngine, SnapshotServic
     ws = tmp_path / "ws"
     ws.mkdir()
     (ws / "SOUL.md").write_text("anima", encoding="utf-8")
-    engine = SnapshotEngine(ws, ws / ".jenny" / "snapshots")
+    engine = SnapshotEngine(ws, ws / ".jafta" / "snapshots")
     config = SnapshotConfig(**cfg_kwargs)
     service = SnapshotService(engine, config, scan_interval_s=0.05, quiet_s=0.15)
     return engine, service, ws
@@ -161,7 +161,7 @@ async def test_start_sweeps_old_safety_copies(tmp_path: Path) -> None:
     """All'avvio il servizio ripulisce le copie di sicurezza scadute dei restore."""
     import os
 
-    from jenny.snapshot.locations import SAFETY_DIR_PREFIX, runtime_root_for
+    from jafta.snapshot.locations import SAFETY_DIR_PREFIX, runtime_root_for
 
     engine, service, ws = _setup(tmp_path)
     runtime_root = runtime_root_for(ws)

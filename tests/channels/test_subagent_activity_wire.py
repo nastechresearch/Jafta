@@ -13,7 +13,7 @@ from typing import Any
 
 import pytest
 
-from jenny.channels.subagent_activity_wire import (
+from jafta.channels.subagent_activity_wire import (
     ACTIVITY_FRAME_EVENT,
     MAX_FRAME_EVENTS,
     MAX_WATCHES_PER_CONNECTION,

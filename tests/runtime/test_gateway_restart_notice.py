@@ -11,7 +11,7 @@ registra ogni ``PendingIntent`` di una notifica con
 ``TEMPORARY_ALLOWLIST_TYPE_FOREGROUND_SERVICE_ALLOWED`` (AOSP
 ``android14-release`` e ``main``), e ``PendingIntentRecord.sendInner`` applica
 l'allowlist prima di ``startServiceInPackage``. Quindi, quando l'avvio viene
-rifiutato e nessuna sveglia esatta lo riproverà, Jenny posta «Jenny è ferma —
+rifiutato e nessuna sveglia esatta lo riproverà, Jafta posta «Jafta è ferma —
 tocca per riavviarla», e la toglie quando il service torna in foreground.
 
 Il Kotlin in CI non gira: si leggono i sorgenti col solo codice
@@ -144,7 +144,7 @@ def test_the_channel_is_its_own_quiet_but_visible_one() -> None:
     assert "NotificationManager.IMPORTANCE_LOW" in channel
     assert "createNotificationChannel(" in channel
     src = read_source("RestartNotice")
-    assert re.search(r'CHANNEL_ID\s*=\s*"jenny_restart"', src)
+    assert re.search(r'CHANNEL_ID\s*=\s*"jafta_restart"', src)
     for key in ("restart_channel_name", "restart_channel_description"):
         assert f"R.string.{key}" in channel
 

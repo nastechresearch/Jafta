@@ -1,9 +1,9 @@
 """Il ponte nativo risponde alla SPA, non a ogni frame della WebView.
 
-Prima c'era un oggetto solo, ``JennyNative``, installato con
+Prima c'era un oggetto solo, ``JaftaNative``, installato con
 ``addJavascriptInterface``. Android lo inietta in **ogni** frame, qualunque sia
 l'origine, e la WebView principale ospita due tipi di pagine non nostre: le
-cornici delle Jenny App (``sandbox="allow-scripts"``) e la vista esterna, cioè
+cornici delle Jafta App (``sandbox="allow-scripts"``) e la vista esterna, cioè
 l'HTML del server dell'utente arrivato in chiaro dal proxy. Una qualunque di
 quelle poteva chiamare ``saveToDownloads('config.json')`` — le chiavi dei
 provider nella cartella Download condivisa — ``restartApp()``, o leggere il
@@ -24,7 +24,7 @@ from support.js_harness import requires_node, run_js
 from support.kotlin_source import block_after, function_body, read_code, read_source
 
 ROOT = Path(__file__).resolve().parents[2]
-UI = ROOT / "jenny" / "templates" / "ui"
+UI = ROOT / "jafta" / "templates" / "ui"
 SHIM = UI / "assets" / "shared" / "native-bridge.js"
 
 # I metodi che un iframe qualunque può chiamare senza danno: nessun effetto,
@@ -101,7 +101,7 @@ def test_the_sensitive_methods_are_not_reachable_from_any_frame() -> None:
 def test_the_all_frames_object_is_the_read_only_one() -> None:
     code = _main()
     calls = re.findall(r"addJavascriptInterface\((.*)\)", code)
-    assert calls == ["JennyNativeInfo(), NATIVE_INFO_JS"], calls
+    assert calls == ["JaftaNativeInfo(), NATIVE_INFO_JS"], calls
 
 
 def test_commands_are_bound_to_the_gateway_origin() -> None:
@@ -139,14 +139,14 @@ def test_the_dispatch_is_closed() -> None:
 
 
 def test_the_sensitive_bodies_left_the_all_frames_class() -> None:
-    info = block_after(_main(), r"inner class JennyNativeInfo")
+    info = block_after(_main(), r"inner class JaftaNativeInfo")
     for name in MUST_BE_ORIGIN_BOUND:
         assert f"fun {name}(" not in info, name
 
 
 def test_the_system_update_read_has_no_side_effect() -> None:
     """Stava nel getter: un iframe che lo chiamava per primo consumava l'avviso."""
-    info = block_after(_main(), r"inner class JennyNativeInfo")
+    info = block_after(_main(), r"inner class JaftaNativeInfo")
     getter = info[info.index("fun systemUpdatedSinceLastRun()") :]
     getter = getter[: getter.index("\n")]
     assert "systemUpdateLatch == true" in getter
@@ -188,7 +188,7 @@ def test_the_shells_load_the_shim_before_any_module() -> None:
         first_module = html.index('type="module"')
         assert html.index(tag) < first_module, shell
         assert html.index("bootstrap.js") < html.index(tag), shell
-    manifest = (ROOT / "jenny" / "utils" / "android_assets.py").read_text(encoding="utf-8")
+    manifest = (ROOT / "jafta" / "utils" / "android_assets.py").read_text(encoding="utf-8")
     assert '"assets/shared/native-bridge.js"' in manifest
 
 
@@ -219,23 +219,23 @@ def _run_shim(prelude: str, script: str) -> str:
 
 @requires_node
 def test_outside_the_shell_there_is_no_bridge() -> None:
-    out = _run_shim("", "assert.equal(window.JennyNative, undefined); console.log('ok');")
+    out = _run_shim("", "assert.equal(window.JaftaNative, undefined); console.log('ok');")
     assert "ok" in out
 
 
 @requires_node
 def test_a_frame_with_only_the_read_port_gets_only_reads() -> None:
-    """È ciò che vede una cornice di Jenny App: la porta dei comandi Chromium
+    """È ciò che vede una cornice di Jafta App: la porta dei comandi Chromium
     non ce la inietta, quindi di scrivere non c'è nemmeno il nome."""
     out = _run_shim(
         """
-window.JennyNativeInfo = {
+window.JaftaNativeInfo = {
   getBottomGestureInset: () => 42, hasHardwareKeyboard: () => true,
   isBatteryExempt: () => false, systemUpdatedSinceLastRun: () => false,
   deviceManufacturer: () => 'Unihertz',
 };""",
         """
-const n = window.JennyNative;
+const n = window.JaftaNative;
 assert.equal(n.getBottomGestureInset(), 42);
 assert.equal(n.deviceManufacturer(), 'Unihertz');
 for (const m of ['saveToDownloads', 'restartApp', 'getLauncherUsage', 'exportBackup', 'chatOpened']) {
@@ -253,12 +253,12 @@ def test_commands_post_and_queries_resolve_through_the_port() -> None:
         """
 const posted = [];
 let listener = null;
-window.JennyNativePort = {
+window.JaftaNativePort = {
   postMessage: (s) => posted.push(JSON.parse(s)),
   addEventListener: (type, fn) => { if (type === 'message') listener = fn; },
 };""",
         """
-const n = window.JennyNative;
+const n = window.JaftaNative;
 assert.equal(n.chatOpened(), undefined, 'un comando non torna niente');
 assert.deepEqual(posted[0], { m: 'chatOpened', a: [] });
 n.setGestureExclusion(1, 2, 3, 4);

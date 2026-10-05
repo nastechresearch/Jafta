@@ -1,4 +1,4 @@
-"""Test del layer di installazione (``jenny/runtime/update_install.py``).
+"""Test del layer di installazione (``jafta/runtime/update_install.py``).
 
 Il bridge Kotlin è sempre finto: quello che si verifica qui è il *contratto* con
 cui il lato Python lo interroga — una installazione alla volta, le stringhe
@@ -27,14 +27,14 @@ import httpx
 import pytest
 from support.aio import wait_until
 
-from jenny.runtime import update_install
-from jenny.runtime.update_check import UpdateInfo
-from jenny.security import fetch
+from jafta.runtime import update_install
+from jafta.runtime.update_check import UpdateInfo
+from jafta.security import fetch
 
 _INFO = UpdateInfo(
     version_code=9,
     version_name="0.7.0",
-    apk_url="https://example.invalid/jenny-0.7.0.apk",
+    apk_url="https://example.invalid/jafta-0.7.0.apk",
     sha256="a" * 64,
     size=48210944,
     notes_url="https://example.invalid/notes",
@@ -49,7 +49,7 @@ class FakeBridge:
     def __init__(
         self,
         *,
-        download: str = "/data/cache/updates/jenny-update.apk",
+        download: str = "/data/cache/updates/jafta-update.apk",
         install: str = "silent",
         gate: asyncio.Event | None = None,
         loop: asyncio.AbstractEventLoop | None = None,
@@ -207,7 +207,7 @@ async def test_silent_commit_reports_done(monkeypatch: pytest.MonkeyPatch) -> No
     assert result.ok is True
     assert result.state == "silent"
     assert bridge.downloads == [(_INFO.apk_url, _INFO.sha256, _INFO.size)]
-    assert bridge.installs == ["/data/cache/updates/jenny-update.apk"]
+    assert bridge.installs == ["/data/cache/updates/jafta-update.apk"]
     status = update_install.install_status()
     assert status["phase"] == "done"
     assert status["progress"] == 100
@@ -340,7 +340,7 @@ async def test_a_failed_attempt_can_be_retried(monkeypatch: pytest.MonkeyPatch) 
 
     assert (await update_install.start_install()).state == "error"
     # Il fallimento non deve incastrare il modulo: liberato spazio, si ritenta.
-    bridge.download_result = "/data/cache/updates/jenny-update.apk"
+    bridge.download_result = "/data/cache/updates/jafta-update.apk"
     assert (await update_install.start_install()).state == "silent"
     assert len(bridge.downloads) == 2
 
@@ -404,19 +404,19 @@ async def test_every_redirect_hop_is_validated(monkeypatch: pytest.MonkeyPatch) 
     def handler(request: httpx.Request) -> httpx.Response:
         if request.url.host == "github.invalid":
             return httpx.Response(
-                302, headers={"location": "https://cdn.invalid/asset/jenny.apk"}
+                302, headers={"location": "https://cdn.invalid/asset/jafta.apk"}
             )
         return httpx.Response(200)
 
     async with _client(handler) as client:
         final = await _REAL_RESOLVE(
-            "https://github.invalid/releases/latest/download/jenny.apk", client=client
+            "https://github.invalid/releases/latest/download/jafta.apk", client=client
         )
 
-    assert final == "https://cdn.invalid/asset/jenny.apk"
+    assert final == "https://cdn.invalid/asset/jafta.apk"
     assert seen == [
-        "https://github.invalid/releases/latest/download/jenny.apk",
-        "https://cdn.invalid/asset/jenny.apk",
+        "https://github.invalid/releases/latest/download/jafta.apk",
+        "https://cdn.invalid/asset/jafta.apk",
     ]
 
 
@@ -468,7 +468,7 @@ async def test_the_bridge_downloads_the_resolved_url(monkeypatch: pytest.MonkeyP
     """Al bridge va l'URL finale — l'unico validato fino in fondo — non quello del manifest."""
 
     async def resolved(url: str, **kwargs: Any) -> str:
-        return "https://cdn.invalid/signed/jenny.apk?token=abc"
+        return "https://cdn.invalid/signed/jafta.apk?token=abc"
 
     monkeypatch.setattr(update_install, "_resolve_apk_url", resolved)
     bridge = FakeBridge()
@@ -477,7 +477,7 @@ async def test_the_bridge_downloads_the_resolved_url(monkeypatch: pytest.MonkeyP
 
     assert (await update_install.start_install()).ok is True
     assert bridge.downloads == [
-        ("https://cdn.invalid/signed/jenny.apk?token=abc", _INFO.sha256, _INFO.size)
+        ("https://cdn.invalid/signed/jafta.apk?token=abc", _INFO.sha256, _INFO.size)
     ]
 
 

@@ -20,10 +20,10 @@ from support.kotlin_source import read_code
 ROOT = Path(__file__).resolve().parents[1]
 RES = ROOT / "android/app/src/main/res"
 SPLASH_XML = RES / "values-v31/themes.xml"
-CSS = ROOT / "jenny/templates/ui/assets/mobile-style.css"
-THEME_JS = ROOT / "jenny/templates/ui/assets/shared/theme.js"
-MAIN_ACTIVITY = ROOT / "android/app/src/main/java/com/flagdizero/jenny/MainActivity.kt"
-PREFIX = "Theme.Jenny.Splash."
+CSS = ROOT / "jafta/templates/ui/assets/mobile-style.css"
+THEME_JS = ROOT / "jafta/templates/ui/assets/shared/theme.js"
+MAIN_ACTIVITY = ROOT / "android/app/src/main/java/com/nastechresearch/jafta/MainActivity.kt"
+PREFIX = "Theme.Jafta.Splash."
 
 
 def _css_block(selector: str) -> str:
@@ -96,7 +96,7 @@ def test_the_splash_backgrounds_are_all_different() -> None:
 
 def test_the_default_splash_is_the_default_theme(themes) -> None:
     tree = ET.parse(SPLASH_XML)
-    base = next(s for s in tree.getroot().iter("style") if s.get("name") == "Theme.Jenny")
+    base = next(s for s in tree.getroot().iter("style") if s.get("name") == "Theme.Jafta")
     items = {i.get("name"): (i.text or "").strip().lower() for i in base.iter("item")}
     default_id = re.search(r"DEFAULT_THEME = '([a-z0-9]+)'", THEME_JS.read_text()).group(1)
     assert items["android:windowSplashScreenBackground"] == themes[default_id][0]
@@ -110,5 +110,5 @@ def test_the_default_splash_is_the_default_theme(themes) -> None:
 
 def test_main_activity_offers_every_splash_style() -> None:
     kotlin = read_code(MAIN_ACTIVITY)
-    listed = set(re.findall(r"R\.style\.Theme_Jenny_Splash_(\w+)", kotlin))
+    listed = set(re.findall(r"R\.style\.Theme_Jafta_Splash_(\w+)", kotlin))
     assert listed == set(_splash_styles()), listed

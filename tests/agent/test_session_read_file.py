@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from jenny.session.manager import Session, SessionManager
+from jafta.session.manager import Session, SessionManager
 
 
 def _seed(workspace: Path, key: str = "websocket:abc") -> SessionManager:

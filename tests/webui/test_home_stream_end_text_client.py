@@ -24,7 +24,7 @@ def test_a_stream_end_with_text_and_no_delta_shows_the_answer() -> None:
     run_home(_HEAD + """
 frame({ event: 'stream_end', chat_id: 'default', turn_id: 'x', text: 'The whole answer' });
 await tick(10);
-assert.deepEqual(thread(), ['jenny: The whole answer']);
+assert.deepEqual(thread(), ['jafta: The whole answer']);
 """)
 
 
@@ -33,5 +33,5 @@ def test_a_stream_end_with_text_after_its_deltas_is_not_drawn_twice() -> None:
 frame({ event: 'delta', chat_id: 'default', turn_id: 'y', text: 'The whole' });
 frame({ event: 'stream_end', chat_id: 'default', turn_id: 'y', text: 'The whole answer' });
 await tick(10);
-assert.deepEqual(thread(), ['jenny: The whole answer']);
+assert.deepEqual(thread(), ['jafta: The whole answer']);
 """)

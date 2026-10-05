@@ -24,7 +24,7 @@ from pathlib import Path
 from support.js_harness import member, requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 CHAT_JS = ASSETS / "mobile-chat.js"
 WIRE_ERROR_JS = ASSETS / "shared" / "wire-error.js"
 I18N = ASSETS / "i18n"

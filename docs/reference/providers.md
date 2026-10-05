@@ -1,12 +1,12 @@
 # Providers and models
 
-How Jenny talks to an LLM: the two wire formats it speaks, how to add or change a provider, and what actually happens (and doesn't) when you do.
+How Jafta talks to an LLM: the two wire formats it speaks, how to add or change a provider, and what actually happens (and doesn't) when you do.
 
-Jenny does not ship with any model. It is bring-your-own-key: you point it at an LLM endpoint you already have access to, and every request — and every dollar or token it costs — goes through your own account.
+Jafta does not ship with any model. It is bring-your-own-key: you point it at an LLM endpoint you already have access to, and every request — and every dollar or token it costs — goes through your own account.
 
 ## There is no built-in catalog
 
-Jenny does not maintain a list of "supported providers." A provider is just an entry you define yourself: a name you pick, a wire format, a credential, and an endpoint. Jenny never infers anything from the model name, the shape of the API key, or the base URL — whatever you configure is exactly what runs. This is why pasting the right API key against the wrong base URL, or the right base URL with a model ID from a different service, is the single most common first-run failure (see [Quick checks](#quick-checks)).
+Jafta does not maintain a list of "supported providers." A provider is just an entry you define yourself: a name you pick, a wire format, a credential, and an endpoint. Jafta never infers anything from the model name, the shape of the API key, or the base URL — whatever you configure is exactly what runs. This is why pasting the right API key against the wrong base URL, or the right base URL with a model ID from a different service, is the single most common first-run failure (see [Quick checks](#quick-checks)).
 
 ## The two formats
 
@@ -33,10 +33,10 @@ Providers are managed in the workshop, under **Brain → Who thinks** (the same 
 Actions available there: **Add provider** below the list, and **Edit** and **Delete** in the panel that the settings button beside each provider opens. Adding one has a **Use it now** switch (on by default) that makes it the one that answers as soon as it's saved, and while it's on it asks for its **First model**; with the switch off the field goes away and the model is picked when you switch to that brand. A few things worth knowing:
 
 - Saving shows **"Provider saved"** (or **"Saved, and it answers now"** with **Use it now** on); deleting asks **`Delete provider "{name}"?`** and then confirms **"Provider deleted"**.
-- You cannot delete the last remaining provider (**"Cannot delete the last provider"**) — Jenny always needs at least one configured to keep the agent runnable.
+- You cannot delete the last remaining provider (**"Cannot delete the last provider"**) — Jafta always needs at least one configured to keep the agent runnable.
 - Both **Name** and **API Key** are required to save (**"Name and API Key are required"**).
 - **Anything you change in these screens hot-reloads immediately** — which provider is active, the key, the base URL, the format, the CA certificate — with no app restart and no "requires restart" prompt. The gateway rebuilds the provider backend in place and swaps it into the running agent for the next turn. If you've read an older doc (or `providers.md`'s previous revision) claiming a provider switch needs a restart, that claim is false as of the current code.
-- Up to and including **0.11.0** that was only true of the active provider, the model and the base URL. Saving a **CA certificate** or an **API key** on its own left the running agent using the client it had built at startup, so a correct CA could load the model list and still fail every chat message with `[SSL: CERTIFICATE_VERIFY_FAILED]` ([#12](https://github.com/flagdizero/jenny-android-ai-agent/issues/12)). On those versions, force-stop the app and reopen it after saving; the certificate on disk is already correct and is picked up at startup.
+- Up to and including **0.11.0** that was only true of the active provider, the model and the base URL. Saving a **CA certificate** or an **API key** on its own left the running agent using the client it had built at startup, so a correct CA could load the model list and still fail every chat message with `[SSL: CERTIFICATE_VERIFY_FAILED]` ([#12](https://github.com/nastechresearch/jafta-android-ai-agent/issues/12)). On those versions, force-stop the app and reopen it after saving; the certificate on disk is already correct and is picked up at startup.
 - `apiType`, and the advanced `extraHeaders` / `extraBody` / `extraQuery` fields described below, are **not exposed in the UI at all** — they only exist if you hand-edit `workspace/config.json`. Hand-editing `config.json` directly *does* require restarting the app for the change to take effect; only changes made in the UI hot-reload.
 
 ## Provider fields (`config.json`)
@@ -53,23 +53,23 @@ The full field set, only reachable by hand-editing `providers.providers[]` in `c
 | `apiType` | no, `openai_compat` only | `"auto"` (default), `"chat_completions"`, or `"responses"`. See [Chat Completions vs. Responses API](#chat-completions-vs-responses-api-openai_compat-only). Config-only, not in the UI. |
 | `extraHeaders` / `extraBody` / `extraQuery` | no | Extra request headers, body fields, and query params merged into every request to this provider. Config-only. |
 
-Keys may be written as camelCase or snake_case in the file; Jenny always writes camelCase back when it saves.
+Keys may be written as camelCase or snake_case in the file; Jafta always writes camelCase back when it saves.
 
 ### A base URL without its version
 
-The `apiBase` above should carry the version path, but one common slip is forgiven for `openai_compat` providers. If a request gets a `404` and the base has no version segment (a last path segment like `v1`), Jenny retries **once** on `<base>/v1`. If that answers, it adopts the corrected base for the rest of the run and logs `API base URL auto-corrected`; nothing is written to `config.json`, so fix the field in Settings if you want the log line gone. If the retry also returns `404`, the error names both URLs it tried, so it reads as a wrong base and not a wrong key. A base that already ends in a version segment is never retried.
+The `apiBase` above should carry the version path, but one common slip is forgiven for `openai_compat` providers. If a request gets a `404` and the base has no version segment (a last path segment like `v1`), Jafta retries **once** on `<base>/v1`. If that answers, it adopts the corrected base for the rest of the run and logs `API base URL auto-corrected`; nothing is written to `config.json`, so fix the field in Settings if you want the log line gone. If the retry also returns `404`, the error names both URLs it tried, so it reads as a wrong base and not a wrong key. A base that already ends in a version segment is never retried.
 
 ## Self-signed certificates
 
 If your server's certificate is signed by a CA of your own, installing that CA on the phone
-does nothing for Jenny. Her HTTP calls are made by the Python runtime bundled inside the APK,
+does nothing for Jafta. Her HTTP calls are made by the Python runtime bundled inside the APK,
 and that runtime carries **its own** set of trusted roots; Android's system and user
 certificate stores are never consulted. The symptom is
 `[SSL: CERTIFICATE_VERIFY_FAILED] unable to get local issuer certificate`.
 
 Name the CA in the provider instead:
 
-1. Get the PEM file into the workspace. Sending it to Jenny as a chat attachment puts it in
+1. Get the PEM file into the workspace. Sending it to Jafta as a chat attachment puts it in
    `workspace/uploads/`; asking her to save the text you paste works too.
 2. In the workshop, **Brain → Who thinks** → the provider's settings button → **Edit** → **CA certificate**, and enter the path
    (relative paths start at the workspace, so `uploads/ca.pem` is enough).
@@ -79,7 +79,7 @@ talks to a publicly-signed host keeps working. The same trust is used by the mod
 probe, so the model list loads too.
 
 If the file is missing, unreadable, or isn't a certificate, the save is refused with a message that says
-which path failed — Jenny never quietly falls back to her own bundle, because that would leave
+which path failed — Jafta never quietly falls back to her own bundle, because that would leave
 you believing you're using your certificate when you aren't. The same check runs at startup: a
 `caBundle` that has gone missing since (a wiped workspace, a restore from backup — the file
 lives in the workspace, so it does travel in a backup) stops the provider from being built, and
@@ -89,7 +89,7 @@ Disabling certificate verification is deliberately not offered.
 
 ## Choosing the active provider
 
-Jenny picks the active provider in this order:
+Jafta picks the active provider in this order:
 
 1. the entry whose `name` matches `providers.default`, if set;
 2. otherwise the first entry in the `providers.providers` list;
@@ -105,12 +105,12 @@ If you export an unencrypted copy of `config.json` yourself (e.g. by pulling it 
 
 ## Chat Completions vs. Responses API (`openai_compat` only)
 
-`apiType: "auto"` (the default) mostly means "use Chat Completions." Jenny only considers the OpenAI Responses API at all when *both* of these are true:
+`apiType: "auto"` (the default) mostly means "use Chat Completions." Jafta only considers the OpenAI Responses API at all when *both* of these are true:
 
 - the base URL points directly at `api.openai.com` (not OpenRouter, not any other gateway), **and**
 - the request either sets a `reasoningEffort` value, or the model is one of OpenAI's reasoning families (o1/o3/o4, or any `gpt-5*` model).
 
-When both hold, Jenny tries the Responses API — and if it starts failing, a small circuit breaker kicks in: after **3 consecutive failures** for that model and reasoning-effort pair, it stops trying Responses and falls back to Chat Completions for **5 minutes** before probing Responses again (a single "half-open" retry). This is tracked per model *and* reasoning effort (the breaker key is `model:reasoning_effort`, so a failing `high` does not shut out `low`), automatic, and not configurable beyond forcing `apiType` to `"chat_completions"` or `"responses"` explicitly if you want to skip the auto-detection entirely.
+When both hold, Jafta tries the Responses API — and if it starts failing, a small circuit breaker kicks in: after **3 consecutive failures** for that model and reasoning-effort pair, it stops trying Responses and falls back to Chat Completions for **5 minutes** before probing Responses again (a single "half-open" retry). This is tracked per model *and* reasoning effort (the breaker key is `model:reasoning_effort`, so a failing `high` does not shut out `low`), automatic, and not configurable beyond forcing `apiType` to `"chat_completions"` or `"responses"` explicitly if you want to skip the auto-detection entirely.
 
 For every other endpoint — Groq, DeepSeek, Ollama, OpenRouter, a self-hosted server, anything that isn't `api.openai.com` directly — `auto` always means Chat Completions; the Responses API is never attempted.
 
@@ -125,23 +125,23 @@ Every request from the `openai_compat` provider carries an `x-session-affinity` 
 Be precise about this, because it differs a lot by format:
 
 - **`anthropic` format**: cache-control markers are always applied to every request. This is unconditional — no setting to flip.
-- **`openai_compat` format**: Jenny only emits explicit `cache_control` markers when **both** the base URL is OpenRouter **and** the model name looks like a Claude/Anthropic model (contains "claude" or an `anthropic/` prefix). Every other `openai_compat` endpoint — OpenAI direct, Groq, DeepSeek, a self-hosted server, OpenRouter with a non-Claude model — gets no explicit cache markers from Jenny at all. Whatever caching happens there, if any, is entirely up to that provider's own server-side behavior; Jenny doesn't request or control it.
+- **`openai_compat` format**: Jafta only emits explicit `cache_control` markers when **both** the base URL is OpenRouter **and** the model name looks like a Claude/Anthropic model (contains "claude" or an `anthropic/` prefix). Every other `openai_compat` endpoint — OpenAI direct, Groq, DeepSeek, a self-hosted server, OpenRouter with a non-Claude model — gets no explicit cache markers from Jafta at all. Whatever caching happens there, if any, is entirely up to that provider's own server-side behavior; Jafta doesn't request or control it.
 
-In short: don't expect Jenny-driven prompt caching outside of Anthropic-format requests and the OpenRouter-Claude combination specifically.
+In short: don't expect Jafta-driven prompt caching outside of Anthropic-format requests and the OpenRouter-Claude combination specifically.
 
 ## OpenRouter attribution headers
 
-When the configured base URL contains `openrouter` (case-insensitive), Jenny automatically attaches attribution headers to every request: an `HTTP-Referer` pointing at the project's GitHub repository and an `X-OpenRouter-Title` of "Jenny" (plus a categories header). This is fixed behavior tied to detecting an OpenRouter base URL — there's no setting to suppress it, and it has no effect on non-OpenRouter endpoints.
+When the configured base URL contains `openrouter` (case-insensitive), Jafta automatically attaches attribution headers to every request: an `HTTP-Referer` pointing at the project's GitHub repository and an `X-OpenRouter-Title` of "Jafta" (plus a categories header). This is fixed behavior tied to detecting an OpenRouter base URL — there's no setting to suppress it, and it has no effect on non-OpenRouter endpoints.
 
 ## OpenCode Go
 
-[OpenCode Go](https://opencode.ai/docs/go/) is a subscription that fronts a curated set of open coding models behind one API key. Its docs ask third-party clients to identify themselves with their own user agent and to send a stable per-conversation ID in `x-opencode-session`, which the gateway uses for routing and prompt-cache affinity. Jenny does both automatically whenever the configured base URL contains `opencode.ai` — there's no setting to flip, and no effect on any other endpoint.
+[OpenCode Go](https://opencode.ai/docs/go/) is a subscription that fronts a curated set of open coding models behind one API key. Its docs ask third-party clients to identify themselves with their own user agent and to send a stable per-conversation ID in `x-opencode-session`, which the gateway uses for routing and prompt-cache affinity. Jafta does both automatically whenever the configured base URL contains `opencode.ai` — there's no setting to flip, and no effect on any other endpoint.
 
-The conversation ID is a SHA-256 hash of Jenny's internal session key, truncated to 32 characters: opaque, stable for the life of a conversation, and distinct across conversations. The raw session key names a channel and a chat (`telegram:123456789`), so it is never sent as-is. Internal sessions — cron, Dream, heartbeat — each get their own ID, as does the unified user conversation. The model-catalog probe sends the user agent but no session header: a catalog listing is not a conversation.
+The conversation ID is a SHA-256 hash of Jafta's internal session key, truncated to 32 characters: opaque, stable for the life of a conversation, and distinct across conversations. The raw session key names a channel and a chat (`telegram:123456789`), so it is never sent as-is. Internal sessions — cron, Dream, heartbeat — each get their own ID, as does the unified user conversation. The model-catalog probe sends the user agent but no session header: a catalog listing is not a conversation.
 
 ### One base URL, three provider entries
 
-Go serves the same base URL in three different wire formats, and a provider entry in Jenny picks exactly one. So reaching every model means up to three entries, all sharing `apiBase` and `apiKey`:
+Go serves the same base URL in three different wire formats, and a provider entry in Jafta picks exactly one. So reaching every model means up to three entries, all sharing `apiBase` and `apiKey`:
 
 | `format` | `apiType` | Endpoint | Models |
 |---|---|---|---|
@@ -155,16 +155,16 @@ The provider dialog only exposes name, format, API key, base URL and CA certific
 
 ### `name` is stripped from messages
 
-The `/chat/completions` endpoint rejects the optional `name` key on a message instead of ignoring it, answering `messages[N]: "name" is not supported by this endpoint`. Jenny puts that key on tool-result messages, so the failure is late and looks worse than it is: the first request of a turn goes through, and the turn dies as soon as the model calls a tool. Jenny therefore drops `name` from outgoing messages when the base URL is OpenCode, and only then — every other endpoint still receives it. Nothing is lost: `tool_call_id` is what correlates a result with its call, and the local history keeps the name.
+The `/chat/completions` endpoint rejects the optional `name` key on a message instead of ignoring it, answering `messages[N]: "name" is not supported by this endpoint`. Jafta puts that key on tool-result messages, so the failure is late and looks worse than it is: the first request of a turn goes through, and the turn dies as soon as the model calls a tool. Jafta therefore drops `name` from outgoing messages when the base URL is OpenCode, and only then — every other endpoint still receives it. Nothing is lost: `tool_call_id` is what correlates a result with its call, and the local history keeps the name.
 
 ### Two things to know before subscribing
 
 - **Privacy.** Most Go models are zero-retention, but `Muse Spark 1.2/1.3 Contributor` are not: their discounted pricing is explicitly in exchange for using your prompts and completions to train future models. For an agent with access to your files and messages, avoid them. `Grok 4.6` and `GPT 5.6 Luna` retain abuse-monitoring logs for 30 days.
-- **Traffic shape.** Go is meant for coding agents and comparable clients, and the docs say traffic is monitored for abuse. Jenny's own validated-client peers include general-purpose agents, so its shape is fine, but the terms are OpenCode's to enforce and to change.
+- **Traffic shape.** Go is meant for coding agents and comparable clients, and the docs say traffic is monitored for abuse. Jafta's own validated-client peers include general-purpose agents, so its shape is fine, but the terms are OpenCode's to enforce and to change.
 
 ## Model IDs must match the endpoint exactly
 
-Jenny sends whatever string you put in the model field straight to the provider. There's no translation or aliasing layer. The most common way a working provider config produces "model not found" is pointing a preset or the onboarding model field at a model ID that belongs to a different service than the one `apiBase`/`apiKey` are configured for — e.g. an OpenRouter-style `anthropic/claude-...` slug sent to a direct Anthropic endpoint, which expects a plain `claude-...` name (or vice versa).
+Jafta sends whatever string you put in the model field straight to the provider. There's no translation or aliasing layer. The most common way a working provider config produces "model not found" is pointing a preset or the onboarding model field at a model ID that belongs to a different service than the one `apiBase`/`apiKey` are configured for — e.g. an OpenRouter-style `anthropic/claude-...` slug sent to a direct Anthropic endpoint, which expects a plain `claude-...` name (or vice versa).
 
 ## Quick checks
 

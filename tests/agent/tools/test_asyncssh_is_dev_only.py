@@ -7,7 +7,7 @@ non avere, e per giunta bloccata alla wheel 42.0.8 che Chaquopy pubblica.
 
 L'unico uso consentito è l'import lazy (dentro funzione) in
 ``ssh_backends/dev.py``: un import a livello modulo in un punto qualunque di
-``jenny/`` farebbe esplodere l'app al primo import sul device.
+``jafta/`` farebbe esplodere l'app al primo import sul device.
 
 Gemello di ``tests/snapshot/test_cryptography_is_dev_only.py``.
 """
@@ -19,7 +19,7 @@ from pathlib import Path
 
 # tests/agent/tools/<questo file> → tre livelli fino a tests/, quattro alla radice.
 REPO_ROOT = Path(__file__).resolve().parents[3]
-JENNY_DIR = REPO_ROOT / "jenny"
+JAFTA_DIR = REPO_ROOT / "jafta"
 
 # Import a colonna zero = import a livello modulo (quelli lazy sono indentati).
 _TOP_LEVEL_IMPORT = re.compile(r"^(import asyncssh|from asyncssh[. ])")
@@ -27,7 +27,7 @@ _TOP_LEVEL_IMPORT = re.compile(r"^(import asyncssh|from asyncssh[. ])")
 
 def test_no_top_level_asyncssh_import_in_runtime() -> None:
     offenders: list[str] = []
-    for path in JENNY_DIR.rglob("*.py"):
+    for path in JAFTA_DIR.rglob("*.py"):
         for lineno, line in enumerate(path.read_text("utf-8").splitlines(), start=1):
             if _TOP_LEVEL_IMPORT.match(line):
                 offenders.append(f"{path.relative_to(REPO_ROOT)}:{lineno}")

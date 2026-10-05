@@ -20,9 +20,9 @@ from pathlib import Path
 
 from support.gateway_http import make_handler
 
-from jenny.command.specs import BUILTIN_COMMAND_SPECS, SCOPES
+from jafta.command.specs import BUILTIN_COMMAND_SPECS, SCOPES
 
-_UI = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui"
+_UI = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui"
 _TABLER_CSS = (
     _UI / "assets" / "vendor" / "@tabler" / "icons-webfont@3.19.0" / "dist" / "tabler-icons.min.css"
 )
@@ -90,9 +90,9 @@ def test_the_two_that_expand_in_the_turn_do_not_pass_through_the_router() -> Non
     proprio con lo stesso scope: confondere le due cose e' come l'invariante
     precedente e' diventata falsa.
     """
-    from jenny.agent.loop import PROJECT_INIT_COMMAND, PROJECT_TIDY_COMMAND
-    from jenny.command.builtin import register_builtin_commands
-    from jenny.command.router import CommandRouter
+    from jafta.agent.loop import PROJECT_INIT_COMMAND, PROJECT_TIDY_COMMAND
+    from jafta.command.builtin import register_builtin_commands
+    from jafta.command.router import CommandRouter
 
     router = CommandRouter()
     register_builtin_commands(router)

@@ -17,12 +17,12 @@ from types import SimpleNamespace
 
 import pytest
 
-from jenny.config.schema import SnapshotConfig
-from jenny.snapshot.backup import BackupError, BackupManager
-from jenny.snapshot.engine import SnapshotEngine
-from jenny.snapshot.locations import STAGED_SNAPSHOTS_DIR_NAME
-from jenny.snapshot.service import SnapshotService
-from jenny.snapshot.store import put_blob
+from jafta.config.schema import SnapshotConfig
+from jafta.snapshot.backup import BackupError, BackupManager
+from jafta.snapshot.engine import SnapshotEngine
+from jafta.snapshot.locations import STAGED_SNAPSHOTS_DIR_NAME
+from jafta.snapshot.service import SnapshotService
+from jafta.snapshot.store import put_blob
 
 _HASH = "a" * 64
 

@@ -12,8 +12,8 @@ import os
 
 import pytest
 
-from jenny.agent.tools.filesystem import EditFileTool, ReadFileTool
-from jenny.agent.tools.filesystem_edit_match import _find_matches
+from jafta.agent.tools.filesystem import EditFileTool, ReadFileTool
+from jafta.agent.tools.filesystem_edit_match import _find_matches
 
 
 def _find_match(content: str, old_text: str) -> tuple[str | None, int]:

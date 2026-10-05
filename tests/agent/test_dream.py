@@ -4,15 +4,15 @@ from types import SimpleNamespace
 
 import pytest
 
-from jenny.agent.memory import MemoryStore
-from jenny.agent.tools.file_state import FileStates
-from jenny.providers.base import LLMResponse
-from jenny.security.workspace_access import (
+from jafta.agent.memory import MemoryStore
+from jafta.agent.tools.file_state import FileStates
+from jafta.providers.base import LLMResponse
+from jafta.security.workspace_access import (
     bind_workspace_scope,
     default_workspace_scope,
     reset_workspace_scope,
 )
-from jenny.utils.prompt_templates import render_template
+from jafta.utils.prompt_templates import render_template
 
 
 @pytest.fixture
@@ -165,7 +165,7 @@ class TestBuildDreamPrompt:
         dell'installazione come tutti gli altri e la sincronizzazione non
         partecipava a niente.
         """
-        from jenny.utils.android_assets import _SYSTEM_PROMPT_TEMPLATES
+        from jafta.utils.android_assets import _SYSTEM_PROMPT_TEMPLATES
 
         assert "agent/dream.md" in _SYSTEM_PROMPT_TEMPLATES
 
@@ -340,7 +340,7 @@ class TestThePromptTeachesTheEntryTool:
         diversi. Un verbo inventato qui diventa una chiamata rifiutata là."""
         from pathlib import Path
 
-        from jenny.agent.tools.memory_entries import MemoryEntryTool
+        from jafta.agent.tools.memory_entries import MemoryEntryTool
 
         actions = set(
             MemoryEntryTool(Path("/tmp")).parameters["properties"]["action"]["enum"]
@@ -794,10 +794,10 @@ class TestWriteFileSaysWhatThePromptSays:
         ``_commit_write`` decide su ``_is_exact_allowed_file``: dare l'allowlist a
         ``write_file`` manda anche le sue scritture su quei tre file da
         ``atomic_write``, come già ``edit_file`` e ``apply_patch``. È lo stato che
-        Jenny rilegge da sé, e su Android un processo ucciso a metà lascerebbe un
+        Jafta rilegge da sé, e su Android un processo ucciso a metà lascerebbe un
         file troncato che si legge come integro.
         """
-        from jenny.agent.tools import filesystem as fs_module
+        from jafta.agent.tools import filesystem as fs_module
 
         seen: list[str] = []
         real = fs_module.atomic_write
@@ -825,7 +825,7 @@ class TestWriteFileSaysWhatThePromptSays:
         scrivere esattamente come ``edit_file``. Una riscrittura intera di
         ``MEMORY.md`` non scavalca la degradazione.
         """
-        from jenny.agent.memory_archive import archive_dir
+        from jafta.agent.memory_archive import archive_dir
 
         store.memory_file.write_text(
             "# Memory\n- Fatto che sta per sparire\n", encoding="utf-8",
@@ -1057,9 +1057,9 @@ class TestEphemeralDirect:
         """Factory fixture that builds a minimal AgentLoop with mocked deps."""
         from unittest.mock import AsyncMock, MagicMock, patch
 
-        from jenny.agent.loop import AgentLoop
-        from jenny.agent.memory import MemoryStore
-        from jenny.bus.queue import MessageBus
+        from jafta.agent.loop import AgentLoop
+        from jafta.agent.memory import MemoryStore
+        from jafta.bus.queue import MessageBus
 
         store = MemoryStore(tmp_path)
         store.soul_file.write_text("# Soul", encoding="utf-8")
@@ -1075,9 +1075,9 @@ class TestEphemeralDirect:
         )
 
         with (
-            patch("jenny.agent.loop.SessionManager"),
-            patch("jenny.agent.loop.SubagentManager") as mock_sub,
-            patch("jenny.agent.loop.Consolidator") as mock_consolidator_cls,
+            patch("jafta.agent.loop.SessionManager"),
+            patch("jafta.agent.loop.SubagentManager") as mock_sub,
+            patch("jafta.agent.loop.Consolidator") as mock_consolidator_cls,
         ):
             mock_sub.return_value.cancel_by_session = AsyncMock(return_value=0)
             mock_consolidator_cls.return_value.maybe_consolidate_by_tokens = AsyncMock()
@@ -1184,8 +1184,8 @@ class TestEphemeralDirect:
         """Dream must only see the batch selected by build_dream_prompt."""
         from unittest.mock import MagicMock
 
-        from jenny.agent.loop import AgentLoop
-        from jenny.bus.queue import MessageBus
+        from jafta.agent.loop import AgentLoop
+        from jafta.bus.queue import MessageBus
 
         store = MemoryStore(tmp_path)
         for i in range(60):
@@ -1248,9 +1248,9 @@ class TestEphemeralHooks:
         """Build an AgentLoop with a spy hook to verify hook firing behavior."""
         from unittest.mock import AsyncMock, MagicMock, patch
 
-        from jenny.agent.hook import AgentHook
-        from jenny.agent.loop import AgentLoop
-        from jenny.bus.queue import MessageBus
+        from jafta.agent.hook import AgentHook
+        from jafta.agent.loop import AgentLoop
+        from jafta.bus.queue import MessageBus
 
         bus = MessageBus()
         provider = MagicMock()
@@ -1275,9 +1275,9 @@ class TestEphemeralHooks:
         spy.after_iteration = AsyncMock()
 
         with (
-            patch("jenny.agent.loop.SessionManager"),
-            patch("jenny.agent.loop.SubagentManager") as mock_sub,
-            patch("jenny.agent.loop.Consolidator") as mock_consolidator_cls,
+            patch("jafta.agent.loop.SessionManager"),
+            patch("jafta.agent.loop.SubagentManager") as mock_sub,
+            patch("jafta.agent.loop.Consolidator") as mock_consolidator_cls,
         ):
             mock_sub.return_value.cancel_by_session = AsyncMock(return_value=0)
             mock_consolidator_cls.return_value.maybe_consolidate_by_tokens = AsyncMock()

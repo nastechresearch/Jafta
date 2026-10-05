@@ -21,13 +21,13 @@ from unittest.mock import MagicMock
 import pytest
 from support.aio import other_tasks, settle_tasks
 
-from jenny.agent.memory import DREAM_HISTORY_HEADER
-from jenny.agent.tools.file_state import FileStates
-from jenny.bus.events import InboundMessage
-from jenny.command.builtin import cmd_dream
-from jenny.command.router import CommandContext
-from jenny.config.schema import Config
-from jenny.runtime.cron_dispatch import CronDispatcher
+from jafta.agent.memory import DREAM_HISTORY_HEADER
+from jafta.agent.tools.file_state import FileStates
+from jafta.bus.events import InboundMessage
+from jafta.command.builtin import cmd_dream
+from jafta.command.router import CommandContext
+from jafta.config.schema import Config
+from jafta.runtime.cron_dispatch import CronDispatcher
 
 _DREAM_JOB = SimpleNamespace(
     name="dream", id="dream", payload=SimpleNamespace(kind="system_event")
@@ -152,7 +152,7 @@ def _process_direct(memory: _Memory):
 @pytest.fixture(autouse=True)
 def _config_from_memory(monkeypatch: pytest.MonkeyPatch):
     """Le due strade rileggono i knob di Dream da disco: qui da una ``Config``."""
-    monkeypatch.setattr("jenny.config.loader.load_config", lambda *a, **k: Config())
+    monkeypatch.setattr("jafta.config.loader.load_config", lambda *a, **k: Config())
 
 
 async def _drain(timeout: float = 30.0) -> None:

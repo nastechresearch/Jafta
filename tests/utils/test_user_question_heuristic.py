@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.utils.runtime import looks_like_user_question
+from jafta.utils.runtime import looks_like_user_question
 
 _INCIDENT_MESSAGE = (
     "ok boss, si parte 😏 prima domanda:\n\n"

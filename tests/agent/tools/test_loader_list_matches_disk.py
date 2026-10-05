@@ -21,9 +21,9 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-from jenny.agent.tools.loader import _HARDCODED_TOOL_MODULES
+from jafta.agent.tools.loader import _HARDCODED_TOOL_MODULES
 
-TOOLS_DIR = Path(__file__).resolve().parents[3] / "jenny" / "agent" / "tools"
+TOOLS_DIR = Path(__file__).resolve().parents[3] / "jafta" / "agent" / "tools"
 
 # Non sono moduli di tool: l'infrastruttura del registro stesso.
 _NOT_TOOL_MODULES = {"__init__", "loader", "registry", "base", "context"}

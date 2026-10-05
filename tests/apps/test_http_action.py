@@ -1,16 +1,16 @@
-"""Tests for the Jenny Apps http action executor (proxy leg)."""
+"""Tests for the Jafta Apps http action executor (proxy leg)."""
 
 from __future__ import annotations
 
 import pytest
 
-import jenny.apps.http as apps_http
-from jenny.apps.http import (
+import jafta.apps.http as apps_http
+from jafta.apps.http import (
     HttpActionError,
     build_request,
     execute_http_action,
 )
-from jenny.apps.manifest import AppAction, AppManifest
+from jafta.apps.manifest import AppAction, AppManifest
 
 
 def _manifest(base_url="http://192.168.1.50:8080", auth=None) -> AppManifest:

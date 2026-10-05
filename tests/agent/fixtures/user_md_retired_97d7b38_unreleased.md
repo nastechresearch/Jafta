@@ -1,6 +1,6 @@
 # User Profile
 
-What Jenny knows about the user: identity, language, communication style, habits
+What Jafta knows about the user: identity, language, communication style, habits
 and interests. Sections appear here as they are learned — nothing is pre-filled,
 and a heading with nothing under it does not belong in this file.
 

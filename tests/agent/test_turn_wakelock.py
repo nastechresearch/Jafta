@@ -17,8 +17,8 @@ from contextlib import asynccontextmanager
 
 import pytest
 
-from jenny.agent.loop import _TURN_WAKELOCK_TIMEOUT_S
-from jenny.bus.events import InboundMessage
+from jafta.agent.loop import _TURN_WAKELOCK_TIMEOUT_S
+from jafta.bus.events import InboundMessage
 
 
 def _spy_keep_awake(monkeypatch: pytest.MonkeyPatch, module: str) -> list[tuple[str, str, float]]:
@@ -44,7 +44,7 @@ def _msg(content: str = "ciao") -> InboundMessage:
 
 
 async def test_the_turn_is_wrapped_in_a_wakelock(loop_factory, monkeypatch) -> None:
-    events = _spy_keep_awake(monkeypatch, "jenny.agent.loop")
+    events = _spy_keep_awake(monkeypatch, "jafta.agent.loop")
     loop = loop_factory()
     seen_inside: list[list[tuple[str, str, float]]] = []
 
@@ -67,7 +67,7 @@ async def test_the_turn_is_wrapped_in_a_wakelock(loop_factory, monkeypatch) -> N
 async def test_a_turn_that_blows_up_still_leaves_the_block(loop_factory, monkeypatch) -> None:
     # ``_dispatch`` assorbe l'eccezione e risponde con un errore all'utente: il
     # rilascio non può dipendere dal fatto che il turno sia andato bene.
-    events = _spy_keep_awake(monkeypatch, "jenny.agent.loop")
+    events = _spy_keep_awake(monkeypatch, "jafta.agent.loop")
     loop = loop_factory()
 
     async def boom(msg, **kwargs):

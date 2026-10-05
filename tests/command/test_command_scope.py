@@ -15,12 +15,12 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.bus.events import InboundMessage
-from jenny.command.builtin import build_help_text, register_builtin_commands
-from jenny.command.router import CommandContext, CommandRouter
-from jenny.command.scope import available, refusal, spec_for_line, visible_specs
-from jenny.command.specs import BUILTIN_COMMAND_SPECS
-from jenny.session.keys import UNIFIED_SESSION_KEY
+from jafta.bus.events import InboundMessage
+from jafta.command.builtin import build_help_text, register_builtin_commands
+from jafta.command.router import CommandContext, CommandRouter
+from jafta.command.scope import available, refusal, spec_for_line, visible_specs
+from jafta.command.specs import BUILTIN_COMMAND_SPECS
+from jafta.session.keys import UNIFIED_SESSION_KEY
 
 _PROJECT = "project:palestra"
 
@@ -186,7 +186,7 @@ async def test_the_priority_tier_is_gated_too() -> None:
 
 
 def _reply_stub(text: str):
-    from jenny.bus.events import OutboundMessage
+    from jafta.bus.events import OutboundMessage
 
     return OutboundMessage(channel="websocket", chat_id="default", content=text)
 
@@ -229,7 +229,7 @@ def test_help_on_telegram_never_advertises_a_project_command() -> None:
     Prima ``/help`` li' elencava ``/tidy`` e ``/init``, che su Telegram non
     possono funzionare mai: la tendina della WebUI filtrava, ``/help`` no.
     """
-    from jenny.session.keys import session_key_for_channel
+    from jafta.session.keys import session_key_for_channel
 
     key = session_key_for_channel("telegram", "project:palestra")
     text = build_help_text(key)

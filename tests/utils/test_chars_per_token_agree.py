@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.agent.consolidator import _estimate_tokens
-from jenny.utils.helpers import CHARS_PER_TOKEN, truncate_text_to_tokens
+from jafta.agent.consolidator import _estimate_tokens
+from jafta.utils.helpers import CHARS_PER_TOKEN, truncate_text_to_tokens
 
 
 @pytest.mark.parametrize("budget", [1, 7, 100, 1234])

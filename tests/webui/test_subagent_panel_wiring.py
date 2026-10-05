@@ -16,7 +16,7 @@ from pathlib import Path
 
 from support import css_levels
 
-UI_DIR = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui"
+UI_DIR = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui"
 CHAT_JS = UI_DIR / "assets" / "mobile-chat.js"
 DIALOG_JS = UI_DIR / "assets" / "shared" / "dialog.js"
 WORKSHOP_HTML = UI_DIR / "workshop.html"
@@ -313,7 +313,7 @@ def test_the_watch_is_resumed_from_the_cursor_we_already_have() -> None:
     assert "sendSubagentWatch(stream.taskId, stream.cursor)" in watch.group(1)
     ws = (
         Path(__file__).resolve().parents[2]
-        / "jenny" / "templates" / "ui" / "assets" / "shared" / "ws-manager.js"
+        / "jafta" / "templates" / "ui" / "assets" / "shared" / "ws-manager.js"
     ).read_text(encoding="utf-8")
     assert "'subagent_watch'" in ws and "'subagent_unwatch'" in ws
     assert "task_id: String(taskId)" in ws
@@ -578,7 +578,7 @@ def test_every_subagent_string_exists_in_both_locales() -> None:
     for locale in ("en", "it"):
         data = json.loads(
             (
-                Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui"
+                Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui"
                 / "assets" / "i18n" / f"{locale}.json"
             ).read_text(encoding="utf-8")
         )
@@ -593,6 +593,6 @@ def test_every_subagent_string_exists_in_both_locales() -> None:
 def test_relaunch_from_the_ui_stays_manual() -> None:
     """Un umano che premo Rilancia non lo rifiuta il tetto automatico."""
     routes = (
-        Path(__file__).resolve().parents[2] / "jenny" / "webui" / "subagent_routes.py"
+        Path(__file__).resolve().parents[2] / "jafta" / "webui" / "subagent_routes.py"
     ).read_text(encoding="utf-8")
     assert "manual=True" in routes

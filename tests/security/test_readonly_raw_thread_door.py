@@ -29,7 +29,7 @@ import dataclasses
 
 import pytest
 
-from jenny.config.tool_schemas import PythonExecConfig
+from jafta.config.tool_schemas import PythonExecConfig
 
 _UPDATE_THE_DOCS = (
     "la porta dei thread nudi sembra chiusa: se è voluto, aggiorna il commento "
@@ -40,8 +40,8 @@ _UPDATE_THE_DOCS = (
 
 def _tool(workspace, *, restrict: bool):
     """Il tool vero, come lo costruisce ``AgentLoop``. Serve il percorso async."""
-    from jenny.agent.tools.python_exec import PythonExecTool
-    from jenny.agent.tools.python_exec_builtins import _register_builtin_functions
+    from jafta.agent.tools.python_exec import PythonExecTool
+    from jafta.agent.tools.python_exec_builtins import _register_builtin_functions
 
     cfg = PythonExecConfig()
     tool = PythonExecTool(
@@ -94,7 +94,7 @@ async def test_a_raw_thread_still_writes_during_a_read_only_turn(tmp_path, restr
     di percorso — e qui infatti cade in entrambe le modalità, che è precisamente
     il punto da non lasciare implicito nei documenti.
     """
-    from jenny.security.workspace_access import (
+    from jafta.security.workspace_access import (
         build_workspace_scope,
         enter_workspace_scope,
     )

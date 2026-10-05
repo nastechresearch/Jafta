@@ -6,17 +6,17 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from support.agent import make_loop
 
-from jenny.agent.loop import AgentLoop
-from jenny.agent.progress_events import (
+from jafta.agent.loop import AgentLoop
+from jafta.agent.progress_events import (
     invoke_file_edit_progress,
     on_progress_accepts_file_edit_events,
 )
-from jenny.bus.events import InboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.bus.runtime_events import TurnCompleted
-from jenny.providers.base import LLMResponse, ToolCallRequest
-from jenny.session.webui_turns import WebuiTurnCoordinator
-from jenny.utils.llm_runtime import LLMRuntime
+from jafta.bus.events import InboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.bus.runtime_events import TurnCompleted
+from jafta.providers.base import LLMResponse, ToolCallRequest
+from jafta.session.webui_turns import WebuiTurnCoordinator
+from jafta.utils.llm_runtime import LLMRuntime
 
 
 def _make_loop(tmp_path: Path) -> AgentLoop:
@@ -191,7 +191,7 @@ class TestToolEventProgress:
         # lo dichiara, ed è precisamente ciò che rende il caso interessante.
         prepare_trackers = MagicMock(side_effect=AssertionError("unexpected file snapshot"))
         monkeypatch.setattr(
-            "jenny.agent.tool_execution.prepare_file_edit_trackers", prepare_trackers,
+            "jafta.agent.tool_execution.prepare_file_edit_trackers", prepare_trackers,
         )
 
         async def on_progress(

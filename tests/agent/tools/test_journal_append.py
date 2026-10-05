@@ -19,8 +19,8 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.tools.journal import JournalAppendTool
-from jenny.security.workspace_access import (
+from jafta.agent.tools.journal import JournalAppendTool
+from jafta.security.workspace_access import (
     WorkspaceScope,
     bind_workspace_scope,
     reset_workspace_scope,
@@ -346,19 +346,19 @@ def test_it_is_registered_in_the_loader() -> None:
     """La registrazione è esplicita (``TOOLS`` + la lista in ``loader.py``): un
     tool che esiste e non è in lista è un tool che nessuno chiamerà mai, e non
     fallisce — semplicemente non c'è."""
-    from jenny.agent.tools import loader
+    from jafta.agent.tools import loader
 
     src = Path(loader.__file__).read_text(encoding="utf-8")
     assert '"journal",' in src
 
-    from jenny.agent.tools.journal import TOOLS
+    from jafta.agent.tools.journal import TOOLS
 
     assert TOOLS == [JournalAppendTool]
 
 
 # ── L'attribuzione: di chi è il fatto che la riga registra ───────────────────
 #
-# Il difetto (D1): il 24/08 Jenny ha chiesto «il telescopio te lo porti, *o quello
+# Il difetto (D1): il 24/08 Jafta ha chiesto «il telescopio te lo porti, *o quello
 # resta a casa*?», l'utente ha risposto «il telescopio che cenrtra?» — una domanda,
 # nessuna scelta — e la cattura ha registrato «resta a casa» come decisione
 # dell'utente. Poi il giardiniere l'ha promossa a `state: decided`.

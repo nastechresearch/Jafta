@@ -1,7 +1,7 @@
 import pytest
 
-from jenny.config.schema import HeartbeatConfig
-from jenny.pydantic_compat import ValidationError
+from jafta.config.schema import HeartbeatConfig
+from jafta.pydantic_compat import ValidationError
 
 
 def test_heartbeat_config_defaults_to_interval_seconds() -> None:

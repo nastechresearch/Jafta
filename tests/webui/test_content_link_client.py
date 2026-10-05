@@ -1,7 +1,7 @@
 """Un link dentro un contenuto non deve poter ricaricare il guscio.
 
 Il difetto da cui veniamo (26/09/2026): la chat della casa scriveva il markdown
-di Jenny in ``innerHTML`` e il suo solo ascoltatore di click guardava
+di Jafta in ``innerHTML`` e il suo solo ascoltatore di click guardava
 ``.home-copy``. Un ``[x](workshop.html)`` o un ``[x](?mode=chat)`` erano quindi
 navigazioni di main frame vere, e ``MainActivity.isShellDocument`` le lascia
 dentro la WebView: la casa si ricaricava **senza** il fragment ``#bs=`` —
@@ -22,7 +22,7 @@ from pathlib import Path
 from support.home_dom import requires_jsdom, run_home
 from support.js_harness import member, requires_node, run_js
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 CONTENT_LINK_JS = ASSETS / "shared" / "content-link.js"
 HOME_CHAT_JS = ASSETS / "home-chat.js"
 WORKSHOP_CHAT_JS = ASSETS / "mobile-chat.js"

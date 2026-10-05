@@ -16,8 +16,8 @@ from __future__ import annotations
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
-from jenny.agent.runner import AgentRunSpec
-from jenny.config.schema import AgentDefaults
+from jafta.agent.runner import AgentRunSpec
+from jafta.config.schema import AgentDefaults
 
 MAX_TOOL_RESULT_CHARS = AgentDefaults().max_tool_result_chars
 

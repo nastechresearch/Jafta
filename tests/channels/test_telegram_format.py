@@ -1,8 +1,8 @@
-"""Test per ``jenny.channels.telegram_format`` (conversione md→HTML e chunking)."""
+"""Test per ``jafta.channels.telegram_format`` (conversione md→HTML e chunking)."""
 
 from __future__ import annotations
 
-from jenny.channels.telegram_format import (
+from jafta.channels.telegram_format import (
     TELEGRAM_MAX_LEN,
     markdown_to_telegram_html,
     split_message,

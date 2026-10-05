@@ -28,9 +28,9 @@ from pathlib import Path
 
 from support.js_harness import requires_node, run_js
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 CHAT_JS = ASSETS / "mobile-chat.js"
-JENNY_JS = ASSETS / "shared" / "jenny-mascot.js"
+JAFTA_JS = ASSETS / "shared" / "jafta-mascot.js"
 
 
 pytestmark = requires_node
@@ -50,7 +50,7 @@ def _turn_scoped_events(source: str) -> str:
 
 def _harness() -> str:
     chat = CHAT_JS.read_text(encoding="utf-8")
-    jenny = JENNY_JS.read_text(encoding="utf-8")
+    jafta = JAFTA_JS.read_text(encoding="utf-8")
     return f"""
 import assert from 'node:assert/strict';
 
@@ -72,7 +72,7 @@ function makeMascot({{ inTurn = true }} = {{}}) {{
     _streamTurnId: null,
     _turnActive: inTurn,
     _pendingTurn: false,
-    {_method(jenny, "_trackedTurnMatches")},
+    {_method(jafta, "_trackedTurnMatches")},
   }};
 }}
 

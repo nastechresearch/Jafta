@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Jafta</title>
+<!-- Pre-render bootstrap (theme + locale). Kept as an external, non-defer
+     script so it runs before the body renders (avoids FOUC) while allowing a
+     script-src 'self' CSP — see M1 in migliorie/webui.md. -->
+<script src="/html-mobile/assets/bootstrap.js"></script>
+<!-- Il ponte col guscio Android, ricomposto in window.JaftaNative prima che
+     giri qualunque modulo: v. il commento in testa al file. -->
+<script src="/html-mobile/assets/shared/native-bridge.js"></script>
+
+<!-- Fonts (Inter + Fira Code + per-theme display fonts) -->
+<link href="/html-mobile/assets/vendor/fonts/google-fonts.css" rel="stylesheet">
+<link href="/html-mobile/assets/vendor/fonts/theme-fonts.css" rel="stylesheet">
+
+<!-- Tabler Icons -->
+<link rel="stylesheet" href="/html-mobile/assets/vendor/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+
+<!-- CodeMirror -->
+<link rel="stylesheet" href="/html-mobile/assets/vendor/codemirror@5.65.16/lib/codemirror.min.css">
+<link rel="stylesheet" id="cm-theme-dark" href="/html-mobile/assets/vendor/codemirror@5.65.16/theme/darcula.min.css" media="all">
+<link rel="stylesheet" id="cm-theme-light" href="/html-mobile/assets/vendor/codemirror@5.65.16/theme/eclipse.min.css" media="not all">
+<script src="/html-mobile/assets/vendor/codemirror@5.65.16/lib/codemirror.min.js" defer></script>
+<script src="/html-mobile/assets/vendor/codemirror@5.65.16/mode/javascript/javascript.min.js" defer></script>
+<script src="/html-mobile/assets/vendor/codemirror@5.65.16/mode/python/python.min.js" defer></script>
+<script src="/html-mobile/assets/vendor/codemirror@5.65.16/mode/xml/xml.min.js" defer></script>
+<script src="/html-mobile/assets/vendor/codemirror@5.65.16/mode/css/css.min.js" defer></script>
+<script src="/html-mobile/assets/vendor/codemirror@5.65.16/mode/yaml/yaml.min.js" defer></script>
+<script src="/html-mobile/assets/vendor/codemirror@5.65.16/mode/markdown/markdown.min.js" defer></script>
+<script src="/html-mobile/assets/vendor/codemirror@5.65.16/mode/go/go.min.js" defer></script>
+<script src="/html-mobile/assets/vendor/codemirror@5.65.16/addon/mode/simple.min.js" defer></script>
+<script src="/html-mobile/assets/vendor/codemirror@5.65.16/mode/rust/rust.min.js" defer></script>
+<script src="/html-mobile/assets/vendor/codemirror@5.65.16/mode/clike/clike.min.js" defer></script>
+<script src="/html-mobile/assets/vendor/codemirror@5.65.16/mode/shell/shell.min.js" defer></script>
+
+<!-- Marked.js (Markdown parser) -->
+<script src="/html-mobile/assets/vendor/marked@15.0.7/marked.min.js" defer></script>
+
+<!-- DOMPurify (HTML sanitizer for model markdown — C1) -->
+<script src="/html-mobile/assets/vendor/dompurify@3/purify.min.js" defer></script>
+
+<!-- Highlight.js (Syntax highlighting) -->
+<link rel="stylesheet" id="hljs-theme-dark" href="/html-mobile/assets/vendor/highlight.js@11.11.1/styles/github-dark.min.css" media="all">
+<link rel="stylesheet" id="hljs-theme-light" href="/html-mobile/assets/vendor/highlight.js@11.11.1/styles/github.min.css" media="not all">
+<script src="/html-mobile/assets/vendor/highlight.js@11.11.1/build/highlight.min.js" defer></script>
+
+<!-- Mobile Styles -->
+<link rel="stylesheet" href="/html-mobile/assets/mobile-style.css">
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- MAIN -->
+    <div class="main">
+
+      <!-- BACKDROP -->
+      <div class="drawer-backdrop" id="backdrop"></div>
+
+      <!-- DRAWER: Storia locale ─ l'elenco delle istantanee.
+           Stava disteso dentro il cassetto Memoria, una riga per istantanea:
+           da solo era due terzi dei 6.467 px della pagina (misurato sul
+           telefono il 21/09/2026). In cassetto resta la riga che si legge —
+           quante sono e quanto e' vecchia la piu' vecchia — e l'elenco, il
+           menu' della conservazione e «crea adesso» si aprono di qua. -->
+      <div class="drawer" id="drawer-history">
+        <div class="drawer-header">
+          <div class="drawer-handle"></div>
+          <div class="drawer-header-row">
+            <span class="drawer-title" data-i18n="backup.snapshotHistory">Storia locale</span>
+            <button class="drawer-close" data-close aria-label="Chiudi" data-i18n-aria="common.close"><i class="ti ti-x" aria-hidden="true"></i></button>
+          </div>
+        </div>
+        <div class="drawer-body" id="drawer-history-body"></div>
+      </div>
+
+      <!-- DRAWER: Skill ─ l'elenco, in due blocchi: le tue e quelle integrate.
+           In cassetto (Mani) ne resta una riga coi due conti. Qui si leggono
+           tutte e si accendono e spengono le tue — solo le tue: le integrate
+           l'avvio le ri-estrae dall'APK, e una scelta su di loro sparirebbe al
+           riavvio. Crearle, cambiarle e cancellarle non stanno qui per scelta
+           (21/09/2026): si chiede a Jafta. -->
+      <div class="drawer" id="drawer-skill">
+        <div class="drawer-header">
+          <div class="drawer-handle"></div>
+          <div class="drawer-header-row">
+            <span class="drawer-title" data-i18n="skills.panel">Skill</span>
+            <button class="drawer-close" data-close aria-label="Chiudi" data-i18n-aria="common.close"><i class="ti ti-x" aria-hidden="true"></i></button>
+          </div>
+        </div>
+        <div class="drawer-body" id="drawer-skill-body"></div>
+      </div>
+
+      <!-- DRAWER: Telegram ─ il pannello di accoppiamento.
+           In cassetto ne resta una riga: «collegato a @nome», oppure spento.
+           Il giro intero — interruttore, token, codice, disaccoppia — e' lo
+           stesso widget condiviso con l'onboarding, che qui dentro ha lo
+           spazio che gli serve. -->
+      <div class="drawer" id="drawer-telegram">
+        <div class="drawer-header">
+          <div class="drawer-handle"></div>
+          <div class="drawer-header-row">
+            <span class="drawer-title" data-i18n="settings.telegram.title">Telegram</span>
+            <button class="drawer-close" data-close aria-label="Chiudi" data-i18n-aria="common.close"><i class="ti ti-x" aria-hidden="true"></i></button>
+          </div>
+        </div>
+        <div class="drawer-body"><div id="drawer-telegram-body"></div></div>
+      </div>
+
+      <!-- DRAWER: un host SSH ─ tutto quel che si fa **a** un host.
+           Genera/rigenera la chiave, la pubblica da copiare, verifica
+           l'impronta, modifica, elimina. In cassetto resta la riga compatta,
+           che pero' **tiene in chiaro i due stati** — credenziale e impronta —
+           perche' sono i due passi che l'utente deve fare, e nasconderli
+           lascerebbe host mezzi configurati che falliscono al primo comando
+           (v. il commento su `_renderSshHost`). -->
+      <div class="drawer" id="drawer-ssh-host">
+        <div class="drawer-header">
+          <div class="drawer-handle"></div>
+          <div class="drawer-header-row">
+            <span class="drawer-title" id="drawer-ssh-host-title">SSH</span>
+            <button class="drawer-close" data-close aria-label="Chiudi" data-i18n-aria="common.close"><i class="ti ti-x" aria-hidden="true"></i></button>
+          </div>
+        </div>
+        <div class="drawer-body" id="drawer-ssh-host-body"></div>
+      </div>
+
+      <!-- DRAWER: una marca ─ modifica ed elimina.
+           In cassetto la marca e' una riga da 52 px: pallino, nome, indirizzo,
+           chiave mascherata, e la pastiglia «risponde» su quella che risponde
+           adesso. Quel che si fa **a** una marca sta di qua. -->
+      <div class="drawer" id="drawer-brand">
+        <div class="drawer-header">
+          <div class="drawer-handle"></div>
+          <div class="drawer-header-row">
+            <span class="drawer-title" id="drawer-brand-title">—</span>
+            <button class="drawer-close" data-close aria-label="Chiudi" data-i18n-aria="common.close"><i class="ti ti-x" aria-hidden="true"></i></button>
+          </div>
+        </div>
+        <div class="drawer-body" id="drawer-brand-body"></div>
+      </div>
+
+      <!-- DRAWER: i tetti dei tre file.
+           In cassetto «quanto ricorda» si **legge**: tre nomi, quanto misurano
+           e quanto ne resta. Cambiare un tetto e' un'altra cosa e sta qui. -->
+      <div class="drawer" id="drawer-caps">
+        <div class="drawer-header">
+          <div class="drawer-handle"></div>
+          <div class="drawer-header-row">
+            <span class="drawer-title" data-i18n="settings.memory.changeBudgets">Cambia i tetti</span>
+            <button class="drawer-close" data-close aria-label="Chiudi" data-i18n-aria="common.close"><i class="ti ti-x" aria-hidden="true"></i></button>
+          </div>
+        </div>
+        <div class="drawer-body" id="drawer-caps-body"></div>
+      </div>
+
+      <!-- VIEW: il file aperto.
+           L'esploratore non e' qui: sta nella scheda «I file veri» di Memoria
+           (`mobile-settings.js::_renderFile`), e ci si gira dentro senza mai
+           lasciare il cassetto. Questa schermata e' il gesto che ne esce —
+           aprire un file — e il breadcrumb qui sotto porta il nome del file e
+           il bottone «Salva». -->
+      <div id="view-workspace" class="view" style="display:none;flex-direction:column;height:100%">
+        <div class="view-title-mount" id="title-workspace"></div>
+        <div class="ws-breadcrumb" id="ws-breadcrumb"></div>
+        <div class="workspace-viewer" id="workspace-viewer">
+          <div id="code-editor-mobile"></div>
+        </div>
+      </div>
+
+      <!-- VIEW: Chat -->
+      <div id="view-chat" class="view" style="display:flex">
+        <!-- L'intestazione, come in casa. In casa dice «conversazione
+             personale / Jafta»; qui la soprascritta non c'e' e il nome e'
+             quello che la barra in fondo da' gia' a questa vista — Console.
+             A differenza degli altri mount questo si incolla in cima
+             (`mobile-style.css`), perche' in chat a scorrere e' il documento
+             intero: senza, il titolo sparirebbe al primo dito. -->
+        <div class="view-title-mount" id="title-chat"></div>
+        <div class="chat-area" id="chat-area"></div>
+        <!-- Tutto quello che sta fermo in fondo mentre la chat scorre: il
+             blocco è `position: sticky` (mobile-style.css), quindi resta in
+             flusso e nessuno deve misurarne l'altezza. Il FAB "vai in fondo"
+             vive qui dentro, assoluto sopra il composer, e lo segue da sé. -->
+        <div class="chat-bottom" id="chat-bottom">
+        <button id="chat-scroll-fab" class="chat-scroll-fab" aria-label="Vai in fondo" data-i18n-aria="chat.scrollToBottom">
+          <i class="ti ti-chevron-down" aria-hidden="true"></i>
+          <span class="chat-scroll-fab-badge" style="display:none"></span>
+        </button>
+        <!-- Subagent panel: fuori da .chat-area così non scorre via mentre
+             cinque job girano. Nascosto quando non c'è nulla da mostrare. -->
+        <div class="subagents" id="subagents" hidden>
+          <button class="subagents-head" id="subagents-head" type="button" aria-expanded="false" aria-controls="subagents-body">
+            <i class="ti ti-users subagents-head-icon" aria-hidden="true"></i>
+            <span class="subagents-head-title" data-i18n="subagents.title">Subagents</span>
+            <span class="subagents-head-count" id="subagents-count"></span>
+            <i class="ti ti-chevron-up subagents-head-chevron" aria-hidden="true"></i>
+          </button>
+          <div class="subagents-body" id="subagents-body" hidden></div>
+        </div>
+        <div class="attach-preview" id="attach-preview" style="display:none"></div>
+        <div id="input-bar">
+          <!-- Scope della conversazione: ancorato sopra il composer perche' e'
+               l'unico punto su cui l'occhio e' posato prima di scrivere. La
+               tendina la costruisce shared/scope-chip.js. -->
+          <div class="compose-scope">
+            <div class="scope-menu" id="scope-menu" role="menu" aria-labelledby="scope-chip"></div>
+            <button class="scope-chip" id="scope-chip" type="button"
+                    aria-haspopup="menu" aria-expanded="false"
+                    aria-label="Cambia scope" data-i18n-aria="scope.change">
+              <span class="scope-chip-mark">✿</span>
+              <span class="scope-chip-path"></span>
+              <i class="ti ti-selector scope-chip-switch" aria-hidden="true"></i>
+            </button>
+            <!-- Seconda meta' della stessa domanda del chip: *cosa fara'* quel
+                 che sto per mandare. Sta nella stessa riga per questo. -->
+            <button class="write-switch" id="write-switch" type="button"
+                    aria-pressed="false"
+                    aria-label="Scrittura o sola lettura" data-i18n-aria="write.change">
+              <i class="write-switch-mark ti ti-pencil" aria-hidden="true"></i>
+              <span class="write-switch-label"></span>
+            </button>
+            <!-- Terza domanda della stessa riga: *cosa posso chiedere*. I
+                 comandi esistevano da sempre e non li vedeva nessuno (issue
+                 #11); la tendina la costruisce shared/commands-chip.js
+                 dall'elenco che serve il backend. -->
+            <div class="commands-menu" id="commands-menu" role="menu" aria-labelledby="commands-chip"></div>
+            <button class="commands-chip" id="commands-chip" type="button"
+                    aria-haspopup="menu" aria-expanded="false"
+                    aria-label="Comandi" data-i18n-aria="commands.aria">
+              <i class="commands-chip-mark ti ti-command" aria-hidden="true"></i>
+              <span class="commands-chip-label"></span>
+            </button>
+          </div>
+          <div id="input-row" class="compose-row">
+            <!-- Il cassetto delle app, a un tocco. Stava sul dock (la voce
+                 «Apps», `data-opens="launcher"`) e il passo 0 del rimaneggiamento
+                 l'ha portata via insieme alle altre: da allora il foglio si
+                 raggiungeva solo da Mani → «Cassetto delle app», cioè tre tocchi
+                 per la cosa che un launcher fa più spesso. Qui è simmetrico al
+                 tasto manda, e sta nello stesso posto in casa. -->
+            <button id="btn-launcher" class="compose-drawer" type="button"
+                    title="Cassetto delle app" data-i18n-title="nav.launcher"
+                    aria-label="Cassetto delle app" data-i18n-aria="nav.launcher"><i class="ti ti-layout-grid" aria-hidden="true"></i></button>
+            <div class="compose-pill">
+              <textarea id="chat-input" placeholder="Chiedi qualcosa…" rows="1" aria-label="Messaggio" data-i18n-placeholder="chat.placeholder" data-i18n-aria="chat.message"></textarea>
+              <div class="input-actions" id="secondary-actions">
+                <!-- Scorciatoia a un tocco per il comando che la issue #11
+                     chiede per nome. È lo stesso `/new` della tendina, e passa
+                     dalla stessa conferma: sta a un pollice dalla graffetta. -->
+                <button class="input-action" id="btn-new-chat" type="button" title="Nuova chat" data-i18n-title="chat.newChat"
+                        aria-label="Nuova chat" data-i18n-aria="chat.newChat"><i class="ti ti-message-plus" aria-hidden="true"></i></button>
+                <button class="input-action" id="btn-attach" type="button" title="Allega" data-i18n-title="chat.attach"
+                        aria-label="Allega" data-i18n-aria="chat.attach"><i class="ti ti-paperclip" aria-hidden="true"></i></button>
+              </div>
+            </div>
+            <button id="btn-send" class="compose-send" type="button" disabled
+                    aria-label="Manda" data-i18n-aria="chat.send"><i class="ti ti-arrow-up" aria-hidden="true"></i></button>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- VIEW: Apps -->
+
+      <!-- VIEW: Settings -->
+      <div id="view-settings" class="view" style="display:none;flex-direction:column;height:100%">
+        <div class="loading-overlay" id="settings-loading"><div class="spinner"></div></div>
+        <div class="view-title-mount" id="title-settings"></div>
+        <div class="settings-content" id="settings-content"></div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /body -->
+
+  <!-- MICRO DOCK — always visible -->
+  <nav class="dock" aria-label="Navigazione" data-i18n-aria="nav.ariaLabel">
+    <!-- Quattro voci: una console e tre facolta' — pensa, fa, ricorda.
+         Erano cinque per sottosistema (chat, wiki, app, file, impostazioni), e
+         il giro delle tavole le ha raggruppate per domanda invece che per
+         pezzo di codice.
+
+         Cervello, Mani e Memoria sono **la stessa vista e lo stesso
+         controller**: cambia solo quale cassetto disegna (v. `DRAWERS` in
+         mobile-settings.js). Delle tre viste che stavano qui e adesso no, due
+         hanno una maniglia altrove — il cassetto delle app accanto alla
+         graffetta del composer, i file in fondo alla scheda «I file veri» di
+         Memoria — e la terza, la wiki, e' uscita del tutto dall'officina il
+         21/09/2026: elenco, mappa e lettore vivono in casa. L'ordine del DOM
+         e' anche quello del carosello orizzontale, che `_visibleModes()`
+         deriva da qui.
+         Sono `<button>` e non `<div>`: con la
+         tastiera fisica del Titan 2 il dock si raggiunge col Tab e si apre con
+         Invio o Spazio, che il bottone traduce nello stesso `click`. -->
+    <button type="button" class="dock-item active" data-mode="chat" title="Console" data-i18n-title="nav.console"><span class="dock-flower" aria-hidden="true">✿</span><span class="dock-label" data-i18n="nav.console">Console</span></button>
+    <button type="button" class="dock-item" data-mode="brain" title="Cervello" data-i18n-title="nav.brain"><i class="ti ti-brain" aria-hidden="true"></i><span class="dock-label" data-i18n="nav.brain">Cervello</span></button>
+    <button type="button" class="dock-item" data-mode="hands" title="Mani" data-i18n-title="nav.hands"><i class="ti ti-hand-finger" aria-hidden="true"></i><span class="dock-label" data-i18n="nav.hands">Mani</span></button>
+    <button type="button" class="dock-item" data-mode="memory" title="Memoria" data-i18n-title="nav.memory"><i class="ti ti-database" aria-hidden="true"></i><span class="dock-label" data-i18n="nav.memory">Memoria</span></button>
+  </nav>
+
+</div><!-- /app -->
+
+<!-- Mobile App Entry Point -->
+<script type="module" src="/html-mobile/assets/mobile-app.js"></script>
+
+<!-- I tre modali condivisi (conferma, prompt, dettaglio) non stanno più qui: il
+     loro markup lo porta `shared/dialog.js`, che lo monta appena viene
+     importato. Stavano in questo file e basta, e la casa — che quei dialoghi li
+     usa per creare un quaderno — avrebbe dovuto tenerne una seconda copia
+     allineata a mano. -->
+
+<dialog class="oc-sheet" id="ws-context-sheet">
+  <div class="oc-sheet-inner">
+    <div class="oc-sheet-title" id="ws-context-title"></div>
+    <div class="oc-sheet-desc" id="ws-context-desc"></div>
+    <div class="oc-sheet-actions" id="ws-context-actions"></div>
+    <button class="oc-sheet-cancel" id="ws-context-cancel" data-i18n="common.cancel">Cancel</button>
+  </div>
+</dialog>
+
+<dialog class="oc-sheet" id="android-app-sheet">
+  <div class="oc-sheet-inner">
+    <div class="oc-sheet-title" id="android-app-title"></div>
+    <div class="oc-sheet-actions" id="android-app-actions"></div>
+    <button class="oc-sheet-cancel" id="android-app-cancel" data-i18n="common.cancel">Annulla</button>
+  </div>
+</dialog>
+
+
+<!-- Superficie di selezione isolata: il messaggio renderizzato, fermo, in un
+     contenitore che nessuno riscrive e nessuno scrolla. -->
+<dialog class="oc-sheet" id="jafta-app-sheet">
+  <div class="oc-sheet-inner">
+    <div class="oc-sheet-title" id="jafta-app-sheet-title"></div>
+    <div class="oc-sheet-actions" id="jafta-app-sheet-actions"></div>
+    <button class="oc-sheet-cancel" id="jafta-app-sheet-cancel" data-i18n="common.cancel">Annulla</button>
+  </div>
+</dialog>
+
+<!-- LAUNCHER SHEET — il cassetto delle app.
+     Vive qui, fuori da `.app`, come `.app-frame-overlay`: così copre anche il
+     dock, resta fuori dall'inerzia che DrawerManager mette allo sfondo, e una
+     mini-app aperta *dal* foglio gli si sovrappone senza trucchi di z-index.
+     Contenuto costruito da assets/mobile-launcher.js. -->
+<div class="launcher-scrim" id="launcher-scrim" aria-hidden="true"></div>
+<div class="launcher-sheet" id="launcher-sheet" role="dialog" aria-modal="true"
+     aria-labelledby="launcher-title" aria-hidden="true" tabindex="-1">
+  <!-- Da qui — maniglia e riga del titolo — si trascina il foglio, e **dalla
+       lista mai** (D7): decide l'origine del tocco, e decide sempre allo stesso
+       modo. Sotto c'è una chat, dove i trascinamenti verticali sono già
+       promessi allo scroller da `setupSwipeNav`; contendere i verticali della
+       propria lista è la ragione per cui i bottom sheet dentro contenuto
+       scrollabile sembrano rotti. V. `LauncherController._setupDrag`. -->
+  <div class="launcher-handle-row" id="launcher-handle-row">
+    <div class="launcher-handle"></div>
+  </div>
+  <div class="launcher-head">
+    <span class="launcher-title" id="launcher-title" data-i18n="launcher.recent">Più usate</span>
+    <button class="launcher-close" id="launcher-close" type="button"
+            aria-label="Chiudi" data-i18n-aria="common.close"><i class="ti ti-x" aria-hidden="true"></i></button>
+  </div>
+  <!-- Il campo di ricerca è il corpo del cassetto, non un accessorio: è la
+       direzione *Digita* del rilievo (su 68 voci, cercare batte scorrere a
+       partire dalla quarta). Niente `autofocus` — alzerebbe la tastiera
+       software e si mangerebbe il foglio (D6); il type-ahead è del passo 4, e
+       così `enterkeyhint="go"`, che promette un ⏎ che qui ancora non apre. -->
+  <div class="launcher-search-row">
+    <i class="ti ti-search launcher-search-icon" aria-hidden="true"></i>
+    <input class="launcher-search" id="launcher-search" type="text"
+           autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
+           enterkeyhint="go" role="combobox" aria-controls="launcher-list"
+           aria-expanded="false" aria-autocomplete="list" aria-haspopup="listbox"
+           placeholder="Cerca un'app…" data-i18n-placeholder="launcher.searchPlaceholder"
+           aria-label="Cerca un'app…" data-i18n-aria="launcher.searchPlaceholder">
+    <button class="launcher-search-clear" id="launcher-search-clear" type="button"
+            aria-label="Pulisci" data-i18n-aria="launcher.clearSearch"><i class="ti ti-x" aria-hidden="true"></i></button>
+  </div>
+  <!-- Passo 4 — la semantica giusta dalla nascita (4.5). La lista è un
+       `listbox` e le righe sono `option`: una lista di risultati con una
+       selezione attiva è quello, non un mucchio di pulsanti. Il campo è il
+       `combobox` che la governa, e la riga selezionata gliela dice
+       `aria-activedescendant` (scritto da JS) — così le frecce muovono la
+       selezione senza spostare il fuoco, che è ciò che tiene il campo
+       scrivibile mentre si scorre. Le righe restano comunque focalizzabili
+       una per una: con TalkBack ci si arriva a scorrimento, non a frecce. -->
+  <!-- Passo 6.2 — l'avviso che distingue "non c'è niente" da "non si è potuto
+       leggere". Serve al caso peggiore, che è quello *parziale*: se il ponte
+       nativo non risponde, le skill e le Jafta App ci sono tutte e mancano solo
+       le app del telefono — nessuno stato vuoto comparirebbe, e il cassetto
+       sembrerebbe un telefono con poche app. `role="status"` e non un dialog:
+       è un'informazione, non una domanda. -->
+  <div class="launcher-status" id="launcher-status" role="status" hidden>
+    <i class="ti ti-alert-triangle launcher-status-icon" aria-hidden="true"></i>
+    <span class="launcher-status-text" data-i18n="launcher.loadFailed">Elenco incompleto: qualcosa non ha risposto.</span>
+    <button class="launcher-status-retry" id="launcher-status-retry" type="button"
+            data-i18n="launcher.retry">Riprova</button>
+  </div>
+  <div class="launcher-list" id="launcher-list" role="listbox"
+       aria-label="Risultati" data-i18n-aria="launcher.resultsList"></div>
+</div>
+
+</body>
+</html>

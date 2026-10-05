@@ -3,7 +3,7 @@
 ``_setView('chat')`` chiamava ``_applyConversation`` — che rifa' le
 traduzioni di tutta la casa, e con loro la fila, i Quaderni, le pagine e le
 stanze delle Impostazioni — e poi ridisegnava di nuovo fila e Quaderni, e il
-conteggio delle pagine una terza volta. Tornare da «Jenny» alla pagina
+conteggio delle pagine una terza volta. Tornare da «Jafta» alla pagina
 Impostazioni disegnava la fila quattro volte e i Quaderni due, per una
 conversazione che non era cambiata.
 
@@ -40,7 +40,7 @@ def test_back_from_a_settings_room_draws_the_strip_at_most_once() -> None:
     run_home(_HEAD + """
 app.homePages.goToId('settings');
 await tick(30);
-app.openJenny();
+app.openJafta();
 await tick(10);
 reset();
 app.goBackOneRoom();

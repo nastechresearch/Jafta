@@ -30,7 +30,7 @@ from pathlib import Path
 
 from support import css_levels
 
-UI = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui"
+UI = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui"
 ASSETS = UI / "assets"
 SWITCH = ASSETS / "shared" / "write-switch.js"
 WS = ASSETS / "shared" / "ws-manager.js"
@@ -252,6 +252,6 @@ def test_both_states_are_named_in_both_languages() -> None:
 
 def test_the_module_is_in_the_ui_manifest() -> None:
     """Fuori dal manifest il file non arriva sul telefono, e l'interruttore non c'è."""
-    from jenny.utils.android_assets import _UI_MANIFEST
+    from jafta.utils.android_assets import _UI_MANIFEST
 
     assert "assets/shared/write-switch.js" in _UI_MANIFEST

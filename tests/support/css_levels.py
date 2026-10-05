@@ -1,6 +1,6 @@
 """I livelli (`z-index`) dei fogli della WebUI, letti come li legge il browser.
 
-Serve ai banchi di «Jenny sempre sopra» (D3, 25/09/2026): la casa carica
+Serve ai banchi di «Jafta sempre sopra» (D3, 25/09/2026): la casa carica
 **due** fogli, `mobile-style.css` e `home-style.css`, e un livello che la copre
 puo' arrivare da tutti e due. Il banco di prima contava i `z-index` di
 `home-style.css` soltanto, e intanto mini-app e lightbox — regole
@@ -23,7 +23,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-UI = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui"
+UI = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui"
 ASSETS = UI / "assets"
 
 _IMPORT = re.compile(

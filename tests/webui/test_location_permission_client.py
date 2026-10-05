@@ -4,7 +4,7 @@ Dal collaudo del 27/09/2026: l'interruttore diceva solo la preferenza. Acceso
 con il permesso negato, la posizione non arrivava, riaccenderlo non chiedeva
 niente e niente lo diceva. Ora Mani mette accanto all'interruttore un avviso
 con «Allow location», e accenderlo chiede il permesso nello stesso tocco. Il
-guscio risponde con l'evento ``jenny-location-permission``.
+guscio risponde con l'evento ``jafta-location-permission``.
 """
 
 from __future__ import annotations
@@ -16,8 +16,8 @@ from support.js_harness import member, requires_node, run_js
 from support.kotlin_source import read_source
 
 ROOT = Path(__file__).resolve().parents[2]
-SETTINGS_JS = ROOT / "jenny" / "templates" / "ui" / "assets" / "mobile-settings.js"
-MAIN_ACTIVITY = ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "flagdizero" / "jenny" / "MainActivity.kt"
+SETTINGS_JS = ROOT / "jafta" / "templates" / "ui" / "assets" / "mobile-settings.js"
+MAIN_ACTIVITY = ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "nastechresearch" / "jafta" / "MainActivity.kt"
 
 
 @requires_node
@@ -31,7 +31,7 @@ def test_the_notice_shows_only_when_the_switch_is_on_and_android_says_no() -> No
         "  '#location-permission-nav': { hidden: true },\n"
         "};\n"
         "let granted = false; const asked = [];\n"
-        "globalThis.window = { JennyNative: {\n"
+        "globalThis.window = { JaftaNative: {\n"
         "  hasLocationPermission: () => granted,\n"
         "  requestLocationPermission: () => asked.push(1),\n"
         "} };\n"
@@ -71,10 +71,10 @@ assert.equal(els['#location-permission'].hidden, true);
 def test_switching_it_on_asks_and_the_answer_redraws() -> None:
     src = SETTINGS_JS.read_text(encoding="utf-8")
     assert "if (enabled) this._askLocationPermission();" in src
-    assert "window.addEventListener('jenny-location-permission', this._onLocationPermission)" in src
+    assert "window.addEventListener('jafta-location-permission', this._onLocationPermission)" in src
     assert "document.addEventListener('visibilitychange', this._onLocationPermission)" in src
     kotlin = read_source(MAIN_ACTIVITY)
-    assert "new Event('jenny-location-permission')" in kotlin
+    assert "new Event('jafta-location-permission')" in kotlin
     assert "ActivityResultContracts.RequestMultiplePermissions()" in kotlin
     ensure = re.search(r"private fun ensureLocationPermission\(\) \{(.*?)\n    \}", kotlin, re.S).group(1)
     assert "hasLocationPermission()" in ensure, "con la sola approssimativa la si richiede a ogni avvio"

@@ -20,7 +20,7 @@ from pathlib import Path
 
 from support import css_levels
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 SHOP = ASSETS / "mobile-style.css"
 HOME = ASSETS / "home-style.css"
 

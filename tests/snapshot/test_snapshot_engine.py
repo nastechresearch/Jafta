@@ -9,15 +9,15 @@ from pathlib import Path
 
 import pytest
 
-from jenny.snapshot.engine import SnapshotEngine
-from jenny.snapshot.store import (
+from jafta.snapshot.engine import SnapshotEngine
+from jafta.snapshot.store import (
     BlobCorruptError,
     get_blob,
     iter_blob_hashes,
     object_path,
     put_blob,
 )
-from jenny.snapshot.types import SnapshotManifest
+from jafta.snapshot.types import SnapshotManifest
 
 
 def _make_workspace(root: Path) -> None:
@@ -28,7 +28,7 @@ def _make_workspace(root: Path) -> None:
 
 
 def _engine(root: Path) -> SnapshotEngine:
-    return SnapshotEngine(root, root / ".jenny" / "snapshots")
+    return SnapshotEngine(root, root / ".jafta" / "snapshots")
 
 
 def test_create_list_and_head(tmp_path: Path) -> None:
@@ -144,12 +144,12 @@ def test_output_dedups_across_snapshots(tmp_path: Path) -> None:
 
 
 def test_store_self_exclusion_with_legacy_runtime_dir(tmp_path: Path) -> None:
-    """Lo store non si auto-include nemmeno col runtime dir legacy .minijenny."""
+    """Lo store non si auto-include nemmeno col runtime dir legacy .minijafta."""
     _make_workspace(tmp_path)
-    engine = SnapshotEngine(tmp_path, tmp_path / ".minijenny" / "snapshots")
+    engine = SnapshotEngine(tmp_path, tmp_path / ".minijafta" / "snapshots")
     first = engine.create_snapshot(trigger="manual", now_ms=1000)
     assert first is not None
-    # Il primo snapshot ha creato blob/manifest dentro .minijenny/snapshots:
+    # Il primo snapshot ha creato blob/manifest dentro .minijafta/snapshots:
     # se non fossero esclusi, il secondo snapshot vedrebbe "modifiche".
     second = engine.create_snapshot(trigger="manual", now_ms=2000)
     assert second is None

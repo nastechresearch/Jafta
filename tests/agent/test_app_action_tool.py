@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import json
 
-from jenny.agent.tools.app_actions import AppActionTool
-from jenny.apps.manifest import AppAction
+from jafta.agent.tools.app_actions import AppActionTool
+from jafta.apps.manifest import AppAction
 
 
 def _storage_action(op="append") -> AppAction:

@@ -1,4 +1,4 @@
-"""Test per ``jenny/channels/notification.py`` (la tendina come canale).
+"""Test per ``jafta/channels/notification.py`` (la tendina come canale).
 
 Il bridge Chaquopy non esiste fuori dal telefono: qui si sostituisce
 ``post_alert`` e si guarda **con che cosa** viene chiamato, più i due gate che
@@ -11,10 +11,10 @@ from typing import Any
 
 import pytest
 
-from jenny.bus.events import NOTIFICATION_CHANNEL, OutboundMessage
-from jenny.channels import notification as nc
-from jenny.channels.notification import REPLY_THREAD_TAG, NotificationChannel
-from jenny.runtime.native_input import NATIVE_THREAD_KEY
+from jafta.bus.events import NOTIFICATION_CHANNEL, OutboundMessage
+from jafta.channels import notification as nc
+from jafta.channels.notification import REPLY_THREAD_TAG, NotificationChannel
+from jafta.runtime.native_input import NATIVE_THREAD_KEY
 
 
 class _Spy:

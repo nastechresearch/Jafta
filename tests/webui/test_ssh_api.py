@@ -19,19 +19,19 @@ from pathlib import Path
 
 import pytest
 
-from jenny.agent.tools.ssh_backends.base import SshTransportError, known_hosts_name
-from jenny.agent.tools.ssh_transport import (
+from jafta.agent.tools.ssh_backends.base import SshTransportError, known_hosts_name
+from jafta.agent.tools.ssh_transport import (
     is_host_pinned,
     known_hosts_path,
     pinned_host_key,
     record_host_key,
     ssh_key_path,
 )
-from jenny.config.loader import load_config, save_config
-from jenny.config.schema import Config
-from jenny.runtime.context import get_runtime_context
-from jenny.webui import ssh_api
-from jenny.webui.settings_api import WebUISettingsError
+from jafta.config.loader import load_config, save_config
+from jafta.config.schema import Config
+from jafta.runtime.context import get_runtime_context
+from jafta.webui import ssh_api
+from jafta.webui.settings_api import WebUISettingsError
 
 # Chiavi finte ma base64 *valido*: l'impronta di una riga già registrata si
 # ricalcola da qui (``_fingerprint_from_known_hosts_line``), e un blob non
@@ -59,7 +59,7 @@ def env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     fra tutti i test: senza questo isolamento un test che scrive ``known_hosts``
     lo scriverebbe per tutti gli altri.
     """
-    from jenny.config import paths as paths_mod
+    from jafta.config import paths as paths_mod
 
     previous = get_runtime_context().workspace_dir
     workspace = tmp_path / "workspace"
@@ -95,7 +95,7 @@ class FakeBackend:
         key_path.parent.mkdir(parents=True, exist_ok=True)
         key_path.write_text("PRIVATE-KEY-MATERIAL-DO-NOT-LEAK")
         self.generated.append(key_path)
-        return "ssh-ed25519 AAAAPUBLIC jenny@phone"
+        return "ssh-ed25519 AAAAPUBLIC jafta@phone"
 
     async def probe_host_key(self, host: str, port: int) -> tuple[str, str]:
         if self.probe_delay:
@@ -183,7 +183,7 @@ async def test_moving_a_host_drops_the_pin_it_no_longer_covers(env) -> None:
     def _stamp(config):
         config.tools.ssh.hosts[0].host_key_fingerprint = FINGERPRINT
 
-    from jenny.config import store
+    from jafta.config import store
 
     await store.mutate(_stamp)
 
@@ -274,7 +274,7 @@ async def test_public_key_survives_closing_the_screen(env, monkeypatch) -> None:
 
 async def test_generated_private_key_is_0600(env, monkeypatch) -> None:
     """Contro il backend vero: i permessi sono la sua parte del contratto."""
-    from jenny.agent.tools.ssh_backends.dev import DevSshBackend
+    from jafta.agent.tools.ssh_backends.dev import DevSshBackend
 
     monkeypatch.setattr(ssh_api, "get_ssh_backend", lambda: DevSshBackend())
     await _add_host()
@@ -666,7 +666,7 @@ def test_module_never_calls_save_config_directly() -> None:
 
 
 async def test_every_write_goes_through_store_mutate(env, monkeypatch) -> None:
-    from jenny.config import store
+    from jafta.config import store
 
     calls: list[str] = []
     real_mutate = store.mutate
@@ -696,13 +696,13 @@ async def test_route_layer_maps_auth_and_errors(env, monkeypatch) -> None:
     from websockets.http11 import Headers
     from websockets.http11 import Request as WsRequest
 
-    from jenny.channels.http_utils import (
+    from jafta.channels.http_utils import (
         check_api_secret,
         http_error,
         http_json_response,
         parse_query,
     )
-    from jenny.webui.settings_routes import WebUISettingsRouter
+    from jafta.webui.settings_routes import WebUISettingsRouter
 
     secret = "s3cr3t-ssh"
     logger = MagicMock()
@@ -763,7 +763,7 @@ async def test_route_layer_maps_auth_and_errors(env, monkeypatch) -> None:
     async def boom(query):
         raise RuntimeError("guasto inatteso")
 
-    monkeypatch.setattr("jenny.webui.settings_routes.probe_ssh_host_key", boom)
+    monkeypatch.setattr("jafta.webui.settings_routes.probe_ssh_host_key", boom)
     failed = await router.dispatch(
         request("/api/settings/ssh/host-key/probe?alias=prod"),
         "/api/settings/ssh/host-key/probe",
@@ -780,7 +780,7 @@ async def test_a_setting_saved_during_a_slow_probe_is_not_lost(env, monkeypatch)
     preso per tutta la sua durata e ogni altra impostazione salvata nel
     frattempo aspetterebbe — o, con una config letta prima, sparirebbe.
     """
-    from jenny.webui.settings_api import update_provider
+    from jafta.webui.settings_api import update_provider
 
     started = asyncio.Event()
 
@@ -825,7 +825,7 @@ async def test_a_restored_workspace_says_which_hosts_lost_their_credentials(env)
     def _stamp(config):
         config.tools.ssh.hosts[0].host_key_fingerprint = FINGERPRINT
 
-    from jenny.config import store
+    from jafta.config import store
 
     await store.mutate(_stamp)
 
@@ -847,7 +847,7 @@ async def test_a_host_with_its_pin_intact_is_not_reported_as_lost(env) -> None:
     def _stamp(config):
         config.tools.ssh.hosts[0].host_key_fingerprint = FINGERPRINT
 
-    from jenny.config import store
+    from jafta.config import store
 
     await store.mutate(_stamp)
 

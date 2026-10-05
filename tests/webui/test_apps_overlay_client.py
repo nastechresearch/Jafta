@@ -1,6 +1,6 @@
 """Il velo di una mini-app: come si apre, cosa porta, come si chiude.
 
-Una Jenny App si apre sopra tutto in un velo (``.app-frame-overlay``) con la
+Una Jafta App si apre sopra tutto in un velo (``.app-frame-overlay``) con la
 sua testata e la cornice. Le strade sono due — l'app servita dal gateway
 (``openApp``) e la vista esterna dietro il proxy (``_openExternalView``) — e
 montavano il velo ognuna con la sua copia. Qui si fissa cosa monta ciascuna, e
@@ -21,7 +21,7 @@ from pathlib import Path
 from support.js_harness import requires_node, run_module
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 
 pytestmark = requires_node
 
@@ -90,7 +90,7 @@ globalThis.fetch = async (url, opts) => {
 };
 
 const { AppsActions } = await import('./shared/apps-actions.js');
-const source = { onAppDataChanged() {}, jennyApps: [
+const source = { onAppDataChanged() {}, jaftaApps: [
   { slug: 'orto', name: 'Orto <b>' },
   { slug: 'meteo', name: 'Meteo', view_kind: 'external' },
 ] };

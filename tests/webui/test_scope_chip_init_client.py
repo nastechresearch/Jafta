@@ -25,7 +25,7 @@ from pathlib import Path
 
 from support.js_harness import function, member, requires_node, run_js
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 CHIP_JS = ASSETS / "shared" / "scope-chip.js"
 LIST_JS = ASSETS / "shared" / "conversation-list.js"
 STATE_JS = ASSETS / "shared" / "state.js"
@@ -64,7 +64,7 @@ const { ConversationList } = await import('__LIST_URL__');
 const api = { listProjects: () => Promise.resolve({}) };
 
 /* Il nome di lei (`shared/bot-name.js`): qui quello di partenza. */
-const botName = { get: () => 'Jenny', set() {}, onChange() { return () => {}; } };
+const botName = { get: () => 'Jafta', set() {}, onChange() { return () => {}; } };
 const i18n = {
   t: (key, vars) => 'i18n:' + key + (vars ? ':' + Object.values(vars).join(',') : ''),
 };
@@ -273,5 +273,5 @@ def test_the_drawing_is_unchanged_when_the_spans_are_there() -> None:
       assert.equal(chipEl.mark.className, 'scope-chip-mark');
       // Il nome di lei, non una parola fissa: rinominata, il chip la segue
       // (collaudo del 27/09/2026).
-      assert.deepEqual(chipEl.path.children.map((n) => n.textContent), ['Jenny']);
+      assert.deepEqual(chipEl.path.children.map((n) => n.textContent), ['Jafta']);
     """)

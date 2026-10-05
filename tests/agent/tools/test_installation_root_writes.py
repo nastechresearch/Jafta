@@ -10,7 +10,7 @@ progetto diceva «scrivi solo dentro questa cartella»: la stessa classe di dife
 che il passo 2 ha sistemato nel prompt, qui sul lato dei file.
 
 Sono venute a galla facendo il passo 4: **fare la sola lettura obbliga a trovare
-tutte le scritture.** La Todo il 22/08 sul telefono (chiedendo a Jenny di
+tutte le scritture.** La Todo il 22/08 sul telefono (chiedendo a Jafta di
 aggirare il divieto), ``downloads/`` leggendo il codice subito dopo.
 
 Le due si chiudono in modo diverso, e la differenza è una decisione sul
@@ -31,15 +31,15 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.agent.tools.context import (
+from jafta.agent.tools.context import (
     RequestContext,
     bind_request_context,
     reset_request_context,
 )
-from jenny.agent.tools.download import DOWNLOADS_SUBDIR, DownloadFileTool
-from jenny.apps.manifest import AppAction
-from jenny.apps.storage import StorageError, execute_storage_action
-from jenny.security.workspace_access import (
+from jafta.agent.tools.download import DOWNLOADS_SUBDIR, DownloadFileTool
+from jafta.apps.manifest import AppAction
+from jafta.apps.storage import StorageError, execute_storage_action
+from jafta.security.workspace_access import (
     WorkspaceScopeResolver,
     build_workspace_scope,
     enter_workspace_scope,

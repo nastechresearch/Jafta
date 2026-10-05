@@ -20,7 +20,7 @@ from pathlib import Path
 from support.js_harness import NODE, requires_node, run_module
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 MARKED = ASSETS / "vendor" / "marked@15.0.7" / "marked.min.js"
 pytestmark = requires_node
 

@@ -8,12 +8,12 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from support.runner import make_spec
 
-from jenny.agent.runner import AgentRunner
-from jenny.agent.tools.base import Tool
-from jenny.agent.tools.registry import ToolRegistry
-from jenny.providers.base import LLMResponse, ToolCallRequest
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
-from jenny.providers.openai_responses.parsing import parse_response_output
+from jafta.agent.runner import AgentRunner
+from jafta.agent.tools.base import Tool
+from jafta.agent.tools.registry import ToolRegistry
+from jafta.providers.base import LLMResponse, ToolCallRequest
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.openai_responses.parsing import parse_response_output
 
 
 class _DelayTool(Tool):

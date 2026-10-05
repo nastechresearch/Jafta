@@ -10,7 +10,7 @@ corso, e la compattazione che il callback lancia la vede solo lei.
 
 from __future__ import annotations
 
-from jenny.providers.base import LLMResponse
+from jafta.providers.base import LLMResponse
 from tests.support.agent import make_loop, make_provider
 
 

@@ -1,11 +1,11 @@
 name: Feature request
-description: Suggest something Jenny should be able to do.
+description: Suggest something Jafta should be able to do.
 labels: ["enhancement"]
 body:
   - type: markdown
     attributes:
       value: |
-        Jenny has a deliberate scope: **Android-only**, local-first, one unified
+        Jafta has a deliberate scope: **Android-only**, local-first, one unified
         conversation, and no phone-home. Requests that fight those constraints
         will probably be declined — see
         [Known limitations](../blob/main/README.md#known-limitations) first.

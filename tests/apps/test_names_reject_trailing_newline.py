@@ -1,4 +1,4 @@
-"""I nomi delle Jenny App non accettano un "a capo" finale.
+"""I nomi delle Jafta App non accettano un "a capo" finale.
 
 ``SLUG_RE``, ``ACTION_NAME_RE`` e ``COLLECTION_RE`` erano ancorate con
 ``^…$`` e usate con ``.match``: in Python ``$`` accetta anche un ``\\n`` in
@@ -15,11 +15,11 @@ from pathlib import Path
 
 import pytest
 
-from jenny.apps import manifest
-from jenny.apps.storage import StorageError, _collection_path
+from jafta.apps import manifest
+from jafta.apps.storage import StorageError, _collection_path
 
 VALIDATOR = (
-    Path(__file__).resolve().parents[2] / "jenny/skills/app-creator/scripts/validate_app.py"
+    Path(__file__).resolve().parents[2] / "jafta/skills/app-creator/scripts/validate_app.py"
 )
 
 

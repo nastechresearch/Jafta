@@ -34,7 +34,7 @@ from pathlib import Path
 from support.js_harness import function, member, requires_node, run_js
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 FLOW_JS = ASSETS / "shared" / "update-flow.js"
 WHEN_JS = ASSETS / "shared" / "when.js"
 I18N_JS = ASSETS / "shared" / "i18n.js"
@@ -442,7 +442,7 @@ def test_a_check_that_could_not_run_says_so_and_unlocks() -> None:
 def test_a_fresh_install_is_not_an_alarm() -> None:
     """Prima del primo tentativo in assoluto non c'e' nessun guasto: c'e'
     un'installazione appena fatta, e darle l'aria dell'allarme sarebbe la prima
-    cosa falsa che Jenny dice."""
+    cosa falsa che Jafta dice."""
     _run_js("""
       const rows = checkLines({});
       assert.equal(rows.length, 1);

@@ -14,11 +14,11 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
 
-from jenny.agent.loop import AgentLoop
-from jenny.bus.events import InboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.providers.base import LLMResponse
-from jenny.providers.message_repair import enforce_role_alternation
+from jafta.agent.loop import AgentLoop
+from jafta.bus.events import InboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.providers.base import LLMResponse
+from jafta.providers.message_repair import enforce_role_alternation
 
 RESULT = "[Subagent 'plant-cards' completed successfully]\n\nResult:\nSix pages written."
 

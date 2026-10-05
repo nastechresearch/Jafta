@@ -17,12 +17,12 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from jenny.channels.websocket import (
+from jafta.channels.websocket import (
     WebSocketChannel,
     WebSocketConfig,
     _extract_data_url_mime,
 )
-from jenny.webui.gateway_services import build_gateway_services
+from jafta.webui.gateway_services import build_gateway_services
 
 
 def _tiny_png_data_url() -> str:
@@ -87,7 +87,7 @@ def test_extract_data_url_mime(url: Any, expected: str | None) -> None:
 
 def test_max_message_bytes_default_supports_multi_image_frame() -> None:
     """Default 36 MB must comfortably hold 4 × 6 MB base64-encoded images."""
-    from jenny.channels.websocket import WebSocketConfig
+    from jafta.channels.websocket import WebSocketConfig
 
     default = WebSocketConfig().max_message_bytes
     # 4 images × 6 MB × 1.37 base64 overhead ≈ 33 MB
@@ -130,7 +130,7 @@ async def test_message_with_single_image_forwards_saved_path(tmp_path) -> None:
     }
 
     with patch(
-        "jenny.channels.websocket.get_uploads_dir", return_value=tmp_path
+        "jafta.channels.websocket.get_uploads_dir", return_value=tmp_path
     ):
         await channel._dispatch_envelope(mock_conn, "client-1", envelope)
 
@@ -159,7 +159,7 @@ async def test_message_with_multiple_images(tmp_path) -> None:
     }
 
     with patch(
-        "jenny.channels.websocket.get_uploads_dir", return_value=tmp_path
+        "jafta.channels.websocket.get_uploads_dir", return_value=tmp_path
     ):
         await channel._dispatch_envelope(mock_conn, "client-1", envelope)
 
@@ -182,7 +182,7 @@ async def test_image_only_message_allows_empty_text(tmp_path) -> None:
     }
 
     with patch(
-        "jenny.channels.websocket.get_uploads_dir", return_value=tmp_path
+        "jafta.channels.websocket.get_uploads_dir", return_value=tmp_path
     ):
         await channel._dispatch_envelope(mock_conn, "client-1", envelope)
 
@@ -203,7 +203,7 @@ async def test_message_rejected_when_more_than_four_images(tmp_path) -> None:
     }
 
     with patch(
-        "jenny.channels.websocket.get_uploads_dir", return_value=tmp_path
+        "jafta.channels.websocket.get_uploads_dir", return_value=tmp_path
     ):
         await channel._dispatch_envelope(mock_conn, "client-1", envelope)
 
@@ -228,7 +228,7 @@ async def test_message_rejected_on_oversize_payload(tmp_path) -> None:
     }
 
     with patch(
-        "jenny.channels.websocket.get_uploads_dir", return_value=tmp_path
+        "jafta.channels.websocket.get_uploads_dir", return_value=tmp_path
     ):
         await channel._dispatch_envelope(mock_conn, "client-1", envelope)
 
@@ -252,7 +252,7 @@ async def test_message_with_document_is_accepted(tmp_path) -> None:
     }
 
     with patch(
-        "jenny.channels.websocket.get_uploads_dir", return_value=tmp_path
+        "jafta.channels.websocket.get_uploads_dir", return_value=tmp_path
     ):
         await channel._dispatch_envelope(mock_conn, "client-1", envelope)
 
@@ -282,7 +282,7 @@ async def test_message_with_unknown_mime_keeps_extension_from_name(tmp_path) -> 
     }
 
     with patch(
-        "jenny.channels.websocket.get_uploads_dir", return_value=tmp_path
+        "jafta.channels.websocket.get_uploads_dir", return_value=tmp_path
     ):
         await channel._dispatch_envelope(mock_conn, "client-1", envelope)
 
@@ -306,7 +306,7 @@ async def test_message_with_svg_is_accepted_as_generic_file(tmp_path) -> None:
     }
 
     with patch(
-        "jenny.channels.websocket.get_uploads_dir", return_value=tmp_path
+        "jafta.channels.websocket.get_uploads_dir", return_value=tmp_path
     ):
         await channel._dispatch_envelope(mock_conn, "client-1", envelope)
 
@@ -326,7 +326,7 @@ async def test_message_rejected_when_more_than_four_files(tmp_path) -> None:
     }
 
     with patch(
-        "jenny.channels.websocket.get_uploads_dir", return_value=tmp_path
+        "jafta.channels.websocket.get_uploads_dir", return_value=tmp_path
     ):
         await channel._dispatch_envelope(mock_conn, "client-1", envelope)
 
@@ -348,7 +348,7 @@ async def test_message_rejected_on_malformed_data_url(tmp_path) -> None:
     }
 
     with patch(
-        "jenny.channels.websocket.get_uploads_dir", return_value=tmp_path
+        "jafta.channels.websocket.get_uploads_dir", return_value=tmp_path
     ):
         await channel._dispatch_envelope(mock_conn, "client-1", envelope)
 
@@ -369,7 +369,7 @@ async def test_message_rejected_on_broken_base64(tmp_path) -> None:
     }
 
     with patch(
-        "jenny.channels.websocket.get_uploads_dir", return_value=tmp_path
+        "jafta.channels.websocket.get_uploads_dir", return_value=tmp_path
     ):
         await channel._dispatch_envelope(mock_conn, "client-1", envelope)
 
@@ -391,7 +391,7 @@ async def test_message_rejected_when_media_item_shape_wrong(tmp_path) -> None:
     }
 
     with patch(
-        "jenny.channels.websocket.get_uploads_dir", return_value=tmp_path
+        "jafta.channels.websocket.get_uploads_dir", return_value=tmp_path
     ):
         await channel._dispatch_envelope(mock_conn, "client-1", envelope)
 
@@ -441,7 +441,7 @@ async def test_failed_media_does_not_partially_persist(tmp_path) -> None:
     }
 
     with patch(
-        "jenny.channels.websocket.get_uploads_dir", return_value=tmp_path
+        "jafta.channels.websocket.get_uploads_dir", return_value=tmp_path
     ):
         await channel._dispatch_envelope(mock_conn, "client-1", envelope)
 
@@ -509,7 +509,7 @@ async def test_media_decode_runs_off_event_loop_thread(tmp_path) -> None:
 
     observed: dict[str, Any] = {}
     real_decode = None
-    from jenny.channels import websocket as ws_mod
+    from jafta.channels import websocket as ws_mod
 
     real_decode = ws_mod.save_base64_data_url
 
@@ -521,8 +521,8 @@ async def test_media_decode_runs_off_event_loop_thread(tmp_path) -> None:
         return real_decode(*args, **kwargs)
 
     with patch(
-        "jenny.channels.websocket.get_uploads_dir", return_value=tmp_path
-    ), patch("jenny.channels.websocket.save_base64_data_url", side_effect=_spy):
+        "jafta.channels.websocket.get_uploads_dir", return_value=tmp_path
+    ), patch("jafta.channels.websocket.save_base64_data_url", side_effect=_spy):
         await channel._dispatch_envelope(mock_conn, "client-1", envelope)
 
     channel._handle_message.assert_awaited_once()

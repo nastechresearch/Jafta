@@ -1,8 +1,8 @@
 """Le taglie della mascotte sono scritte in due posti: devono coincidere.
 
 ``shared/mascot.js`` è la fonte di verità a runtime, ma ``bootstrap.js`` gira
-prima di qualsiasi modulo ES (non può importare) e riscrive ``--jenny-size``
-per evitare che Jenny compaia media e poi si ridimensioni. Se le due tabelle
+prima di qualsiasi modulo ES (non può importare) e riscrive ``--jafta-size``
+per evitare che Jafta compaia media e poi si ridimensioni. Se le due tabelle
 divergono, il flash torna — e solo per chi non usa la taglia di default, cioè
 esattamente il caso che quel codice esiste per coprire.
 """
@@ -14,7 +14,7 @@ from pathlib import Path
 
 from support.kotlin_source import read_source
 
-UI_ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+UI_ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 
 
 def _sizes_from(source: str, pattern: str) -> dict[str, int]:
@@ -48,7 +48,7 @@ def test_default_size_matches_the_css_token():
 
     Il default si legge da ``mascotSize()`` invece di essere scritto qui: così
     spostarlo (era 'md', oggi 'sm') non lascia il token CSS indietro di
-    nascosto — chi non ha mai scelto una taglia vedrebbe Jenny comparire con
+    nascosto — chi non ha mai scelto una taglia vedrebbe Jafta comparire con
     quella vecchia e poi ridimensionarsi.
     """
     source = (UI_ASSETS / "shared" / "mascot.js").read_text("utf-8")
@@ -59,8 +59,8 @@ def test_default_size_matches_the_css_token():
     assert default in module, f"default '{default}' non è una taglia di MASCOT_SIZES"
 
     css = (UI_ASSETS / "mobile-style.css").read_text("utf-8")
-    token = re.search(r"--jenny-size:\s*(\d+)px", css)
-    assert token, "--jenny-size non è più definita in :root"
+    token = re.search(r"--jafta-size:\s*(\d+)px", css)
+    assert token, "--jafta-size non è più definita in :root"
     assert int(token.group(1)) == module[default]
 
 
@@ -75,10 +75,10 @@ def test_the_floating_mascot_takes_its_size_from_the_same_place():
     `@JavascriptInterface` che la riceve, e il fatto che il controller non
     reintroduca una taglia fissa come misura di lavoro.
     """
-    android = Path(__file__).resolve().parents[2] / "android/app/src/main/java/com/flagdizero/jenny"
+    android = Path(__file__).resolve().parents[2] / "android/app/src/main/java/com/nastechresearch/jafta"
 
     mascot_js = (UI_ASSETS / "shared" / "mascot.js").read_text("utf-8")
-    assert "JennyNative?.setMascotSize?.(px, window.devicePixelRatio" in mascot_js, (
+    assert "JaftaNative?.setMascotSize?.(px, window.devicePixelRatio" in mascot_js, (
         "applyMascotSize non spinge più la taglia al guscio nativo: la mascotte "
         "flottante resterebbe a quella di prima, in silenzio"
     )

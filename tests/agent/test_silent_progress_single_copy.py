@@ -12,10 +12,10 @@ import inspect
 
 import pytest
 
-from jenny.agent import dream_cycle, dream_review, gardener
-from jenny.agent.dream_cycle import DreamOutcome, DreamTurnResult
-from jenny.runtime import cron_dispatch
-from jenny.session.turn_visibility import silent_progress
+from jafta.agent import dream_cycle, dream_review, gardener
+from jafta.agent.dream_cycle import DreamOutcome, DreamTurnResult
+from jafta.runtime import cron_dispatch
+from jafta.session.turn_visibility import silent_progress
 
 
 @pytest.mark.parametrize("module", [dream_cycle, dream_review, gardener, cron_dispatch])

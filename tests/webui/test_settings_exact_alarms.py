@@ -26,14 +26,14 @@ from pathlib import Path
 import pytest
 from support.kotlin_source import read_source
 
-from jenny.config.schema import KEEP_AWAKE_MODES
+from jafta.config.schema import KEEP_AWAKE_MODES
 
 ROOT = Path(__file__).resolve().parents[2]
-_UI_ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+_UI_ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 _SETTINGS_JS = _UI_ASSETS / "mobile-settings.js"
 _STYLE_CSS = _UI_ASSETS / "mobile-style.css"
 _MAIN_ACTIVITY = (
-    ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "flagdizero" / "jenny"
+    ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "nastechresearch" / "jafta"
     / "MainActivity.kt"
 )
 

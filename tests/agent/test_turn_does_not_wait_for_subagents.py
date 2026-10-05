@@ -12,8 +12,8 @@ from __future__ import annotations
 
 import asyncio
 
-from jenny.bus.events import InboundMessage
-from jenny.providers.base import LLMResponse, ToolCallRequest
+from jafta.bus.events import InboundMessage
+from jafta.providers.base import LLMResponse, ToolCallRequest
 from tests.support.agent import make_loop, make_provider
 
 KEY = "unified:default"

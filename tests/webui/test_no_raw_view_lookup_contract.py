@@ -38,7 +38,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 SETTINGS = ASSETS / "mobile-settings.js"
 
 SOURCES = sorted(
@@ -51,7 +51,7 @@ SOURCES = sorted(
 # non e' il difetto: li' non c'e' nessun modo da tradurre, e vietarlo direbbe una
 # bugia. Fino al 25/09/2026 la regex vedeva solo la prima forma, e
 # `mobile-ui-query.js` con `getElementById('view-' + view)` le passava sotto:
-# lo strumento `ui_view` mandava a Jenny un HTML vuoto per i tre cassetti.
+# lo strumento `ui_view` mandava a Jafta un HTML vuoto per i tre cassetti.
 RAW = re.compile(
     r"""(?:getElementById\(\s*|querySelector(?:All)?\(\s*)"""
     r"""(?:`#?(?:view|title)-\$\{|(['"])#?(?:view|title)-\1\s*\+)"""
@@ -147,7 +147,7 @@ def test_it_would_have_caught_all_three() -> None:
 
 def test_it_catches_the_concatenated_and_selector_forms() -> None:
     """Le forme che la prima regex non vedeva, fra cui quella di
-    `mobile-ui-query.js` che mandava a Jenny un HTML vuoto (H6)."""
+    `mobile-ui-query.js` che mandava a Jafta un HTML vuoto (H6)."""
     fake = """
       const container = document.getElementById('view-' + view);
       const t = document.getElementById("title-" + mode);

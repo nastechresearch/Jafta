@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from jenny.providers.openai_compat_provider import (
+from jafta.providers.openai_compat_provider import (
     OpenAICompatProvider,
     _deep_merge,
 )
@@ -264,19 +264,19 @@ class TestSchemaConfig:
     """Verify ProviderConfig accepts extra_body."""
 
     def test_default_is_none(self) -> None:
-        from jenny.config.schema import ProviderConfig
+        from jafta.config.schema import ProviderConfig
 
         config = ProviderConfig(name="test", format="openai_compat")
         assert config.extra_body is None
 
     def test_accepts_dict(self) -> None:
-        from jenny.config.schema import ProviderConfig
+        from jafta.config.schema import ProviderConfig
 
         config = ProviderConfig(name="test", format="openai_compat", extra_body={"guided_json": {"type": "object"}})
         assert config.extra_body == {"guided_json": {"type": "object"}}
 
     def test_nested_dict(self) -> None:
-        from jenny.config.schema import ProviderConfig
+        from jafta.config.schema import ProviderConfig
 
         config = ProviderConfig(
             name="test", format="openai_compat",

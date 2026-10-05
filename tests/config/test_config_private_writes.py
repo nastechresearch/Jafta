@@ -15,10 +15,10 @@ from pathlib import Path
 
 import pytest
 
-from jenny.config import store
-from jenny.config.bootstrap import ensure_minimal_config
-from jenny.config.loader import _backup_path, load_config
-from jenny.runtime.context import get_runtime_context
+from jafta.config import store
+from jafta.config.bootstrap import ensure_minimal_config
+from jafta.config.loader import _backup_path, load_config
+from jafta.runtime.context import get_runtime_context
 
 
 @pytest.fixture
@@ -79,7 +79,7 @@ def test_the_backup_promotion_writes_the_file_already_private(tmp_path, renames)
 
 def test_a_filesystem_that_refuses_chmod_still_gets_the_file(tmp_path, monkeypatch) -> None:
     """Best-effort come prima: su FAT il ``chmod`` fallisce, la scrittura no."""
-    from jenny.config.bootstrap import write_private_file
+    from jafta.config.bootstrap import write_private_file
 
     def refuse(*a, **k):
         raise PermissionError("chmod not supported")

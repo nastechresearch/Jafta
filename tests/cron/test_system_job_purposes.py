@@ -20,13 +20,13 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-from jenny.cron.purposes import (
+from jafta.cron.purposes import (
     SYSTEM_JOB_PURPOSES,
     UNKNOWN_SYSTEM_JOB_PURPOSE,
     system_job_purpose,
 )
 
-CONTAINER = Path(__file__).resolve().parents[2] / "jenny" / "runtime" / "container.py"
+CONTAINER = Path(__file__).resolve().parents[2] / "jafta" / "runtime" / "container.py"
 
 
 def _registered_system_job_ids() -> set[str]:
@@ -86,7 +86,7 @@ def test_every_registered_system_job_can_present_itself() -> None:
     assert not missing, (
         f"job di sistema registrati senza una riga in SYSTEM_JOB_PURPOSES: {missing}. "
         "Girano da soli e spendono token o rete: devono sapersi presentare "
-        "(v. jenny/cron/purposes.py)."
+        "(v. jafta/cron/purposes.py)."
     )
 
 

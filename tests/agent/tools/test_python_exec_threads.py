@@ -12,7 +12,7 @@ default executor. ``asyncio.wait_for`` scadeva e chiamava
 ``PyThreadState_SetAsyncExc``, che non raggiunge un thread fermo in un lock a
 livello C: la coroutine tornava un ordinato "timed out" al modello e il thread
 restava bloccato per sempre. Il default executor ha ~12 worker sul device ed è
-condiviso con le ~50 ``asyncio.to_thread`` di ``jenny/`` — snapshot, backup,
+condiviso con le ~50 ``asyncio.to_thread`` di ``jafta/`` — snapshot, backup,
 notifier, cron. Riprodotto con un pool piccolo, che è la forma giusta::
 
     [1.3s] python_exec results: ['Error: Python execution timed out after 1 seconds', ...x2]
@@ -42,9 +42,9 @@ from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 
-from jenny.agent.tools import python_exec
-from jenny.agent.tools.python_exec import PythonNamespace, run_python_async
-from jenny.config.tool_schemas import PythonExecConfig
+from jafta.agent.tools import python_exec
+from jafta.agent.tools.python_exec import PythonNamespace, run_python_async
+from jafta.config.tool_schemas import PythonExecConfig
 
 _REFUSED = "outside allowed directory"
 
@@ -449,8 +449,8 @@ class TestKnownRemainingDoors:
 class TestBothHalvesCrossTheHop:
     @staticmethod
     def _tool(ws, *, restrict: bool = True):
-        from jenny.agent.tools.python_exec import PythonExecTool
-        from jenny.agent.tools.python_exec_builtins import _register_builtin_functions
+        from jafta.agent.tools.python_exec import PythonExecTool
+        from jafta.agent.tools.python_exec_builtins import _register_builtin_functions
 
         cfg = PythonExecConfig()
         tool = PythonExecTool(
@@ -511,7 +511,7 @@ class TestBothHalvesCrossTheHop:
         """
         import dataclasses
 
-        from jenny.security.workspace_access import (
+        from jafta.security.workspace_access import (
             build_workspace_scope,
             enter_workspace_scope,
         )
@@ -541,7 +541,7 @@ class TestBothHalvesCrossTheHop:
         """
         import dataclasses
 
-        from jenny.security.workspace_access import (
+        from jafta.security.workspace_access import (
             build_workspace_scope,
             enter_workspace_scope,
         )
@@ -570,7 +570,7 @@ class TestBothHalvesCrossTheHop:
         passerebbe i due test qui sopra e renderebbe inutilizzabile
         ``asyncio.to_thread``, che è nell'allowlist perché il modello la usi.
         """
-        from jenny.security.workspace_access import (
+        from jafta.security.workspace_access import (
             build_workspace_scope,
             enter_workspace_scope,
         )
@@ -593,7 +593,7 @@ class TestBothHalvesCrossTheHop:
         """
         import dataclasses
 
-        from jenny.security.workspace_access import (
+        from jafta.security.workspace_access import (
             build_workspace_scope,
             enter_workspace_scope,
         )
@@ -635,7 +635,7 @@ class TestTheGateKeepsTheHostOut:
     """
 
     def test_a_host_callable_crosses_untouched(self):
-        from jenny.agent.tools.python_exec import _carry_guard_state
+        from jafta.agent.tools.python_exec import _carry_guard_state
 
         def fn() -> None:
             pass
@@ -644,7 +644,7 @@ class TestTheGateKeepsTheHostOut:
 
     def test_a_guarded_callable_gets_the_bridge(self, workspace):
         """Controprova: con un guard attivo sul thread, la callable è avvolta."""
-        from jenny.agent.tools.python_exec import _carry_guard_state, _import_guard_state
+        from jafta.agent.tools.python_exec import _carry_guard_state, _import_guard_state
 
         def fn() -> None:
             pass
@@ -707,7 +707,7 @@ class TestOnlyOneBridgeExists:
         """Le quattro primitive di trasporto, più la copia del contesto."""
         import ast
 
-        from jenny.agent.tools import exec_session, python_exec
+        from jafta.agent.tools import exec_session, python_exec
 
         watched = {
             "_guard_state_snapshot",
@@ -741,19 +741,19 @@ class TestOnlyOneBridgeExists:
         """L'elenco dei salti. Debole: v. il docstring della classe."""
         import ast
 
-        from jenny.agent.tools import exec_session, python_exec
+        from jafta.agent.tools import exec_session, python_exec
 
         # (modulo, funzione che contiene il salto) -> perché è a posto.
         declared = {
-            ("jenny.agent.tools.python_exec", "_patch_asyncio_thread_hops"): (
+            ("jafta.agent.tools.python_exec", "_patch_asyncio_thread_hops"): (
                 "è il patch stesso: avvolge la callable in _carry_guard_state, "
                 "che è il ponte più il gate per il codice host"
             ),
-            ("jenny.agent.tools.python_exec", "run_python_async"): (
+            ("jafta.agent.tools.python_exec", "run_python_async"): (
                 "passa _run_carried, costruito con _carry_turn_across_thread sul "
                 "thread dell'event loop"
             ),
-            ("jenny.agent.tools.exec_session", "__init__"): (
+            ("jafta.agent.tools.exec_session", "__init__"): (
                 "il thread grezzo della sessione: il ponte lo costruisce "
                 "_ContextBoundNamespace, prima, dove il turno esiste ancora"
             ),

@@ -1,4 +1,4 @@
-"""La scheda di una Jenny App, aperta con una pressione lunga dal cassetto.
+"""La scheda di una Jafta App, aperta con una pressione lunga dal cassetto.
 
 In casa ha quattro righe — Apri · Metti come pagina · Modifica · Elimina — nello
 stesso ordine della scheda di un quaderno: **una cosa si appende dal posto dove
@@ -23,7 +23,7 @@ import pytest
 from support.js_harness import requires_node, run_module
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 
 pytestmark = requires_node
 
@@ -32,7 +32,7 @@ _NEIGHBORS = {
     "api-client.js": """
 export const api = {
   cancellate: [],
-  async deleteJennyApp(slug) { this.cancellate.push(slug); },
+  async deleteJaftaApp(slug) { this.cancellate.push(slug); },
   getSecret() { return 'ok'; },
 };
 """,
@@ -64,8 +64,8 @@ function createEl(id) {
   if (id) elements.set(id, el);
   return el;
 }
-for (const id of ['jenny-app-sheet', 'jenny-app-sheet-title',
-                  'jenny-app-sheet-actions', 'jenny-app-sheet-cancel']) createEl(id);
+for (const id of ['jafta-app-sheet', 'jafta-app-sheet-title',
+                  'jafta-app-sheet-actions', 'jafta-app-sheet-cancel']) createEl(id);
 globalThis.document = {
   getElementById: (id) => elements.get(id) || null,
   createElement: () => createEl(null),
@@ -77,7 +77,7 @@ globalThis.MutationObserver = class { observe() {} };
 
 /* Le righe della scheda, lette dal testo che scrive: azione, spenta, perche'. */
 function rows() {
-  const html = elements.get('jenny-app-sheet-actions').innerHTML;
+  const html = elements.get('jafta-app-sheet-actions').innerHTML;
   return [...html.matchAll(/<button[^>]*data-action="([^"]+)"([^>]*)>([\\s\\S]*?)<\\/button>/g)]
     .map(([, action, attr, inside]) => ({
       action,
@@ -102,15 +102,15 @@ def _run(body: str, *, app: dict, pages: str | None) -> None:
             const calls = [];
             const APP = {json.dumps(app)};
             const source = {{
-              jennyApps: [APP],
-              async loadJennyApps() {{ calls.push(['rilette']); }},
+              jaftaApps: [APP],
+              async loadJaftaApps() {{ calls.push(['rilette']); }},
               onAppDataChanged() {{ return () => {{}}; }},
             }};
             const DOOR = {door};
             const shell = {{ sendChatPrompt() {{}} }};
             if (DOOR) shell.homePages = () => DOOR;
             const actions = new AppsActions(source, shell);
-            actions.showJennyAppSheet(APP.slug);
+            actions.showJaftaAppSheet(APP.slug);
             """
         )
         + body
@@ -160,7 +160,7 @@ def test_in_the_workshop_the_sheet_is_exactly_as_before() -> None:
     """
     _run(
         "assert.deepEqual(rows().map((r) => r.action), ['open', 'edit', 'delete']);\n"
-        "const html = document.getElementById('jenny-app-sheet-actions').innerHTML;\n"
+        "const html = document.getElementById('jafta-app-sheet-actions').innerHTML;\n"
         "assert.ok(!html.includes('oc-sheet-label'), 'le righe dell officina hanno cambiato forma');\n"
         "assert.ok(!html.includes('disabled'));\n",
         app=GARDEN,
@@ -213,7 +213,7 @@ def test_a_row_that_can_be_used_is_not_off() -> None:
 
 def test_pin_asks_the_pages_for_this_app() -> None:
     _run(
-        "await actions._handleJennySheetAction('pin', APP);\n"
+        "await actions._handleJaftaSheetAction('pin', APP);\n"
         "assert.deepEqual(calls.at(-1), ['appendi', 'app', 'orto']);\n",
         app=GARDEN,
         pages=_door("free"),
@@ -222,7 +222,7 @@ def test_pin_asks_the_pages_for_this_app() -> None:
 
 def test_unpin_takes_it_off_and_says_so() -> None:
     _run(
-        "await actions._handleJennySheetAction('unpin', APP);\n"
+        "await actions._handleJaftaSheetAction('unpin', APP);\n"
         "assert.deepEqual(calls.at(-1), ['stacca', 'app', 'orto']);\n"
         "assert.deepEqual(notices.at(-1), ['apps.unpinned', 'success']);\n",
         app=GARDEN,
@@ -234,7 +234,7 @@ def test_deleting_an_app_rereads_the_pages() -> None:
     """Il gateway toglie la pagina insieme all'app; la casa lo deve sapere, o
     resterebbe un pallino verso un'app che non c'e' piu'."""
     _run(
-        "await actions._handleJennySheetAction('delete', APP);\n"
+        "await actions._handleJaftaSheetAction('delete', APP);\n"
         "assert.deepEqual(api.cancellate, ['orto']);\n"
         "assert.ok(calls.some((c) => c[0] === 'ricarica'), 'le pagine non sono state rilette');\n",
         app=GARDEN,
@@ -245,7 +245,7 @@ def test_deleting_an_app_rereads_the_pages() -> None:
 def test_deleting_from_the_workshop_needs_no_pages() -> None:
     """Senza porta la cancellazione va come prima, senza inciampare."""
     _run(
-        "await actions._handleJennySheetAction('delete', APP);\n"
+        "await actions._handleJaftaSheetAction('delete', APP);\n"
         "assert.deepEqual(api.cancellate, ['orto']);\n"
         "assert.deepEqual(notices.at(-1), ['apps.appDeleted', 'success']);\n",
         app=GARDEN,

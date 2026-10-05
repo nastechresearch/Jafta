@@ -16,8 +16,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from jenny.providers.anthropic_provider import AnthropicProvider
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.anthropic_provider import AnthropicProvider
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 
 class _Headers(dict):

@@ -32,7 +32,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 APP_JS = ASSETS / "mobile-app.js"
 CHAT_JS = ASSETS / "mobile-chat.js"
 SETTINGS_JS = ASSETS / "mobile-settings.js"
@@ -151,7 +151,7 @@ def test_the_home_view_preference_is_gone_from_the_product() -> None:
     elencato e non presente e' un 404 silenzioso sul telefono, che in locale
     non si vede.
     """
-    from jenny.utils.android_assets import _UI_MANIFEST
+    from jafta.utils.android_assets import _UI_MANIFEST
 
     module = ASSETS / "shared" / "home-view.js"
     assert not module.exists(), "il modulo della vista home e' tornato"

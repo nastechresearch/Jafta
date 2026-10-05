@@ -1,6 +1,6 @@
 import pytest
 
-from jenny.config.paths import (
+from jafta.config.paths import (
     get_data_dir,
     get_media_dir,
     get_runtime_subdir,
@@ -18,7 +18,7 @@ def _reset_workspace_dir(monkeypatch, tmp_path):
     """
     from pathlib import Path
 
-    from jenny.runtime.context import get_runtime_context
+    from jafta.runtime.context import get_runtime_context
 
     # Records the session workspace value and restores it after the test.
     monkeypatch.setattr(get_runtime_context(), "workspace_dir", Path(str(tmp_path)))
@@ -26,7 +26,7 @@ def _reset_workspace_dir(monkeypatch, tmp_path):
 
 def test_data_dir_is_inside_workspace() -> None:
     workspace = get_workspace_path()
-    assert get_data_dir() == workspace / ".jenny"
+    assert get_data_dir() == workspace / ".jafta"
 
 
 def test_data_dir_migrates_legacy_nanobot_dir() -> None:
@@ -37,27 +37,27 @@ def test_data_dir_migrates_legacy_nanobot_dir() -> None:
 
     data = get_data_dir()
 
-    assert data == workspace / ".jenny"
+    assert data == workspace / ".jafta"
     assert not legacy_dir.exists()
     assert (data / "cron" / "marker.txt").read_text() == "legacy"
 
 
-def test_data_dir_migrates_legacy_minijenny_dir() -> None:
+def test_data_dir_migrates_legacy_minijafta_dir() -> None:
     workspace = get_workspace_path()
-    legacy_dir = workspace / ".minijenny"
+    legacy_dir = workspace / ".minijafta"
     (legacy_dir / "cron").mkdir(parents=True)
     (legacy_dir / "cron" / "marker.txt").write_text("legacy")
 
     data = get_data_dir()
 
-    assert data == workspace / ".jenny"
+    assert data == workspace / ".jafta"
     assert not legacy_dir.exists()
     assert (data / "cron" / "marker.txt").read_text() == "legacy"
 
 
 def test_data_dir_does_not_overwrite_existing_new_dir(tmp_path) -> None:
     workspace = get_workspace_path()
-    new_dir = workspace / ".jenny"
+    new_dir = workspace / ".jafta"
     new_dir.mkdir()
     (new_dir / "marker.txt").write_text("current")
     legacy_dir = workspace / ".nanobot"
@@ -85,7 +85,7 @@ def test_media_dir_supports_channel_namespace() -> None:
 
 
 def test_workspace_path_raises_when_unconfigured(monkeypatch):
-    from jenny.runtime.context import get_runtime_context
+    from jafta.runtime.context import get_runtime_context
 
     monkeypatch.setattr(get_runtime_context(), "workspace_dir", None)
 
@@ -98,4 +98,4 @@ def test_set_workspace_dir_takes_priority(tmp_path):
     set_workspace_dir(workspace_dir)
 
     assert get_workspace_path() == workspace_dir
-    assert get_data_dir() == workspace_dir / ".jenny"
+    assert get_data_dir() == workspace_dir / ".jafta"

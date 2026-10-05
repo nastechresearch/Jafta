@@ -39,7 +39,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 WORKSPACE_JS = ASSETS / "mobile-workspace.js"
 SETTINGS_JS = ASSETS / "mobile-settings.js"
 BACKUP_JS = ASSETS / "shared" / "backup-flow.js"

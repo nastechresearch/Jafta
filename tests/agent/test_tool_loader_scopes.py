@@ -1,8 +1,8 @@
 import pytest
 
-from jenny.agent.tools.base import Tool
-from jenny.agent.tools.context import ToolContext
-from jenny.agent.tools.loader import ToolLoader
+from jafta.agent.tools.base import Tool
+from jafta.agent.tools.context import ToolContext
+from jafta.agent.tools.loader import ToolLoader
 
 
 class _CoreOnlyTool(Tool):
@@ -64,7 +64,7 @@ class _UniversalTool(Tool):
 
 @pytest.mark.asyncio
 async def test_loader_filters_by_scope():
-    from jenny.agent.tools.registry import ToolRegistry
+    from jafta.agent.tools.registry import ToolRegistry
 
     loader = ToolLoader(test_classes=[_CoreOnlyTool, _SubagentOnlyTool, _UniversalTool])
 

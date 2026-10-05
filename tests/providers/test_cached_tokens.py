@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 
 class _FakeSpec:
@@ -127,7 +127,7 @@ def test_extract_usage_priority_nested_over_top_level_dict():
 
 def test_anthropic_maps_cache_fields_to_cached_tokens():
     """Anthropic's cache_read_input_tokens should map to cached_tokens."""
-    from jenny.providers.anthropic_provider import AnthropicProvider
+    from jafta.providers.anthropic_provider import AnthropicProvider
 
     response = {
         "content": [{"type": "text", "text": "hello"}],
@@ -148,7 +148,7 @@ def test_anthropic_maps_cache_fields_to_cached_tokens():
 
 def test_anthropic_no_cache_fields():
     """Anthropic response without cache fields should not have cached_tokens."""
-    from jenny.providers.anthropic_provider import AnthropicProvider
+    from jafta.providers.anthropic_provider import AnthropicProvider
 
     response = {
         "content": [{"type": "text", "text": "hello"}],

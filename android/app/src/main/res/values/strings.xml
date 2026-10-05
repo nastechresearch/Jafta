@@ -1,53 +1,53 @@
 <resources>
-    <string name="app_name">Jenny</string>
+    <string name="app_name">Jafta</string>
 
     <!-- Foreground service: the ongoing notification Android requires while the
          gateway runs. Wording has to answer "what is this and why can't I
          dismiss it?", because that is the only question it ever raises. -->
-    <string name="gateway_notification_title">Jenny is running</string>
+    <string name="gateway_notification_title">Jafta is running</string>
     <string name="gateway_notification_text">Ready to reply and to run scheduled tasks</string>
     <string name="gateway_channel_name">Background service</string>
-    <string name="gateway_channel_description">Shown while Jenny runs in the background. Android requires it, and it stays until Jenny is stopped. Tap it to open Jenny.</string>
+    <string name="gateway_channel_description">Shown while Jafta runs in the background. Android requires it, and it stays until Jafta is stopped. Tap it to open Jafta.</string>
 
     <!-- Il gateway non può ripartire da background (RestartNotice): Android
          rifiuta l'avvio e nessuna sveglia esatta lo riproverà. Il tocco sulla
          notifica lo concede, quindi il testo chiede proprio quel gesto. -->
     <string name="restart_channel_name">Restart needed</string>
-    <string name="restart_channel_description">Shown when Android has stopped Jenny in the background and won\'t let her start again on her own. Tap it to restart her.</string>
-    <string name="restart_notice_title">Jenny has stopped</string>
+    <string name="restart_channel_description">Shown when Android has stopped Jafta in the background and won\'t let her start again on her own. Tap it to restart her.</string>
+    <string name="restart_notice_title">Jafta has stopped</string>
     <string name="restart_notice_text">Tap to restart her</string>
 
     <!-- Proactive alerts posted by the agent (the message itself comes from
          Python; only the channel is described here). -->
     <string name="alerts_channel_name">Alerts</string>
-    <string name="alerts_channel_description">Reminders and messages Jenny sends on her own initiative</string>
+    <string name="alerts_channel_description">Reminders and messages Jafta sends on her own initiative</string>
     <!-- Risposta rapida dalla tendina (RemoteInput): etichetta dell'azione,
          segnaposto della casella, e i due esiti della consegna. -->
     <string name="reply_action_label">Reply</string>
-    <string name="reply_input_hint">Write to Jenny…</string>
-    <string name="reply_failed_title">Jenny didn\'t get your message</string>
+    <string name="reply_input_hint">Write to Jafta…</string>
+    <string name="reply_failed_title">Jafta didn\'t get your message</string>
     <string name="reply_failed_text">She wasn\'t running. Tap to send it again.</string>
     <string name="reply_retry_label">Send again</string>
-    <!-- I due interlocutori nella conversazione della tendina. Il nome di Jenny
+    <!-- I due interlocutori nella conversazione della tendina. Il nome di Jafta
          non si traduce; quello dell'utente sì. -->
-    <string name="reply_bot_name">Jenny</string>
+    <string name="reply_bot_name">Jafta</string>
     <string name="reply_user_name">You</string>
 
     <!-- Mascotte flottante: il campo che si apre al tocco e i due modi in cui
          una risposta può non arrivare. Sono le uniche stringhe di quella
          finestra: tutto il resto che si vede è lo sprite. -->
-    <string name="floating_input_hint">Ask Jenny…</string>
-    <string name="floating_not_running">Jenny isn\'t running right now.</string>
+    <string name="floating_input_hint">Ask Jafta…</string>
+    <string name="floating_not_running">Jafta isn\'t running right now.</string>
     <string name="floating_no_reply">No reply. Open the chat to see what happened.</string>
     <string name="floating_send">Send</string>
     <string name="floating_open_app">Open the app</string>
     <string name="floating_continue_app">Continue in the app</string>
 
     <!-- App update waiting for the user to confirm it in the system installer
-         (UpdateBridge). Its own channel, not the agent's: silencing Jenny's
+         (UpdateBridge). Its own channel, not the agent's: silencing Jafta's
          alerts must not hide an update that is stuck waiting for a tap. -->
     <string name="update_channel_name">App updates</string>
     <string name="update_channel_description">Shown when a downloaded update needs your confirmation to install</string>
     <string name="update_notification_title">Update ready to install</string>
-    <string name="update_notification_text">Tap to confirm — Jenny restarts on her own afterwards</string>
+    <string name="update_notification_text">Tap to confirm — Jafta restarts on her own afterwards</string>
 </resources>

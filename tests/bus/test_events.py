@@ -1,4 +1,4 @@
-"""Test diretti per jenny/bus/events.py: dataclass e costanti degli eventi.
+"""Test diretti per jafta/bus/events.py: dataclass e costanti degli eventi.
 
 InboundMessage/OutboundMessage sono ampiamente usati (e implicitamente
 esercitati) in molti altri test, ma nessuno testa qui il *contratto* del
@@ -10,13 +10,13 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from jenny.bus.events import (
+from jafta.bus.events import (
     INTERNAL_CHANNEL,
     OUTBOUND_META_AGENT_UI,
     InboundMessage,
     OutboundMessage,
 )
-from jenny.session.keys import UNIFIED_SESSION_KEY
+from jafta.session.keys import UNIFIED_SESSION_KEY
 
 # ---------------------------------------------------------------------------
 # Costanti

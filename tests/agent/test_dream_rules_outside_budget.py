@@ -1,7 +1,7 @@
 """Le regole dell'utente in SOUL.md restano fuori dal budget ovunque.
 
-Il blocco con le regole che l'utente ha dato a Jenny non e' di Dream — lo proietta
-l'app da ``.jenny/soul_rules.md`` — e il budget esiste per limitare quel che scrive
+Il blocco con le regole che l'utente ha dato a Jafta non e' di Dream — lo proietta
+l'app da ``.jafta/soul_rules.md`` — e il budget esiste per limitare quel che scrive
 Dream. ``FileBudget.skip_user_rules`` lo toglie dal conto, e c'erano test per il
 report e per il guard. Non per le due misure prese *dopo*: la crescita con cui
 ``dream_cycle.consolidation_landed`` decide se un batch e' atterrato, e la
@@ -14,13 +14,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from jenny.agent import dream_review
-from jenny.agent.dream_cycle import consolidation_landed
-from jenny.agent.memory import MemoryStore
-from jenny.agent.memory_budget import budget_report
-from jenny.agent.soul_rules import save_rules
+from jafta.agent import dream_review
+from jafta.agent.dream_cycle import consolidation_landed
+from jafta.agent.memory import MemoryStore
+from jafta.agent.memory_budget import budget_report
+from jafta.agent.soul_rules import save_rules
 
-SOUL = "# Soul\n\nSono Jenny.\n\n## Come parlo\n\nBreve.\n"
+SOUL = "# Soul\n\nSono Jafta.\n\n## Come parlo\n\nBreve.\n"
 RULES = "- Non chiamarmi mai per cognome.\n- Rispondi sempre in italiano."
 
 

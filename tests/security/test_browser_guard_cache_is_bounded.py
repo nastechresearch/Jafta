@@ -1,6 +1,6 @@
 """La guardia della sessione di navigazione non si fa pilotare dalla pagina.
 
-``JennyBrowserGuard.blocked(host)`` è visibile a ogni frame che la sessione
+``JaftaBrowserGuard.blocked(host)`` è visibile a ogni frame che la sessione
 apre, e il nome lo sceglie la pagina. Tre conseguenze che erano aperte:
 
 - la cache dei verdetti era una ``ConcurrentHashMap`` senza tetto: nomi casuali
@@ -23,7 +23,7 @@ from support.kotlin_source import block_after, function_body, read_code, read_so
 
 
 def _code() -> str:
-    return read_code("JennyBrowserBridge")
+    return read_code("JaftaBrowserBridge")
 
 
 def test_the_verdict_cache_is_a_bounded_lru() -> None:
@@ -62,7 +62,7 @@ def test_page_driven_warnings_are_throttled() -> None:
 
 
 def test_the_warnings_do_not_carry_the_page_chosen_name() -> None:
-    src = read_source("JennyBrowserBridge")
+    src = read_source("JaftaBrowserBridge")
     for call in re.findall(r"warnThrottled\(([^\n]*)\)", src):
         assert not re.search(r"\$\{?(h|host|uri|url)\b", call), (
             f"il nome (o l'URL) della pagina finisce nel log: {call}"

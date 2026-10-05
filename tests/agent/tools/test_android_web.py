@@ -7,15 +7,15 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from jenny.agent.tools import android_web
-from jenny.agent.tools.android_web import (
+from jafta.agent.tools import android_web
+from jafta.agent.tools.android_web import (
     AndroidWebFetchTool,
     AndroidWebSearchTool,
     _looks_like_captcha,
     _parse_search_response,
 )
-from jenny.config.schema import ToolsConfig
-from jenny.config.tool_schemas import AndroidWebFetchConfig, AndroidWebSearchConfig
+from jafta.config.schema import ToolsConfig
+from jafta.config.tool_schemas import AndroidWebFetchConfig, AndroidWebSearchConfig
 
 RESULTS = [
     {"title": "Python", "url": "https://python.org", "snippet": "Official site"},

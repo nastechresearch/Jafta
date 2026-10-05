@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
 
-from jenny.config.schema import ProviderConfig
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.config.schema import ProviderConfig
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 
 class TestExtraQuerySchema:

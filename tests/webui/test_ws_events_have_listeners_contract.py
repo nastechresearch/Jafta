@@ -7,7 +7,7 @@ per giorni: un frame senza ascoltatore non fa errore, non fa log, non fa
 niente — la mini-app aperta smette solo di aggiornarsi da sola. Lo ha trovato
 un audit sul codice morto, non un test.
 
-Il banco legge i nomi dal lato Python (le forme in cui ``jenny/channels``
+Il banco legge i nomi dal lato Python (le forme in cui ``jafta/channels``
 scrive un evento) e chiede che ognuno compaia nel JS della WebUI, commenti
 esclusi — perché dopo `98a0230` i nomi sopravvivevano proprio nei commenti, a
 descrivere un ascolto che non c'era più — **in una forma d'ascolto**:
@@ -20,7 +20,7 @@ gestore funzioni; dimostra che esiste un posto dove guardare.
 **Per guscio, dal 26/09/2026.** Il banco cercava l'ascolto «in un JS qualunque
 della WebUI», e i gusci sono due: ``ui_query`` lo ascoltava solo l'officina, e
 il test restava verde mentre dalla casa — il guscio di default — ``ui_view``
-aspettava sei secondi e diceva a Jenny che l'app era in background. Adesso ogni
+aspettava sei secondi e diceva a Jafta che l'app era in background. Adesso ogni
 guscio conta solo i moduli che carica davvero (la chiusura degli ``import`` a
 partire dal suo ``<script type="module">``), e un evento che un guscio non
 ascolta di proposito sta nella sua lista, col perché.
@@ -33,11 +33,11 @@ from pathlib import Path
 
 import pytest
 
-from jenny.channels.subagent_activity_wire import ACTIVITY_FRAME_EVENT
+from jafta.channels.subagent_activity_wire import ACTIVITY_FRAME_EVENT
 
 ROOT = Path(__file__).resolve().parents[2]
-CHANNELS = ROOT / "jenny" / "channels"
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+CHANNELS = ROOT / "jafta" / "channels"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 
 # Eventi che il client non deve ascoltare, ognuno con il suo perché. Chi ne
 # aggiunge uno qui lo fa sapendolo; un evento nuovo senza ascoltatore fa rosso.
@@ -191,7 +191,7 @@ def test_a_bare_mention_is_not_a_listener() -> None:
 # ── La chat, non la mascotte ────────────────────────────────────────────────
 
 # Il modulo della chat di ogni guscio, e gli eventi che deve smistare **lui**.
-# La mascotte (`shared/jenny-mascot.js`) li ascolta quasi tutti per animarsi, e
+# La mascotte (`shared/jafta-mascot.js`) li ascolta quasi tutti per animarsi, e
 # vive in tutti e due i gusci: contato insieme a lei, il gestore `'error'` della
 # chat si poteva togliere lasciando il banco verde — e un rifiuto del gateway
 # diventava una faccina triste e nessuna parola.
@@ -205,7 +205,7 @@ CHAT_EVENTS = ("delta", "stream_end", "message", "turn_end", "error")
 def test_the_mascot_really_hears_the_chat_events() -> None:
     """E' lei che rendeva il banco di sopra cieco: se smettesse di ascoltarli,
     questo di sotto non servirebbe piu', e lo si vuole sapere."""
-    mascot = _strip_comments((ASSETS / "shared" / "jenny-mascot.js").read_text(encoding="utf-8"))
+    mascot = _strip_comments((ASSETS / "shared" / "jafta-mascot.js").read_text(encoding="utf-8"))
     assert all(_listener(e).search(mascot) for e in CHAT_EVENTS)
 
 

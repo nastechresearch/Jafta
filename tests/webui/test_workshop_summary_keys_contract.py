@@ -14,7 +14,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-UI = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui"
+UI = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui"
 SETTINGS = (UI / "assets" / "mobile-settings.js").read_text(encoding="utf-8")
 WORKSHOP = (UI / "workshop.html").read_text(encoding="utf-8")
 

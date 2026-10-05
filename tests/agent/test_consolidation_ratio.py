@@ -4,11 +4,11 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.loop import AgentLoop
-from jenny.bus.queue import MessageBus
-from jenny.config.schema import AgentDefaults
-from jenny.providers.base import GenerationSettings, LLMResponse
-from jenny.pydantic_compat import ValidationError
+from jafta.agent.loop import AgentLoop
+from jafta.bus.queue import MessageBus
+from jafta.config.schema import AgentDefaults
+from jafta.providers.base import GenerationSettings, LLMResponse
+from jafta.pydantic_compat import ValidationError
 
 
 def _make_loop(
@@ -81,7 +81,7 @@ async def test_consolidation_ratio_controls_target(
         return (remaining_estimates.pop(0), "test")
 
     loop.consolidator.estimate_session_prompt_tokens = mock_estimate  # type: ignore[method-assign]
-    monkeypatch.setattr("jenny.agent.consolidator.estimate_message_tokens", lambda _m: 100)
+    monkeypatch.setattr("jafta.agent.consolidator.estimate_message_tokens", lambda _m: 100)
 
     await loop.consolidator.maybe_consolidate_by_tokens(session)
 

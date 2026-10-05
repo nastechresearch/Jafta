@@ -21,13 +21,13 @@ import pytest
 from loguru import logger as loguru_logger
 from support.sessions import FakeSessions
 
-from jenny.agent.turn_types import TurnOutcome
-from jenny.cron.heartbeat_tasks import active_section_text, parse_heartbeat_tasks
-from jenny.cron.types import CronJob, CronPayload
-from jenny.runtime.cron_dispatch import _HEARTBEAT_PREAMBLE, CronDispatcher
-from jenny.session.keys import HEARTBEAT_SESSION_KEY
-from jenny.session.turn_visibility import TurnVisibility
-from jenny.utils.helpers import load_bundled_template
+from jafta.agent.turn_types import TurnOutcome
+from jafta.cron.heartbeat_tasks import active_section_text, parse_heartbeat_tasks
+from jafta.cron.types import CronJob, CronPayload
+from jafta.runtime.cron_dispatch import _HEARTBEAT_PREAMBLE, CronDispatcher
+from jafta.session.keys import HEARTBEAT_SESSION_KEY
+from jafta.session.turn_visibility import TurnVisibility
+from jafta.utils.helpers import load_bundled_template
 
 
 def _heartbeat_job() -> CronJob:
@@ -160,7 +160,7 @@ _BARE = """## Active Tasks
 _FURNISHED = """# Heartbeat Tasks
 
 <!--
-This file is checked periodically by your Jenny agent. When the gateway starts
+This file is checked periodically by your Jafta agent. When the gateway starts
 with `gateway.heartbeat.enabled=true`, it automatically registers a protected
 heartbeat cron job that reads this file.
 
@@ -357,7 +357,7 @@ class TestWhereTheSectionEndsAndWhatSurvivesIt:
 
 
 _CRON_SKILL = (
-    Path(__file__).resolve().parents[2] / "jenny" / "skills" / "cron" / "SKILL.md"
+    Path(__file__).resolve().parents[2] / "jafta" / "skills" / "cron" / "SKILL.md"
 ).read_text(encoding="utf-8")
 
 
@@ -495,4 +495,4 @@ def test_the_llm_notification_judge_is_gone() -> None:
     """Un gate che con un modello reasoning finiva sempre in ``finish_reason='length'``
     non era una cintura di sicurezza: restituiva sempre il default."""
     with pytest.raises(ModuleNotFoundError):
-        __import__("jenny.utils.evaluator")
+        __import__("jafta.utils.evaluator")

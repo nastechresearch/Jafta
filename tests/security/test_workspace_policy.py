@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from jenny.security.workspace_policy import (
+from jafta.security.workspace_policy import (
     _ROOT_RESOLVE_CACHE,
     _ROOT_RESOLVE_CACHE_MAX,
     WorkspaceBoundaryError,
@@ -179,7 +179,7 @@ def test_the_path_itself_is_never_cached(tmp_path: Path) -> None:
 
 def test_entering_the_guard_invalidates_the_cache(tmp_path: Path) -> None:
     """L'invalidazione dichiarata: una voce stantia vive al massimo un exec."""
-    from jenny.agent.tools.python_exec import PythonNamespace
+    from jafta.agent.tools.python_exec import PythonNamespace
 
     workspace = tmp_path / "workspace"
     workspace.mkdir()

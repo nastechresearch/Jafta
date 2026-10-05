@@ -1,4 +1,4 @@
-"""Test diretti per jenny/bus/progress.py.
+"""Test diretti per jafta/bus/progress.py.
 
 ``build_bus_progress_callback`` produce una callback che pubblica un
 ``OutboundMessage`` di progress sul bus, con i flag ``_progress``/``_tool_hint``
@@ -10,9 +10,9 @@ stato nel modulo, solo mapping puro.
 
 from __future__ import annotations
 
-from jenny.bus.events import InboundMessage
-from jenny.bus.progress import build_bus_progress_callback
-from jenny.bus.queue import MessageBus
+from jafta.bus.events import InboundMessage
+from jafta.bus.progress import build_bus_progress_callback
+from jafta.bus.queue import MessageBus
 
 
 def _inbound(**overrides) -> InboundMessage:

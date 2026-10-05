@@ -13,10 +13,10 @@ from pathlib import Path
 
 import pytest
 
-from jenny.config.loader import load_config, save_config
-from jenny.config.schema import Config
-from jenny.runtime.context import get_runtime_context
-from jenny.webui.commands import CommandContext, CommandError, dispatch_command
+from jafta.config.loader import load_config, save_config
+from jafta.config.schema import Config
+from jafta.runtime.context import get_runtime_context
+from jafta.webui.commands import CommandContext, CommandError, dispatch_command
 
 
 @pytest.fixture()
@@ -97,7 +97,7 @@ async def test_delete_fails_closed_when_config_raises(
     def _boom(*args, **kwargs):
         raise RuntimeError("config unreadable")
 
-    monkeypatch.setattr("jenny.config.loader.load_config", _boom)
+    monkeypatch.setattr("jafta.config.loader.load_config", _boom)
     err = await _refused(ctx, "workspace.delete", {"path": "keep.txt"})
     assert err.code == "unavailable"
     assert (workspace_root / "keep.txt").exists()
@@ -292,7 +292,7 @@ async def test_writing_config_json_goes_through_the_store(
 async def test_writing_config_json_takes_the_store_lock(
     ctx: CommandContext, live_config: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from jenny.config import store
+    from jafta.config import store
 
     calls: list[str] = []
     real = store.mutate
@@ -339,7 +339,7 @@ async def test_a_stale_editor_copy_of_config_json_is_a_conflict(
     spariva senza che nessuno lo sapesse. Con ``base`` il salvataggio si ferma."""
     import json
 
-    from jenny.config import store
+    from jafta.config import store
 
     opened = live_config.read_text(encoding="utf-8")
 
@@ -403,16 +403,16 @@ async def test_the_answer_carries_config_json_as_now_on_disk(
 async def test_a_file_changed_under_the_editor_is_a_conflict(
     ctx: CommandContext, workspace_root: Path, config_path: Path
 ) -> None:
-    """``base`` vale per ogni file, non solo per la config: Jenny scrive nel
+    """``base`` vale per ogni file, non solo per la config: Jafta scrive nel
     workspace con i suoi strumenti mentre l'editor e' aperto."""
     note = workspace_root / "nota.md"
     note.write_text("aperta\n", encoding="utf-8")
-    note.write_text("riscritta da Jenny\n", encoding="utf-8")
+    note.write_text("riscritta da Jafta\n", encoding="utf-8")
     err = await _refused(
         ctx, "workspace.write", {"path": "nota.md", "content": "mia", "base": "aperta\n"}
     )
     assert err.code == "conflict"
-    assert note.read_text(encoding="utf-8") == "riscritta da Jenny\n"
+    assert note.read_text(encoding="utf-8") == "riscritta da Jafta\n"
 
 
 async def test_a_file_unchanged_under_the_editor_is_saved(

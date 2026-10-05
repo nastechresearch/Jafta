@@ -8,9 +8,9 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from support.agent import make_loop
 
-from jenny.config.schema import AgentDefaults
-from jenny.providers.base import LLMResponse, ToolCallRequest
-from jenny.session.keys import UNIFIED_SESSION_KEY
+from jafta.config.schema import AgentDefaults
+from jafta.providers.base import LLMResponse, ToolCallRequest
+from jafta.session.keys import UNIFIED_SESSION_KEY
 
 _MAX_TOOL_RESULT_CHARS = AgentDefaults().max_tool_result_chars
 
@@ -158,9 +158,9 @@ async def test_loop_retries_think_only_final_response(tmp_path):
 async def test_streamed_flag_not_set_on_llm_error(tmp_path):
     """When LLM errors during a streaming-capable channel interaction,
     _streamed must NOT be set so the outbound dispatcher delivers the error."""
-    from jenny.agent.loop import AgentLoop
-    from jenny.bus.events import InboundMessage
-    from jenny.bus.queue import MessageBus
+    from jafta.agent.loop import AgentLoop
+    from jafta.bus.events import InboundMessage
+    from jafta.bus.queue import MessageBus
 
     bus = MessageBus()
     provider = MagicMock()
@@ -190,9 +190,9 @@ async def test_streamed_flag_not_set_on_llm_error(tmp_path):
 
 @pytest.mark.asyncio
 async def test_ssrf_soft_block_can_finalize_after_streamed_tool_call(tmp_path):
-    from jenny.agent.loop import AgentLoop
-    from jenny.bus.events import InboundMessage
-    from jenny.bus.queue import MessageBus
+    from jafta.agent.loop import AgentLoop
+    from jafta.bus.events import InboundMessage
+    from jafta.bus.queue import MessageBus
 
     bus = MessageBus()
     provider = MagicMock()
@@ -235,10 +235,10 @@ async def test_ssrf_soft_block_can_finalize_after_streamed_tool_call(tmp_path):
 
 @pytest.mark.asyncio
 async def test_next_turn_after_llm_error_keeps_turn_boundary(tmp_path):
-    from jenny.agent.loop import AgentLoop
-    from jenny.agent.runner import _PERSISTED_MODEL_ERROR_PLACEHOLDER
-    from jenny.bus.events import InboundMessage
-    from jenny.bus.queue import MessageBus
+    from jafta.agent.loop import AgentLoop
+    from jafta.agent.runner import _PERSISTED_MODEL_ERROR_PLACEHOLDER
+    from jafta.bus.events import InboundMessage
+    from jafta.bus.queue import MessageBus
 
     provider = MagicMock()
     provider.get_default_model.return_value = "test-model"
@@ -284,8 +284,8 @@ async def test_next_turn_after_llm_error_keeps_turn_boundary(tmp_path):
 
 @pytest.mark.asyncio
 async def test_subagent_max_iterations_announces_the_budget_stop(tmp_path, monkeypatch):
-    from jenny.agent.subagent import SubagentManager, SubagentSpec, SubagentStatus
-    from jenny.bus.queue import MessageBus
+    from jafta.agent.subagent import SubagentManager, SubagentSpec, SubagentStatus
+    from jafta.bus.queue import MessageBus
 
     bus = MessageBus()
     provider = MagicMock()
@@ -308,7 +308,7 @@ async def test_subagent_max_iterations_announces_the_budget_stop(tmp_path, monke
     async def fake_execute(self, **kwargs):
         return "tool result"
 
-    monkeypatch.setattr("jenny.agent.tools.filesystem.ListDirTool.execute", fake_execute)
+    monkeypatch.setattr("jafta.agent.tools.filesystem.ListDirTool.execute", fake_execute)
 
     status = SubagentStatus(task_id="sub-1", label="label", task_description="do task", started_at=time.monotonic())
     await mgr._run_subagent(

@@ -3,7 +3,7 @@
 Questo header e' enforcing da luglio 2026 e non era asserito da nessuna parte
 (l'unica CSP sotto test era quella della route media, che e' un'altra:
 ``default-src 'none'``). Il costo, misurato sul device il 01/09/2026: la vista
-esterna di una Jenny App e' servita dal proxy su loopback su una porta effimera,
+esterna di una Jafta App e' servita dal proxy su loopback su una porta effimera,
 cioe' **un'altra origine**; senza ``frame-src`` la direttiva ricadeva su
 ``default-src 'self'`` e la shell bloccava il proprio iframe con
 ``net::ERR_BLOCKED_BY_CSP``. Un header di sicurezza non asserito e' un header
@@ -16,7 +16,7 @@ from pathlib import Path
 
 from support.gateway_http import make_handler
 
-from jenny.webui.ws_http import GatewayHTTPHandler
+from jafta.webui.ws_http import GatewayHTTPHandler
 
 _AUTH_SECRET = "test-secret"
 

@@ -3,14 +3,14 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.loop import AgentLoop
-from jenny.agent.turn_types import TurnOutcome
-from jenny.bus.events import OutboundMessage
-from jenny.bus.queue import MessageBus
-from jenny.providers.base import GenerationSettings, LLMResponse
-from jenny.session.keys import HEARTBEAT_SESSION_KEY, UNIFIED_SESSION_KEY
-from jenny.session.turn_visibility import TurnVisibility
-from jenny.session.webui_turns import WebuiTurnCoordinator
+from jafta.agent.loop import AgentLoop
+from jafta.agent.turn_types import TurnOutcome
+from jafta.bus.events import OutboundMessage
+from jafta.bus.queue import MessageBus
+from jafta.providers.base import GenerationSettings, LLMResponse
+from jafta.session.keys import HEARTBEAT_SESSION_KEY, UNIFIED_SESSION_KEY
+from jafta.session.turn_visibility import TurnVisibility
+from jafta.session.webui_turns import WebuiTurnCoordinator
 
 
 def _make_loop(tmp_path):

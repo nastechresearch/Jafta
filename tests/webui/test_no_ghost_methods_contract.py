@@ -27,7 +27,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "jenny" / "templates" / "ui" / "assets"
+ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 
 # I file che definiscono una classe con metodi privati: quelli in cui la
 # domanda ha senso. `shared/` entra pure lui — `update-flow.js` e'
@@ -74,7 +74,7 @@ def _inherited(source: Path, src: str) -> set[str]:
     """Quel che arriva da una classe madre importata (`class A extends B`).
 
     Dal 24/09/2026 la companion dell'officina estende la mascotte condivisa
-    (`shared/jenny-mascot.js`): i metodi che chiama sono definiti la'. Si segue
+    (`shared/jafta-mascot.js`): i metodi che chiama sono definiti la'. Si segue
     l'`import` fino al file vero invece di dichiarare i nomi uno per uno — una
     lista di concessioni lunga quanto la classe madre non proverebbe niente, e
     un metodo tolto dalla madre deve far diventare rosso anche il figlio.

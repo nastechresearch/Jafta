@@ -30,7 +30,7 @@ from pathlib import Path
 
 from support.js_harness import function, requires_node, run_js
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 DIALOG_JS = ASSETS / "shared" / "dialog.js"
 
 

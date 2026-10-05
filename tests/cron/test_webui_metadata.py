@@ -1,4 +1,4 @@
-"""Test per jenny/cron/webui_metadata.py.
+"""Test per jafta/cron/webui_metadata.py.
 
 Copre la derivazione dei metadata WebUI per le consegne cron proattive:
 turn id univoco e sorgente strutturata solo sul canale ``websocket``, pulizia
@@ -7,8 +7,8 @@ di un turn id residuo su qualunque canale, e non-mutazione dell'input.
 
 from __future__ import annotations
 
-from jenny.cron.webui_metadata import cron_proactive_delivery_metadata
-from jenny.webui.metadata import WEBUI_MESSAGE_SOURCE_METADATA_KEY, WEBUI_TURN_METADATA_KEY
+from jafta.cron.webui_metadata import cron_proactive_delivery_metadata
+from jafta.webui.metadata import WEBUI_MESSAGE_SOURCE_METADATA_KEY, WEBUI_TURN_METADATA_KEY
 
 
 def test_websocket_channel_adds_turn_id_and_source_with_label() -> None:

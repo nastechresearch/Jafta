@@ -8,7 +8,7 @@ dentro il testo scelto.
 **Il valore di questo banco sta nei due rifiuti**, non nel caso che riesce. Un
 commento attaccato al punto sbagliato e' peggio di un commento non scritto,
 perche' nessuno dei due lati se ne accorge: il file esiste, il linter lo vede,
-Jenny lo legge, e parla di una frase diversa da quella che avevi in mente.
+Jafta lo legge, e parla di una frase diversa da quella che avevi in mente.
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ from pathlib import Path
 
 from support.js_harness import function, locale, member, requires_node, run_js, run_module
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 AUDIT_JS = ASSETS / "home-audit.js"
 APP_JS = ASSETS / "home-app.js"
 API_JS = ASSETS / "shared" / "api-client.js"
@@ -49,7 +49,7 @@ def test_a_selection_that_appears_twice_is_refused() -> None:
     """Ambigua vuol dire **non si ancora**, non «si prende la prima».
 
     Prendere la prima darebbe un audit ben formato, che il linter accetta e
-    Jenny legge, attaccato a una frase che non e' quella che avevi scelto: un
+    Jafta legge, attaccato a una frase che non e' quella che avevi scelto: un
     guasto che nessuno dei due lati puo' vedere.
     """
     _run("""
@@ -179,7 +179,7 @@ def test_nothing_in_the_flow_asks_for_a_severity() -> None:
 
     lint = (
         Path(__file__).resolve().parents[2]
-        / "jenny" / "skills" / "llm-wiki" / "scripts" / "lint_wiki.py"
+        / "jafta" / "skills" / "llm-wiki" / "scripts" / "lint_wiki.py"
     ).read_text(encoding="utf-8")
     assert "VALID_SEVERITIES" not in lint
     m = re.search(r"AUDIT_REQUIRED_FIELDS = \{([^}]*)\}", lint)
@@ -265,9 +265,9 @@ def test_the_message_carries_the_page_the_quote_and_the_id() -> None:
     """)
 
 
-def test_a_quoted_formula_reaches_jenny_as_it_was_written() -> None:
+def test_a_quoted_formula_reaches_jafta_as_it_was_written() -> None:
     """`String.replace(string, text)` legge `$$`, `$&` e `$'` nel testo come
-    comandi: una formula citata arrivava a Jenny storpiata — `$$` diventava `$`,
+    comandi: una formula citata arrivava a Jafta storpiata — `$$` diventava `$`,
     `$&` il segnaposto stesso, `$'` il resto della frase."""
     _run_app("""
       const quote = "$$E = mc^2$$ e $& e $' e $1";

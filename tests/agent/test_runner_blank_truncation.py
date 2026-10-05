@@ -15,8 +15,8 @@ from unittest.mock import MagicMock
 import pytest
 from support.runner import make_spec
 
-from jenny.config.schema import AgentDefaults
-from jenny.providers.base import LLMProvider, LLMResponse
+from jafta.config.schema import AgentDefaults
+from jafta.providers.base import LLMProvider, LLMResponse
 
 _MAX_TOOL_RESULT_CHARS = AgentDefaults().max_tool_result_chars
 
@@ -33,7 +33,7 @@ def _truncated_blank(budget: int) -> LLMResponse:
 
 
 def _make_spec(**overrides):
-    from jenny.agent.runner import AgentRunSpec
+    from jafta.agent.runner import AgentRunSpec
 
     tools = MagicMock()
     tools.get_definitions.return_value = []
@@ -57,7 +57,7 @@ async def test_blank_truncation_retry_raises_the_output_budget():
     Questa è la regressione centrale: una richiesta byte-identica contro lo
     stesso ``max_tokens`` non può che ri-troncare.
     """
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     budgets: list[int | None] = []
@@ -89,7 +89,7 @@ async def test_blank_truncation_does_not_mutate_the_conversation():
     continuazione sarebbe un'istruzione insoddisfacibile, oltre a sporcare la
     storia con un turno assistant vuoto.
     """
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     seen_messages: list[list[dict]] = []
@@ -117,7 +117,7 @@ async def test_second_retry_also_lowers_reasoning_effort():
     Ordine deliberato: se il gateway rifiuta ``reasoning_effort``, un tentativo
     col solo budget alzato è già stato speso.
     """
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     calls: list[dict] = []
@@ -150,7 +150,7 @@ async def test_exhausted_retries_report_truncation_not_a_generic_failure():
     Con il messaggio generico "non ho prodotto una risposta" la causa resta
     invisibile e si va a caccia del bug sbagliato.
     """
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     calls = {"n": 0}
@@ -178,7 +178,7 @@ async def test_no_headroom_falls_back_to_lowering_the_effort():
     stadio "solo budget" qui non esiste, quindi l'effort va usato subito invece
     di arrendersi con una leva ancora in mano.
     """
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     calls: list[dict] = []
@@ -212,7 +212,7 @@ async def test_no_headroom_falls_back_to_lowering_the_effort():
 @pytest.mark.asyncio
 async def test_no_headroom_and_effort_already_low_gives_up_immediately():
     """Nessuna leva disponibile: si smette invece di ripetere a vuoto."""
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     calls = {"n": 0}
@@ -238,11 +238,11 @@ async def test_no_headroom_and_effort_already_low_gives_up_immediately():
 async def test_truncation_detected_when_provider_mislabels_finish_reason():
     """Il rilevamento non dipende da ``finish_reason == "length"``.
 
-    Jenny non logga ``finish_reason`` da nessuna parte, quindi non è verificabile
+    Jafta non logga ``finish_reason`` da nessuna parte, quindi non è verificabile
     a posteriori se un gateway lo riporti: il confronto con l'usage riportato è
     ciò che rende il fix indipendente da quell'etichetta.
     """
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     budgets: list[int | None] = []
@@ -278,8 +278,8 @@ async def test_raised_budget_survives_a_tool_phase():
     sullo stesso muro, sprecando un'altra chiamata per riscoprire una cosa già
     nota.
     """
-    from jenny.agent.runner import AgentRunner
-    from jenny.providers.base import ToolCallRequest
+    from jafta.agent.runner import AgentRunner
+    from jafta.providers.base import ToolCallRequest
 
     registry = MagicMock()
     registry.get_definitions.return_value = []
@@ -327,7 +327,7 @@ async def test_raised_budget_survives_a_tool_phase():
 @pytest.mark.asyncio
 async def test_genuinely_empty_response_keeps_the_old_retry_path():
     """Non-regressione: la risposta vuota non troncata non alza il budget."""
-    from jenny.agent.runner import AgentRunner
+    from jafta.agent.runner import AgentRunner
 
     provider = MagicMock(spec=LLMProvider)
     budgets: list[int | None] = []

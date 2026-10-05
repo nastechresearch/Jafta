@@ -13,8 +13,8 @@ import asyncio
 import httpx
 import pytest
 
-from jenny.providers import anthropic_provider
-from jenny.providers.anthropic_provider import AnthropicProvider
+from jafta.providers import anthropic_provider
+from jafta.providers.anthropic_provider import AnthropicProvider
 
 TEXT = {"_event_type": "content_block_delta", "type": "content_block_delta", "index": 0,
         "delta": {"type": "text_delta", "text": "ciao"}}

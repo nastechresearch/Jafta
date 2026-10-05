@@ -9,7 +9,7 @@ Non lo facevano:
   titoli delle azioni (tooltip ed etichetta del lettore di schermo) restavano
   ``header.back`` e ``header.refresh``;
 * la minichat rileggeva solo il placeholder: scrim, campo e bottone d'invio
-  restavano con ``jenny.send`` come nome.
+  restavano con ``jafta.send`` come nome.
 
 Qui i metodi veri girano in node con un ``i18n`` che traduce solo dopo il
 ``load``.
@@ -23,7 +23,7 @@ pytestmark = requires_node
 
 HEADER = (ASSETS / "mobile-header.js").read_text(encoding="utf-8")
 # La minichat e' dei due gusci dal 28/09/2026: le sue etichette stanno li'.
-JENNY = (ASSETS / "shared" / "jenny-minichat.js").read_text(encoding="utf-8")
+JAFTA = (ASSETS / "shared" / "jafta-minichat.js").read_text(encoding="utf-8")
 
 _I18N = """
 import assert from 'node:assert/strict';
@@ -84,23 +84,23 @@ function node() {
   return n;
 }
 globalThis.document = { createElement: () => node(), getElementById: () => null };
-class JennyMascot { _buildDom() {} }
-class J extends JennyMascot {
+class JaftaMascot { _buildDom() {} }
+class J extends JaftaMascot {
   constructor() { super(); this.host = node(); this._adapter = { placeholder: () => '' }; }
   _busy() { return false; }
 """
-        + member(JENNY, "_buildDom")
-        + member(JENNY, "_syncPlaceholder")
+        + member(JAFTA, "_buildDom")
+        + member(JAFTA, "_syncPlaceholder")
         + """
   _setOut() {}
 }
 const j = new J();
 j._buildDom();
 await new Promise((r) => setTimeout(r, 0));
-assert.equal(j.scrim.attrs['aria-label'], 'T:jenny.closeMinichat');
-assert.equal(j.input.attrs['aria-label'], 'T:jenny.askJenny');
-assert.equal(j.sendBtn.attrs['aria-label'], 'T:jenny.send');
-assert.equal(j.input.placeholder, 'T:jenny.askHere');
+assert.equal(j.scrim.attrs['aria-label'], 'T:jafta.closeMinichat');
+assert.equal(j.input.attrs['aria-label'], 'T:jafta.askJafta');
+assert.equal(j.sendBtn.attrs['aria-label'], 'T:jafta.send');
+assert.equal(j.input.placeholder, 'T:jafta.askHere');
 console.log('ok');
 """
     )

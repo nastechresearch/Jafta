@@ -36,7 +36,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-CHAT_JS = ROOT / "jenny" / "templates" / "ui" / "assets" / "mobile-chat.js"
+CHAT_JS = ROOT / "jafta" / "templates" / "ui" / "assets" / "mobile-chat.js"
 
 
 def _activate(src: str) -> str:

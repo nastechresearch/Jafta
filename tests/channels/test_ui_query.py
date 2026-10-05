@@ -6,7 +6,7 @@ import asyncio
 
 import pytest
 
-from jenny.channels.ui_query import (
+from jafta.channels.ui_query import (
     MAX_PAYLOAD_BYTES,
     UiQueryCoordinator,
     UiQueryTimeoutError,

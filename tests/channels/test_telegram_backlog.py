@@ -13,9 +13,9 @@ import asyncio
 import time
 from typing import Any
 
-from jenny.bus.queue import MessageBus
-from jenny.channels.telegram import _BACKLOG_MAX_AGE_S, TelegramChannel
-from jenny.config.schema import TelegramConfig
+from jafta.bus.queue import MessageBus
+from jafta.channels.telegram import _BACKLOG_MAX_AGE_S, TelegramChannel
+from jafta.config.schema import TelegramConfig
 
 CHAT = "21824351"
 

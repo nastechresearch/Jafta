@@ -1,6 +1,6 @@
 """Il profilo «incognito» del browser dell'agente si svuota davvero alla chiusura.
 
-``JennyBrowserBridge.close`` chiamava ``ProfileStore.deleteProfile`` dal thread
+``JaftaBrowserBridge.close`` chiamava ``ProfileStore.deleteProfile`` dal thread
 del chiamante (Python) dentro un ``catch`` muto. L'API è ``@UiThread``, e anche
 sul main rifiuta un profilo già caricato in memoria (lo dice la documentazione
 di ``ProfileStore``): la cancellazione non riusciva mai, e nessuno lo vedeva.
@@ -18,7 +18,7 @@ from support.kotlin_source import block_after, function_body, read_code
 
 
 def _code() -> str:
-    return read_code("JennyBrowserBridge")
+    return read_code("JaftaBrowserBridge")
 
 
 def test_close_wipes_the_profile_on_the_main_thread_after_destroy() -> None:

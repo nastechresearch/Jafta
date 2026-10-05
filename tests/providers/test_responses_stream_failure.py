@@ -14,8 +14,8 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from jenny.providers.base import LLMProvider
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.base import LLMProvider
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
 
 MESSAGES = [{"role": "user", "content": "x"}]
 TEXT = {"type": "response.output_text.delta", "delta": "Ecco la ri"}
@@ -118,7 +118,7 @@ async def test_a_completed_stream_is_still_a_stop() -> None:
 
 
 def _parsed(response: dict):
-    from jenny.providers.openai_responses import parse_response_output
+    from jafta.providers.openai_responses import parse_response_output
 
     return parse_response_output(response)
 

@@ -7,7 +7,7 @@ con la richiesta al modello che serviva: la sua uscita dal file e' provata in
 
 from __future__ import annotations
 
-from jenny.config.schema import Config
+from jafta.config.schema import Config
 
 
 def test_mascot_mood_defaults_on():

@@ -16,9 +16,9 @@ import httpx
 import pytest
 from port_alloc import free_port
 
-import jenny.channels.websocket as websocket_module
-from jenny.channels.websocket import WebSocketChannel, WebSocketConfig
-from jenny.webui.gateway_services import build_gateway_services
+import jafta.channels.websocket as websocket_module
+from jafta.channels.websocket import WebSocketChannel, WebSocketConfig
+from jafta.webui.gateway_services import build_gateway_services
 
 
 def _channel(port: int) -> WebSocketChannel:

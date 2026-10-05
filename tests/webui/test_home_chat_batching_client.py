@@ -3,7 +3,7 @@
 Due costi che crescevano col quadrato, misurati contando le chiamate:
 
 * **la storia**: ogni ``_append`` chiamava ``gap.refresh()``, che legge il
-  rettangolo di **ogni** ``.home-msg`` del filo (``shared/jenny-gap.js``); e
+  rettangolo di **ogni** ``.home-msg`` del filo (``shared/jafta-gap.js``); e
   ``load()``/``prependTurns()`` appendono un turno alla volta. Una pagina di N
   turni costava N letture di N rettangoli, ognuna dopo una scrittura — layout
   forzato a ogni giro. Adesso il margine si ricalcola una volta a pagina finita;
@@ -22,7 +22,7 @@ from pathlib import Path
 
 from support.js_harness import member, requires_node, run_js
 
-ASSETS = Path(__file__).resolve().parents[2] / "jenny" / "templates" / "ui" / "assets"
+ASSETS = Path(__file__).resolve().parents[2] / "jafta" / "templates" / "ui" / "assets"
 HOME_CHAT_JS = ASSETS / "home-chat.js"
 
 pytestmark = requires_node
@@ -97,7 +97,7 @@ function makeChat() {
       return this._append(n, toTop);
     },
     _appendAssistant(content, media, toTop = false) {
-      const n = makeNode(); n.className = 'home-msg home-msg-jenny'; n.innerHTML = content;
+      const n = makeNode(); n.className = 'home-msg home-msg-jafta'; n.innerHTML = content;
       return this._append(n, toTop);
     },
     __METHODS__,

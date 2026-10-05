@@ -20,9 +20,9 @@ from pathlib import Path
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
-from jenny.agent.hook import AgentHookContext, ToolResultHookContext
-from jenny.agent.runner import AgentRunResult
-from jenny.agent.subagent import (
+from jafta.agent.hook import AgentHookContext, ToolResultHookContext
+from jafta.agent.runner import AgentRunResult
+from jafta.agent.subagent import (
     _PHASE_LABELS,
     _THINKING_EXCERPT_CHARS,
     _THINKING_THROTTLE_S,
@@ -31,7 +31,7 @@ from jenny.agent.subagent import (
     _SubagentHook,
     _thinking_excerpt,
 )
-from jenny.agent.subagent_activity import (
+from jafta.agent.subagent_activity import (
     DIGEST_KIND_TOOL,
     DIGEST_STATUS_INCOMPLETE,
     KIND_ERROR,
@@ -48,13 +48,13 @@ from jenny.agent.subagent_activity import (
     STATUS_OK,
     SubagentActivityLog,
 )
-from jenny.agent.subagent_records import (
+from jafta.agent.subagent_records import (
     CANCEL_REASON_USER,
     SubagentRecord,
     SubagentSpec,
 )
-from jenny.bus.queue import MessageBus
-from jenny.providers.base import LLMProvider, ToolCallRequest
+from jafta.bus.queue import MessageBus
+from jafta.providers.base import LLMProvider, ToolCallRequest
 
 # ---------------------------------------------------------------------------
 # helper
@@ -285,7 +285,7 @@ class TestThinkingSignal:
     async def test_a_reasoning_stream_is_coalesced(self, monkeypatch):
         clock = {"now": 1000.0}
         monkeypatch.setattr(
-            "jenny.agent.subagent.time.monotonic", lambda: clock["now"]
+            "jafta.agent.subagent.time.monotonic", lambda: clock["now"]
         )
         hook, log = _hook()
         # 50 chunk dentro la stessa finestra di throttle: uno solo esce.
@@ -302,7 +302,7 @@ class TestThinkingSignal:
     async def test_a_reasoning_stream_cannot_flood_the_ring(self, monkeypatch):
         clock = {"now": 1000.0}
         monkeypatch.setattr(
-            "jenny.agent.subagent.time.monotonic", lambda: clock["now"]
+            "jafta.agent.subagent.time.monotonic", lambda: clock["now"]
         )
         hook, log = _hook()
         # Mezz'ora di ragionamento a token: senza throttle sarebbero migliaia di
@@ -315,7 +315,7 @@ class TestThinkingSignal:
     async def test_elapsed_grows_within_one_segment(self, monkeypatch):
         clock = {"now": 1000.0}
         monkeypatch.setattr(
-            "jenny.agent.subagent.time.monotonic", lambda: clock["now"]
+            "jafta.agent.subagent.time.monotonic", lambda: clock["now"]
         )
         hook, log = _hook()
         await hook.emit_reasoning("first thought. ")
@@ -330,7 +330,7 @@ class TestThinkingSignal:
     async def test_identical_text_still_emits_because_elapsed_changed(self, monkeypatch):
         clock = {"now": 1000.0}
         monkeypatch.setattr(
-            "jenny.agent.subagent.time.monotonic", lambda: clock["now"]
+            "jafta.agent.subagent.time.monotonic", lambda: clock["now"]
         )
         hook, log = _hook()
         await hook.emit_reasoning("thinking about the schema")
@@ -345,7 +345,7 @@ class TestThinkingSignal:
     async def test_end_flushes_the_coalesced_tail(self, monkeypatch):
         clock = {"now": 1000.0}
         monkeypatch.setattr(
-            "jenny.agent.subagent.time.monotonic", lambda: clock["now"]
+            "jafta.agent.subagent.time.monotonic", lambda: clock["now"]
         )
         hook, log = _hook()
         await hook.emit_reasoning("first. ")
@@ -362,7 +362,7 @@ class TestThinkingSignal:
     async def test_end_without_a_pending_update_emits_nothing_new(self, monkeypatch):
         clock = {"now": 1000.0}
         monkeypatch.setattr(
-            "jenny.agent.subagent.time.monotonic", lambda: clock["now"]
+            "jafta.agent.subagent.time.monotonic", lambda: clock["now"]
         )
         hook, log = _hook()
         await hook.emit_reasoning("a single shot of reasoning")
@@ -372,7 +372,7 @@ class TestThinkingSignal:
     async def test_a_new_segment_restarts_the_elapsed(self, monkeypatch):
         clock = {"now": 1000.0}
         monkeypatch.setattr(
-            "jenny.agent.subagent.time.monotonic", lambda: clock["now"]
+            "jafta.agent.subagent.time.monotonic", lambda: clock["now"]
         )
         hook, log = _hook()
         await hook.emit_reasoning("one")
@@ -385,7 +385,7 @@ class TestThinkingSignal:
     async def test_summary_is_capped(self, monkeypatch):
         clock = {"now": 1000.0}
         monkeypatch.setattr(
-            "jenny.agent.subagent.time.monotonic", lambda: clock["now"]
+            "jafta.agent.subagent.time.monotonic", lambda: clock["now"]
         )
         hook, log = _hook()
         await hook.emit_reasoning("word " * 4000)
@@ -397,7 +397,7 @@ class TestThinkingSignal:
     async def test_thinking_counts_as_progress(self, monkeypatch):
         clock = {"now": 1000.0}
         monkeypatch.setattr(
-            "jenny.agent.subagent.time.monotonic", lambda: clock["now"]
+            "jafta.agent.subagent.time.monotonic", lambda: clock["now"]
         )
         status = _status()
         status.last_progress_at = 1.0
@@ -411,7 +411,7 @@ class TestThinkingSignal:
     async def test_answer_text_is_a_separate_label(self, monkeypatch):
         clock = {"now": 1000.0}
         monkeypatch.setattr(
-            "jenny.agent.subagent.time.monotonic", lambda: clock["now"]
+            "jafta.agent.subagent.time.monotonic", lambda: clock["now"]
         )
         hook, log = _hook()
         hook.note_output("Here is what I found: the relay list is stale.")
@@ -720,7 +720,7 @@ class TestOrphanSweep:
 class TestMainAgentUnaffected:
     async def test_the_progress_hook_ignores_the_new_tool_hook(self):
         """L'hook e condiviso: il default e no-op e ``AgentProgressHook`` non lo usa."""
-        from jenny.agent.progress_hook import AgentProgressHook
+        from jafta.agent.progress_hook import AgentProgressHook
 
         emitted: list[tuple] = []
 
@@ -736,7 +736,7 @@ class TestMainAgentUnaffected:
         assert emitted == []
 
     async def test_a_composite_isolates_a_raising_consumer(self):
-        from jenny.agent.hook import CompositeHook
+        from jafta.agent.hook import CompositeHook
 
         class _Boom(AgentHookSpy):
             async def after_execute_tool(self, context):

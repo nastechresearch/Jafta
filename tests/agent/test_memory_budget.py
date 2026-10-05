@@ -2,14 +2,14 @@
 
 import pytest
 
-from jenny.agent.memory import MemoryStore
-from jenny.agent.memory_budget import (
+from jafta.agent.memory import MemoryStore
+from jafta.agent.memory_budget import (
     FileBudget,
     budget_report,
     make_write_size_guard,
     render_gauge,
 )
-from jenny.config.schema import DreamConfig
+from jafta.config.schema import DreamConfig
 
 
 @pytest.fixture
@@ -249,14 +249,14 @@ class TestUserRulesDoNotCountAgainstSoul:
 
     Il budget di SOUL.md esiste per limitare ciò che Dream scrive. Contare il
     blocco dell'utente vorrebbe dire che un testo lungo nella casella «Tu e
-    Jenny» porta il file oltre il tetto, e da lì ogni scrittura di Dream viene
+    Jafta» porta il file oltre il tetto, e da lì ogni scrittura di Dream viene
     rifiutata — ``stuck`` sale e parte un review forzato per righe non sue.
     """
 
     RULES = "Regola dell'utente, lunga. " * 40  # ~1.100 caratteri
 
     def _with_rules(self, store):
-        from jenny.agent.soul_rules import save_rules
+        from jafta.agent.soul_rules import save_rules
 
         save_rules(store.soul_file.parent, self.RULES)
         return store.soul_file.read_text(encoding="utf-8")
@@ -284,7 +284,7 @@ class TestUserRulesDoNotCountAgainstSoul:
         assert refusal is not None and "SOUL.md" in refusal
 
     def test_other_files_count_everything(self, store):
-        from jenny.agent.soul_rules import MARK_END, MARK_START
+        from jafta.agent.soul_rules import MARK_END, MARK_START
 
         store.user_file.write_text(MARK_START + "\nabc\n" + MARK_END, encoding="utf-8")
         assert _report(store)[1].chars == len(MARK_START + "\nabc\n" + MARK_END)

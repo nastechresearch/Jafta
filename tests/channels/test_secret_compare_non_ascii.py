@@ -20,14 +20,14 @@ import pytest
 import websockets
 from port_alloc import free_port
 
-from jenny.channels.http_utils import (
+from jafta.channels.http_utils import (
     check_api_secret,
     check_app_secret,
     issue_route_secret_matches,
     secret_matches,
 )
-from jenny.channels.websocket import WebSocketChannel, WebSocketConfig
-from jenny.webui.gateway_services import build_gateway_services
+from jafta.channels.websocket import WebSocketChannel, WebSocketConfig
+from jafta.webui.gateway_services import build_gateway_services
 
 SECRET = "route-secret"
 
@@ -54,10 +54,10 @@ def test_every_gateway_check_is_false_on_non_ascii_token(supplied: str) -> None:
     # un valore con surrogati o fuori da Latin-1, e qui conta cosa fanno le
     # funzioni con qualunque stringa arrivi (16.0, sul Mac, la lascia passare).
     bearer = {"Authorization": f"Bearer {supplied}"}
-    jenny_auth = {"X-Jenny-Auth": supplied}
+    jafta_auth = {"X-Jafta-Auth": supplied}
     none: dict[str, str] = {}
     assert issue_route_secret_matches(bearer, SECRET) is False
-    assert issue_route_secret_matches(jenny_auth, SECRET) is False
+    assert issue_route_secret_matches(jafta_auth, SECRET) is False
     assert check_api_secret(bearer, "/api/x", SECRET) is False
     assert check_api_secret(none, "/api/x?token=" + supplied, SECRET) is False
     assert check_app_secret(bearer, "/apps/a/", SECRET, "a") is False
@@ -95,7 +95,7 @@ async def _get(url: str, headers: dict[str, Any] | None = None) -> httpx.Respons
 
 @pytest.fixture(autouse=True)
 def _isolate_data_dir(tmp_path, monkeypatch) -> None:
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
 
 
 @pytest.mark.asyncio
@@ -114,7 +114,7 @@ async def test_non_ascii_token_gets_a_clean_401_on_every_door() -> None:
             resp = await _get(f"{base}/api/sessions/x/webui-thread",
                               {"Authorization": b"Bearer " + raw})
             assert resp.status_code == 401
-            resp = await _get(f"{base}/webui/bootstrap", {"X-Jenny-Auth": raw})
+            resp = await _get(f"{base}/webui/bootstrap", {"X-Jafta-Auth": raw})
             assert resp.status_code == 401
             resp = await _get(f"{base}/webui/bootstrap", {"Authorization": b"Bearer " + raw})
             assert resp.status_code == 401
@@ -124,7 +124,7 @@ async def test_non_ascii_token_gets_a_clean_401_on_every_door() -> None:
                 pass
         assert excinfo.value.response.status_code == 401
         # Il segreto giusto passa ancora.
-        resp = await _get(f"{base}/webui/bootstrap", {"X-Jenny-Auth": SECRET})
+        resp = await _get(f"{base}/webui/bootstrap", {"X-Jafta-Auth": SECRET})
         assert resp.status_code == 200
     finally:
         await channel.stop()

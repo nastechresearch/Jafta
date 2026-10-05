@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import pytest
 
-from jenny.webui.transcript import (
+from jafta.webui.transcript import (
     _MAX_TRANSCRIPT_PAGE_RECORDS,
     _TRANSCRIPT_ACTIVE_CHUNK_ID,
     _count_anchor_messages,
@@ -21,7 +21,7 @@ from jenny.webui.transcript import (
 
 @pytest.fixture
 def data_dir(tmp_path, monkeypatch):
-    monkeypatch.setattr("jenny.config.paths.get_data_dir", lambda: tmp_path)
+    monkeypatch.setattr("jafta.config.paths.get_data_dir", lambda: tmp_path)
     return tmp_path
 
 
@@ -102,7 +102,7 @@ def test_active_chunk_is_read_once_per_request(data_dir, monkeypatch) -> None:
     for n in range(3):
         _fat_turn(key, f"t{n}", 5)
 
-    import jenny.webui.transcript as transcript_mod
+    import jafta.webui.transcript as transcript_mod
 
     reads: list[str] = []
     original = transcript_mod._read_chunk_turns

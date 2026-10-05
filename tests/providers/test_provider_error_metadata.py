@@ -4,10 +4,10 @@ from unittest.mock import AsyncMock, MagicMock
 import httpx
 import pytest
 
-from jenny.providers.anthropic_provider import AnthropicProvider
-from jenny.providers.base import LLMProvider, LLMResponse
-from jenny.providers.openai_compat_provider import OpenAICompatProvider
-from jenny.providers.retry_policy import is_transient_response
+from jafta.providers.anthropic_provider import AnthropicProvider
+from jafta.providers.base import LLMProvider, LLMResponse
+from jafta.providers.openai_compat_provider import OpenAICompatProvider
+from jafta.providers.retry_policy import is_transient_response
 
 
 def _fake_response(

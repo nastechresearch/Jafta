@@ -7,7 +7,7 @@ loro. La quarta — ``token_usage`` — è sopravvissuta più a lungo delle altr
 proprio perché non era una tupla di prefissi ma una catena di ``if/elif``, che
 una ricerca per letterali di tupla non intercetta.
 
-Questo test fa uno sweep ``ast`` su ``jenny/`` e ``tests/`` e conta i membri
+Questo test fa uno sweep ``ast`` su ``jafta/`` e ``tests/`` e conta i membri
 **distinti** del vocabolario che compaiono in *posizione di classificazione*:
 
 - elemento di un letterale tupla/set/lista, o chiave di un letterale dict;
@@ -16,8 +16,8 @@ Questo test fa uno sweep ``ast`` su ``jenny/`` e ``tests/`` e conta i membri
 
 Perché proprio questa forma, e non "qualunque occorrenza": il vocabolario
 compare legittimamente in una ventina di punti che non classificano niente —
-``jenny/runtime/notifier.py`` costruisce ``f"cron:{label}"`` come *tag* di una
-notifica, ``jenny/runtime/container.py`` usa ``"heartbeat"`` come id di un job
+``jafta/runtime/notifier.py`` costruisce ``f"cron:{label}"`` come *tag* di una
+notifica, ``jafta/runtime/container.py`` usa ``"heartbeat"`` come id di un job
 cron. Sono usi produttori o di etichettatura, non decisioni sul confine, e una
 versione ingenua li segnalerebbe tutti. Filtrando sulla posizione sintattica
 restano solo i punti che davvero *decidono*.
@@ -29,7 +29,7 @@ particolare, non replicando la partizione.
 partizione da difendere non è più "interna sì/no" ma
 interna/progetto/personale, e la forma sbagliata da intercettare è la stessa —
 un modulo che si ricopia i prefissi invece di chiedere a
-``jenny.session.keys.session_kind``. Il prefisso di progetto è quello che costa
+``jafta.session.keys.session_kind``. Il prefisso di progetto è quello che costa
 di più a lasciar copiare: sbagliarlo non fa sparire una funzione, mette la
 conversazione di un progetto dentro ``MEMORY.md``.
 """
@@ -76,7 +76,7 @@ VOCABULARY = frozenset(
 # l'opposto di ricopiarsi la partizione.
 EXEMPT = frozenset(
     {
-        Path("jenny/session/keys.py"),
+        Path("jafta/session/keys.py"),
         Path("tests/session/test_internal_key_vocabulary.py"),
         Path("tests/session/test_keys.py"),
     }
@@ -114,7 +114,7 @@ def _classification_literals(tree: ast.AST) -> set[str]:
 
 def _sources() -> list[Path]:
     paths: list[Path] = []
-    for package in ("jenny", "tests"):
+    for package in ("jafta", "tests"):
         paths.extend(sorted((REPO_ROOT / package).rglob("*.py")))
     return paths
 
@@ -138,7 +138,7 @@ class TestInternalKeyVocabulary:
         offenders = _offenders()
         assert offenders == {}, (
             "questi moduli si sono ricopiati il vocabolario delle sessioni "
-            "interne invece di importarlo da jenny.session.keys: " + repr(offenders)
+            "interne invece di importarlo da jafta.session.keys: " + repr(offenders)
         )
 
     def test_sweep_actually_sees_an_ifelif_chain(self):
@@ -206,7 +206,7 @@ class TestInternalKeyVocabulary:
         il modulo tiene in una tupla a parte, e la whitelist personale nomina
         ``unified:default`` per uguaglianza.
         """
-        from jenny.session import keys
+        from jafta.session import keys
 
         registered = (
             {prefix for prefix, _ in keys._INTERNAL_KIND_BY_PREFIX}
@@ -216,6 +216,6 @@ class TestInternalKeyVocabulary:
             | {keys.PROJECT_SESSION_PREFIX}
         )
         assert registered <= VOCABULARY, (
-            "questi membri sono registrati in jenny.session.keys ma lo sweep non li "
+            "questi membri sono registrati in jafta.session.keys ma lo sweep non li "
             f"cerca: {sorted(registered - VOCABULARY)}"
         )

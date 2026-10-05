@@ -7,8 +7,8 @@ Android un job lungo dodici ore poteva non scattare mai.
 
 import pytest
 
-from jenny.cron.service import CronService
-from jenny.cron.types import CronJob, CronPayload, CronSchedule
+from jafta.cron.service import CronService
+from jafta.cron.types import CronJob, CronPayload, CronSchedule
 
 _HOUR_MS = 3_600_000
 
@@ -23,7 +23,7 @@ def _dream_job(interval_h: int = 12) -> CronJob:
 
 
 def _now_ms() -> int:
-    from jenny.cron.service import _now_ms as impl
+    from jafta.cron.service import _now_ms as impl
 
     return impl()
 

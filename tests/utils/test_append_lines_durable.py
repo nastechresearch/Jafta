@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from jenny.utils import path as path_mod
-from jenny.utils.path import append_lines_durable
+from jafta.utils import path as path_mod
+from jafta.utils.path import append_lines_durable
 
 
 def test_lines_are_appended_each_with_its_newline(tmp_path: Path) -> None:

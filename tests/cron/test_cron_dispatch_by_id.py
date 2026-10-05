@@ -15,9 +15,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jenny.cron.types import CronJob, CronPayload
-from jenny.runtime import cron_dispatch
-from jenny.runtime.cron_dispatch import CronDispatcher
+from jafta.cron.types import CronJob, CronPayload
+from jafta.runtime import cron_dispatch
+from jafta.runtime.cron_dispatch import CronDispatcher
 
 _WORKERS = ("dream", "gardener", "heartbeat", "update_check")
 

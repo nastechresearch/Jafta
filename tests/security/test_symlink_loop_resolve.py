@@ -22,10 +22,10 @@ import pytest
 from websockets.http11 import Headers
 from websockets.http11 import Request as WsRequest
 
-from jenny.agent import wiki_provenance
-from jenny.webui import media_api
-from jenny.webui.apps_routes import AppsRoutes
-from jenny.webui.wiki import create_audit
+from jafta.agent import wiki_provenance
+from jafta.webui import media_api
+from jafta.webui.apps_routes import AppsRoutes
+from jafta.webui.wiki import create_audit
 
 _resolve_real = pathlib.Path.resolve
 
@@ -75,8 +75,8 @@ def test_an_audit_on_a_loop_is_not_found(tmp_path: Path) -> None:
 async def test_the_audit_command_refuses_a_loop(tmp_path: Path, monkeypatch) -> None:
     """Era la route ``/api/audit/create`` (403); dal 26/09/2026 e' il comando
     ``audit.create``, e il loop resta un rifiuto, non un errore interno."""
-    from jenny.webui import commands
-    from jenny.webui.commands import CommandContext, CommandError, dispatch_command
+    from jafta.webui import commands
+    from jafta.webui.commands import CommandContext, CommandError, dispatch_command
 
     root, pages = _project(tmp_path)
     (pages / "index.md").write_text("# indice\n", encoding="utf-8")
@@ -95,7 +95,7 @@ async def test_the_audit_command_refuses_a_loop(tmp_path: Path, monkeypatch) -> 
 def test_a_static_file_through_a_loop_is_403(tmp_path: Path) -> None:
     from unittest.mock import MagicMock
 
-    from jenny.webui.ws_http import GatewayHTTPHandler
+    from jafta.webui.ws_http import GatewayHTTPHandler
 
     handler = GatewayHTTPHandler(
         config=SimpleNamespace(

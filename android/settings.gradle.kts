@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "jenny"
+rootProject.name = "jafta"
 include(":app")

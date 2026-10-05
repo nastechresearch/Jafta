@@ -10,10 +10,10 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from jenny.agent.loop import AgentLoop
-from jenny.agent.subagent import SubagentManager, SubagentSpec, SubagentStatus
-from jenny.agent.tools.search import FindFilesTool, GrepTool
-from jenny.bus.queue import MessageBus
+from jafta.agent.loop import AgentLoop
+from jafta.agent.subagent import SubagentManager, SubagentSpec, SubagentStatus
+from jafta.agent.tools.search import FindFilesTool, GrepTool
+from jafta.bus.queue import MessageBus
 
 
 @pytest.mark.asyncio
