@@ -141,10 +141,38 @@ jobs:
           java-version: "17"
           cache: gradle
 
-      - name: Setup Python 3.12
+      # 3.11, not 3.12, and not an oversight: this app embeds CPython through
+      # Chaquopy, which requires the build machine's Python to match the app's
+      # major.minor, and app/build.gradle.kts pins `version = "3.11"`. Chaquopy
+      # looks for `python3.11` then `python3`; on 3.12 it fails with
+      # "Couldn't find Python 3.11" inside :app:installDebugPythonRequirements.
+      # One interpreter serves the whole job — pyproject.toml declares
+      # requires-python = ">=3.11", so scripts/release.py runs on it too.
+      - name: Set up Python 3.11
         uses: actions/setup-python@v7
         with:
-          python-version: "3.12"
+          python-version: "3.11"
+
+      # Reads the required version out of the build file instead of trusting the
+      # pin above, so bumping `chaquopy { version = ... }` fails here with an
+      # actionable message rather than deep inside Chaquopy with
+      # "Couldn't find Python 3.11". Same guard as android.yml.
+      - name: Verify Chaquopy's Python is the one on PATH
+        run: |
+          set -euo pipefail
+          WANT=$(grep -oE 'version = "[0-9]+\.[0-9]+"' android/app/build.gradle.kts \
+                 | head -1 | grep -oE '[0-9]+\.[0-9]+')
+          if [ -z "$WANT" ]; then
+            echo "::error::Could not read the Chaquopy Python version from android/app/build.gradle.kts"
+            exit 1
+          fi
+          echo "Chaquopy requires Python $WANT"
+          if ! command -v "python${WANT}" > /dev/null; then
+            echo "::error::Chaquopy needs python${WANT} on PATH, and it is not there."
+            echo "::error::Fix the 'Set up Python' step above to $WANT."
+            exit 1
+          fi
+          echo "  found: $(command -v "python${WANT}") $("python${WANT}" -V 2>&1)"
 
       # Space-separated on one line, never a YAML block scalar: the action splits
       # `packages` on a single space, so newlines become part of one package's

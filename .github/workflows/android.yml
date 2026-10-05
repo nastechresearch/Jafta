@@ -75,6 +75,48 @@ jobs:
           java-version: "17"
           cache: gradle
 
+      # Required, and the version is not negotiable: this app embeds CPython
+      # via Chaquopy, and Chaquopy requires the build machine's Python to match
+      # the app's major.minor exactly. app/build.gradle.kts pins
+      # `chaquopy { defaultConfig { version = "3.11" } }`, and Chaquopy searches
+      # for `python3.11` then `python3`. The runner image ships 3.12 as
+      # `python3`, so without this step the build fails in
+      # :app:installDebugPythonRequirements with:
+      #
+      #     Couldn't find Python 3.11.
+      #     See https://chaquo.com/chaquopy/doc/current/android.html#buildpython
+      #
+      # pip install for the four target ABIs runs as part of that same task, so
+      # this is needed for the debug build too, not only the release build.
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      # Chaquopy fails with "Couldn't find Python 3.11", which names a version
+      # but not the cause, and says nothing about which file to edit. So the
+      # required version is read from the build file and checked here, where the
+      # error can say what to do about it. This is what catches someone bumping
+      # `chaquopy { version = ... }` to 3.12 and not updating the step above.
+      - name: Verify Chaquopy's Python is the one on PATH
+        run: |
+          set -euo pipefail
+          WANT=$(grep -oE 'version = "[0-9]+\.[0-9]+"' android/app/build.gradle.kts \
+                 | head -1 | grep -oE '[0-9]+\.[0-9]+')
+          if [ -z "$WANT" ]; then
+            echo "::error::Could not read the Chaquopy Python version from android/app/build.gradle.kts"
+            exit 1
+          fi
+          echo "Chaquopy requires Python $WANT"
+          if ! command -v "python${WANT}" > /dev/null; then
+            echo "::error::Chaquopy needs python${WANT} on PATH, and it is not there."
+            echo "::error::Fix the 'Set up Python' step above to $WANT, to match"
+            echo "::error::chaquopy { defaultConfig { version = \"$WANT\" } }."
+            echo "::error::python3 is currently: $(command -v python3 || echo none) $(python3 -V 2>&1 || true)"
+            exit 1
+          fi
+          echo "  found: $(command -v "python${WANT}") $("python${WANT}" -V 2>&1)"
+
       # Gradle 8.9 (android/gradle/wrapper/gradle-wrapper.properties) wants a
       # compileSdk of 34 and build-tools 34.0.0; the action only installs the
       # platform-tools by default, so the rest is asked for by name.
