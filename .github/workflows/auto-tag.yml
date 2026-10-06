@@ -1,9 +1,10 @@
 # Decides the next version and creates the tag. Triggered by a push to main.
 #
 # It does not build anything. It writes the version files, commits them, and pushes
-# a tag; release.yml is what reacts to that tag by building and publishing the APK.
+# a tag; release-pipeline.yml is what reacts to that tag, building, signing and publishing
+# the APK.
 # Splitting it this way means the version history is decided from one place
-# (scripts/next_version.py) and the publishing rules stay in release.yml, where the
+# (scripts/next_version.py) and the publishing rules stay in release-pipeline.yml, where
 # check that nothing untested gets shipped already lives.
 #
 # It writes to main directly, with no pull request. That is a deliberate trade: the
@@ -237,7 +238,7 @@ jobs:
           # human may be reading.
           git push origin HEAD:main
 
-      # release.yml refuses to publish from a tag whose commit has not passed CI,
+      # the pipeline refuses to publish from a tag whose commit has not passed CI,
       # and it checks that on the tag's own commit. Tagging straight after the bump
       # would race CI: the tag could land while the checks were still queued, and
       # the release would refuse for a reason that has nothing to do with the code.
@@ -262,7 +263,7 @@ jobs:
           SHA=$(git rev-parse HEAD)
           # The parent, deliberately — see the comment on this step. On the first
           # release there is no parent, and then there is nothing to wait for: the
-          # tag points at a root commit and release.yml has its own gate.
+          # tag points at a root commit and the pipeline has its own gate.
           if git rev-parse -q --verify HEAD^ >/dev/null; then
             SHA=$(git rev-parse HEAD^)
           fi
@@ -354,7 +355,7 @@ jobs:
             # is the re-run case, not a conflict: the version is already tagged, so
             # the release may simply not have been cut yet (it was dispatched
             # before it existed, or the run died mid-way). Carry on and dispatch.
-            # release.yml deletes and recreates the release, so re-running is safe.
+            # the pipeline deletes and recreates the release, so re-running is safe.
             echo "::notice::$TAG already exists; dispatching Release for it again."
           else
             # Annotated, not lightweight: next_version.py reads tags by creatordate,
@@ -371,23 +372,27 @@ jobs:
 
           # Start the release ourselves, because the tag push will not.
           #
-          # release.yml listens on `push: tags`, and this push carries
+          # release-pipeline.yml listens on `push: tags`, and this push carries
           # GITHUB_TOKEN, which GitHub does not let create new workflow runs — the
-          # same suppression that left the bump commit with no CI. So the tag lands
-          # and nothing happens, and the release only ever appears if a human runs
-          # Release by hand. That is the manual step this is here to remove.
+          # same suppression that leaves the bump commit with no CI. So the tag
+          # lands and nothing happens, and the release only ever appears if a
+          # human runs it by hand. That is the manual step this exists to remove.
           #
-          # `workflow_dispatch` is one of the two documented exceptions and always
-          # creates a run even from GITHUB_TOKEN, so it is the way through. The tag
-          # argument is passed explicitly: the dispatch cannot rely on
-          # github.ref_name, which is `main` here, not the tag.
-          echo "dispatching Release for $TAG"
-          gh workflow run release.yml \
+          # `workflow_dispatch` is one of exactly two events GitHub exempts from
+          # the suppression (the other is `repository_dispatch`), so it is the way
+          # through from inside a workflow. The tag is passed explicitly: the
+          # dispatch cannot rely on github.ref_name, which is `main` here.
+          #
+          # One pipeline, not several: it does the bootstrap check, the tests, the
+          # build, the signing, the manifest and the verification in order, so
+          # there is no second place where a release can be assembled by hand and
+          # no hand-written manifest.
+          echo "dispatching Release pipeline for $TAG"
+          gh workflow run release-pipeline.yml \
             --repo "$REPO" \
             --ref main \
             -f "tag=$TAG"
 
-          echo "::notice::Release dispatched for $TAG. It builds the APK and publishes it;"
           echo "::notice::update-health.yml then validates the served manifest and APK."
 
       - name: Summary
@@ -420,7 +425,7 @@ jobs:
             elif [ "$DRY" = "yes" ]; then
               echo "Dry run: **\`v$VERSION\` would have been tagged**, but nothing was written."
             else
-              echo "Tagged **\`v$VERSION\`**. release.yml builds and publishes it;"
+              echo "Tagged **\`v$VERSION\`**. The pipeline builds and publishes it;"
               echo "update-health.yml then checks the published manifest and APK."
             fi
           } >> "$GITHUB_STEP_SUMMARY"

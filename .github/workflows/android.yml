@@ -1,7 +1,7 @@
 # Builds the APK. Every pull request gets a debug build; only main gets a
 # signed release build, because only main is a thing users can be sent.
 #
-# This does NOT publish anything. A release is cut by release.yml on a tag, and
+# This does NOT publish anything. A release is cut by release-pipeline.yml on a tag, and
 # the artifact this produces is what that workflow verifies and uploads. Keeping
 # the two apart means a broken main never publishes an APK, and a release never
 # builds untested code.
@@ -320,7 +320,7 @@ jobs:
           name: jafta-release-apk
           path: android/app/build/outputs/apk/release/app-release.apk
           retention-days: 30
-          # error, not warn: this artifact is what release.yml signs off on, and a
+          # error, not warn: this artifact is what the pipeline signs off on, and a
           # missing one should fail the build rather than pass quietly.
           if-no-files-found: error
 
