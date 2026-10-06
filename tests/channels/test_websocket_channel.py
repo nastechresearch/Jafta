@@ -3,6 +3,7 @@
 import asyncio
 import functools
 import json
+from contextlib import suppress
 from pathlib import Path
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
@@ -175,6 +176,83 @@ def test_parse_inbound_payload_edge_cases(raw: str, expected: str | None) -> Non
 def test_web_socket_config_path_must_start_with_slash() -> None:
     with pytest.raises(ValueError, match='path must start with "/"'):
         WebSocketConfig(path="bad")
+
+
+def _unsatisfiable_handshake(lines: list[str]) -> bool:
+    """True se all'avvio è stato detto che ogni handshake verrà respinto."""
+    return any("token_issue_secret is empty" in line and "401" in line for line in lines)
+
+
+async def _start_briefly(lines: list[str], **channel_kw: Any) -> None:
+    """Avvia il canale quanto basta a emettere i log di avvio, poi lo ferma.
+
+    ``start()`` non torna mai da solo — aspetta che il server venga chiuso — quindi
+    qui si avvia come task, si lascia il tempo di loggare e si cancella. ``sleep``
+    e non un timeout: la riga da catturare è emessa prima di qualsiasi ``await``
+    che possa sospenderla, e un timeout aggiungerebbe solo un secondo modo di
+    rendere la prova incoerente.
+    """
+    from loguru import logger
+
+    bus = MagicMock()
+    sink = logger.add(lines.append, level="DEBUG")
+    try:
+        channel = WebSocketChannel(
+            {
+                "enabled": True,
+                "allowFrom": ["*"],
+                "host": "127.0.0.1",
+                "port": free_port(),
+                **channel_kw,
+            },
+            bus,
+            gateway=_basic_handler(bus),
+        )
+        task = asyncio.create_task(channel.start())
+        try:
+            await asyncio.sleep(0.05)
+        finally:
+            task.cancel()
+            with suppress(asyncio.CancelledError):
+                await task
+    finally:
+        logger.remove(sink)
+
+
+async def test_an_empty_secret_with_a_required_token_is_reported_at_startup() -> None:
+    """Segreto vuoto + token obbligatorio = uno stato che nessun client può soddisfare.
+
+    ``_authorize_websocket_handshake`` calcola ``bool(secret and supplied and ...)``,
+    quindi con il segreto vuoto il risultato è False per **qualsiasi** richiesta e
+    l'handshake riceve 401 ogni volta. Il gateway è su, la pagina è servita, solo
+    il socket è respinto: dall'app è «Connection lost, retrying» a ciclo, e senza
+    questa riga non c'è un posto nel log dove leggere il perché.
+    """
+    lines: list[str] = []
+
+    await _start_briefly(lines, websocketRequiresToken=True, token_issue_secret="")
+
+    assert _unsatisfiable_handshake(lines), lines
+
+
+async def test_a_configured_secret_does_not_warn_at_startup() -> None:
+    """Il percorso sano non deve fare rumore: un avviso che ripete a ogni avvio
+    viene letto una volta e poi ignorato, che è come smette di servire."""
+    lines: list[str] = []
+
+    await _start_briefly(lines, websocketRequiresToken=True, token_issue_secret="a-real-secret")
+
+    assert not _unsatisfiable_handshake(lines), lines
+
+
+async def test_no_warn_when_a_token_is_not_required() -> None:
+    """Senza ``websocket_requires_token`` il segreto vuoto è legittimo: il
+    handshake passa e la chat resta aperta. Non è uno stato da segnalare."""
+    lines: list[str] = []
+
+    await _start_briefly(lines, websocketRequiresToken=False, token_issue_secret="")
+
+    assert not _unsatisfiable_handshake(lines), lines
 
 
 def test_ssl_context_requires_both_cert_and_key_files() -> None:

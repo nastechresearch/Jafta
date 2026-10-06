@@ -396,6 +396,21 @@ class WebSocketChannel(OutboundSenderMixin):
             f"{scheme}://{self.config.host}:{self.config.port}{self.config.path}",
         )
 
+        # An empty secret with ``websocket_requires_token`` is a state no client
+        # can satisfy: ``_authorize_websocket_handshake`` computes
+        # ``bool(secret and supplied and ...)`` so it is False for every request,
+        # and the handshake gets 401 every time. From the UI that is
+        # "Connection lost, retrying" on a loop, forever, with no cause anywhere —
+        # the gateway is up, the page is served, only the socket is refused. Say
+        # it once, here, where the cause actually is.
+        if self.config.websocket_requires_token and not self.config.token_issue_secret.strip():
+            self.logger.error(
+                "websocket.token_issue_secret is empty but websocket_requires_token is on: "
+                "every WebSocket handshake will be refused with 401 and the app will show "
+                "'Connection lost, retrying'. Check that workspace/config.json carries "
+                "websocket.token_issue_secret and is writable."
+            )
+
         async def runner() -> None:
             server = await serve(
                 handler,

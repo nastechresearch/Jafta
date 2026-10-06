@@ -3,6 +3,8 @@ import json
 import secrets
 from pathlib import Path
 
+from loguru import logger
+
 from jafta.utils.path import atomic_write
 
 _TOKEN_ISSUE_SECRET_KEYS = ("token_issue_secret", "tokenIssueSecret")
@@ -48,6 +50,15 @@ def _backfill_token_issue_secret(config_path: Path) -> None:
 
     No-ops if the config already has a non-empty ``token`` or
     ``token_issue_secret`` — an explicit operator choice is never overwritten.
+
+    Nota su ``token``: e' una chiave che nessuno legge. ``WebSocketConfig`` non ha
+    alias, quindi ``token`` non finisce in ``token_issue_secret``, e ne' Kotlin
+    (``MainActivity.readBootstrapSecret``) ne' l'handshake
+    (``WebSocketChannel._authorize_websocket_handshake``) la consultano. Un config
+    che porta solo ``token`` resta quindi con ``token_issue_secret`` vuota e viene
+    respinto con 401 a ogni handshake. E' un comportamento voluto (test
+    ``test_does_not_overwrite_explicit_token``) e non si tocca qui, ma il vuoto e'
+    ora segnalato: v. l'errore in ``WebSocketChannel.start``.
     """
     try:
         data = json.loads(config_path.read_text(encoding="utf-8"))
@@ -73,7 +84,17 @@ def _backfill_token_issue_secret(config_path: Path) -> None:
     data["websocket"] = websocket
     try:
         write_private_file(config_path, json.dumps(data, indent=2))
-    except OSError:
+    except OSError as exc:
+        # NOT silent. An unpersisted secret means ``token_issue_secret`` stays
+        # empty, and with ``websocket_requires_token`` the WebSocket then rejects
+        # every handshake with 401 — the app shows "Connection lost, retrying"
+        # and nothing anywhere says why. This is the one line that names it.
+        logger.error(
+            "Could not persist websocket.token_issue_secret to {} ({}). The WebSocket "
+            "will reject every handshake with 401 until this succeeds.",
+            config_path,
+            exc,
+        )
         return
 
 

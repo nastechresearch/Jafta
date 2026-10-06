@@ -10,6 +10,10 @@ from __future__ import annotations
 
 import json
 import stat
+from unittest.mock import patch
+
+import pytest
+from loguru import logger
 
 from jafta.config.bootstrap import ensure_minimal_config
 from jafta.config.loader import load_config
@@ -169,3 +173,58 @@ def test_backfilled_config_is_reloadable_by_loader(tmp_path):
     config = load_config(config_path)
 
     assert config.websocket["token_issue_secret"]
+
+
+@pytest.fixture()
+def logged():
+    """Raccoglie le righe che loguru emette durante il test.
+
+    Non c'è un fixture condiviso in ``tests/support`` e ``caplog`` non serve: qui
+    si scrive con loguru, non con il logging stdlib.
+    """
+    lines: list[str] = []
+    sink_id = logger.add(lines.append, level="DEBUG")
+    try:
+        yield lines
+    finally:
+        logger.remove(sink_id)
+
+
+def test_an_unwritable_config_says_so_instead_of_failing_silently(tmp_path, logged):
+    """Un segreto non persistito è l'unico modo di avere ``token_issue_secret`` vuota.
+
+    Con ``websocket_requires_token`` (il default) il vuoto rende ogni handshake
+    non soddisfacibile: ``_authorize_websocket_handshake`` calcola
+    ``bool(secret and supplied and ...)``, che è False per qualunque richiesta.
+    Il sintomo dall'app è «Connection lost, retrying» a ciclo, senza causa
+    visibile da nessuna parte. Prima di questo il fallimento di scrittura era
+    ingoiato da ``except OSError: return``.
+    """
+    config_path = tmp_path / "config.json"
+    config_path.write_text(json.dumps({"gateway": {"host": "127.0.0.1"}}), encoding="utf-8")
+
+    def refuse(*args, **kwargs):
+        raise OSError("no space left on device")
+
+    with patch("jafta.config.bootstrap.write_private_file", refuse):
+        ensure_minimal_config(tmp_path)
+
+    # Il config resta com'era: nessun segreto, nessun mezzo accettarlo.
+    data = json.loads(config_path.read_text(encoding="utf-8"))
+    assert "token_issue_secret" not in data.get("websocket", {})
+
+    # E il motivo è detto, una volta, con la conseguenza scritta.
+    said = [line for line in logged if "token_issue_secret" in line]
+    assert said, logged
+    assert any("401" in line for line in said)
+
+
+def test_a_persisted_secret_stays_silent(tmp_path, logged):
+    """Il percorso normale non deve produrre rumore: un errore a ogni avvio
+    viene ignorato esattamente come un avviso che ripete sempre."""
+    config_path = tmp_path / "config.json"
+    config_path.write_text(json.dumps({"gateway": {"host": "127.0.0.1"}}), encoding="utf-8")
+
+    ensure_minimal_config(tmp_path)
+
+    assert not [line for line in logged if "token_issue_secret" in line]
