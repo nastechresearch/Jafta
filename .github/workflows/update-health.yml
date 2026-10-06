@@ -173,7 +173,7 @@ jobs:
               else:
                   published = found.group(1).replace(":", "").upper()
 
-                  # The signing report that release.yml published next to the APK.
+                  # The signing report that the release pipeline published next to the APK.
                   # It is apksigner's own output for the very APK whose hash was just
                   # verified above, so it closes the chain: manifest -> bytes -> key.
                   #

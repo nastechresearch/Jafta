@@ -17,8 +17,9 @@ start offering updates to herself.
 A push to `main` does most of this on its own: `.github/workflows/auto-tag.yml` reads the
 commits since the last tag, decides the version, writes it into the three version files,
 commits that, and pushes a `vX.Y.Z` tag. The tag is what starts
-[the release workflow](https://github.com/nastechresearch/Jafta/actions), which builds the
-signed APK and publishes it. There is nothing to run by hand.
+[the release pipeline](https://github.com/nastechresearch/Jafta/actions), which does
+the bootstrap check, the tests, the build, the signing, the manifest and the
+verification in order, and publishes the result. There is nothing to run by hand.
 
 You still run `scripts/release.py` by hand whenever the convention does not describe what you
 want — a rollback, a hotfix, or the very first tag, which has no previous tag to compare
@@ -50,7 +51,7 @@ single byte.
 ## How a merge becomes a release
 
 `auto-tag.yml` runs on every push to `main`. It does not publish anything itself — it decides
-a version and creates a tag, and `release.yml` is what reacts to that tag. Keeping the two
+a version and creates a tag, and `release-pipeline.yml` is what reacts to that tag. Keeping the two
 apart means the rule about what may be published stays in one place, and that is the workflow
 already refusing to publish from a commit that has not passed CI.
 
@@ -79,7 +80,7 @@ Two things worth knowing before you rely on it:
 
 - **The tag waits for CI.** `auto-tag.yml` pushes the version bump, waits for the checks on
   that exact commit to go green, and only then pushes the tag. Tagging straight away would
-  race CI, and `release.yml` would refuse for a reason that has nothing to do with the code.
+  race CI, and the pipeline would refuse for a reason that has nothing to do with the code.
   If CI goes red the version files stay bumped and no tag is created; fix the failure and
   re-run the workflow.
 - **It writes to `main` directly**, with no pull request. The bump is a mechanical edit of
@@ -125,8 +126,9 @@ still only ever built from a tag on a commit that passed CI.
 
 ## Step by step
 
-Everything below is the by-hand path: the first release, a rollback, or a version the commit
-messages do not imply. An ordinary `fix:` or `feat:` merge does not need any of it.
+Everything below is the by-hand path, for a build outside CI: the first release before the
+secrets are set, a rollback, or a version the commit messages do not imply. An ordinary
+`fix:` or `feat:` merge needs none of it — the pipeline does all of this on a runner.
 
 ### Before you start
 
