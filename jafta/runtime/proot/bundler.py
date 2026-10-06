@@ -9,9 +9,6 @@
 from __future__ import annotations
 
 import argparse
-from contextlib import contextmanager
-from hashlib import sha256
-from io import BytesIO
 import json
 import os
 import posixpath
@@ -21,15 +18,27 @@ import sys
 import tarfile
 import urllib.request
 import zipfile
+from contextlib import contextmanager
+from hashlib import sha256
+from io import BytesIO
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
-
-from runtime_tools.termux_assets import (
+# La radice del **package** `jafta`, non `parents[1]`: and-code aveva questo
+# file in `runtime_tools/`, quindi `parents[1]` era la sua radice di repository
+# e `runtime_tools` un pacchetto che si poteva importare dopo averlo aggiunto a
+# ``sys.path``. Qui il file sta in ``jafta/runtime/proot/``, quindi
+# ``parents[1]`` è ``jafta/runtime`` — un livello troppo in basso: il modulo da
+# importare non è raggiungibile, e l'hack su ``sys.path`` rendeva l'import
+# riuscire solo in un checkout completo. Da sola ``import jafta.runtime.proot
+# .bundler`` in un interprete appena avviato moriva con ``ModuleNotFoundError``,
+# che è esattamente quello che ``tests/session/test_cold_imports.py`` esiste per
+# impedire: verde in collezione, gateway che non parte a freddo.
+from jafta.runtime.proot.termux_assets import (
     ANDROID_LINUX_ASSET_ROOT,
     ANDROID_TO_TERMUX_ARCH,
+    ROOT_PACKAGES,
+    TERMUX_MAIN_BASE_URL,
+    TermuxPackageRecord,
     asset_manifest_path,
     asset_prefix_dir,
     load_data_tar_bytes_from_deb,
@@ -37,16 +46,17 @@ from runtime_tools.termux_assets import (
     open_data_tar,
     parse_packages_index,
     resolve_dependency_closure,
-    ROOT_PACKAGES,
     serializable_manifest,
     strip_termux_prefix,
-    TERMUX_MAIN_BASE_URL,
     verify_sha256,
     write_manifest,
-    TermuxPackageRecord,
 )
 
-DEFAULT_LOCK_FILE = REPO_ROOT / "runtime_tools" / "termux_assets.lock.json"
+PACKAGE_ROOT = Path(__file__).resolve().parents[1]  # jafta/runtime
+REPO_ROOT = PACKAGE_ROOT.parents[1]  # la radice del checkout
+PROOT_DIR = Path(__file__).resolve().parent
+
+DEFAULT_LOCK_FILE = PROOT_DIR / "termux_assets.lock.json"
 LOCK_FILE_VERSION = 1
 # Prefer mirrors that still host historical lock-file .deb paths. packages.termux.dev
 # and packages-cf frequently 404/403 from GitHub Actions IPs; keep multiple fallthroughs.
