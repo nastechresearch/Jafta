@@ -22,9 +22,6 @@
 from __future__ import annotations
 
 import argparse
-from contextlib import contextmanager
-from hashlib import sha256
-from io import BytesIO
 import json
 import os
 import posixpath
@@ -34,15 +31,26 @@ import sys
 import tarfile
 import urllib.request
 import zipfile
+from contextlib import contextmanager
+from hashlib import sha256
+from io import BytesIO
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from jafta.runtime.proot.termux_assets import (
+# E402: l'import segue di proposito il `sys.path.insert`. `REPO_ROOT` e' la
+# directory del repository e il pacchetto vive dentro (`jafta/runtime/proot/`),
+# quindi l'import puo' funzionare solo dopo che quel percorso e' in `sys.path`.
+# Spostare l'import in testa farebbe fallire l'avvio con ModuleNotFoundError, e
+# l'eccezione che si evita qui e' ben piu' costosa di una regola di stile.
+from jafta.runtime.proot.termux_assets import (  # noqa: E402
     ANDROID_LINUX_ASSET_ROOT,
     ANDROID_TO_TERMUX_ARCH,
+    ROOT_PACKAGES,
+    TERMUX_MAIN_BASE_URL,
+    TermuxPackageRecord,
     asset_manifest_path,
     asset_prefix_dir,
     load_data_tar_bytes_from_deb,
@@ -50,13 +58,10 @@ from jafta.runtime.proot.termux_assets import (
     open_data_tar,
     parse_packages_index,
     resolve_dependency_closure,
-    ROOT_PACKAGES,
     serializable_manifest,
     strip_termux_prefix,
-    TERMUX_MAIN_BASE_URL,
     verify_sha256,
     write_manifest,
-    TermuxPackageRecord,
 )
 
 DEFAULT_LOCK_FILE = REPO_ROOT / "jafta" / "runtime" / "proot" / "termux_assets.lock.json"

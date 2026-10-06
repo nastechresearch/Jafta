@@ -385,7 +385,19 @@ dependencies {
     // compress gestisce i formati degli archivi del runtime (tar, ar, xz).
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-    implementation("org.apache.commons:commons-compress:1.26.2")
+    // commons-compress **non** porta con sé xz: `XZCompressorInputStream` referenzia
+    // `org.tukaani.xz.{XZInputStream,SingleXZInputStream,MemoryLimitException}`, che
+    // vivono nel progetto separato `org.tukaani:xz`. Senza questa riga `assembleDebug`
+    // passa e `assembleRelease` muore in `minifyReleaseWithR8` con
+    // "Missing class org.tukaani.xz.MemoryLimitException" — R8 considera un'assenza
+    // un errore, e la build debug non lo fa girare.
+    //
+    // Le versioni sono quelle di and-code, non le ultime: 1.27.1 e 1.9 sono le coppie
+    // con cui quel progetto compila e i suoi test passano, e il runtime portato
+    // (`RuntimeArchive`) dipende dalla linea 1.27. Se qui resta 1.26.2 il R8 non
+    // segnala nulla di nuovo, ma la coppia non è più quella verificata a monte.
+    implementation("org.apache.commons:commons-compress:1.27.1")
+    implementation("org.tukaani:xz:1.9")
     // Coroutines: il runtime copiato è scritto con `Flow`/`StateFlow` come stato
     // della sessione, `Mutex` attorno alle operazioni di installazione e
     // `Dispatchers` per i blocchi I/O. Prima arrivava solo per via
