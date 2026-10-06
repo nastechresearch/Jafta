@@ -317,18 +317,44 @@ jobs:
       # What the bump was allowed to change. Small enough to be a list, and the
       # alternative is trusting that a script only ever writes the version — which
       # is exactly the assumption that produced a tag ten seconds after a push.
+      #
+      # The bump commit is FOUND, not assumed to be HEAD^. It usually is, but in
+      # the recovery path it is not: the orphan bump sits some way back in history
+      # and merges have landed on top of it since. Comparing HEAD^ against the
+      # parent then measures the wrong diff entirely — it compared the *merge* of
+      # the workflow change against the orphan and called the YAML "shipped code".
+      #
+      # Located by its own subject, which is the one thing every bump commit has and
+      # no human or merge commit does.
       - name: Check the bump touched only the version files
         if: (steps.next.outputs.level != 'none' || steps.next.outputs.pending_tag == 'yes') && steps.opts.outputs.dry_run == 'no'
+        env:
+          VERSION: ${{ steps.next.outputs.version }}
         run: |
           set -euo pipefail
-          if ! git rev-parse -q --verify HEAD^ >/dev/null; then
-            echo "first release: nothing to compare against"
+
+          if git rev-parse -q --verify HEAD^ >/dev/null; then
+            BUMP=$(git log --format='%H%x09%s' | awk -F'\t' -v v="$VERSION" \
+              '$2 == "chore(release): " v { print $1; exit }' || true)
+          else
+            BUMP=""
+          fi
+
+          if [ -z "$BUMP" ]; then
+            echo "first release: no bump commit to check"
             exit 0
           fi
-          CHANGED=$(git diff --name-only HEAD^ HEAD | sort)
+          if ! git rev-parse -q --verify "$BUMP^" >/dev/null; then
+            echo "the bump commit is the root commit; nothing to compare against"
+            exit 0
+          fi
+
+          echo "bump commit: $(git log -1 --format='%h %s' "$BUMP")"
+          CHANGED=$(git diff --name-only "$BUMP^" "$BUMP" | sort)
           echo "bump changed:"
           echo "$CHANGED" | sed 's/^/  /'
-          UNEXPECTED=$(echo "$CHANGED" | grep -vE             '^(pyproject\.toml|jafta/__init__\.py|android/app/build\.gradle\.kts)$' || true)
+          UNEXPECTED=$(echo "$CHANGED" | grep -vE \
+            '^(pyproject[.]toml|jafta/__init__[.]py|android/app/build[.]gradle[.]kts)$' || true)
           if [ -n "$UNEXPECTED" ]; then
             echo "::error::the version bump changed files that are not version files:"
             echo "$UNEXPECTED" | sed 's/^/  /'
