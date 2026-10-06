@@ -212,29 +212,40 @@ jobs:
           fi
           echo "tag is on main"
 
-          # Ask GitHub whether CI actually passed for this commit. A green check on
-          # a different commit does not count. Check-runs on a commit made by
-          # GITHUB_TOKEN are absent — that is GitHub suppressing recursive runs —
-          # so for the bot's own bump commit this finds none and says so below
-          # rather than passing vacuously.
+          # The verdict is the CI workflow run's conclusion on this commit, not
+          # the count of check-runs on it. The auto-tag job registers its own
+          # check-run (named "tag") on the same commit, so a failed auto-tag run
+          # — a failure about tagging, not about the code — would otherwise read
+          # as a red check and block a release of perfectly green code. That is
+          # how the run after #18 went: CI red only because its own "tag" check
+          # from a stale dispatch was still there.
           if command -v gh >/dev/null 2>&1; then
-            echo "::group::check-runs for $SHA"
-            gh api "repos/${{ github.repository }}/commits/$SHA/check-runs" \
-               --jq '.check_runs[] | "\(.name): \(.conclusion)"' || true
-            echo "::endgroup::"
-            FAILED=$(gh api "repos/${{ github.repository }}/commits/$SHA/check-runs" --paginate \
-                      --jq '[.check_runs[] | select(.conclusion != "success" and .conclusion != "skipped" and .conclusion != null)] | length' || echo 0)
-            if [ "${FAILED:-0}" -gt 0 ]; then
-              echo "::error::$FAILED check(s) did not succeed on $SHA. Not releasing."
-              exit 1
-            fi
-            TOTAL=$(gh api "repos/${{ github.repository }}/commits/$SHA/check-runs" \
-                      --jq '.total_count' 2>/dev/null || echo 0)
-            if [ "${TOTAL:-0}" -eq 0 ]; then
-              # The tests below are what stands in for CI on this commit. Not a
-              # gap, but it must not be silent.
-              echo "::notice::no check-runs on $SHA (a GITHUB_TOKEN commit); the test"
+            CI_RUNS=$(gh api "repos/${{ github.repository }}/actions/runs?head_sha=$SHA&per_page=100" \
+                 --jq '[.workflow_runs[] | select(.name == "CI")] | length' || echo 0)
+            if [ "${CI_RUNS:-0}" -eq 0 ]; then
+              # Check-runs on a commit made by GITHUB_TOKEN are absent — that is
+              # GitHub suppressing recursive runs — so for the bot's own bump
+              # commit there is no CI run and this says so rather than passing
+              # vacuously.
+              echo "::notice::no CI run on $SHA (a GITHUB_TOKEN commit); the test"
               echo "::notice::step below is the gate for this release."
+            else
+              echo "::group::CI workflow runs for $SHA"
+              gh api "repos/${{ github.repository }}/actions/runs?head_sha=$SHA&per_page=100" \
+                 --jq '[.workflow_runs[] | select(.name == "CI")] | .[] | "\(.status) \(.conclusion // "-") \(.html_url)"' || true
+              echo "::endgroup::"
+              STATUS=$(gh api "repos/${{ github.repository }}/actions/runs?head_sha=$SHA&per_page=100" \
+                       --jq '[.workflow_runs[] | select(.name == "CI")] | first | "\(.status) \(.conclusion // "-")"' || echo "unknown unknown")
+              if [ "${STATUS%% *}" != "completed" ]; then
+                echo "::error::CI is still running on $SHA; not releasing. Re-run once CI finishes."
+                exit 1
+              fi
+              CONCLUSION=${STATUS#* }
+              if [ "$CONCLUSION" != "success" ]; then
+                echo "::error::CI concluded '$CONCLUSION' on $SHA. Not releasing."
+                exit 1
+              fi
+              echo "CI is green on $SHA"
             fi
           fi
 

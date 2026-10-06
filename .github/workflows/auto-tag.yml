@@ -42,6 +42,8 @@ concurrency:
 
 permissions:
   contents: write
+  # To re-run a cancelled CI run (gh run rerun).
+  actions: write
 
 jobs:
   tag:
@@ -257,13 +259,22 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
+          LEVEL: ${{ steps.next.outputs.level }}
+          PENDING_TAG: ${{ steps.next.outputs.pending_tag }}
         run: |
           set -euo pipefail
-          SHA=$(git rev-parse HEAD)
-          # The parent, deliberately — see the comment on this step. On the first
-          # release there is no parent, and then there is nothing to wait for: the
-          # tag points at a root commit and release-pipeline.yml has its own gate.
-          if git rev-parse -q --verify HEAD^ >/dev/null; then
+          # The commit the tag will point at. If this run wrote the bump commit,
+          # that commit is HEAD — and it never gets its own CI runs, because GitHub
+          # suppresses workflows started by a GITHUB_TOKEN push — so the verdict we
+          # need is the parent's. Otherwise (a pending bump recovered from an
+          # earlier failed run, so no bump is written now) HEAD is a real human
+          # merge with its own CI run, and waiting on the parent would gate on code
+          # the tag does not contain. Seen on 37446916045: the recovery waited on
+          # HEAD^'s run and failed on that run's cancelled tests, while the commit
+          # actually being released had green CI.
+          if [ "${PENDING_TAG:-no}" = "yes" ] || [ "${LEVEL:-none}" = "none" ]; then
+            SHA=$(git rev-parse HEAD)
+          else
             SHA=$(git rev-parse HEAD^)
           fi
           echo "waiting for the CI workflow on $SHA"
@@ -271,6 +282,7 @@ jobs:
           # 20 minutes: CI here builds an APK on two Python versions, and it has
           # been observed taking a shade over 8.
           DEADLINE=$((SECONDS + 1200))
+          RERUN_TRIED=no
           while :; do
             # The signal is the **CI workflow run** for this commit, not a count of
             # its check-runs. The first version of this step counted check-runs and
@@ -295,6 +307,23 @@ jobs:
                 if [ "$CONCLUSION" = "success" ]; then
                   echo "CI is green on $SHA"
                   exit 0
+                fi
+                # A run concludes 'cancelled' when a newer push to main cancels it
+                # (cancel-in-progress) or when the Actions service drops it —
+                # both happened in one day, the service once. That is no verdict on
+                # the code, but without a nudge the CI never re-runs and this step
+                # would have to fail on a transient. Re-run the failed jobs once;
+                # a second cancellation is no longer transient.
+                if [ "$CONCLUSION" = "cancelled" ] && [ "$RERUN_TRIED" = "no" ]; then
+                  RERUN_TRIED=yes
+                  RUN_ID=$(gh api "repos/$REPO/actions/runs?head_sha=$SHA&per_page=100" \
+                    --jq '[.workflow_runs[] | select(.name == "CI")] | first | .id')
+                  echo "::notice::CI on $SHA was cancelled; re-running its failed jobs"
+                  gh run rerun "$RUN_ID" --repo "$REPO" --failed || true
+                  # Give the rerun a few seconds to register before polling again,
+                  # or the next poll sees the same stale 'cancelled' and exits.
+                  sleep 30
+                  continue
                 fi
                 echo "::error::CI concluded '$CONCLUSION' on $SHA; not tagging."
                 echo "::error::The version files are bumped but no tag was created. Re-run this"
