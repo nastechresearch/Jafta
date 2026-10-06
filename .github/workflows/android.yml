@@ -35,6 +35,13 @@ on:
       - "jafta/**"
       - "scripts/release.py"
       - ".github/workflows/android.yml"
+      # These two change what is *inside* the APK, so omitting them meant a
+      # dependency bump produced no APK build and no test at all.
+      # requirements-android.lock.txt is the file Chaquopy pip-installs, so it is
+      # the dependency set of the shipped app, not a hint about it.
+      - "requirements-android.lock.txt"
+      - "requirements-android.txt"
+      - "pyproject.toml"
   push:
     branches: [main]
     paths:
@@ -42,6 +49,9 @@ on:
       - "jafta/**"
       - "scripts/release.py"
       - ".github/workflows/android.yml"
+      - "requirements-android.lock.txt"
+      - "requirements-android.txt"
+      - "pyproject.toml"
   # Building takes ~20 minutes. Being able to retry one without pushing a commit
   # is the difference between fixing a flaky runner and waiting for review.
   workflow_dispatch:
