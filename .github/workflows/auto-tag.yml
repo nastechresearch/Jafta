@@ -340,6 +340,8 @@ jobs:
       - name: Create and push the tag
         if: (steps.next.outputs.level != 'none' || steps.next.outputs.pending_tag == 'yes') && steps.opts.outputs.dry_run == 'no'
         env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
           VERSION: ${{ steps.next.outputs.version }}
           LEVEL: ${{ steps.next.outputs.level }}
           REASON: ${{ steps.next.outputs.reason }}
@@ -348,18 +350,45 @@ jobs:
           TAG="v$VERSION"
 
           if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
-            echo "::error::tag $TAG already exists. Re-run release.yml with that tag to republish."
-            exit 1
+            # The tag is already there and this run is publishing exactly it. That
+            # is the re-run case, not a conflict: the version is already tagged, so
+            # the release may simply not have been cut yet (it was dispatched
+            # before it existed, or the run died mid-way). Carry on and dispatch.
+            # release.yml deletes and recreates the release, so re-running is safe.
+            echo "::notice::$TAG already exists; dispatching Release for it again."
+          else
+            # Annotated, not lightweight: next_version.py reads tags by creatordate,
+            # and a lightweight tag carries the commit date instead, which makes two
+            # tags created out of order sort wrong and silently re-release an old
+            # version.
+            git tag -a "$TAG" -m "$TAG" -m "$REASON" \
+              -m "versionCode is bumped alongside; see android/app/build.gradle.kts."
+            git push origin "refs/tags/$TAG"
+            echo "::notice::pushed $TAG ($LEVEL)"
           fi
 
-          # Annotated, not lightweight: next_version.py reads tags by creatordate, and
-          # a lightweight tag carries the commit date instead, which makes two tags
-          # created out of order sort wrong and silently re-release an old version.
-          git tag -a "$TAG" -m "$TAG" -m "$REASON" \
-            -m "versionCode is bumped alongside; see android/app/build.gradle.kts."
-          git push origin "refs/tags/$TAG"
+          echo "::notice::pushed $TAG ($LEVEL)"
 
-          echo "::notice::pushed $TAG ($LEVEL). release.yml will build and publish it."
+          # Start the release ourselves, because the tag push will not.
+          #
+          # release.yml listens on `push: tags`, and this push carries
+          # GITHUB_TOKEN, which GitHub does not let create new workflow runs — the
+          # same suppression that left the bump commit with no CI. So the tag lands
+          # and nothing happens, and the release only ever appears if a human runs
+          # Release by hand. That is the manual step this is here to remove.
+          #
+          # `workflow_dispatch` is one of the two documented exceptions and always
+          # creates a run even from GITHUB_TOKEN, so it is the way through. The tag
+          # argument is passed explicitly: the dispatch cannot rely on
+          # github.ref_name, which is `main` here, not the tag.
+          echo "dispatching Release for $TAG"
+          gh workflow run release.yml \
+            --repo "$REPO" \
+            --ref main \
+            -f "tag=$TAG"
+
+          echo "::notice::Release dispatched for $TAG. It builds the APK and publishes it;"
+          echo "::notice::update-health.yml then validates the served manifest and APK."
 
       - name: Summary
         if: always()

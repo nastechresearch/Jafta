@@ -19,8 +19,9 @@ on:
   push:
     tags: ["v*.*.*"]
   # Re-running a failed release. Republishing the same version over an existing
-  # release is allowed below (--clobber), because a half-finished release is
-  # worse than a re-upload.
+  # release is allowed below, because a half-finished release is worse than a
+  # re-upload: the step deletes the existing release first, since `gh release
+  # create` has no --clobber and refuses to overwrite.
   workflow_dispatch:
     inputs:
       tag:
@@ -361,6 +362,28 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           set -euo pipefail
+
+          # A release for this tag may already exist. `gh release create` has no
+          # --clobber flag and fails outright with "a release with the same tag
+          # name already exists", so a re-run could never republish — which is
+          # what the workflow_dispatch path above promises. Deleting first is the
+          # only way to make that true.
+          #
+          # Deliberately not `--cleanup-tag`: the tag is what the release points
+          # at and what release.yml's own ancestor check resolves, and deleting it
+          # would take the only record that this version was ever cut.
+          #
+          # Scoped to the one tag being released. `--cleanup-tag` without
+          # `--yes` would also be refused, but neither is used here.
+          if gh release view "v$VERSION" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            echo "::notice::v$VERSION already exists; deleting it so this run can republish."
+            gh release delete "v$VERSION" \
+              --repo "${{ github.repository }}" \
+              --yes \
+              --cleanup-tag=false
+            sleep 5
+          fi
+
           gh release create "v$VERSION" \
             "dist/release/jafta-$VERSION.apk" \
             "dist/release/latest.json" \
