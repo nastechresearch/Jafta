@@ -3,6 +3,14 @@ import java.util.Properties
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    // Da Kotlin 2.0 il compiler di Compose è un plugin a parte
+    // (`kotlinCompilerExtensionVersion` è sparito dal plugin kotlin-android):
+    // senza questo i file copiati da and-code non compilano nemmeno gli
+    // `@Composable`, perché `@Composable` è un'annotation generata dal compiler.
+    // La versione deve combaciare **esattamente** con quella di Kotlin: qui 2.0.0,
+    // la stessa di `android/build.gradle.kts`.
+    id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.plugin.serialization")
     id("com.chaquo.python")
 }
 
@@ -100,6 +108,14 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    // Con il plugin Compose dichiarato, il flag dice al plugin di generare il
+    // codice dei `@Composable`. `buildFeatures` è il posto giusto: accenderlo in
+    // `android {}` prima di `dependencies` cambierebbe l'ordine di applicazione
+    // dei plugin e fallirebbe la configurazione.
+    buildFeatures {
+        compose = true
     }
 
     packaging {
@@ -245,6 +261,48 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+
+    // Compose — serve agli schermi di onboarding del runtime proot+OpenCode
+    // portati da and-code (`feature/onboarding/OnboardingChoiceScreen.kt`,
+    // `core/UrlLauncher.kt`). `compose-bom` tiene allineate le librerie fra
+    // loro: senza, foundation e material3 possono prendere versioni diverse e
+    // il risultato è un APK che non linka. Il BOM 2024.09.03 sta dentro
+    // compileSdk 34, che è il tetto di questo progetto.
+    //
+    // `material-icons-extended` porta le icone filled usate dal selettore
+    // (Android, Computer, Terminal): in `material-icons-core` ci sono solo le
+    // pochissime icone di default.
+    val composeBom = platform("androidx.compose:compose-bom:2024.09.03")
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.foundation:foundation")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended")
+    // **Non** `activity-compose`, e la ragione va tenuta a mente: nessun file
+    // copiato chiama `setContent { }` — il runtime non monta una Activity sua,
+    // restituisce solo funzioni `@Composable` che un caller valido può
+    // invocare. Aggiungerla tirava su androidx.activity 1.9.3, che cambia la
+    // firma di `ComponentActivity.onNewIntent` da `Intent?` a `Intent`, e
+    // rompeva l'override già presente in `MainActivity.kt:883` — un file di
+    // v1.0.3 che questa PR non deve toccare. Se un giorno serve, va insieme al
+    // fix di quell'override, non da solo.
+
+    // Runtime proot + OpenCode. OkHttp parla col server OpenCode; kotlinx
+    //.serialization è il codec dei suoi modelli e degli eventi SSE; commons-
+    // compress gestisce i formati degli archivi del runtime (tar, ar, xz).
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation("org.apache.commons:commons-compress:1.26.2")
+    // Coroutines: il runtime copiato è scritto con `Flow`/`StateFlow` come stato
+    // della sessione, `Mutex` attorno alle operazioni di installazione e
+    // `Dispatchers` per i blocchi I/O. Prima arrivava solo per via
+    // transitività da WorkManager, il che è fragile da dipenderne:
+    // WorkManager può alzare o abbassare la versione e la compilazione si
+    // romperebbe per un motivo che non riguarda nessuno dei due. Dichiarata,
+    // stessa versione di and-code.
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     // Chrome Custom Tabs: apre i link esterni della chat in un browser
     // in-app (con pulsante di chiusura) invece di dirottare la WebView SPA.
     implementation("androidx.browser:browser:1.7.0")
