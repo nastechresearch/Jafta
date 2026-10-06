@@ -33,6 +33,75 @@ val keystoreProps = Properties().apply {
     }
 }
 
+// ── Runtime payload ──────────────────────────────────────────────────────────
+// The proot runtime needs two things in the APK: the native launcher (proot
+// plus libandroid-shmem and libtalloc, as `.so` files under `jniLibs`), and the
+// download manifest that tells the installer where to fetch the Linux rootfs
+// and the OpenCode binary from. The launcher has to be **in** the APK because
+// it is what `RuntimeBridge` invokes before any download can happen; the
+// rootfs is fetched at install time from the URLs in the manifest.
+//
+// Two Exec tasks, in order: the first downloads the pinned Termux packages and
+// mirrors them under `opencode-runtime/<abi>/prefix`, the second copies the
+// native libraries out of that tree into the `jniLibs` layout Android expects.
+// `inputs`/`outputs` are declared so Gradle can skip the work when nothing
+// changed — a payload build is a network round-trip per Termux package.
+//
+// Upstream (yuga-hashimoto/and-code @ 247ff996) also has a `--local-debs-dir`
+// branch that builds the native payload from source instead of downloading
+// prebuilt `.deb`s. It is deliberately not wired here: it needs an NDK and a
+// Termux cross-toolchain, and the pinned mirror path reproduces the same
+// artefacts for anyone building this repo.
+// `rootProject.projectDir` e' la directory di `android/`, non quella del
+// repository: i path del payload devono risalire di un livello. Usare
+// `rootProject.projectDir` produce `/…/Jafta/android/jafta/runtime/proot/…`, che
+// non esiste, e Gradle fallisce la configurazione della task con un
+// "An input file was expected to be present but it doesn't exist" — un errore
+// che nomina i file mancanti senza dire che il root e' sbagliato.
+//
+// `rootDir.parentFile` e' la stessa directory per un altro verso, ed e' l'idioma
+// che questo file usa gia' per risalire al repository (vedi `srcDir("../../")`
+// e `rootDir.parentFile` sotto): i due equivalenti, scelti per coerenza.
+val runtimeRoot = rootDir.parentFile
+val generatedRuntimeAssets = rootProject.layout.buildDirectory.dir("generated/runtime-assets")
+val generatedRuntimeJni = rootProject.layout.buildDirectory.dir("generated/runtime-jni")
+
+val prepareRuntimeAssets =
+    tasks.register<Exec>("prepareRuntimeAssets") {
+        group = "build"
+        description = "Download the pinned Termux packages that back the proot runtime"
+        inputs.file(runtimeRoot.resolve("jafta/runtime/proot/termux_assets.py"))
+        inputs.file(runtimeRoot.resolve("jafta/runtime/proot/termux_assets.lock.json"))
+        inputs.file(runtimeRoot.resolve("scripts/prepare_android_runtime_assets.py"))
+        outputs.dir(generatedRuntimeAssets)
+        commandLine(
+            "python3",
+            runtimeRoot.resolve("scripts/prepare_android_runtime_assets.py").absolutePath,
+            "--output-dir",
+            generatedRuntimeAssets.get().asFile.absolutePath,
+            "--lock-file",
+            runtimeRoot.resolve("jafta/runtime/proot/termux_assets.lock.json").absolutePath,
+        )
+    }
+
+val prepareRuntimeNativeLibs =
+    tasks.register<Exec>("prepareRuntimeNativeLibs") {
+        group = "build"
+        description = "Copy the proot native launcher out of the payload tree into jniLibs"
+        dependsOn(prepareRuntimeAssets)
+        inputs.dir(generatedRuntimeAssets)
+        inputs.file(runtimeRoot.resolve("jafta/runtime/proot/native_libs.py"))
+        outputs.dir(generatedRuntimeJni)
+        commandLine(
+            "python3",
+            runtimeRoot.resolve("jafta/runtime/proot/native_libs.py").absolutePath,
+            "--linux-assets-dir",
+            generatedRuntimeAssets.get().asFile.absolutePath,
+            "--output-dir",
+            generatedRuntimeJni.get().asFile.absolutePath,
+        )
+    }
+
 fun signingCredential(envName: String, propName: String): String? =
     (System.getenv(envName) ?: keystoreProps.getProperty(propName))?.takeIf { it.isNotBlank() }
 
@@ -130,6 +199,14 @@ android {
             // passano da qui, le dexa D8).
             excludes += "/META-INF/versions/**/OSGI-INF/**"
         }
+        jniLibs {
+            // Con il packaging moderno AGP comprime le `.so` dentro l'APK e le
+            // estrae al primo accesso. proot non lo sopporta: il processo gira
+            // sotto proot, che deve mappare i segmenti dell'eseguibile, e una
+            // libreria estratta in `/data` non è mappabile da lì. `extractNativeLibs`
+            // deve quindi restare `false`, cioè le `.so` viaggiano grezze.
+            useLegacyPackaging = true
+        }
     }
 
     kotlinOptions {
@@ -152,6 +229,15 @@ android {
             assets.srcDirs(
                 files("$buildDir/generated/assets")
                     .builtBy("copyScriptAssets", "copyPackageSourceAssets")
+            )
+            // Le librerie native del runtime, prodotte da `prepareRuntimeNativeLibs`.
+            // `builtBy` dichiara il produttore sulla FileCollection: senza, il
+            // grafo non sa che questo percorso dipende dalla task e la copia gira
+            // (o no) per caso. Vale la stessa regola scritta sopra per
+            // `assets.srcDirs`: non toccare l'uno senza l'altro.
+            jniLibs.srcDir(
+                files(generatedRuntimeJni)
+                    .builtBy(prepareRuntimeNativeLibs)
             )
         }
     }
@@ -253,8 +339,13 @@ val copyPackageSourceAssets by tasks.registering(Sync::class) {
 // `preBuild` è l'ancora che precede l'intera pipeline della variante, quindi li
 // copre tutti, presenti e futuri. Senza questo blocco il build riesce comunque,
 // ma silenziosamente con gli asset vecchi: è già capitato.
+//
+// `prepareRuntimeNativeLibs` si aggancia qui per lo stesso motivo, e per uno in
+// più: le `.so` del runtime servono a `mergeJniLibFolders`, che sta più giù
+// nella pipeline, e senza questo blocco un clone pulito produce un APK senza
+// proot e senza che nessun errore lo dica.
 tasks.named("preBuild") {
-    dependsOn(copyScriptAssets, copyPackageSourceAssets)
+    dependsOn(copyScriptAssets, copyPackageSourceAssets, prepareRuntimeNativeLibs)
 }
 
 dependencies {

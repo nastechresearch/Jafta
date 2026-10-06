@@ -1,0 +1,160 @@
+name: Runtime payload
+
+# The proot runtime needs its native launcher inside the APK, and that payload is
+# produced by two Python scripts rather than by the Android build itself. Nothing
+# in `ci.yml` or `android.yml` runs them, so without this workflow a break in the
+# payload pipeline — a lock that no longer resolves, a script whose import path
+# rots, a Termux mirror that stopped serving a pinned `.deb` — reaches a release
+# and shows up only as a runtime failure on a phone.
+#
+# This runs the real pinned-mirror path end to end and asserts the resulting
+# `jniLibs` layout. It is a separate workflow rather than a job in `ci.yml`
+# because it makes network calls to Termux mirrors and takes minutes; keeping it
+# out means a mirror hiccup cannot mark an ordinary Python PR red.
+#
+# It does NOT validate the source-build path (`--local-debs-dir`): that needs an
+# NDK and a Termux cross-toolchain, and this fork does not wire it. The two
+# produce the same libraries from the same lock, so a break in the copier shows up
+# here either way.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "scripts/prepare_android_runtime_assets.py"
+      - "jafta/runtime/proot/**"
+      - "android/app/build.gradle.kts"
+      - "android/app/src/main/assets/local-runtime-manifest.json"
+      - "tests/runtime/proot/**"
+      - ".github/workflows/runtime-payload.yml"
+  # A lock bump on main is the case that must not wait for a PR: it changes what
+  # every future build downloads.
+  push:
+    branches: [main]
+    paths:
+      - "scripts/prepare_android_runtime_assets.py"
+      - "jafta/runtime/proot/**"
+      - ".github/workflows/runtime-payload.yml"
+
+# Same shape as ci.yml: one run per push per event kind, newest wins.
+concurrency:
+  group: runtime-payload-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  payload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Materialize the pinned Termux payload
+        run: |
+          python3 scripts/prepare_android_runtime_assets.py \
+            --output-dir build/generated/runtime-assets \
+            --lock-file jafta/runtime/proot/termux_assets.lock.json
+
+      - name: Copy the native launcher out of the payload tree
+        run: |
+          python3 jafta/runtime/proot/native_libs.py \
+            --linux-assets-dir build/generated/runtime-assets \
+            --output-dir build/generated/runtime-jni
+
+      # The library names are load-bearing: `LocalRuntimeProcessLauncher` asks the
+      # package manager for `libopencode_android_proot.so` by name, and proot
+      # resolves `libtalloc.so` through the DT_NEEDED the patch in `native_libs.py`
+      # rewrites. A renamed file here is a runtime failure, not a build failure.
+      - name: Verify the expected native payload is present
+        run: |
+          set -euo pipefail
+          for abi in arm64-v8a x86_64; do
+            echo "== $abi =="
+            ls -l "build/generated/runtime-jni/$abi"
+            for f in \
+              libopencode_android_proot.so \
+              libopencode_android_proot_loader.so \
+              libopencode_android_proot_loader32.so \
+              libtalloc.so \
+              libandroid-shmem.so; do
+              test -f "build/generated/runtime-jni/$abi/$f" || {
+                echo "missing $abi/$f" >&2
+                exit 1
+              }
+              # `copy_abi` chmods 0755 and `jniLibs` is loaded by dlopen, so a
+              # payload that lost the executable bit builds and then fails to load.
+              test -x "build/generated/runtime-jni/$abi/$f" || {
+                echo "not executable: $abi/$f" >&2
+                exit 1
+              }
+            done
+          done
+
+      # The copied library must be a real file, not a link into the payload tree:
+      # a symlink in `jniLibs` points at a path that does not exist inside the APK.
+      - name: Verify nothing shipped is a symlink
+        run: |
+          set -euo pipefail
+          if find build/generated/runtime-jni -type l | grep -q .; then
+            echo "symlinks in the jniLibs payload:" >&2
+            find build/generated/runtime-jni -type l >&2
+            exit 1
+          fi
+          echo "no symlinks in the payload"
+
+      # The DT_NEEDED rewrite is what lets proot find talloc under the name the
+      # payload ships. Checking the shipped bytes is cheaper and more direct than
+      # booting a device.
+      - name: Verify the talloc SONAME was patched to the shipped name
+        run: |
+          set -euo pipefail
+          for abi in arm64-v8a x86_64; do
+            so="build/generated/runtime-jni/$abi/libopencode_android_proot.so"
+            if strings "$so" | grep -qx 'libtalloc.so'; then
+              echo "$abi: libtalloc.so present as expected"
+            else
+              echo "$abi: libtalloc.so NOT found in the patched binary" >&2
+              exit 1
+            fi
+            if strings "$so" | grep -qx 'libtalloc.so.2'; then
+              echo "$abi: the unpatched SONAME survived" >&2
+              exit 1
+            fi
+          done
+
+      # The manifest is what the installer reads at runtime to learn where to
+      # fetch the Linux rootfs and the OpenCode binary. A malformed one produces
+      # an APK that installs and then cannot install anything.
+      - name: Verify the download manifest is well formed
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import pathlib
+          import re
+
+          manifest = json.loads(
+              pathlib.Path("android/app/src/main/assets/local-runtime-manifest.json").read_text()
+          )
+          assert manifest["architectures"].keys() == {"arm64-v8a", "x86_64"}, manifest["architectures"].keys()
+          for abi, entry in manifest["architectures"].items():
+              for key in ("alpineUrl", "alpineSha256", "openCodeUrl", "openCodeSha256"):
+                  assert key in entry, f"{abi} is missing {key}"
+              for digest_key in ("alpineSha256", "openCodeSha256"):
+                  assert re.fullmatch(r"[0-9a-f]{64}", entry[digest_key]), (abi, digest_key)
+          print(f"manifest ok: runtime {manifest['runtimeVersion']}, "
+                f"opencode {manifest['openCodeVersion']}, alpine {manifest['alpineVersion']}")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: runtime-payload
+          path: build/generated/runtime-jni
+          retention-days: 7
