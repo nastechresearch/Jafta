@@ -233,6 +233,33 @@ jobs:
           cd android
           ./gradlew assembleDebug --no-daemon --stacktrace
 
+      # Runs R8, on every PR, without needing the keystore.
+      #
+      # Why this exists: `assembleDebug` never runs R8 and `kotlinc` resolves a
+      # call to a missing class silently, so a dependency that only R8 notices
+      # is missing passes every debug build. That is how PR #23 and PR #24 were
+      # both green while `main` could not produce a release build at all — the
+      # only step that could have seen it was gated behind `push` to main, so it
+      # ran *after* the merge, which is the worst possible moment to find out.
+      #
+      # R8 does not need a signature: signing happens when the APK is packaged,
+      # well after shrinking. `assembleRelease` therefore exercises exactly the
+      # same R8 pass with or without a keystore — with one it additionally
+      # verifies the signature. So on a PR we build the release *unsigned* to get
+      # the gate, and on main the signed build below still runs and still checks
+      # the certificate.
+      #
+      # `assembleRelease` on an unsigned tree only warns (`hasReleaseSigning` in
+      # app/build.gradle.kts), it does not fail: the warning says the APK cannot
+      # be installed on a device, which is true and irrelevant here — this build
+      # exists to be shrunk, not to be installed.
+      - name: Build release APK (unsigned — this is the R8 gate)
+        if: github.event_name != 'push' || github.ref != 'refs/heads/main'
+        run: |
+          set -euo pipefail
+          cd android
+          ./gradlew assembleRelease --no-daemon --stacktrace
+
       - name: Build signed release APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
