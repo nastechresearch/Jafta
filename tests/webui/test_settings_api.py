@@ -358,6 +358,94 @@ def test_provider_models_payload_requires_gateway_key(
     assert payload["models"] == []
 
 
+# --------------------------------------------------------------------------
+# Senza rete
+# --------------------------------------------------------------------------
+
+
+def _offline_config(tmp_path, monkeypatch: pytest.MonkeyPatch, api_base: str) -> None:
+    config_path = tmp_path / "config.json"
+    save_config(_add_provider(Config(), "openai", api_key="sk-test", api_base=api_base), config_path)
+    monkeypatch.setattr(get_runtime_context(), "config_path", config_path)
+
+
+def test_model_catalog_on_a_phone_with_no_network_is_a_readable_error_not_a_crash(
+    tmp_path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Nessuna rete: la lista modelli non arriva, e l'utente deve poter capire perché.
+
+    Il caso reale è un telefono senza connessione: il catalogo viene chiesto al
+    provider a ogni apertura, quindi la lista è **vuota per costruzione** e non
+    è un difetto. Ciò che non deve succedere è che la risposta sia un'eccezione
+    non gestita — l'errore attraversa il RPC come failure e la UI cade nel ramo
+    ``catch``, che non ha niente da dire.
+
+    Qui il caso è riprodotto senza toccare la rete: ``.invalid`` non risolve per
+    definizione (RFC 2606), quindi il test è determinista anche su una macchina
+    con internet.
+    """
+    _offline_config(tmp_path, monkeypatch, "https://api.example.invalid/v1")
+
+    payload = provider_models_payload({"provider": ["openai"]})
+
+    # Non un'eccezione: un esito applicativo che la UI sa mostrare.
+    assert payload["status"] == "error"
+    assert payload["models"] == []
+    assert payload["model_count"] == 0
+    # Il messaggio è ciò che l'utente legge sotto l'elenco vuoto (v.
+    # home-model.js `_paintModels`): se è vuoto, la stanza resta muta e sembra
+    # un caricamento fallito senza spiegazione.
+    assert payload["message"], "an unreachable provider must still say why"
+    assert "models" in payload["message"].lower()
+
+
+def test_model_catalog_offline_does_not_leak_the_api_key(
+    tmp_path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Il messaggio d'errore finisce a schermo dell'utente: la chiave non ci va.
+
+    ``httpx`` mette nel messaggio URL e address, mai l'header di autenticazione,
+    ma il payload è la superficie che finisce nel log e nella stanza: una chiave
+    lì la legge chiunque apra il log del gateway.
+    """
+    _offline_config(tmp_path, monkeypatch, "https://api.example.invalid/v1")
+
+    payload = provider_models_payload({"provider": ["openai"]})
+
+    assert "sk-test" not in payload["message"]
+    assert "sk-test" not in repr(payload)
+
+
+def test_a_loopback_provider_still_lists_models_with_no_network(
+    tmp_path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Un modello in loopback si vede anche senza rete: è la strada offline.
+
+    Su Android il sandbox non raggiunge la LAN, quindi l'unico provider che
+    funziona con il telefono scollegato è uno in ``127.0.0.1``. Se anche quello
+    risultasse irraggiungibile, l'app sarebbe inutilizzabile offline e il caso
+    meriterebbe un altro nome: qui il server risponde e l'elenco si popola.
+    """
+    _offline_config(tmp_path, monkeypatch, "http://127.0.0.1:8080/v1")
+
+    def fake_get(url: str, **kwargs):
+        return httpx.Response(
+            200,
+            json={"data": [{"id": "local-model"}, {"id": "local-model-mini"}]},
+            request=httpx.Request("GET", url),
+        )
+
+    monkeypatch.setattr("jafta.webui.settings_api.httpx.get", fake_get)
+
+    payload = provider_models_payload({"provider": ["openai"]})
+
+    assert payload["status"] == "available"
+    assert [row["id"] for row in payload["models"]] == ["local-model", "local-model-mini"]
+
+
 
 # ---------------------------------------------------------------------------
 # Fase 6.7 — onboarding valida il provider e propaga l'errore alla WebUI

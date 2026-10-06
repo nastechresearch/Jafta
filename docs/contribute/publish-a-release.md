@@ -14,6 +14,16 @@ start offering updates to herself.
 
 ## The short version
 
+A push to `main` does most of this on its own: `.github/workflows/auto-tag.yml` reads the
+commits since the last tag, decides the version, writes it into the three version files,
+commits that, and pushes a `vX.Y.Z` tag. The tag is what starts
+[the release workflow](https://github.com/nastechresearch/Jafta/actions), which builds the
+signed APK and publishes it. There is nothing to run by hand.
+
+You still run `scripts/release.py` by hand whenever the convention does not describe what you
+want — a rollback, a hotfix, or the very first tag, which has no previous tag to compare
+against.
+
 ```bash
 # 1. bump every place the version lives
 python3 scripts/release.py 0.7.0
@@ -36,6 +46,50 @@ gh release create v0.7.0 dist/release/jafta-0.7.0.apk dist/release/latest.json \
 Add `--dry-run` to any `release.py` invocation to see exactly what it would do — every file it
 would touch, the manifest it would produce, the commands it would print — without writing a
 single byte.
+
+## How a merge becomes a release
+
+`auto-tag.yml` runs on every push to `main`. It does not publish anything itself — it decides
+a version and creates a tag, and `release.yml` is what reacts to that tag. Keeping the two
+apart means the rule about what may be published stays in one place, and that is the workflow
+already refusing to publish from a commit that has not passed CI.
+
+The version comes from [Conventional Commits](https://www.conventionalcommits.org/), and only
+from the commits since the last tag:
+
+| Subject prefix | Version |
+|---|---|
+| `feat:` | minor — `1.2.3` → `1.3.0` |
+| `fix:`, `perf:`, `refactor:`, `revert:` | patch — `1.2.3` → `1.2.4` |
+| `!` on the type, or a `BREAKING CHANGE:` footer | major — `1.2.3` → `2.0.0` |
+| `docs:`, `chore:`, `ci:`, `test:`, `style:`, `build:` | nothing — no release |
+| anything else | nothing — no release |
+
+A merge commit is not counted, and neither is the `chore(release):` commit `auto-tag.yml`
+writes itself, so the workflow cannot trigger itself.
+
+**An unrecognised subject publishes nothing.** That is the common case in a pull request
+titled "Update README" and squash-merged into a message nobody wrote to the standard: an APK
+per release is noise, and noise in a release history is the fastest way to stop anyone reading
+the releases. When you need a release the convention does not imply, ask for one explicitly —
+run the **Auto-tag** workflow with `bump` set to `patch`, `minor` or `major`, and tick
+`dry_run` first to see what it would do without writing anything.
+
+Two things worth knowing before you rely on it:
+
+- **The tag waits for CI.** `auto-tag.yml` pushes the version bump, waits for the checks on
+  that exact commit to go green, and only then pushes the tag. Tagging straight away would
+  race CI, and `release.yml` would refuse for a reason that has nothing to do with the code.
+  If CI goes red the version files stay bumped and no tag is created; fix the failure and
+  re-run the workflow.
+- **It writes to `main` directly**, with no pull request. The bump is a mechanical edit of
+  three files that no human needs to read, and a release that waits on a review waits on
+  whoever is awake. The commit carries a DCO sign-off and names the version in its subject.
+
+You can see the decision without trusting it: `python3 scripts/next_version.py` prints the same
+level and version the workflow would use, and changes nothing. It also warns when the version
+files and the last tag disagree — in that case it bumps from the **higher** of the two, so a
+hand-made tag can never cause an older version to be published again.
 
 ## Why there is a script at all
 
@@ -64,18 +118,24 @@ Two rules it enforces, both worth knowing before you fight with it:
   `versionCode` is lower than the installed one, and there is no way back down. This is the
   number the updater actually compares; `versionName` is decoration for humans.
 
-The script never publishes. It prints the `gh` commands and stops. Uploading an asset is a
-deliberate act, not something that happens because you typed a version number.
+The script never publishes. It prints the `gh` commands and stops. On a push to `main` the
+bump and the tag happen without it — see
+[how a merge becomes a release](#how-a-merge-becomes-a-release) — but the release itself is
+still only ever built from a tag on a commit that passed CI.
 
 ## Step by step
+
+Everything below is the by-hand path: the first release, a rollback, or a version the commit
+messages do not imply. An ordinary `fix:` or `feat:` merge does not need any of it.
 
 ### Before you start
 
 - The working tree should be clean and on the commit you intend to ship.
 - You need the release keystore, either as `android/keystore.properties` or via the
   `JAFTA_KEYSTORE_*` environment variables — see
-  [Environment variables](../reference/environment-variables.md). CI does not publish releases
-  precisely because it does not have the key; the whole thing happens on your machine.
+  [Environment variables](../reference/environment-variables.md). CI has the same key in the
+  repository secrets and uses it to build the release; the copy on your machine is what lets
+  you build one outside CI.
 - You need the `gh` CLI, authenticated against the repository.
 
 ### 1. Bump the version
