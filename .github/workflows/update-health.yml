@@ -163,52 +163,63 @@ jobs:
           # The certificate is what makes an in-place update possible, and it is
           # the one thing an attacker with release access could substitute
           # without breaking the hash check above (they would re-upload both).
-          expected_fp = pathlib.Path("keystore/README.md").read_text() if pathlib.Path("keystore/README.md").exists() else None
-          if expected_fp:
-              found = re.search(r"SHA-256 \| `([0-9A-Fa-f:]+)`", expected_fp)
-              if found:
-                  published = found.group(1).replace(":", "").upper()
-                  # Read the signing cert out of the APK without needing apksigner.
-                  # META-INF/CERT.RSA holds the PKCS#7 signature; hashing the raw
-                  # entry is not the certificate digest, so extract it properly.
-                  import zipfile
-                  with zipfile.ZipFile(out) as z:
-                      names = [n for n in z.namelist() if n.upper().startswith("META-INF/")
-                               and n.upper().endswith((".RSA", ".DSA", ".EC"))]
-                      if not names:
-                          warn.append("no META-INF signature block found (v2/v3 signing only?)")
-                      else:
-                          cert_sha = None
-                          try:
-                              # keytool can read a PKCS#7 file; apksigner is not
-                              # installed on the runner image without setup-android.
-                              import subprocess, tempfile
-                              with tempfile.TemporaryDirectory() as td:
-                                  p7 = pathlib.Path(td) / "sig.p7"
-                                  p7.write_bytes(z.read(names[0]))
-                                  proc = subprocess.run(
-                                      ["keytool", "-printcert", "-file", str(p7)],
-                                      capture_output=True, text=True,
-                                  )
-                              mm = re.search(r"SHA256:\s*([0-9A-F:]+)", proc.stdout)
-                              if mm:
-                                  cert_sha = mm.group(1).replace(":", "").upper()
-                          except Exception as exc:
-                              warn.append(f"could not read the signing certificate: {exc}")
-                          if cert_sha:
-                              if cert_sha == published:
-                                  print("certificate ok: signed by the published key")
-                              else:
-                                  sys.exit(
-                                      "CERTIFICATE MISMATCH\n"
-                                      f"  APK signed by: {cert_sha}\n"
-                                      f"  published key: {published}\n"
-                                      "  An APK signed by another key cannot be installed\n"
-                                      "  over an existing one: Android rejects it and users\n"
-                                      "  would have to uninstall, losing all on-device memory."
-                                  )
-          else:
+          readme = pathlib.Path("keystore/README.md")
+          if not readme.exists():
               warn.append("keystore/README.md not in this tree; certificate not checked")
+          else:
+              found = re.search(r"SHA-256 \| `([0-9A-Fa-f:]+)`", readme.read_text())
+              if not found:
+                  warn.append("keystore/README.md has no SHA-256 fingerprint row; not checked")
+              else:
+                  published = found.group(1).replace(":", "").upper()
+
+                  # The signing report that release.yml published next to the APK.
+                  # It is apksigner's own output for the very APK whose hash was just
+                  # verified above, so it closes the chain: manifest -> bytes -> key.
+                  #
+                  # This deliberately does NOT read the certificate out of the APK
+                  # here. The first version looked for a META-INF/*.RSA entry, which
+                  # only exists under v1 (JAR) signing — and this project signs v2/v3
+                  # only, so it could never have worked; it degraded to a warning
+                  # about a missing signature block, on every run, silently. The APK
+                  # Signing Block would have to be parsed by hand instead, which is
+                  # the kind of code that is wrong in a way nobody notices.
+                  report_url = url.rsplit("/", 1)[0] + "/release-signature.txt"
+                  try:
+                      with urllib.request.urlopen(report_url, timeout=60) as r:
+                          report = r.read().decode("utf-8", "replace")
+                  except Exception as exc:
+                      sys.exit(f"release-signature.txt is not downloadable: {exc}")
+
+                  # Anchored on "certificate": the report also prints a public key
+                  # digest, and a looser pattern silently matches the wrong one.
+                  cert = re.search(
+                      r"Signer #1 certificate SHA-256 digest:\s*([0-9a-fA-F]{64})", report
+                  )
+                  if not cert:
+                      sys.exit("release-signature.txt has no certificate digest line")
+                  served = cert.group(1).upper()
+
+                  if served != published:
+                      sys.exit(
+                          "CERTIFICATE MISMATCH\n"
+                          f"  APK signed by: {served}\n"
+                          f"  published key: {published}\n"
+                          "  An APK signed by another key cannot be installed\n"
+                          "  over an existing one: Android rejects it and users\n"
+                          "  would have to uninstall, losing all on-device memory."
+                      )
+                  print("certificate ok: signed by the published key")
+
+                  # v2 and v3 are what Android actually uses here; v1 alone would
+                  # leave the install rejected on anything past Android 7.
+                  for scheme in ("v2", "v3"):
+                      line = re.search(
+                          rf"Verified using {scheme} scheme[^:]*:\s*(\w+)", report
+                      )
+                      if line and line.group(1).lower() != "true":
+                          sys.exit(f"APK is not signed with scheme {scheme}: {line.group(1)}")
+                  print("signing schemes ok: v2 and v3 both verified")
 
           if warn:
               print("\nwarnings:")
