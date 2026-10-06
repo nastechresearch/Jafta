@@ -33,7 +33,7 @@ _UI_ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 _SETTINGS_JS = _UI_ASSETS / "mobile-settings.js"
 _STYLE_CSS = _UI_ASSETS / "mobile-style.css"
 _MAIN_ACTIVITY = (
-    ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "flagdizero" / "jafta"
+    ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "nastechresearch" / "jafta"
     / "MainActivity.kt"
 )
 

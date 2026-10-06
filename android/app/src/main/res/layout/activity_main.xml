@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.flagdizero.jenny.NoAutofillWebView
+    <za.nastech.jafta.NoAutofillWebView
         android:id="@+id/webview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
                 android:fontFamily="sans-serif-medium"
-                android:text="Jenny"
+                android:text="Jafta"
                 android:textColor="#f2ecff"
                 android:textSize="20sp" />
 

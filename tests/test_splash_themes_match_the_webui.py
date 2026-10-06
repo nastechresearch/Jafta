@@ -22,7 +22,7 @@ RES = ROOT / "android/app/src/main/res"
 SPLASH_XML = RES / "values-v31/themes.xml"
 CSS = ROOT / "jafta/templates/ui/assets/mobile-style.css"
 THEME_JS = ROOT / "jafta/templates/ui/assets/shared/theme.js"
-MAIN_ACTIVITY = ROOT / "android/app/src/main/java/com/flagdizero/jafta/MainActivity.kt"
+MAIN_ACTIVITY = ROOT / "android/app/src/main/java/za/nastech/jafta/MainActivity.kt"
 PREFIX = "Theme.Jafta.Splash."
 
 

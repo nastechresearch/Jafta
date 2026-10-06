@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -16,7 +16,7 @@ import androidx.core.graphics.drawable.IconCompat
 
 /**
  * Bridge per gli alert di sistema (le notifiche che squillano), esposto a
- * Python via Chaquopy (`jclass("com.flagdizero.jenny.NotifierBridge")`), mai
+ * Python via Chaquopy (`jclass("za.nastech.jafta.NotifierBridge")`), mai
  * istanziato da Kotlin — stesso pattern di InstalledAppsBridge.
  *
  * Usa un canale dedicato `jenny_alerts` (IMPORTANCE_HIGH, suono/vibrazione di
@@ -26,7 +26,7 @@ import androidx.core.graphics.drawable.IconCompat
  *
  * Gate di visibilità: se MainActivity è in foreground l'alert viene soppresso
  * (il messaggio è già visibile in chat) — la policy "se squillare" vive qui,
- * quella "cosa dire" vive in Python (jenny/runtime/notifier.py).
+ * quella "cosa dire" vive in Python (jafta/runtime/notifier.py).
  */
 class NotifierBridge(context: Context) {
 
@@ -42,21 +42,21 @@ class NotifierBridge(context: Context) {
         /** Chiave del testo dentro il bundle di `RemoteInput`. La legge
          *  `ReplyReceiver` e non esiste altrove: è il nome con cui il sistema ci
          *  restituisce ciò che l'utente ha scritto. */
-        internal const val KEY_REPLY_TEXT = "com.flagdizero.jenny.reply.TEXT"
+        internal const val KEY_REPLY_TEXT = "za.nastech.jafta.reply.TEXT"
 
         /** Tag dell'alert a cui si sta rispondendo, cotto nel PendingIntent
          *  della risposta: serve a `ReplyReceiver` per cancellare *quello* e non
          *  tutti. */
-        internal const val EXTRA_REPLY_SOURCE_TAG = "com.flagdizero.jenny.reply.SOURCE_TAG"
+        internal const val EXTRA_REPLY_SOURCE_TAG = "za.nastech.jafta.reply.SOURCE_TAG"
 
         /** Testo da riconsegnare, presente **solo** sull'intent del "Rimanda"
          *  della notifica di mancata consegna: là il testo non arriva da
          *  `RemoteInput` (l'utente l'ha già scritto una volta) e viaggia
          *  nell'extra. */
-        internal const val EXTRA_REPLY_RETRY_TEXT = "com.flagdizero.jenny.reply.RETRY_TEXT"
+        internal const val EXTRA_REPLY_RETRY_TEXT = "za.nastech.jafta.reply.RETRY_TEXT"
 
         /** Tag della notifica "non ho ricevuto il messaggio". Distinto da quelli
-         *  degli alert: non è un avviso di Jenny, è un guasto da riparare, e
+         *  degli alert: non è un avviso di Jafta, è un guasto da riparare, e
          *  sostituirlo con l'avviso successivo lo farebbe sparire non letto. */
         internal const val FAILED_TAG = "reply-failed"
 
@@ -82,7 +82,7 @@ class NotifierBridge(context: Context) {
          *  Il prezzo, da non dimenticare: mutabile vuol dire che **chiunque tenga
          *  il PendingIntent** ne riempie gli extra. Il componente è esplicito e
          *  non si dirotta, ma un'app con l'accesso alle notifiche può mandarlo
-         *  con un testo suo, che arriva a Jenny come dell'utente (v. il KDoc di
+         *  con un testo suo, che arriva a Jafta come dell'utente (v. il KDoc di
          *  `ReplyReceiver`). È il contratto della risposta diretta di Android,
          *  non un buco da chiudere qui. */
         private fun replyIntentFlags(): Int =
@@ -111,13 +111,13 @@ class NotifierBridge(context: Context) {
          * L'azione "Rispondi" da appendere a un alert.
          *
          * Ogni alert del canale la porta, non solo le risposte dell'agente: a un
-         * promemoria del cron si replica come a qualunque altra cosa Jenny dica,
+         * promemoria del cron si replica come a qualunque altra cosa Jafta dica,
          * e una regola sola non può divergere da se stessa.
          *
          * `setShowsUserInterface(false)` tiene la risposta *dentro* la tendina —
          * senza, alcune shell aprono l'app, che è l'unica cosa che questa
          * funzione doveva evitare. `setAuthenticationRequired(true)` pretende lo
-         * sblocco: in questa conversazione c'è tutto ciò che Jenny sa
+         * sblocco: in questa conversazione c'è tutto ciò che Jafta sa
          * dell'utente, e la tendina la legge chiunque prenda il telefono dal
          * tavolo. `setAllowGeneratedReplies(false)` toglie le risposte
          * suggerite dal sistema: metterebbero parole in bocca all'utente, e il
@@ -205,13 +205,13 @@ class NotifierBridge(context: Context) {
          *  della conversazione si legge in chat, che è la storia vera. */
         private const val MAX_CONVERSATION_MESSAGES = 10
 
-        /** Jenny, come interlocutore. La `key` tiene ferma l'identità fra una
+        /** Jafta, come interlocutore. La `key` tiene ferma l'identità fra una
          *  ricostruzione e l'altra: senza, ogni `addMessage` rischia di sembrare
          *  un mittente nuovo. */
         private fun jennyPerson(context: Context): Person =
             Person.Builder()
                 .setName(context.getString(R.string.reply_bot_name))
-                .setKey("jenny")
+                .setKey("jafta")
                 .setIcon(
                     IconCompat.createWithResource(context, R.drawable.ic_notification_large)
                 )
@@ -326,7 +326,7 @@ class NotifierBridge(context: Context) {
          *
          *  *silent* distingue i due motivi per cui si riposta: l'eco di ciò che
          *  ha appena scritto l'utente non deve suonare (sta guardando la
-         *  tendina, l'ha appena toccata), la risposta di Jenny sì — è la notizia
+         *  tendina, l'ha appena toccata), la risposta di Jafta sì — è la notizia
          *  per cui la notifica esiste.
          */
         private fun postConversation(
@@ -386,7 +386,7 @@ class NotifierBridge(context: Context) {
          * cui si è risposto **proprio perché** si aspetta che l'app la aggiorni.
          *
          * Il primo messaggio del filo è il corpo dell'avviso originale. Se il suo
-         * titolo portava un'etichetta (`Jenny ⏰ spesa`), l'etichetta finisce
+         * titolo portava un'etichetta (`Jafta ⏰ spesa`), l'etichetta finisce
          * davanti al testo e non in `setConversationTitle`: quel campo Android lo
          * tratta come il nome di un gruppo e su un uno-a-uno lo rende male o lo
          * ignora, mentre "quale promemoria" deve sopravvivere alla conversione.

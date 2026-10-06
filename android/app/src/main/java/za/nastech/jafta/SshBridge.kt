@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.system.Os
 import android.util.Base64
@@ -132,7 +132,7 @@ private class StreamCollector(
  * quattro diventano eccezioni diverse, perche una host key non pinnata richiede
  * un intervento umano e un timeout no.
  *
- * Il lato Python e `jenny/agent/tools/ssh_backends/android.py`.
+ * Il lato Python e `jafta/agent/tools/ssh_backends/android.py`.
  */
 object SshBridge {
 
@@ -172,7 +172,7 @@ object SshBridge {
      * algoritmi, non solo quelli che ci servono. Misurato sul dispositivo
      * (Titan 2, Android 16): con BouncyCastle in posizione 1 il provider di
      * AES/GCM passava da `AndroidOpenSSL` a `BC` per l'INTERA app, compreso il
-     * container di backup cifrato (`jenny/snapshot/crypto_backends/android.py`).
+     * container di backup cifrato (`jafta/snapshot/crypto_backends/android.py`).
      * Due danni in uno: un cambio di implementazione sotto i piedi al backup, e
      * la perdita dell'accelerazione hardware di BoringSSL a favore del Java puro
      * di BouncyCastle — su un archivio di tutto il workspace si sente.
@@ -660,7 +660,7 @@ object SshBridge {
                 throw BridgeException("io", "could not move the generated key into place")
             }
             val public = ByteArrayOutputStream()
-            pair.writePublicKey(public, req.optString("comment", "jenny"))
+            pair.writePublicKey(public, req.optString("comment", "jafta"))
             JSONObject().put("publicKey", public.toString("UTF-8").trim())
         } finally {
             pair.dispose()
@@ -684,7 +684,7 @@ object SshBridge {
         val captor = CapturingHostKeys()
         val jsch = JSch()
         jsch.hostKeyRepository = captor
-        val session = jsch.getSession("jenny-probe", host, port)
+        val session = jsch.getSession("jafta-probe", host, port)
         session.userInfo = SilentUserInfo
         session.setConfig("PreferredAuthentications", "publickey")
         try {
@@ -729,7 +729,7 @@ object SshBridge {
         override fun add(hostkey: HostKey?, ui: UserInfo?) {}
         override fun remove(host: String?, type: String?) {}
         override fun remove(host: String?, type: String?, key: ByteArray?) {}
-        override fun getKnownHostsRepositoryID(): String = "jenny-probe"
+        override fun getKnownHostsRepositoryID(): String = "jafta-probe"
         override fun getHostKey(): Array<HostKey> = emptyArray()
         override fun getHostKey(host: String?, type: String?): Array<HostKey> = emptyArray()
     }

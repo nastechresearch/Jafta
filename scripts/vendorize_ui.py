@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Host-only: Build/maintenance script for vendoring UI assets.
 # Downloads from CDN (npm-based). Not used during Android build.
-"""Vendorize external CDN assets referenced by jenny/templates/ui/index.html."""
+"""Vendorize external CDN assets referenced by jafta/templates/ui/index.html."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ import urllib.request
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
 
-INDEX_HTML = Path(__file__).resolve().parent.parent / "jenny/templates/ui/index.html"
+INDEX_HTML = Path(__file__).resolve().parent.parent / "jafta/templates/ui/index.html"
 VENDOR_DIR = INDEX_HTML.parent / "assets/vendor"
 USER_AGENT = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "

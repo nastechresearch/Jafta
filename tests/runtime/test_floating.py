@@ -21,8 +21,8 @@ from support.kotlin_source import read_source
 from jafta.runtime import floating as fl
 
 REPO = Path(__file__).resolve().parents[2]
-CONTROLLER = REPO / "android/app/src/main/java/com/flagdizero/jafta/FloatingOverlayController.kt"
-BRIDGE_KT = REPO / "android/app/src/main/java/com/flagdizero/jafta/FloatingBridge.kt"
+CONTROLLER = REPO / "android/app/src/main/java/za/nastech/jafta/FloatingOverlayController.kt"
+BRIDGE_KT = REPO / "android/app/src/main/java/za/nastech/jafta/FloatingBridge.kt"
 
 
 class _FakeBridge:
@@ -158,7 +158,7 @@ class TestBoundaryWithKotlin:
     """
 
     def test_the_kotlin_class_name_exists(self):
-        assert fl._BRIDGE.java_class == "com.flagdizero.jafta.FloatingBridge"
+        assert fl._BRIDGE.java_class == "za.nastech.jafta.FloatingBridge"
         assert BRIDGE_KT.is_file()
         assert "class FloatingBridge(" in read_source(BRIDGE_KT)
 
@@ -212,7 +212,7 @@ class TestThePhysicsDoesNotDiverge:
     una costante nuova entra da sola nel confronto.
     """
 
-    FLIGHT_KT = REPO / "android/app/src/main/java/com/flagdizero/jafta/FloatingFlight.kt"
+    FLIGHT_KT = REPO / "android/app/src/main/java/za/nastech/jafta/FloatingFlight.kt"
     COMPANION_JS = REPO / "jafta/templates/ui/assets/shared/mascot-drag.js"
 
     @staticmethod

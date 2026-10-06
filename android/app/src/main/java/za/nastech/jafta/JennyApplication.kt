@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.app.Activity
 import android.app.Application
@@ -34,7 +34,7 @@ import android.util.Log
  * sveglie esatte (`WakeReceiver.syncExactAlarmState`), e non su un terzo
  * ascoltatore suo: "qualcosa è cambiato, vale la pena ricontrollare" è
  * esattamente la stessa domanda, e l'utente che concede il permesso dalle
- * impostazioni di sistema torna su Jenny subito dopo.
+ * impostazioni di sistema torna su Jafta subito dopo.
  */
 class JennyApplication : Application() {
 
@@ -110,7 +110,7 @@ class JennyApplication : Application() {
     /**
      * App in primo piano → ricontrolla il gateway.
      *
-     * È il momento in cui un utente che apre Jenny si aspetta che risponda: se
+     * È il momento in cui un utente che apre Jafta si aspetta che risponda: se
      * il gateway è giù, aspettare il prossimo giro del watchdog significa
      * mostrargli una WebView che non si connette per minuti.
      *
@@ -148,7 +148,7 @@ class JennyApplication : Application() {
         // cambiato dall'ultima volta, che nella vita di un telefono succede una
         // manciata di volte in tutto. Metterlo dopo il freno significherebbe
         // perdere l'occasione buona — l'utente che concede il permesso e torna
-        // subito su Jenny — solo perché la callback di rete ha parlato mezzo
+        // subito su Jafta — solo perché la callback di rete ha parlato mezzo
         // minuto prima. Vedi `WakeReceiver.syncExactAlarmState`: la broadcast di
         // sistema che dovrebbe avvisarci non è arrivata sul dispositivo reale, e
         // questo è il giro che non dipende da lei.

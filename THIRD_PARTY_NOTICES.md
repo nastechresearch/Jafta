@@ -1,12 +1,12 @@
 # Third-Party Notices
 
-Jenny redistributes the third-party components listed below. Each keeps its own
-license; the AGPL-3.0 that covers Jenny itself does not apply to them. Full
+Jafta redistributes the third-party components listed below. Each keeps its own
+license; the AGPL-3.0 that covers Jafta itself does not apply to them. Full
 license texts live next to the files they cover, at the paths given.
 
 ## Bundled WebUI assets
 
-Vendored under `jenny/templates/ui/assets/vendor/` and shipped inside the APK.
+Vendored under `jafta/templates/ui/assets/vendor/` and shipped inside the APK.
 Nothing is fetched from a CDN at runtime — the WebUI has no outbound asset
 loads, which is why these are vendored in the first place.
 
@@ -29,7 +29,7 @@ of APK that nothing could open.
 
 ## Bundled fonts
 
-Self-hosted under `jenny/templates/ui/assets/vendor/fonts/`. All are licensed
+Self-hosted under `jafta/templates/ui/assets/vendor/fonts/`. All are licensed
 under the [SIL Open Font License 1.1](https://openfontlicense.org); the full
 OFL text and the per-font copyright notices are in `vendor/fonts/LICENSE.txt`.
 
@@ -71,14 +71,14 @@ Both licenses are permissive and compatible with this project's AGPL-3.0 grant.
 
 ## Mascot artwork
 
-The Jenny mascot artwork (`android/image_source/`, and the WebP poses derived
-from it under `jenny/templates/ui/assets/`) is original work, copyright © 2026
+The Jafta mascot artwork (`android/image_source/`, and the WebP poses derived
+from it under `jafta/templates/ui/assets/`) is original work, copyright © 2026
 Ludovico Ragno, and is **not** covered by the AGPL grant — see
 [TRADEMARK.md](./TRADEMARK.md).
 
 ## Upstream project — nanobot (MIT License)
 
-This project (Jenny) is derived from [nanobot](https://github.com/HKUDS/nanobot),
+This project (Jafta) is derived from [nanobot](https://github.com/HKUDS/nanobot),
 originally authored by Xubin Ren and the nanobot contributors and distributed
 under the MIT License. The original license text is reproduced verbatim below,
 as required by the MIT License's terms.

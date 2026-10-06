@@ -1,6 +1,6 @@
 # Themes and mascot
 
-Jenny's look (the color theme and the on-screen mascot) is personal to the phone you're using: none of it is backed up or synced.
+Jafta's look (the color theme and the on-screen mascot) is personal to the phone you're using: none of it is backed up or synced.
 
 ## Themes
 
@@ -14,15 +14,15 @@ There are seven named themes:
 |---|---|---|
 | Chanel | Dark | Black and white couture, a thread of gold only where it counts |
 | Synthwave '84 | Dark (default) | Neon pink on near-black |
-| Jenny Kyoto | Dark | Earth, rust, hand-rounded edges |
-| Jenny Sticker | Dark | Cut-out sticker look, white borders, hard shadows |
-| Jenny Fumetto | Light | Ink on paper, comic-panel replies |
-| Jenny Y2K | Light | Glossy gradients, bubblegum gloss |
-| Jenny Pietra | Light | Travertine, bronze, Roman serifs |
+| Jafta Kyoto | Dark | Earth, rust, hand-rounded edges |
+| Jafta Sticker | Dark | Cut-out sticker look, white borders, hard shadows |
+| Jafta Fumetto | Light | Ink on paper, comic-panel replies |
+| Jafta Y2K | Light | Glossy gradients, bubblegum gloss |
+| Jafta Pietra | Light | Travertine, bronze, Roman serifs |
 
 Synthwave '84 is what a fresh install starts with. Whichever theme you pick, the app applies it before the very first paint on later launches, so there's no flash of the wrong colors.
 
-On Android, the status bar and navigation bar follow your theme automatically — their background color and icon color (light or dark) are kept in sync with whichever theme is active, so a light theme like Jenny Pietra gets dark system-bar icons and a dark theme like Synthwave '84 gets light ones. This only happens inside the Jenny app itself; if you ever open the WebUI in a regular desktop or mobile browser instead of the Android app, the system bars obviously stay whatever your browser or OS already uses.
+On Android, the status bar and navigation bar follow your theme automatically — their background color and icon color (light or dark) are kept in sync with whichever theme is active, so a light theme like Jafta Pietra gets dark system-bar icons and a dark theme like Synthwave '84 gets light ones. This only happens inside the Jafta app itself; if you ever open the WebUI in a regular desktop or mobile browser instead of the Android app, the system bars obviously stay whatever your browser or OS already uses.
 
 Your theme choice lives in the WebView's local storage on this specific device, not in `config.json`. That has two consequences worth knowing up front:
 
@@ -31,13 +31,13 @@ Your theme choice lives in the WebView's local storage on this specific device, 
 
 ## Mascot
 
-A small companion (Jenny, styled as "✿") follows the conversation from the corner of the screen. On the home's chat page she is simply present beside the conversation, and a tap sends her to the edge or brings her back out; she comes back the way you left her. Everywhere else — the home's other pages (Apps, Notebooks, Settings) and the rooms opened from them, and every view of the workshop except the Console — she lives docked at the edge: tap her, or swipe her inward from the edge, and she pops out with a one-turn minichat, a text field ("Ask here…") and a speech bubble for the reply.
+A small companion (Jafta, styled as "✿") follows the conversation from the corner of the screen. On the home's chat page she is simply present beside the conversation, and a tap sends her to the edge or brings her back out; she comes back the way you left her. Everywhere else — the home's other pages (Apps, Notebooks, Settings) and the rooms opened from them, and every view of the workshop except the Console — she lives docked at the edge: tap her, or swipe her inward from the edge, and she pops out with a one-turn minichat, a text field ("Ask here…") and a speech bubble for the reply.
 
 A few things about that minichat are worth knowing before you rely on it:
 
 - Replies are capped at **280 characters** and stripped down to plain text — no markdown, no code blocks, no formatting survives.
-- It talks over the **same conversation** as your main chat. Anything you ask the mascot lands in the same history the main chat sees, so a question you type into the minichat can come back up later if you ask Jenny to recall the conversation.
-- The mascot gets **no automatic awareness of which screen you're on** — nothing about the current view is silently attached to what you type to her. Jenny does have a pull-based tool that can fetch the HTML of whatever's open (chat, Wiki, Workspace, apps, settings) when she decides it's relevant, but that tool works the same way regardless of whether you asked through the mascot's minichat or the main chat box — so talking to her isn't any blinder than talking in chat, it's just never handed screen context for free.
+- It talks over the **same conversation** as your main chat. Anything you ask the mascot lands in the same history the main chat sees, so a question you type into the minichat can come back up later if you ask Jafta to recall the conversation.
+- The mascot gets **no automatic awareness of which screen you're on** — nothing about the current view is silently attached to what you type to her. Jafta does have a pull-based tool that can fetch the HTML of whatever's open (chat, Wiki, Workspace, apps, settings) when she decides it's relevant, but that tool works the same way regardless of whether you asked through the mascot's minichat or the main chat box — so talking to her isn't any blinder than talking in chat, it's just never handed screen context for free.
 
 While waiting for a reply she switches between a "thinking" pose and, once text starts streaming back, a "talking" pose with an animated mouth. If you leave her alone reading a long reply she quiets back down into "thinking" after about a second of no new text.
 
@@ -47,7 +47,7 @@ Her face and her body are two separate drawings stacked on each other, which is 
 
 Drag her instead of tapping and she takes flight: she hangs from your finger with a bit of pendulum physics, and on release falls, bounces, gets up, and walks back home to her docked position. It's a pure fidget interaction with no functional effect — dragging her doesn't send anything or change any setting.
 
-Her preferences are on the home's **Settings** page, in the row named after her (**Jenny** unless you gave her another name):
+Her preferences are on the home's **Settings** page, in the row named after her (**Jafta** unless you gave her another name):
 
 | Setting | Options | Default |
 |---|---|---|
@@ -67,7 +67,7 @@ She comes in one look, in color. There used to be a black-and-white switch here,
 
 Like the theme, **Show mascot** and **Mascot size** are stored in this device's local storage, not in `config.json` and not in your encrypted backup. A reinstall brings her back showing and small. **Floating mascot** is the exception: it lives in `config.json` (`floating.enabled`), because the window is started by the app's background service, which can't read the WebView's storage.
 
-If your phone has "reduce motion" turned on at the OS level, Jenny respects it: the animated mouth-flap while she talks is skipped in favor of a static pose. The drag-to-fly gesture itself is a direct manipulation you control with your finger, so it still works if you choose to use it.
+If your phone has "reduce motion" turned on at the OS level, Jafta respects it: the animated mouth-flap while she talks is skipped in favor of a static pose. The drag-to-fly gesture itself is a direct manipulation you control with your finger, so it still works if you choose to use it.
 
 ## UI language
 
@@ -80,7 +80,7 @@ This is worth separating clearly from a similarly named setting:
 
 Changing the phone's language later does **not** touch `agents.defaults.language`. Any backend-generated text that depends on that field keeps using the language you had during onboarding until you edit `config.json` directly; see [Configuration](../reference/configuration.md). Several backend error messages (settings validation, some model-list failures) are in English regardless of either.
 
-None of this affects what language Jenny actually *replies* to you in during a normal conversation: that depends on the language model you're using and how you write to it, not on any setting in this app.
+None of this affects what language Jafta actually *replies* to you in during a normal conversation: that depends on the language model you're using and how you write to it, not on any setting in this app.
 
 ## See also
 

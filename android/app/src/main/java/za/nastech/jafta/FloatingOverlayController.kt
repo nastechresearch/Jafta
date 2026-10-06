@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
@@ -60,7 +60,7 @@ import kotlin.math.abs
 import kotlin.math.max
 
 /**
- * La mascotte flottante: Jenny sopra le altre app, un tap e le parli.
+ * La mascotte flottante: Jafta sopra le altre app, un tap e le parli.
  *
  * ## Tre finestre, una sola che cambia taglia
  *
@@ -127,7 +127,7 @@ object FloatingOverlayController {
     /**
      * I due ancoraggi orizzontali, in frazioni del lato dello sprite.
      *
-     * Copiati da `mobile-style.css` (`.jenny-duo` e `.jenny-duo.out`), dove la
+     * Copiati da `mobile-style.css` (`.jafta-duo` e `.jafta-duo.out`), dove la
      * mascotte in chat vive con gli stessi due numeri: a riposo poco meno di
      * metà quadrato resta fuori schermo, e quando è attiva rientra a un quarto.
      * Sono frazioni e non pixel per la stessa ragione scritta là: la stessa
@@ -136,7 +136,7 @@ object FloatingOverlayController {
     private const val DOCKED_OUT_RATIO = 0.469f
     private const val OUT_RATIO = 0.25f
 
-    /** Quanto dura lo scivolamento fra i due ancoraggi. `.jenny-duo` usa
+    /** Quanto dura lo scivolamento fra i due ancoraggi. `.jafta-duo` usa
      *  0,3 s con questa curva, ed è la stessa transizione. */
     private const val ANCHOR_SLIDE_MS = 300L
 
@@ -176,7 +176,7 @@ object FloatingOverlayController {
     /**
      * Dove stanno i suoi piedi e il suo asse nello sprite, in frazioni del lato.
      *
-     * Misurati sui pixel opachi di `jenny-body-front-idle` (768 px): i piedi
+     * Misurati sui pixel opachi di `jafta-body-front-idle` (768 px): i piedi
      * finiscono alla riga 668 e il corpo occupa le colonne 229–572, quindi il
      * suo asse sta a 0,52 del quadrato — non a metà — con l'arte che guarda a
      * sinistra, cioè com'è sul bordo destro, l'unico. Servono
@@ -323,7 +323,7 @@ object FloatingOverlayController {
     /** Quanto si aspetta la risposta prima di dire che non arriva. Uguale al
      *  `REPLY_TIMEOUT_MS` della minichat della WebUI: è lo stesso agente, con
      *  gli stessi tempi, e due soglie diverse per la stessa attesa sarebbero
-     *  due verità diverse su quando Jenny è in ritardo. */
+     *  due verità diverse su quando Jafta è in ritardo. */
     private const val REPLY_TIMEOUT_MS = 90_000L
 
     /** Ripiego se Python non ha ancora spinto la config. */
@@ -349,7 +349,7 @@ object FloatingOverlayController {
     // Fra le preferenze non c'e' il bordo: e' sempre il destro (24/09/2026).
     //
     // **E nemmeno l'altezza.** E' la riga sopra la barra di input, in ogni
-    // stato — l'invariante che `.jenny-duo` dichiara nel CSS («Non deve mai
+    // stato — l'invariante che `.jafta-duo` dichiara nel CSS («Non deve mai
     // cambiare in Y») — ed e' anche il pavimento del volo, come `fs.y0` in JS.
     // Per un giro (17/09) si e' provato a farla cadere fino in fondo e restare
     // dove atterrava: finiva sempre in un angolo, mezza fuori, sotto le icone
@@ -694,7 +694,7 @@ object FloatingOverlayController {
     /**
      * L'app è passata in primo piano (o ne è uscita).
      *
-     * Jenny è la home del telefono: senza questo, sulla schermata iniziale ci
+     * Jafta è la home del telefono: senza questo, sulla schermata iniziale ci
      * sarebbero **due** mascotte, una dentro la SPA e una sopra. Si nasconde e
      * non si smonta — rimontare una finestra a ogni passaggio in foreground
      * costerebbe più che tenerla ferma.
@@ -1273,7 +1273,7 @@ object FloatingOverlayController {
         // `FLAG_NOT_TOUCHABLE` viene tappato da Android a 0,8 di opacità (protezione anti-tapjacking, si legge in
         // `dumpsys` come `alpha=0.8`), e il palco da fermo *deve* essere
         // `NOT_TOUCHABLE` o si mangerebbe ogni tocco del telefono. Disegnarla
-        // là vorrebbe dire una Jenny semitrasparente, sempre.
+        // là vorrebbe dire una Jafta semitrasparente, sempre.
         //
         // In volo il problema non c'è: l'arena è la maniglia, il palco può
         // essere toccabile (nessuno lo raggiunge, la maniglia gli sta sopra) e
@@ -1397,7 +1397,7 @@ object FloatingOverlayController {
      * È **toccabile** anche se non riceve i tocchi (glieli prende la maniglia,
      * che le sta sopra): un overlay non fidato con `FLAG_NOT_TOUCHABLE` lo
      * paga in opacità — Android lo tappa a 0,8 contro il tapjacking — e una
-     * Jenny semitrasparente non è una Jenny.
+     * Jafta semitrasparente non è una Jafta.
      */
     private fun buildMascotWindow(ctx: Context): FrameLayout {
         val side = mascotSize(ctx)
@@ -2338,7 +2338,7 @@ object FloatingOverlayController {
         art.translationY = startTop
         art.rotation = 0f
         art.scaleX = 1f
-        art.setImageBitmap(sprite("jenny-hang"))
+        art.setImageBitmap(sprite("jafta-hang"))
         art.visibility = View.VISIBLE
         main.post { if (flight != null) mascot.visibility = View.INVISIBLE }
 
@@ -2379,11 +2379,11 @@ object FloatingOverlayController {
         art.rotation = rotationDeg
         art.scaleX = if (flip) -1f else 1f
         val name = when (pose) {
-            FloatingFlight.Pose.HANG -> "jenny-hang"
-            FloatingFlight.Pose.FALL -> "jenny-fall"
-            FloatingFlight.Pose.GROUND -> "jenny-ground"
-            FloatingFlight.Pose.WALK1 -> "jenny-walk1"
-            FloatingFlight.Pose.WALK2 -> "jenny-walk2"
+            FloatingFlight.Pose.HANG -> "jafta-hang"
+            FloatingFlight.Pose.FALL -> "jafta-fall"
+            FloatingFlight.Pose.GROUND -> "jafta-ground"
+            FloatingFlight.Pose.WALK1 -> "jafta-walk1"
+            FloatingFlight.Pose.WALK2 -> "jafta-walk2"
         }
         art.setImageBitmap(sprite(name))
     }
@@ -2498,7 +2498,7 @@ object FloatingOverlayController {
      *
      * **Al bordo non va la faccia frontale.** Docked resta fuori schermo poco
      * meno di metà quadrato, e di una faccia si vedrebbe un occhio e mezza
-     * bocca: è esattamente il motivo per cui `jenny-side` — l'arte diagonale,
+     * bocca: è esattamente il motivo per cui `jafta-side` — l'arte diagonale,
      * con la faccia già disegnata dentro — esiste. Quando è *out* torna la
      * pila a due livelli, corpo × faccia, che è dove le espressioni si leggono.
      *
@@ -2507,16 +2507,16 @@ object FloatingOverlayController {
      */
     private fun syncFace(sad: Boolean = false) {
         if (!expanded) {
-            mascotBody?.setImageBitmap(sprite("jenny-side"))
+            mascotBody?.setImageBitmap(sprite("jafta-side"))
             mascotFace?.visibility = View.GONE
             return
         }
         mascotFace?.visibility = View.VISIBLE
-        val body = if (waitingForReply) "jenny-body-front-think" else "jenny-body-front-idle"
+        val body = if (waitingForReply) "jafta-body-front-think" else "jafta-body-front-idle"
         val face = when {
-            sad -> "jenny-face-front-sad"
-            waitingForReply -> "jenny-face-front-thinking"
-            else -> "jenny-face-front-normal"
+            sad -> "jafta-face-front-sad"
+            waitingForReply -> "jafta-face-front-thinking"
+            else -> "jafta-face-front-normal"
         }
         mascotBody?.setImageBitmap(sprite(body))
         mascotFace?.setImageBitmap(sprite(face))
@@ -2561,7 +2561,7 @@ object FloatingOverlayController {
     /**
      * Scivola fino a *(left, top)* dentro la finestra grande, e **ci resta**.
      *
-     * La curva e la durata sono quelle di `.jenny-duo` nel CSS —
+     * La curva e la durata sono quelle di `.jafta-duo` nel CSS —
      * 0,3 s con un rimbalzino finale — così il gesto è lo stesso che si vede
      * in chat. La differenza importante è la fine: la traslazione viene
      * *committata* nel margine e azzerata, altrimenti resta addosso al
@@ -2627,7 +2627,7 @@ object FloatingOverlayController {
     }
 
     /**
-     * Il respiro: `jenny-bob` quando è fuori, `jenny-wobble` mentre pensa.
+     * Il respiro: `jafta-bob` quando è fuori, `jafta-wobble` mentre pensa.
      *
      * Stessi tempi e stesse origini del CSS. L'ampiezza però **non** si copia
      * in pixel: là sono 4 px su uno sprite da 120, qui il lato è un altro, e un
@@ -2732,7 +2732,7 @@ object FloatingOverlayController {
      * L'ordinata, **derivata e mai memorizzata**: quella con cui i suoi piedi
      * poggiano [FEET_GAP_DP] sopra il bordo alto della pillola.
      *
-     * È l'invariante di `.jenny-duo` («Non deve mai cambiare in Y»), è dove
+     * È l'invariante di `.jafta-duo` («Non deve mai cambiare in Y»), è dove
      * *risiede*, è il pavimento del volo e la riga a cui la camminata torna.
      * Si calcola anche a composer nascosto — la pillola esiste come misura
      * pure quando non è a schermo — con l'altezza a una riga. A chat aperta

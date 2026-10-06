@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate all Android launcher + notification icons from icon.png.
 
-Source `icon.png` is the Jenny mascot: an opaque white face with black line-art
+Source `icon.png` is the Jafta mascot: an opaque white face with black line-art
 details on a transparent background. On a black background the mascot reads as-is
 (white face floats on black, dark features sit on top of the white fill), so the
 launcher/large icons need no colour inversion.

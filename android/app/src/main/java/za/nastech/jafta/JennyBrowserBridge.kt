@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.content.Context
 import android.net.Uri
@@ -56,7 +56,7 @@ class JennyBrowserBridge(context: Context) {
     companion object {
         private const val TAG = "JennyBrowser"
         private const val DEFAULT_TIMEOUT_SECONDS = 30L
-        private const val PROFILE_NAME = "jenny-browser-session"
+        private const val PROFILE_NAME = "jafta-browser-session"
         private const val SETTLE_QUIET_MS = 400L
 
         /**
@@ -108,7 +108,7 @@ class JennyBrowserBridge(context: Context) {
         )
 
         /**
-         * Le stesse reti di ``jenny/security/network.py::_BLOCKED_NETWORKS``.
+         * Le stesse reti di ``jafta/security/network.py::_BLOCKED_NETWORKS``.
          *
          * Vivono qui e non solo in Python perché con una sessione interattiva
          * **Python l'indirizzo di un link non lo vede mai**: il modello clicca,
@@ -160,7 +160,7 @@ class JennyBrowserBridge(context: Context) {
     // «bloccato».
     private val guardDns = ThreadPoolExecutor(
         2, 2, 30L, TimeUnit.SECONDS, ArrayBlockingQueue(32),
-    ) { r -> Thread(r, "jenny-browser-guard-dns").apply { isDaemon = true } }
+    ) { r -> Thread(r, "jafta-browser-guard-dns").apply { isDaemon = true } }
         .apply { allowCoreThreadTimeOut(true) }
 
     private val lastWarnAt = AtomicLong(0L)

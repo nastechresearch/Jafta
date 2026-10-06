@@ -16,7 +16,7 @@ from pathlib import Path
 import pytest
 
 ANDROID_SRC = (
-    Path(__file__).resolve().parents[2] / "android/app/src/main/java/com/flagdizero/jafta"
+    Path(__file__).resolve().parents[2] / "android/app/src/main/java/za/nastech/jafta"
 )
 
 _CHAR_LITERAL = re.compile(r"'(\\.[^']*|[^'\\])'")

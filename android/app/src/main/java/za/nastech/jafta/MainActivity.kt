@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.Manifest
 import android.animation.Animator
@@ -64,7 +64,7 @@ import org.json.JSONObject
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        private const val TAG = "Jenny"
+        private const val TAG = "Jafta"
         private const val GATEWAY_HOST = "127.0.0.1"
         private const val GATEWAY_PORT = 18790
         // Il path — e SOLO quel path — che serve la SPA. Vedi isInternalGatewayUrl():
@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         private const val GATEWAY_URL = "http://${GATEWAY_HOST}:${GATEWAY_PORT}${GATEWAY_PATH}"
         // L'origine della SPA, nella forma che vogliono le regole di
         // addWebMessageListener (schema://host:porta, niente path). La vista
-        // esterna delle Jenny App sta su 127.0.0.1 ma su un'ALTRA porta, e le
+        // esterna delle Jafta App sta su 127.0.0.1 ma su un'ALTRA porta, e le
         // cornici delle app hanno origine opaca: nessuna delle due combacia.
         private const val GATEWAY_ORIGIN = "http://${GATEWAY_HOST}:${GATEWAY_PORT}"
         // I due nomi con cui il nativo compare nella pagina. Il JS non li usa
@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity() {
         private const val NATIVE_PORT_JS = "JennyNativePort"
         private const val RETRY_DELAY_MS = 500L
         private const val MAX_RETRIES = 30
-        private const val PREFS_NAME = "jenny"
+        private const val PREFS_NAME = "jafta"
         private const val PREF_BOOT_TO_CHAT = "boot_to_chat"
         // L'ultimo tema scelto nella WebUI, come colori già risolti: v.
         // applyBootPalette. Li scrivono setThemeBars e setFloatingPalette.
@@ -159,7 +159,7 @@ class MainActivity : AppCompatActivity() {
          * quindi il tap portava l'app in primo piano esattamente dov'era —
          * dentro una mini-app, in Wiki, ovunque — e non in chat.
          */
-        const val ACTION_OPEN_CHAT = "com.flagdizero.jenny.action.OPEN_CHAT"
+        const val ACTION_OPEN_CHAT = "za.nastech.jafta.action.OPEN_CHAT"
 
         /**
          * Il gettone che dice «questo [ACTION_OPEN_CHAT] l'abbiamo fatto noi».
@@ -174,7 +174,7 @@ class MainActivity : AppCompatActivity() {
          * vale come un avvio qualunque: niente chat forzata, niente avvisi
          * cancellati.
          */
-        private const val EXTRA_OPEN_CHAT_TOKEN = "com.flagdizero.jenny.extra.OPEN_CHAT_TOKEN"
+        private const val EXTRA_OPEN_CHAT_TOKEN = "za.nastech.jafta.extra.OPEN_CHAT_TOKEN"
         private const val PREF_OPEN_CHAT_TOKEN = "open_chat_token"
 
         private fun openChatToken(context: Context): String = synchronized(this) {
@@ -337,7 +337,7 @@ class MainActivity : AppCompatActivity() {
             val granted = result.values.any { it }
             // Una risposta arrivata subito vuol dire che Android non ha
             // mostrato niente: il permesso è negato per sempre, e dall'app si
-            // può solo mandare alla scheda di Jenny nelle impostazioni. Solo se
+            // può solo mandare alla scheda di Jafta nelle impostazioni. Solo se
             // la richiesta veniva da un tocco, non da quella d'avvio.
             val askedAt = locationAskedFromUiAt
             locationAskedFromUiAt = 0L
@@ -356,7 +356,7 @@ class MainActivity : AppCompatActivity() {
             // La WebUI ridisegna l'avviso di Mani: il dialog di sistema non
             // produce un `visibilitychange` affidabile nella WebView.
             webView?.evaluateJavascript(
-                "window.dispatchEvent(new Event('jenny-location-permission'))", null
+                "window.dispatchEvent(new Event('jafta-location-permission'))", null
             )
         }
 
@@ -376,7 +376,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    /** La scheda di Jenny nelle impostazioni di Android: dove si concede un
+    /** La scheda di Jafta nelle impostazioni di Android: dove si concede un
      *  permesso che l'app non può più chiedere. */
     private fun openAppDetailsSettings() {
         try {
@@ -617,7 +617,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Launcher: back is delegated to the SPA. It either consumes it inside
-        // an open Jenny App or falls back to natural WebView history.
+        // an open Jafta App or falls back to natural WebView history.
         //
         // Nasce DISABILITATO. Registrarlo abilitato da qui significa intercettare
         // il tasto Indietro quando la SPA non esiste ancora — per tutta la
@@ -747,7 +747,7 @@ class MainActivity : AppCompatActivity() {
      * leggere i colori salvati come fa applyBootPalette: legge solo uno stile.
      * Da Android 13 `setSplashScreenTheme` permette di cambiarlo, e il sistema
      * lo ricorda fra un lancio e l'altro. Su Android 12 resta lo sfondo fisso
-     * di `Theme.Jenny`, cioè il tema di default; sotto il 12 lo splash non c'è.
+     * di `Theme.Jafta`, cioè il tema di default; sotto il 12 lo splash non c'è.
      *
      * Si confronta il colore e non l'id del tema perché il nativo l'id non lo
      * riceve. Nessuna corrispondenza — un `--bg` cambiato nel CSS senza
@@ -829,7 +829,7 @@ class MainActivity : AppCompatActivity() {
         // al primo disegno, con getBottomGestureInset().
         if (!loaded) return
         wv.evaluateJavascript(
-            "window.dispatchEvent(new Event('jenny-gesture-insets'))",
+            "window.dispatchEvent(new Event('jafta-gesture-insets'))",
             null
         )
     }
@@ -907,7 +907,7 @@ class MainActivity : AppCompatActivity() {
         // swipe gesture while we are already the foreground task re-delivers the
         // HOME intent here instead of a fresh onCreate (launchMode=singleTask).
         // A launcher's Home means "collapse back to the home screen": close any
-        // open Jenny mini-app overlay and return the WebUI to chat (✿). It is a
+        // open Jafta mini-app overlay and return the WebUI to chat (✿). It is a
         // no-op when already home. The gateway service is untouched.
         // Solo per il VERO intent Home (ACTION_MAIN + CATEGORY_HOME): anche
         // l'alarm di restartApp arriva qui via onNewIntent (intent esplicito,
@@ -935,7 +935,7 @@ class MainActivity : AppCompatActivity() {
         isInForeground = true
         // La mascotte flottante si toglie di mezzo: questa app è la home del
         // telefono, e sulla schermata iniziale la mascotte c'è già dentro la
-        // SPA. Due Jenny sarebbero una di troppo.
+        // SPA. Due Jafta sarebbero una di troppo.
         FloatingOverlayController.onAppForegroundChanged()
         webView?.onResume()
         // Terzo modo in cui la chat arriva a schermo: il rientro in primo piano
@@ -1039,7 +1039,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * Read the per-install gateway bootstrap secret directly from
      * `<filesDir>/workspace/config.json` — the same file
-     * `jenny.config.bootstrap.ensure_minimal_config` writes
+     * `jafta.config.bootstrap.ensure_minimal_config` writes
      * `websocket.token_issue_secret` into. Only this app's Android UID can
      * read this file, which is what lets the WebView prove to
      * `/webui/bootstrap` that it is this app and not some other app on the
@@ -1110,7 +1110,7 @@ class MainActivity : AppCompatActivity() {
         // Il ponte verso il nativo: due porte con due regole, v.
         // installNativeBridges(). NON è vero che «la WebView carica solo il
         // gateway fidato»: il documento principale sì, ma dentro ci sono le
-        // cornici delle Jenny App e la vista esterna servita dal server
+        // cornici delle Jafta App e la vista esterna servita dal server
         // dell'utente, e un oggetto di addJavascriptInterface arriva a tutte.
         installNativeBridges(wv)
         // L'inset di gesture in fondo, che il CSS non può leggere da sé: v.
@@ -1196,11 +1196,11 @@ class MainActivity : AppCompatActivity() {
      * non scatta e `contentDocument` è inaccessibile. Il risultato misurato è un
      * riquadro bianco e zero informazione — per *qualunque* causa: 404, script
      * rotto, o (il caso che ha portato qui) `ERR_CLEARTEXT_NOT_PERMITTED` su una
-     * Jenny App che incorniciava un `http://` non-loopback. L'errore esisteva
+     * Jafta App che incorniciava un `http://` non-loopback. L'errore esisteva
      * solo in logcat, che l'utente non legge e l'agente non può leggere: sei
      * occorrenze in un'ora senza che niente arrivasse a nessuno.
      *
-     * Il canale è lo stesso già usato per `jenny-gesture-insets`
+     * Il canale è lo stesso già usato per `jafta-gesture-insets`
      * (v. refreshGestureInsets): un CustomEvent sulla window della SPA. Il
      * payload passa da [JSONObject] e non da concatenazione di stringhe —
      * l'URL arriva dalla rete e finirebbe dentro codice JS valutato.
@@ -1219,7 +1219,7 @@ class MainActivity : AppCompatActivity() {
             put("errorCode", error.errorCode)
         }
         wv.evaluateJavascript(
-            "window.dispatchEvent(new CustomEvent('jenny-subframe-error'," +
+            "window.dispatchEvent(new CustomEvent('jafta-subframe-error'," +
                 "{detail:$detail}))",
             null
         )
@@ -1309,7 +1309,7 @@ class MainActivity : AppCompatActivity() {
     // **Perché due.** `addJavascriptInterface` inietta l'oggetto in OGNI frame
     // della WebView, qualunque sia la sua origine (lo dice la documentazione di
     // WebView.addJavascriptInterface), e questa WebView ne ospita di non fidati:
-    // le cornici delle Jenny App (`sandbox="allow-scripts"`, origine opaca) e la
+    // le cornici delle Jafta App (`sandbox="allow-scripts"`, origine opaca) e la
     // vista esterna, cioè l'HTML del server dell'utente arrivato in chiaro dal
     // proxy su loopback. Finché il ponte era uno solo, una qualunque di quelle
     // pagine poteva chiamare `saveToDownloads('config.json')` — cioè copiare le
@@ -1339,7 +1339,7 @@ class MainActivity : AppCompatActivity() {
     // deve rileggere il valore appena scritto, ed è quel che la migrazione in
     // `shared/launcher-usage-store.js` verifica.
     private val nativeExecutor: ExecutorService =
-        Executors.newSingleThreadExecutor { r -> Thread(r, "jenny-native-commands") }
+        Executors.newSingleThreadExecutor { r -> Thread(r, "jafta-native-commands") }
 
     // Una sola installazione per WebView: il pulsante Riprova richiama
     // loadWebView(), e un secondo addWebMessageListener con lo stesso nome
@@ -1366,7 +1366,7 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * Riceve i comandi della SPA. Chromium lo chiama solo per i frame di
-     * [GATEWAY_ORIGIN]: è **questa** la barriera, e ferma le cornici delle Jenny
+     * [GATEWAY_ORIGIN]: è **questa** la barriera, e ferma le cornici delle Jafta
      * App (origine opaca) e la vista esterna (altra porta).
      *
      * Il controllo in più sul frame principale è difesa in profondità, non una
@@ -1429,7 +1429,7 @@ class MainActivity : AppCompatActivity() {
      * La porta sincrona, visibile a **ogni** frame: solo letture innocue.
      *
      * Ogni metodo qui è una domanda sul dispositivo o sulla geometria, senza
-     * effetti e senza dati dell'utente — perché una cornice di Jenny App o la
+     * effetti e senza dati dell'utente — perché una cornice di Jafta App o la
      * pagina di un server qualunque può chiamarlo quanto la SPA (v. il commento
      * sopra [installNativeBridges]). Qualunque cosa scriva, apra o legga un
      * file sta in [NativeCommands].
@@ -1439,7 +1439,7 @@ class MainActivity : AppCompatActivity() {
          * Quanti px fisici del **fondo** della WebView cadono dentro la fascia
          * in cui la shell di sistema riconosce la gesture di home. Il cassetto ci tiene sopra la propria
          * lista: una passata verso l'alto partita lì dentro non scorrerebbe,
-         * chiamerebbe `goHome()` — e siccome Jenny **è** il launcher, non
+         * chiamerebbe `goHome()` — e siccome Jafta **è** il launcher, non
          * porterebbe via a un'altra app ma smonterebbe tutti gli overlay.
          *
          * Il gemello di questo metodo — escludere quella fascia con
@@ -1625,7 +1625,7 @@ class MainActivity : AppCompatActivity() {
          * **Perché si è spostato.** Stava in `localStorage`, e il commento di
          * [buildGatewayUrl] dice già perché era il posto sbagliato: la
          * persistenza di Chromium è asincrona e non sopravvive a un kill del
-         * processo, mentre le SharedPreferences sì. Jenny è il launcher del
+         * processo, mentre le SharedPreferences sì. Jafta è il launcher del
          * telefono e il sistema la uccide di routine, quindi l'ordine «più
          * usate» si sbriciolava da sé — un difetto silenzioso, perché un
          * cassetto in ordine sbagliato non sembra rotto, sembra solo inutile.
@@ -1647,7 +1647,7 @@ class MainActivity : AppCompatActivity() {
          *
          * `commit()` e non `apply()`, ed è tutto il punto dello spostamento:
          * questa riga si scrive nell'istante in cui stai **aprendo un'altra
-         * app**, cioè esattamente quando Jenny passa in background e diventa
+         * app**, cioè esattamente quando Jafta passa in background e diventa
          * uccidibile. Un flush asincrono è la sola cosa su cui qui non si può
          * contare, e affidarcisi rifarebbe in Kotlin il difetto da cui si
          * scappava.
@@ -1791,7 +1791,7 @@ class MainActivity : AppCompatActivity() {
             val safeName = if (Regex("^[A-Za-z0-9._-]{1,100}$").matches(suggestedName)) {
                 suggestedName
             } else {
-                "jenny-backup.jbk"
+                "jafta-backup.jbk"
             }
             pendingExportPath = canonical
             val dropped = {
@@ -1847,7 +1847,7 @@ class MainActivity : AppCompatActivity() {
          *  SSH (`files/ssh/`, fuori dal workspace apposta), lo store degli
          *  snapshot e lo staging dei backup. Ora è il workspace, cioè quel che
          *  l'esploratore mostra e dove stanno gli allegati della chat
-         *  (`uploads/`, `.jenny/media/`). Il path canonico risolve i symlink:
+         *  (`uploads/`, `.jafta/media/`). Il path canonico risolve i symlink:
          *  un link nel workspace verso `../ssh/` finisce fuori e si rifiuta.
          *  Dentro il workspace si esclude [isWorkspaceSecret]. */
         private fun resolveLocalFile(path: String, caller: String): File? {
@@ -1880,7 +1880,7 @@ class MainActivity : AppCompatActivity() {
          *    atomica (`config.json.<uuid>.tmp`);
          *  - `config.corrupt-<data>.json`: la copia in quarantena che il loader
          *    mette da parte quando il file non si legge (`_quarantine` in
-         *    `jenny/config/loader.py`). Il nome non comincia con `config.json`,
+         *    `jafta/config/loader.py`). Il nome non comincia con `config.json`,
          *    e il solo prefisso la lasciava aprire e condividere. */
         private fun isWorkspaceSecret(file: File, workspace: File): Boolean {
             if (file.parentFile != workspace) return false
@@ -2256,7 +2256,7 @@ class MainActivity : AppCompatActivity() {
             override fun onAnimationEnd(animator: Animator) {
                 lv.visibility = View.GONE
                 // Overlay sparito e WebView visibile: sblocca le animazioni
-                // d'ingresso della WebUI (es. la caduta della mini Jenny
+                // d'ingresso della WebUI (es. la caduta della mini Jafta
                 // nell'onboarding), che altrimenti scorrono dietro il loading.
                 webView?.evaluateJavascript(
                     "window.mobileApp && window.mobileApp.onNativeReady && window.mobileApp.onNativeReady()",

@@ -1,4 +1,4 @@
-# jenny runtime workspace (config, sessions, memory, cron, media)
+# jafta runtime workspace (config, sessions, memory, cron, media)
 /workspace/
 /data/
 /test-data/
@@ -45,7 +45,7 @@ dmypy.json
 
 # Build & packaging
 # Anchored to the repo root on purpose: unanchored `dist/` and `build/` also match
-# jenny/templates/ui/assets/vendor/<pkg>/dist|build, which silently excluded the
+# jafta/templates/ui/assets/vendor/<pkg>/dist|build, which silently excluded the
 # vendored KaTeX, Mermaid, highlight.js and Tabler icon-font assets that index.html
 # loads and the APK bundles. Keep these anchored; add explicit paths for nested
 # build outputs instead.

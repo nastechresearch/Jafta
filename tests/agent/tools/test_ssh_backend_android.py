@@ -37,7 +37,7 @@ _METHODS = ("exec", "put", "get", "generateKeyPair", "probeHostKey", "closeAll")
 
 
 class FakeSshBridge:
-    """Sosia di ``com.flagdizero.jafta.SshBridge``: JSON in, JSON out."""
+    """Sosia di ``za.nastech.jafta.SshBridge``: JSON in, JSON out."""
 
     def __init__(self) -> None:
         #: (metodo, payload decodificato) di ogni chiamata, in ordine.
@@ -69,7 +69,7 @@ def _install(monkeypatch: pytest.MonkeyPatch) -> FakeSshBridge:
     bridge = FakeSshBridge()
     for name in _METHODS:
         setattr(bridge, name, lambda request, _n=name: bridge._handle(_n, request))
-    fake_java_module(monkeypatch, {"com.flagdizero.jafta.SshBridge": bridge})
+    fake_java_module(monkeypatch, {"za.nastech.jafta.SshBridge": bridge})
     # La classe risolta è cachata in un globale di modulo: va azzerata fra un
     # test e l'altro o il secondo test parlerebbe col bridge del primo.
     monkeypatch.setattr(android_mod, "_bridge", None)
@@ -411,7 +411,7 @@ async def test_close_all_surfaces_a_failing_bridge(bridge):
 
 def test_bridge_class_name_matches_the_kotlin_object():
     """Il nome è l'unico contratto con Kotlin che nessun test può verificare a runtime."""
-    assert android_mod._BRIDGE_CLASS == "com.flagdizero.jafta.SshBridge"
+    assert android_mod._BRIDGE_CLASS == "za.nastech.jafta.SshBridge"
 
 
 async def test_concurrent_calls_do_not_block_the_event_loop(bridge, tmp_path):

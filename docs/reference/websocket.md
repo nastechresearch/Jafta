@@ -1,6 +1,6 @@
 # WebSocket Protocol
 
-Jenny exposes a WebSocket server channel used by the Android WebView UI and any compatible client — this page documents the wire protocol for integrators writing their own client.
+Jafta exposes a WebSocket server channel used by the Android WebView UI and any compatible client — this page documents the wire protocol for integrators writing their own client.
 
 ## On the Android device, this is not optional
 
@@ -50,7 +50,7 @@ Only `path`, `allowFrom`, the token and TLS fields and `streaming` are honoured 
 Use the same entry point the Android runtime uses, and pass the address you want:
 
 ```python
-from jenny.android_entry import run_gateway
+from jafta.android_entry import run_gateway
 run_gateway("/path/to/data_dir", host="127.0.0.1", port=8765)
 ```
 
@@ -58,7 +58,7 @@ Note the first argument is a *data directory*, not the workspace itself — the 
 
 Called as `run_gateway("/path/to/data_dir")`, with no `host=`/`port=`, it binds `127.0.0.1:18790` whatever `config.json` says — the same as the app. `host` and `port` set both the gateway and the WebSocket channel, since they share one port.
 
-If you would rather have `websocket.host` and `websocket.port` come from `config.json`, skip `run_gateway` and call the lower-level `jenny.gateway_runtime._run_gateway(config=None)` yourself: with no overrides given, it loads the config as it is and the schema defaults (`enabled: false`, port `8765`) apply. It is a private, test-patchable function and it does none of the workspace preparation `run_gateway` does — you set the workspace (`jenny.config.paths.set_workspace_dir`) and create the config first.
+If you would rather have `websocket.host` and `websocket.port` come from `config.json`, skip `run_gateway` and call the lower-level `jafta.gateway_runtime._run_gateway(config=None)` yourself: with no overrides given, it loads the config as it is and the schema defaults (`enabled: false`, port `8765`) apply. It is a private, test-patchable function and it does none of the workspace preparation `run_gateway` does — you set the workspace (`jafta.config.paths.set_workspace_dir`) and create the config first.
 
 You should see:
 
@@ -281,7 +281,7 @@ status simply replaces a pending one. `started_at` appears only with `"running"`
 {"event": "goal_status", "chat_id": "default", "status": "running", "started_at": 1756640000.0}
 ```
 
-**`mascot_mood`** — how Jenny feels about the reply she just gave, for the on-screen mascot,
+**`mascot_mood`** — how Jafta feels about the reply she just gave, for the on-screen mascot,
 read by the server from the emoji in that reply (no model request). Sent after `turn_end`, only to subscribers of that chat, never retried and never persisted: the
 next turn replaces it, and a reload starts from a neutral face. `mood` is one of `happy`, `sad`,
 `angry` — the three expressions that exist as artwork (a neutral verdict sends nothing). `turn_id` is present when the turn had
@@ -299,7 +299,7 @@ appended to the transcript, so a reload replays it:
 {"event": "file_edit", "chat_id": "default", "edits": [{"path": "SOUL.md", "added": 2, "deleted": 1, "status": "done"}]}
 ```
 
-**`app_data_changed`** — a Jenny App's stored data changed, so an open app iframe should
+**`app_data_changed`** — a Jafta App's stored data changed, so an open app iframe should
 refresh itself. Broadcast to every connection, not just one chat's subscribers:
 
 ```json
@@ -334,11 +334,11 @@ is human-readable, `reason` is the stable token for a client to branch on (`miss
 **Legacy (default chat):** send a plain string, or a JSON object with a recognized text field:
 
 ```json
-"Hello Jenny!"
+"Hello Jafta!"
 ```
 
 ```json
-{"content": "Hello Jenny!"}
+{"content": "Hello Jafta!"}
 ```
 
 Recognized fields: `content`, `text`, `message` (checked in that order). Invalid JSON is treated as plain text. These frames route to the personal chat (`default`, announced in `ready`).
@@ -410,7 +410,7 @@ Reply — always one `rpc_result` per request, correlated by the opaque `id`:
 
 Error codes: `bad_request`, `forbidden`, `not_found`, `too_large`, `conflict`, `name_taken`, `unavailable`, `internal`.
 `name_taken` means the name asked for already belongs to something else (today: a notebook's new name is already a folder's or a conversation's).
-`conflict` is the only one that is not about the request but about the world: the request was fine, and the world moved underneath it — the file changed since the client read it (`page.write`, `workspace.write` with a `base`), or Jenny is still writing in that notebook (`project.rename`, `project.delete`). A client that gets it should not correct what it sent: re-read, or try again once she has finished.
+`conflict` is the only one that is not about the request but about the world: the request was fine, and the world moved underneath it — the file changed since the client read it (`page.write`, `workspace.write` with a `base`), or Jafta is still writing in that notebook (`project.rename`, `project.delete`). A client that gets it should not correct what it sent: re-read, or try again once she has finished.
 A frame whose `id` is missing or malformed is dropped with a log line — there is nothing to
 correlate a reply to.
 
@@ -431,14 +431,14 @@ correlate a reply to.
 | `settings.provider.update` | `name`, `format`, `api_base`, `api_key`, `ca_bundle`, `ca_bundle_clear` | Create or update a provider with its API key, then hot-reload the active provider. |
 | `telegram.save` | `token` | Save the Telegram bot token (checked with `getMe`) and restart the channel. |
 | `ssh.host.save` | `alias`, `host`, `port`, `username`, `auth`, `password`, `description`, `job_log_dir` | Create or update an SSH host. A missing `password` keeps the saved one. |
-| `onboarding.save` | `provider_name`, `format`, `api_key`, `api_base`, `model`, `bot_name`, `bot_icon`, `locale` | The first-run setup: save the provider with its API key, the model and Jenny's name, then wake the agent that was waiting for it and write the welcome message into the conversation. Replies `{status, chat_id, welcome_message}`. A missing provider or model is `bad_request` and nothing is saved. |
+| `onboarding.save` | `provider_name`, `format`, `api_key`, `api_base`, `model`, `bot_name`, `bot_icon`, `locale` | The first-run setup: save the provider with its API key, the model and Jafta's name, then wake the agent that was waiting for it and write the welcome message into the conversation. Replies `{status, chat_id, welcome_message}`. A missing provider or model is `bad_request` and nothing is saved. |
 
 **Authorization is the handshake's, not the frame's.** Only a connection that presented
 `token_issue_secret` at handshake time may run a command, even if `websocket_requires_token`
 is `false` — otherwise a mutation would sit on a weaker gate than `/api/`. And like `/api/`,
 which answers `401` to everyone when no secret is set, without a secret every command is
-refused with `forbidden`. Commands live in `jenny/webui/commands.py`
-(transport-agnostic); the frame handling is `jenny/channels/ws_rpc.py`.
+refused with `forbidden`. Commands live in `jafta/webui/commands.py`
+(transport-agnostic); the frame handling is `jafta/channels/ws_rpc.py`.
 
 ## Configuration Reference
 
@@ -498,7 +498,7 @@ For production deployments where `websocketRequiresToken: true` (the default, an
 ### How it works
 
 1. The legitimate client (e.g. the Android WebView) reads `token_issue_secret` from the private workspace `config.json`.
-2. The client calls `GET /webui/bootstrap` with `Authorization: Bearer <secret>` or `X-Jenny-Auth: <secret>` to receive connection metadata (WebSocket URL, model name, etc.).
+2. The client calls `GET /webui/bootstrap` with `Authorization: Bearer <secret>` or `X-Jafta-Auth: <secret>` to receive connection metadata (WebSocket URL, model name, etc.).
 3. The client opens the WebSocket with `?token=<secret>&client_id=...`.
 4. The same secret is used for all subsequent HTTP API requests via `Authorization: Bearer <secret>`.
 
@@ -523,7 +523,7 @@ On the Android app specifically, Kotlin reads the secret from `config.json` and 
 Client flow:
 
 1. Read `websocket.token_issue_secret` from the app's private workspace.
-2. Call `GET /webui/bootstrap` with `X-Jenny-Auth: your-secret-here`.
+2. Call `GET /webui/bootstrap` with `X-Jafta-Auth: your-secret-here`.
 3. Connect to the WebSocket with `?client_id=alice&token=your-secret-here`.
 4. Call HTTP APIs with `Authorization: Bearer your-secret-here`.
 
@@ -570,7 +570,7 @@ Legacy clients that only send plain text or `{"content": ...}` keep working unch
 
 ### Security boundary
 
-Anyone holding a valid WebSocket auth credential joins the personal conversation and sees its output, and can attach to any project chat. This is safe for Jenny's local, single-user model; auth on the handshake is the single line of defense.
+Anyone holding a valid WebSocket auth credential joins the personal conversation and sees its output, and can attach to any project chat. This is safe for Jafta's local, single-user model; auth on the handshake is the single line of defense.
 
 ## Security Notes
 
@@ -586,7 +586,7 @@ Anyone holding a valid WebSocket auth credential joins the personal conversation
 Outbound `message` events may include a `media` field containing local filesystem paths. Remote clients cannot access these files directly — they need either:
 
 - A shared filesystem mount, or
-- An HTTP file server serving the Jenny media directory
+- An HTTP file server serving the Jafta media directory
 
 ## Common Patterns
 
@@ -663,4 +663,4 @@ Clients connect to `ws://127.0.0.1:8765/chat/ws?client_id=...`. Trailing slashes
 
 - [Configuration reference](configuration.md) — full `config.json` field reference, including `websocket.*`.
 - [Settings](settings.md) — what is and is not exposed in the WebUI for this channel (none of `websocket.*` is UI-configurable).
-- [Security model](../internals/security-model.md) — how the bootstrap secret fits into Jenny's overall security boundaries.
+- [Security model](../internals/security-model.md) — how the bootstrap secret fits into Jafta's overall security boundaries.

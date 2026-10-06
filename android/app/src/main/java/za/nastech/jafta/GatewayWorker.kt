@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.content.Context
 import android.util.Log
@@ -81,7 +81,7 @@ class GatewayWorker(
         /** Nome del lavoro unico. Cambiarlo NON rinomina il lavoro già in coda:
          *  ne creerebbe un secondo accanto al primo, che continuerebbe a girare
          *  per sempre senza che nulla lo disarmi. */
-        const val UNIQUE_NAME = "jenny-gateway-keepalive"
+        const val UNIQUE_NAME = "jafta-gateway-keepalive"
 
         /** Il minimo che JobScheduler accetta per un lavoro periodico
          *  (`PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS`). Chiedere meno

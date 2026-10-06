@@ -45,7 +45,7 @@ CHAT_JS = ASSETS / "mobile-chat.js"
 WIKI_JS = ASSETS / "mobile-wiki.js"
 I18N_DIR = ASSETS / "i18n"
 MAIN_ACTIVITY = (
-    ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "flagdizero" / "jafta" / "MainActivity.kt"
+    ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "nastechresearch" / "jafta" / "MainActivity.kt"
 )
 
 # Tutto ciò che, eseguito prima di preventDefault(), lascerebbe partire la

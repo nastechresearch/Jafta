@@ -38,7 +38,7 @@ _SECRET = "s3cr3t-diagnostics"
 ROOT = Path(__file__).resolve().parents[2]
 _UI_ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 _MAIN_ACTIVITY = (
-    ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "flagdizero" / "jafta"
+    ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "nastechresearch" / "jafta"
     / "MainActivity.kt"
 )
 

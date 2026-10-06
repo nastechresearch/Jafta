@@ -4,7 +4,7 @@ You can attach photos, camera shots, and any other file to a chat message; this 
 
 ## Attaching something
 
-Tap the paperclip button in the composer (in the home and in the workshop's Console alike). It opens the Android system chooser — the same picker any app uses — so you get your file manager, your gallery, and a "take a photo" option all in one place. Jenny does not request the `CAMERA` permission for this: taking a photo is delegated entirely to your phone's own camera app, which hands the finished picture back to Jenny.
+Tap the paperclip button in the composer (in the home and in the workshop's Console alike). It opens the Android system chooser — the same picker any app uses — so you get your file manager, your gallery, and a "take a photo" option all in one place. Jafta does not request the `CAMERA` permission for this: taking a photo is delegated entirely to your phone's own camera app, which hands the finished picture back to Jafta.
 
 In the workshop's Console the paperclip (together with the **New chat** button beside it) hides itself once you start typing text, and reappears when the input is empty again; in the home it stays where it is.
 
@@ -14,7 +14,7 @@ Before you hit send, each attachment shows up in the composer as a thumbnail (im
 
 ## Limits per message
 
-Jenny enforces the same limits on both the phone (composer) and the gateway (server), so a well-formed message never gets silently truncated after the fact — see the notes below for what happens when you go over.
+Jafta enforces the same limits on both the phone (composer) and the gateway (server), so a well-formed message never gets silently truncated after the fact — see the notes below for what happens when you go over.
 
 | Kind | Max count per message | Max size each | Recognized formats |
 |---|---|---|---|
@@ -28,7 +28,7 @@ All attachments, once sent, are saved on the device under `workspace/uploads/` �
 
 ## What the model actually sees
 
-Attaching a file doesn't mean the model reads all of it, all the time — Jenny is deliberately conservative about what goes into every turn's context:
+Attaching a file doesn't mean the model reads all of it, all the time — Jafta is deliberately conservative about what goes into every turn's context:
 
 - **Images** are sent to the model as vision input, if the active model supports vision.
 - **Small text files and PDFs** (under 512 KB) have their text extracted and inlined directly into your message, so the model sees the content immediately without needing to use a tool. Extractable text types: `.txt`, `.md`, `.csv`, `.json`, `.xml`, `.html`/`.htm`, `.log`, `.yaml`/`.yml`, `.toml`, `.ini`, `.cfg`, plus `.pdf`. Extracted text is capped at 200,000 characters — anything longer is cut off with a `(truncated, N chars total)` note.
@@ -36,7 +36,7 @@ Attaching a file doesn't mean the model reads all of it, all the time — Jenny 
 
 This inline-extraction behavior is controlled by the `extractDocumentText` config key, which defaults to **false** (the on-demand-reference behavior above). Setting it to `true` switches to a legacy mode that force-extracts text from documents up to 50 MB instead of skipping straight to a reference above 512 KB — but the 200,000-character cap on extracted text still applies either way; this key is config-only today, there's no UI toggle for it — see [Configuration](../reference/configuration.md).
 
-If the active model doesn't support vision, Jenny drops the attached images and retries with text only, then appends a visible warning to its reply so it doesn't look like the attachment was silently ignored. The warning is in English whatever the phone's language, because it is saved in the conversation history the model reads back:
+If the active model doesn't support vision, Jafta drops the attached images and retries with text only, then appends a visible warning to its reply so it doesn't look like the attachment was silently ignored. The warning is in English whatever the phone's language, because it is saved in the conversation history the model reads back:
 
 > ⚠️ The attached images were not processed: the active model does not support image input.
 

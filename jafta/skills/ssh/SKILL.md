@@ -29,7 +29,7 @@ Use `ssh_job` for package installs and upgrades, builds, backups, database dumps
 
 ```
 ssh_job(host="vps", action="start", command="apt-get -y upgrade")
-  -> job vps-1a2b3c4d (remote pid 4821), logging to /tmp/jenny-jobs/vps-1a2b3c4d.log
+  -> job vps-1a2b3c4d (remote pid 4821), logging to /tmp/jafta-jobs/vps-1a2b3c4d.log
 ssh_job(host="vps", action="poll", job_id="vps-1a2b3c4d")
   -> running, new output since your last poll
 ```

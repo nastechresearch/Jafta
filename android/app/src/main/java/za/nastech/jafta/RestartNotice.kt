@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.Manifest
 import android.app.ForegroundServiceStartNotAllowedException
@@ -14,7 +14,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 
 /**
- * «Jenny è ferma — tocca per riavviarla»: la notifica che chiede all'utente il
+ * «Jafta è ferma — tocca per riavviarla»: la notifica che chiede all'utente il
  * gesto che nessuna rete di sicurezza può fare al posto suo.
  *
  * Da Android 12 un foreground service non parte da background, salvo
@@ -34,11 +34,11 @@ import androidx.core.content.ContextCompat
  * «l'utente agisce su un elemento dell'interfaccia legato all'app», e la
  * stessa su cui già conta `ReplyReceiver` per la risposta dalla tendina.
  *
- * **Perché il tocco avvia il service e non apre l'app.** Jenny è anche il
+ * **Perché il tocco avvia il service e non apre l'app.** Jafta è anche il
  * launcher: aprirla per riavviarla porterebbe l'utente via da ciò che stava
  * facendo, per un gesto che a lui non chiede altro. Un
  * `PendingIntent.getForegroundService` fa partire il gateway lì dove si è; chi
- * vuole la chat apre Jenny, e anche quello basta a togliere la notifica.
+ * vuole la chat apre Jafta, e anche quello basta a togliere la notifica.
  *
  * **Una sola, e se ne va da sé.** Id fisso, quindi un secondo post la
  * sostituisce; `setOnlyAlertOnce` perché le reti riprovano ogni pochi minuti e
@@ -53,7 +53,7 @@ object RestartNotice {
     private const val TAG = "RestartNotice"
 
     /** Canale suo, non quello del service né quello degli avvisi: chi silenzia
-     *  i promemoria di Jenny non deve perdersi il fatto che Jenny non c'è. */
+     *  i promemoria di Jafta non deve perdersi il fatto che Jafta non c'è. */
     private const val CHANNEL_ID = "jenny_restart"
 
     /** 1 è la notifica del service, 2 gli avvisi (con tag), 3 l'aggiornamento
@@ -67,7 +67,7 @@ object RestartNotice {
 
     /** Extra con cui il tocco si fa riconoscere in `onStartCommand`: serve solo
      *  al log, per distinguere in logcat il riavvio chiesto dall'utente. */
-    const val EXTRA_FROM_NOTICE = "com.flagdizero.jenny.extra.FROM_RESTART_NOTICE"
+    const val EXTRA_FROM_NOTICE = "za.nastech.jafta.extra.FROM_RESTART_NOTICE"
 
     /**
      * Mostra la notifica se *e* è il rifiuto di un avvio da background. Ritorna
@@ -79,7 +79,7 @@ object RestartNotice {
      * controllo di versione la precede; sotto non c'è niente da rifiutare.
      *
      * Non la mostra se il service è vivo in questo processo con il gateway
-     * dietro: lì Jenny non è ferma, e la notifica resterebbe a dirlo senza che
+     * dietro: lì Jafta non è ferma, e la notifica resterebbe a dirlo senza che
      * nessun avvio la tolga.
      */
     fun showIfRefused(context: Context, e: Exception, reason: String): Boolean {

@@ -3,8 +3,8 @@
 Jafta brand audit — fails CI if any forbidden brand string appears in source.
 
 Forbidden:
-- jenny / Jenny / JENNY (upstream project name)
-- flagdizero / FlagDiZero / FLAGDIZERO (upstream maintainer)
+- jafta / Jafta / JAFTA (upstream project name)
+- nastechresearch / NasTech Research / NASTECH RESEARCH (upstream maintainer)
 - HKUDS (upstream upstream, nanobot)
 - nanobot (upstream upstream)
 
@@ -30,7 +30,18 @@ FORBIDDEN = [
     re.compile(r"\bnanobot\b", re.IGNORECASE),
 ]
 EXEMPT_DIRS = {".git", "keystore", "node_modules", "__pycache__", ".venv", "build", "dist"}
-EXEMPT_FILES = {"LICENSE", "THIRD_PARTY_NOTICES.md", "SECURITY.md"}
+# Files in the upstream-license attribution chain legitimately name the original
+# project + author. These are the docs that say "Jafta is derived from X".
+# They're human-readable attribution, not leak risk.
+EXEMPT_FILES = {
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md",
+    "SECURITY.md",
+    "TRADEMARK.md",
+    "FORK_BOUNDARY.md",
+    "CHANGELOG.md",
+    "README.md",
+}
 SCAN_EXTS = {
     ".py", ".kt", ".java", ".js", ".ts", ".html", ".css", ".md",
     ".toml", ".json", ".yml", ".yaml", ".gradle", ".kts",

@@ -6,14 +6,14 @@ What happens, step by step, between a message arriving on the bus and a reply go
 
 Every inbound message — from the WebUI, from Telegram, from a reply typed into a notification, from the floating mascot's bubble, from a cron job, from a subagent announcing its result — goes through the same pipeline:
 
-1. **Bus.** The channel (`jenny/channels/websocket.py`, `telegram.py`, `notification.py`, `floating.py`) publishes an `InboundMessage` to the async `MessageBus` (`jenny/bus/queue.py`). This decouples "a message arrived" from "the agent is ready to process it."
-2. **`AgentLoop.run()`** (`jenny/agent/loop.py`) consumes the bus in a loop, resolves the session key for the message, and dispatches it as an `asyncio.Task` — one task per session at a time; other sessions run concurrently. Priority commands (`/stop`) and non-priority commands (`/new`, `/status`, …) for a session that already has a turn in flight are special-cased: they run inline instead of queuing behind the active turn. Ordinary follow-up messages sent while a turn is running are not dropped and not raced against it — they go into a per-session pending queue and are drained as mid-turn injections by the runner (see below).
-3. **`_process_message`** drives a small state machine (below) that builds context, calls **`AgentRunner`** (`jenny/agent/runner.py`) to talk to the provider and execute tools, persists the turn, and assembles the outbound reply. It returns a `TurnOutcome` (`jenny/agent/turn_types.py`): either `DELIVERED` with a message, `SPOKE_VIA_TOOL` (the agent called `message` itself), or `SILENT` — a successful turn with nothing to say, which is a first-class outcome and not a failure.
-4. If the outcome carries a message it is published as an `OutboundMessage` back onto the bus; the dispatcher (`jenny/channels/dispatcher.py`) delivers it to whichever channel(s) should see it. This is the single point of implicit delivery in the system.
+1. **Bus.** The channel (`jafta/channels/websocket.py`, `telegram.py`, `notification.py`, `floating.py`) publishes an `InboundMessage` to the async `MessageBus` (`jafta/bus/queue.py`). This decouples "a message arrived" from "the agent is ready to process it."
+2. **`AgentLoop.run()`** (`jafta/agent/loop.py`) consumes the bus in a loop, resolves the session key for the message, and dispatches it as an `asyncio.Task` — one task per session at a time; other sessions run concurrently. Priority commands (`/stop`) and non-priority commands (`/new`, `/status`, …) for a session that already has a turn in flight are special-cased: they run inline instead of queuing behind the active turn. Ordinary follow-up messages sent while a turn is running are not dropped and not raced against it — they go into a per-session pending queue and are drained as mid-turn injections by the runner (see below).
+3. **`_process_message`** drives a small state machine (below) that builds context, calls **`AgentRunner`** (`jafta/agent/runner.py`) to talk to the provider and execute tools, persists the turn, and assembles the outbound reply. It returns a `TurnOutcome` (`jafta/agent/turn_types.py`): either `DELIVERED` with a message, `SPOKE_VIA_TOOL` (the agent called `message` itself), or `SILENT` — a successful turn with nothing to say, which is a first-class outcome and not a failure.
+4. If the outcome carries a message it is published as an `OutboundMessage` back onto the bus; the dispatcher (`jafta/channels/dispatcher.py`) delivers it to whichever channel(s) should see it. This is the single point of implicit delivery in the system.
 
 ### Turn visibility
 
-Delivery is not a property of the channel a turn happens to run on. It is a property of the turn, resolved once at its boundary by `jenny/session/turn_visibility.py`:
+Delivery is not a property of the channel a turn happens to run on. It is a property of the turn, resolved once at its boundary by `jafta/session/turn_visibility.py`:
 
 - A **visible** turn delivers its final answer implicitly. This is the ordinary conversation.
 - A **silent** turn reaches the user through nothing at all — no answer, no progress rows, no reasoning deltas, no "running" spinner, no `turn_end` marker, not even its own error message — unless the agent explicitly calls the `message` tool during the turn.
@@ -24,14 +24,14 @@ A turn on the internal channel stays visible: there is no user to reach, and its
 
 ## The turn state machine
 
-`AgentLoop` drives each turn through a fixed sequence of states (`jenny/agent/turn_states.py`, transition table in `loop.py`):
+`AgentLoop` drives each turn through a fixed sequence of states (`jafta/agent/turn_states.py`, transition table in `loop.py`):
 
 | State | What happens |
 |---|---|
 | `RESTORE` | Fetch/create the session; restore a runtime checkpoint left by a turn that was interrupted mid-flight (see "Interrupted turns" below); extract or reference document attachments. |
 | `COMPACT` | Pick up a background auto-compaction summary if the session went idle past the idle timeout (see "Automatic compaction"). |
 | `COMMAND` | Try the message as a slash command. If it matches, the command's reply is persisted and returned directly — the turn skips straight to `DONE` without ever calling the model. Unrecognized `/foo`-looking text is **not** an error: it is passed through to the model as ordinary text. |
-| `BUILD` | Re-sync Jenny Apps tools, read session history within the token/message budget, build the full message list (system prompt + history + current message), persist the user's message early (so it survives even if the process dies before `SAVE`). |
+| `BUILD` | Re-sync Jafta Apps tools, read session history within the token/message budget, build the full message list (system prompt + history + current message), persist the user's message early (so it survives even if the process dies before `SAVE`). |
 | `RUN` | Call `AgentRunner.run()` — the provider/tool loop, described below. Emits the `running` runtime event (the WebUI's "Agent running" banner). |
 | `SAVE` | Persist the new messages to the session, enforce the file-attachment cap, schedule background token-based consolidation, clear the mid-turn checkpoint. |
 | `RESPOND` | Assemble the `OutboundMessage`, or suppress it entirely if the agent already delivered its reply via the `message` tool during the turn. |
@@ -44,16 +44,16 @@ If `/stop` or `/new` land while a turn is mid-flight, the loop does not just can
 
 ## Building context
 
-`ContextBuilder.build_system_prompt()` (`jenny/agent/context.py`) assembles the system prompt from, in order:
+`ContextBuilder.build_system_prompt()` (`jafta/agent/context.py`) assembles the system prompt from, in order:
 
 1. **Identity** — name, workspace path, runtime string ("Android, Python 3.11.x"), platform policy.
-2. **Bootstrap files** — `AGENTS.md`, `SOUL.md`, `USER.md` from the workspace root (`ContextBuilder.BOOTSTRAP_FILES`), each read in full and concatenated *if it says anything*. A file still identical to a template the app shipped — the current one or any withdrawn version, matched by digest — was not written by the user, and the three are not treated alike: `USER.md` and `AGENTS.md` are scaffolding for content that does not exist yet, so they are omitted entirely; `SOUL.md` is Jenny's default personality, which is written nowhere else, so it stays but is labelled as an unmodified default so the model does not quote it back as a user preference.
+2. **Bootstrap files** — `AGENTS.md`, `SOUL.md`, `USER.md` from the workspace root (`ContextBuilder.BOOTSTRAP_FILES`), each read in full and concatenated *if it says anything*. A file still identical to a template the app shipped — the current one or any withdrawn version, matched by digest — was not written by the user, and the three are not treated alike: `USER.md` and `AGENTS.md` are scaffolding for content that does not exist yet, so they are omitted entirely; `SOUL.md` is Jafta's default personality, which is written nowhere else, so it stays but is labelled as an unmodified default so the model does not quote it back as a user preference.
 3. **Tool contract** — a fixed template describing how to call tools.
 4. **Recurring work** — where a repeating request belongs: a line in `HEARTBEAT.md`, a `cron` job in `reminder` mode, or one in `monitor` mode. Rendered when the turn's registry contains the `cron` tool, and also when the turn does not say which tools it has (`available_tools=None`) — that means "not asked", not "the tool is absent". The registries that *are* declared and lack `cron` (Dream, the gardener) are the ones this skips, so they are no longer told to schedule with something they do not have.
 5. **Orchestrator mode**, when the turn is orchestrating — what to delegate, which agent type, and why its own tools are deliberately narrow.
 6. **`# Memory`** — up to two subsections under one heading. `## Long-term Memory` is `workspace/memory/MEMORY.md`, omitted while it still matches the bundled template whitespace-trimmed (i.e. Dream has never customized it, and showing it would pass a template off as real memory). `## Wikis` is the list of your wikis — name, scope and index path of every folder under `workspace/wikis/`, rendered from disk at every build and withheld from project and gardener turns. The two are gated independently — an untouched `MEMORY.md` does not suppress the list — but share the heading and a fixed order, so the cacheable prefix stays stable.
 7. **Active skills** (loaded in full) and a **skills summary** (names + descriptions only, for skills the model can ask to load).
-8. **Jenny Apps summary**, if any apps are installed.
+8. **Jafta Apps summary**, if any apps are installed.
 9. **`# Recent History`** — up to 50 entries / 8,000 tokens of `history.jsonl` written since the last Dream run, so the model sees what has already happened even before Dream has processed it into long-term memory. Two floors apply, and the higher one wins: Dream's cursor, and a per-session floor written by `/new` (`_history_floor` in the session metadata) so a conversation the user cleared does not come back as a summary in the very next turn. Entries the archiver marks Dream-only — the summary `/new` writes of what it discarded — are skipped regardless, and so are a project's entries: this block carries the personal conversation only. Dream itself still reads everything, and so does the `recall_history` tool — from the personal chat it lists every entry in the file, Dream-only entries and project (notebook) journals included.
 10. **`[Archived Context Summary]`**, if the session was auto-compacted (see below).
 11. **Tool inventory** — the authoritative list of tool names in this turn's registry, built from the registry itself and placed last on purpose: the prose nearest the end is what the model follows when two parts of a prompt disagree about which tools exist.
@@ -64,7 +64,7 @@ None of this system-prompt/runtime-context assembly is visible in the WebUI tran
 
 ## The runner loop
 
-`AgentRunner.run()` (`jenny/agent/runner.py`) owns the provider/tool conversation for one turn:
+`AgentRunner.run()` (`jafta/agent/runner.py`) owns the provider/tool conversation for one turn:
 
 - Loops up to `agents.defaults.maxToolIterations` (**default 200**) times. Each iteration: govern the message list for the model (drop orphaned tool results, backfill missing ones, micro-compact, apply a per-tool-result character budget, snip history to fit the context window), call the provider, and — if the model asked for tools — run them (`concurrent_tools=True`, tool results fed back as the next message).
 - Streams content deltas back through the hook (`on_stream`) as they arrive; reasoning/thinking content is extracted and emitted separately, once, before the visible content.
@@ -77,13 +77,13 @@ Tool execution, provider retry policy, and per-tool-result truncation live in th
 
 ## The three layers, precisely
 
-Users (understandably) conflate three different things that all look like "what Jenny remembers." They are independent, live in different files, and are cleared by different triggers:
+Users (understandably) conflate three different things that all look like "what Jafta remembers." They are independent, live in different files, and are cleared by different triggers:
 
 | Layer | What it is | Where it lives | Cleared/reset by |
 |---|---|---|---|
-| **Visible transcript** | Every message, tool pill, reasoning block, and attachment ever shown in the WebUI, reconstructed identically on reopen. Permanent JSONL, one file per session key, rotating into numbered segment files once the active file passes **8 MB** (oldest turns move out first; nothing is deleted, just split across files). | `<workspace>/.jenny/webui/<session-key>.jsonl` (+ `.segments/`) — `transcript_store.py` | Never, by any in-app action. `/new` explicitly does **not** touch it — it only adds a visual separator bubble ("New session started."). |
+| **Visible transcript** | Every message, tool pill, reasoning block, and attachment ever shown in the WebUI, reconstructed identically on reopen. Permanent JSONL, one file per session key, rotating into numbered segment files once the active file passes **8 MB** (oldest turns move out first; nothing is deleted, just split across files). | `<workspace>/.jafta/webui/<session-key>.jsonl` (+ `.segments/`) — `transcript_store.py` | Never, by any in-app action. `/new` explicitly does **not** touch it — it only adds a visual separator bubble ("New session started."). |
 | **Model context** | The actual message list sent to the provider on the next call: the live, uncompacted tail of the session plus whatever summary replaced the compacted prefix. This is what the model can "see" right now. | `<workspace>/sessions/<session-key>.jsonl` — `session/manager.py` | `/new` (archives the unconsolidated tail to `history.jsonl` in the background, then clears the session outright). Automatic idle compaction (below). Token-budget consolidation when the session grows past its budget mid-conversation. |
-| **Long-term memory (Dream)** | Durable facts Jenny has decided are worth keeping past any single conversation: `MEMORY.md`, `USER.md`, `SOUL.md`, and skill files, updated by the two-phase Dream pipeline. See [Memory and Dream](../using/memory.md) for the full pipeline. | `workspace/memory/` | Only by Dream itself (which can also *prune*, not just add). |
+| **Long-term memory (Dream)** | Durable facts Jafta has decided are worth keeping past any single conversation: `MEMORY.md`, `USER.md`, `SOUL.md`, and skill files, updated by the two-phase Dream pipeline. See [Memory and Dream](../using/memory.md) for the full pipeline. | `workspace/memory/` | Only by Dream itself (which can also *prune*, not just add). |
 | **Wikis** | Your own knowledge bases under `workspace/wikis/` — not a memory of anything said, but something you wrote down. The personal prompt lists them by name and scope; pages are read on demand. | `<workspace>/wikis/<name>/` | By you, by the agent when you ask, and by the [gardener](../using/gardener.md) inside a project. |
 
 The gotcha worth stating plainly: **you can scroll up and re-read a conversation the model no longer remembers.** After `/new`, or after the idle auto-compaction kicks in, the transcript on screen is unchanged, but the model's next reply is generated from a summary plus a short tail, not from the full conversation you're looking at.
@@ -96,7 +96,7 @@ The same consolidator also runs synchronously, mid-conversation, whenever the se
 
 ## Session keys
 
-There is one user-facing conversation. `session_key_for_channel()` (`jenny/session/keys.py`) maps every channel/chat pair — WebUI, Telegram, notification, floating bubble, whatever chat ID — onto the single constant `unified:default`. This is deliberate: a message sent from Telegram and one sent from the WebUI land in the same session, the same transcript, the same model context. There is no per-channel or per-device session.
+There is one user-facing conversation. `session_key_for_channel()` (`jafta/session/keys.py`) maps every channel/chat pair — WebUI, Telegram, notification, floating bubble, whatever chat ID — onto the single constant `unified:default`. This is deliberate: a message sent from Telegram and one sent from the WebUI land in the same session, the same transcript, the same model context. There is no per-channel or per-device session.
 
 The one exception is a **project** conversation: a chat ID of the form `project:<name>` (with a valid project name) on the WebSocket channel maps to the session key `project:<name>`, which has its own history and memory rules (see [Concepts](./concepts.md#channels-and-sessions) and [Projects](../using/projects.md)). Any other channel sending the same chat ID, and any invalid name, falls back to `unified:default`.
 

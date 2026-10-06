@@ -84,7 +84,7 @@ No active task to stop.
 No arguments. Output is a fixed-format block (rendered as plain text, not markdown), for example:
 
 ```text
-🐈 jenny v1.0.0
+🐈 jafta v1.0.0
 🧠 Model: gpt-4o
 📊 Tokens: 1234 in / 567 out (40% cached)
 📚 Context: 12k/65k (22% of input budget)
@@ -245,7 +245,7 @@ The other direction is refused the same way: `/dream`, `/model` or `/skill` sent
 Available skills (3):
 
 - **weather** — Look up current weather and forecasts.
-- **app-creator** — Guide the user through building a new Jenny App.
+- **app-creator** — Guide the user through building a new Jafta App.
 - **llm-wiki** — Maintain the workspace wiki (scaffold, ingest, compile).
 ```
 
@@ -260,7 +260,7 @@ No skills available.
 In the personal chat:
 
 ```text
-✿ jenny commands:
+✿ jafta commands:
 /new — Stop the current task and start a fresh conversation.
 /stop — Cancel the active agent turn for this chat.
 /status — Display runtime, provider, and channel status.
@@ -291,7 +291,7 @@ If you want a conversation to actually go away, deleting it is a different opera
 
 ## Periodic tasks (HEARTBEAT.md)
 
-This is unrelated to slash commands but shares the same "plain files, no terminal" spirit: Jenny also runs a periodic check every 30 minutes (`gateway.heartbeat.intervalS`, default 1800) driven by `workspace/HEARTBEAT.md`. It only acts on lines under a `## Active Tasks` heading; everything else in the file is ignored. You can edit that file directly from the workshop's **Memory** drawer (**The real files**), or just ask Jenny in chat to "add a periodic task" and she'll update it for you. This job shows up in the agent's internal job list as `heartbeat`, but it's system-managed and can't be removed the way a normal reminder can; to disable it you'd set `gateway.heartbeat.enabled` to `false` in `config.json` and restart the app (there is no in-app toggle for it). See [Scheduling and proactivity](./scheduling.md) for the full picture, including the cost-per-cycle caveat and reliability limits.
+This is unrelated to slash commands but shares the same "plain files, no terminal" spirit: Jafta also runs a periodic check every 30 minutes (`gateway.heartbeat.intervalS`, default 1800) driven by `workspace/HEARTBEAT.md`. It only acts on lines under a `## Active Tasks` heading; everything else in the file is ignored. You can edit that file directly from the workshop's **Memory** drawer (**The real files**), or just ask Jafta in chat to "add a periodic task" and she'll update it for you. This job shows up in the agent's internal job list as `heartbeat`, but it's system-managed and can't be removed the way a normal reminder can; to disable it you'd set `gateway.heartbeat.enabled` to `false` in `config.json` and restart the app (there is no in-app toggle for it). See [Scheduling and proactivity](./scheduling.md) for the full picture, including the cost-per-cycle caveat and reliability limits.
 
 ## See also
 

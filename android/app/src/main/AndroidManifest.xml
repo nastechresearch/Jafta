@@ -76,7 +76,7 @@
 
          Dichiararlo non apre nulla da solo: senza il consenso esplicito
          l'`addView` verrebbe rifiutato dal WindowManager. L'interruttore nelle
-         impostazioni di Jenny lo sa, e a permesso negato resta spento invece di
+         impostazioni di Jafta lo sa, e a permesso negato resta spento invece di
          dichiarare una mascotte che non può esistere.
 
          La finestra vive dentro il processo del GatewayService e muore con lui:
@@ -114,10 +114,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Jenny"
+        android:theme="@style/Theme.Jafta"
         android:networkSecurityConfig="@xml/network_security_config">
 
-        <!-- Niente `excludeFromRecents`: quando Jenny è la home attiva ci pensa
+        <!-- Niente `excludeFromRecents`: quando Jafta è la home attiva ci pensa
              già il sistema a tenere il task home fuori dai Recenti, mentre chi
              la usa come app normale restava senza la via di rientro standard —
              fuori dai Recenti e senza icona a portata di mano. -->
@@ -143,7 +143,7 @@
              assorbita qui sopra ricreava comunque.
 
              Assorbirli senza ricreare è sicuro **perché nulla di nativo dipende
-             da quelle risorse**: `Theme.Jenny` discende da `Theme.AppCompat.Light.NoActionBar`, non
+             da quelle risorse**: `Theme.Jafta` discende da `Theme.AppCompat.Light.NoActionBar`, non
              DayNight, quindi `uiMode` non cambia nessun colore (nemmeno gli
              splash per tema di values-v31, che dipendono dal tema della WebUI); i temi della
              WebUI sono CSS puro (`data-theme` + `setThemeBars`) e non usano
@@ -261,7 +261,7 @@
              appende all'alert. exported="false" per la stessa ragione di
              WakeReceiver, qui anche piu netta: questo receiver consegna testo a
              un turno dell'agente, quindi un'app qualunque che potesse mandargli
-             un broadcast potrebbe far dire a Jenny quello che vuole.
+             un broadcast potrebbe far dire a Jafta quello che vuole.
 
              Non è però chiuso del tutto, e non può esserlo: quel PendingIntent
              è mutabile (la risposta diretta lo richiede), quindi un'app con

@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.content.Context
 import android.content.pm.ApplicationInfo

@@ -1,4 +1,4 @@
-# Jenny App Manifest Reference
+# Jafta App Manifest Reference
 
 Contents: [app.json fields](#appjson-fields) · [storage actions](#storage-actions) ·
 [http actions](#http-actions) · [Complete example](#complete-example) ·
@@ -8,7 +8,7 @@ Contents: [app.json fields](#appjson-fields) · [storage actions](#storage-actio
 
 | Field | Required | Notes |
 |-------|----------|-------|
-| `name` | yes | Display name shown in the Jenny Apps grid |
+| `name` | yes | Display name shown in the Jafta Apps grid |
 | `description` | yes | One line: what the app does (shown in the grid and to the agent) |
 | `icon` | no | Tabler icon name (e.g. `ti-plant`); defaults to `ti-apps` |
 | `server` | no | Only for apps backed by an external API: `{"baseUrl": "..."}` |
@@ -68,7 +68,7 @@ Reserved params (auto-added to the action's schema, don't declare them):
   "required": ["plant"] }
 ```
 
-**Response shape.** `jenny.action()` never resolves to a bare array or record — every storage
+**Response shape.** `jafta.action()` never resolves to a bare array or record — every storage
 op resolves to an envelope object, and the frontend must unwrap the field it needs:
 
 | `op` | Resolves to |
@@ -86,11 +86,11 @@ as the array:
 
 ```js
 // WRONG — notes is {ok, records, count}; notes.length is undefined, notes.forEach throws
-const notes = await jenny.action('list_notes');
+const notes = await jafta.action('list_notes');
 notes.forEach(...)
 
 // RIGHT
-const { records: notes } = await jenny.action('list_notes');
+const { records: notes } = await jafta.action('list_notes');
 notes.forEach(...)
 ```
 
@@ -119,7 +119,7 @@ body — it resolves to `{ok: true, status: 200, data: <parsed body>}` (`ok` fol
 status, `data` is the server's JSON, parsed). Read the payload from `.data`:
 
 ```js
-const { data: plants } = await jenny.action('list_plants');
+const { data: plants } = await jafta.action('list_plants');
 ```
 
 ## External view (`view: {"kind": "external"}`)
@@ -183,21 +183,21 @@ repeat the manifest — the agent already sees the actions as tools.
 
 `app/index.html` is rendered in a sandboxed full-screen iframe inside the SPA. It never loads
 anything from an external host (the device may be offline): app-specific CSS/JS is inline,
-and everything shared comes from the **Jenny Kit** served by the gateway on the same origin.
+and everything shared comes from the **Jafta Kit** served by the gateway on the same origin.
 The app talks to the world only through its own action endpoints and never renders agent
 output.
 
-### The Jenny Kit (the graphical standard)
+### The Jafta Kit (the graphical standard)
 
 Every app links the kit in `<head>` — never write a custom design from scratch:
 
 ```html
-<link rel="stylesheet" href="/html-mobile/assets/apps/jenny-kit.css">
+<link rel="stylesheet" href="/html-mobile/assets/apps/jafta-kit.css">
 ```
 
 The kit provides:
 
-1. **Theme tokens** — the kit's own CSS variables, fed at runtime from whichever of Jenny's
+1. **Theme tokens** — the kit's own CSS variables, fed at runtime from whichever of Jafta's
    7 themes the user picked (the SDK stamps `data-theme` and applies the palette; the values
    in the kit stylesheet are only the fallback). **Always color with the variables, never
    with hardcoded hex values** — a hex ignores the theme and stays identical on all 7, which
@@ -246,7 +246,7 @@ entirely and start the body directly with `<main id="app">`.
 
 ```html
 <script src="/html-mobile/assets/vendor/d3@7/d3.min.js"></script>
-<script src="/html-mobile/assets/apps/jenny-charts.js"></script>
+<script src="/html-mobile/assets/apps/jafta-charts.js"></script>
 <script>
   JennyCharts.line(el, points);        // [{x: Date|number, y: number}] — trends over time
   JennyCharts.bars(el, items);         // [{label, value}] — comparisons
@@ -263,8 +263,8 @@ entirely and start the body directly with `<main id="app">`.
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Plants</title>
-  <link rel="stylesheet" href="/html-mobile/assets/apps/jenny-kit.css">
-  <script src="/html-mobile/assets/apps/jenny-sdk.js"></script>
+  <link rel="stylesheet" href="/html-mobile/assets/apps/jafta-kit.css">
+  <script src="/html-mobile/assets/apps/jafta-sdk.js"></script>
   <style>/* app-specific tweaks only — keep minimal */</style>
 </head>
 <body>
@@ -273,50 +273,50 @@ entirely and start the body directly with `<main id="app">`.
   <main id="app"><div class="empty">Loading…</div></main>
   <script>
     async function render() {
-      const { data: plants } = await jenny.action('list_plants');
+      const { data: plants } = await jafta.action('list_plants');
       /* build DOM from data using the kit vocabulary */
     }
     render();
     // Re-render when the agent changes this app's data while the app is open.
-    window.addEventListener('jenny:data-changed', render);
+    window.addEventListener('jafta:data-changed', render);
   </script>
 </body>
 </html>
 ```
 
-The SDK (`jenny-sdk.js`, load it in `<head>` before app code) handles everything transport-
-and theme-related: it stamps the theme, exposes `jenny.action(name, params)` (resolves the
+The SDK (`jafta-sdk.js`, load it in `<head>` before app code) handles everything transport-
+and theme-related: it stamps the theme, exposes `jafta.action(name, params)` (resolves the
 envelope object described above — `.records`/`.record`/`.deleted` for storage, `.data` for
-http — throws `Error` with the structured message on failure), `jenny.discuss(text)`,
-`jenny.navigate(label, state)` / `jenny.back()` (see below), and re-dispatches agent-side
-data changes as the `jenny:data-changed` window event.
+http — throws `Error` with the structured message on failure), `jafta.discuss(text)`,
+`jafta.navigate(label, state)` / `jafta.back()` (see below), and re-dispatches agent-side
+data changes as the `jafta:data-changed` window event.
 
 ### Internal navigation and the Android back button
 
 The app fills the whole screen and the phone's back button is the only way out of it. The
 host SPA has no idea what the app is showing (the iframe has an opaque origin), so it asks:
-**every internal screen change must be declared with `jenny.navigate()`, otherwise Back
+**every internal screen change must be declared with `jafta.navigate()`, otherwise Back
 closes the whole app instead of going up one level** — and the user loses the sub-screen,
 the half-filled form, everything.
 
 ```js
 function openDetail(id) {
-  jenny.navigate('#detail', { id });   // declare the level BEFORE painting it
+  jafta.navigate('#detail', { id });   // declare the level BEFORE painting it
   paintDetail(id);
 }
 
-// Back (hardware button or jenny.back()) replays the previous level here:
+// Back (hardware button or jafta.back()) replays the previous level here:
 window.addEventListener('popstate', (e) => {
   if (e.state && e.state.id) paintDetail(e.state.id);
   else paintList();
 });
 ```
 
-- `jenny.navigate(label, state)` pushes one logical level. `label` is only a readable name
+- `jafta.navigate(label, state)` pushes one logical level. `label` is only a readable name
   for the screen — the SDK deliberately never writes the browser history (entries pushed
   from the iframe end up in the WebView's joint history and survive the app being closed,
   leaving dead back presses behind). `state` comes back in the `popstate` event.
-- `jenny.back()` pops one level and fires the synthetic `popstate`. Wire the app's own "←"
+- `jafta.back()` pops one level and fires the synthetic `popstate`. Wire the app's own "←"
   buttons to it so they behave exactly like the hardware key.
 - A `<dialog>` opened inside the app counts as a level automatically — the SDK watches for
   it and closes the topmost one on the first Back press. Nothing to declare, but do use
@@ -330,11 +330,11 @@ window.addEventListener('popstate', (e) => {
 - **No `<form>` at all** — there is no `allow-forms`, and the submission is blocked *before*
   the `submit` event is fired, so `event.preventDefault()` never runs and cannot rescue it.
   Use a plain `<button type="button">` with a click handler, add a `keydown` listener for
-  Enter on the input, and call `jenny.action(...)` from the handler. `validate_app.py`
+  Enter on the input, and call `jafta.action(...)` from the handler. `validate_app.py`
   rejects any `<form>` in `index.html`.
 - **Never call the actions API with `fetch` directly, and never with POST or custom
   headers** — the gateway is GET-only and cannot answer CORS preflights. Always go through
-  `jenny.action()`, which issues the correct simple GET.
+  `jafta.action()`, which issues the correct simple GET.
 - **Keep a single action's params under ~6 KB** (they travel in the request line).
 - **Inline everything app-specific** — only the `app/` subfolder is web-served (manifest,
   AGENT.md and `data/` are never reachable over HTTP); prefer a single `app/index.html` and
@@ -343,12 +343,12 @@ window.addEventListener('popstate', (e) => {
 ### Rules
 
 - Mobile-first; the iframe is full-screen on a phone.
-- Every internal screen change goes through `jenny.navigate()`, and the app restores the
+- Every internal screen change goes through `jafta.navigate()`, and the app restores the
   previous screen on `popstate` — otherwise the back button closes the whole app instead of
   going up one level.
 - All state changes go through actions — never write files or call external hosts directly
   (CORS and auth are handled by the gateway proxy).
 - No external hosts anywhere (`https://...` in `src`/`href` fails validation); gateway paths
   (`/html-mobile/assets/...`) are the only allowed shared resources.
-- Hand-off to chat (e.g. a "Discuss with Jenny" button on selected content) uses the SDK's
-  `jenny.discuss(text)`; the reply arrives in chat, never inside the app.
+- Hand-off to chat (e.g. a "Discuss with Jafta" button on selected content) uses the SDK's
+  `jafta.discuss(text)`; the reply arrives in chat, never inside the app.

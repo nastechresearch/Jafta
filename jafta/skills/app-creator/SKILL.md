@@ -1,10 +1,10 @@
 ---
 name: app-creator
 description: >
-  Create or update Jenny Apps (folders in workspace/apps/ with a typed-actions manifest,
+  Create or update Jafta Apps (folders in workspace/apps/ with a typed-actions manifest,
   a self-contained HTML UI, and agent context). Use when:
-  - User asks, in any language, to create or build an app ("create an app", "make me a Jenny App for...")
-  - User taps the "+" button in the Jenny Apps grid
+  - User asks, in any language, to create or build an app ("create an app", "make me a Jafta App for...")
+  - User taps the "+" button in the Jafta Apps grid
   - User wants to connect an external server (REST API) as an app with UI
   Do NOT use for skills (chat-only capabilities, no screen) — use skill-creator for those.
 locked: true
@@ -12,7 +12,7 @@ locked: true
 
 # App Creator
 
-A Jenny App is a folder in `apps/<slug>/` (workspace-relative) that packages a UI for the
+A Jafta App is a folder in `apps/<slug>/` (workspace-relative) that packages a UI for the
 user and typed actions for the agent. If it needs a screen, it's an app; if it only lives in
 chat, it's a skill.
 
@@ -36,18 +36,18 @@ nothing when tapped:
 - **Never use `<form>`.** Submission is blocked *before* the `submit` event fires, so
   `event.preventDefault()` never runs and cannot rescue it. Use
   `<button type="button">` with a click handler, plus a `keydown` listener for Enter on
-  the input, and call `jenny.action()` from the handler.
+  the input, and call `jafta.action()` from the handler.
 - **Never use `alert()`, `confirm()`, `prompt()`.** There is no `allow-modals`. Build
   dialogs with `<dialog>` or kit markup.
-- **Never call `/api/apps/` with `fetch`.** Always go through `jenny.action()` — the
+- **Never call `/api/apps/` with `fetch`.** Always go through `jafta.action()` — the
   gateway is GET-only and answers no CORS preflight.
 
 `scripts/validate_app.py` rejects the first as an error and warns on the others.
 </rule>
 
 <rule>
-**Every internal screen change goes through `jenny.navigate(label, state)`**, and the app
-repaints the previous screen on the `popstate` event (`jenny.back()` for the app's own "←"
+**Every internal screen change goes through `jafta.navigate(label, state)`**, and the app
+repaints the previous screen on the `popstate` event (`jafta.back()` for the app's own "←"
 buttons). The app fills the screen and the phone's back button is the only way out: a screen
 change the SDK never heard about means the next Back press closes the *whole app*, taking the
 sub-screen or the half-filled form with it. A `<dialog>` counts as a level by itself — the SDK
@@ -138,7 +138,7 @@ Only after confirmation, create the folder and write, in this order:
 2. `apps/<slug>/AGENT.md` — 5–15 lines: what the app is for, user preferences and thresholds
    learned in the conversation (e.g. "water the basil when humidity drops below 20%"),
    anything the agent needs to act well. NOT a copy of the manifest.
-3. `apps/<slug>/app/index.html` — UI built on the Jenny Kit (theme tokens, classless base,
+3. `apps/<slug>/app/index.html` — UI built on the Jafta Kit (theme tokens, classless base,
    component vocabulary, chart helpers) following the conventions in the reference. Never
    invent a custom design or load anything from an external host.
 4. `apps/<slug>/data/` — create the directory; leave collections to be created on first write.
@@ -157,7 +157,7 @@ python_exec(
 `working_dir` is what makes the bare `import` resolve; the app path must be absolute, because
 the script walks it with `pathlib`.
 
-Then tell the user the app is ready and will appear in the Jenny Apps grid.
+Then tell the user the app is ready and will appear in the Jafta Apps grid.
 
 ## Secrets
 
@@ -170,7 +170,7 @@ action was dead on arrival, and it is withdrawn.
 
 So: an app can only talk to an endpoint that needs no credentials (a LAN or Tailscale server
 without auth is the normal case). If the user's endpoint *does* need a token, say plainly
-that Jenny Apps cannot authenticate to an app server yet, and do not write a manifest that
+that Jafta Apps cannot authenticate to an app server yet, and do not write a manifest that
 pretends otherwise. Never put a raw token in `app.json` or `index.html`. If the user pastes a
 token in chat, do not echo it and do not write it to any file in the workspace.
 

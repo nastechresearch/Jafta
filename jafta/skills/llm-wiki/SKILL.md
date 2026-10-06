@@ -150,7 +150,7 @@ python_exec(
     └── queries/       ← Query answers (promote durable ones to wiki/)
 ```
 
-`raw/journal/` is in **every** wiki, whatever its shape: it is where the conversation itself is captured, one file per day, append-only. `scaffold.py` creates it in both layouts, and the lint checks it in both — the folders that a project and a research library have in common are defined once, in the app's project scaffolder (`jenny/webui/project_scaffold.py::PROJECT_DIRS`), and the skill's script carries a pinned copy.
+`raw/journal/` is in **every** wiki, whatever its shape: it is where the conversation itself is captured, one file per day, append-only. `scaffold.py` creates it in both layouts, and the lint checks it in both — the folders that a project and a research library have in common are defined once, in the app's project scaffolder (`jafta/webui/project_scaffold.py::PROJECT_DIRS`), and the skill's script carries a pinned copy.
 
 `AGENTS.md` is the wiki's **instructions file** — what this wiki covers, what it excludes, and anything true of it and no other wiki. Read `references/schema-guide.md` for what to put in it. Read it at the start of every session.
 

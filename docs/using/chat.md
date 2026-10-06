@@ -1,8 +1,8 @@
 # Chat basics
 
-This page describes the **Console**, the chat of the workshop: the view where everything under a turn is on show — thoughts, tool calls, the Subagents strip, the files a turn changed. The home's **Jenny** page is a plainer chat (a paperclip, the text box and a send button, and one line saying what she is doing); its behavior is in [the home section of the WebUI tour](webui-tour.md#the-conversation). Wherever a control below is one only the Console has, it says so.
+This page describes the **Console**, the chat of the workshop: the view where everything under a turn is on show — thoughts, tool calls, the Subagents strip, the files a turn changed. The home's **Jafta** page is a plainer chat (a paperclip, the text box and a send button, and one line saying what she is doing); its behavior is in [the home section of the WebUI tour](webui-tour.md#the-conversation). Wherever a control below is one only the Console has, it says so.
 
-The Console is where you talk to Jenny at full detail; this page covers how a message goes out, how a reply is built on screen, and what all the small pieces of a response mean.
+The Console is where you talk to Jafta at full detail; this page covers how a message goes out, how a reply is built on screen, and what all the small pieces of a response mean.
 
 ## Sending a message
 
@@ -20,7 +20,7 @@ Around the box sit the Console's other controls:
 
 If you have a hardware keyboard (for example on a Unihertz Titan-style device), you don't have to tap the input first: typing any single printable character while the Console is active moves focus into the message box automatically ("type-ahead focus"). This does not trigger on Enter, Escape, arrow keys, spacebar, key combinations with a modifier held down, or while another input/textarea/select/dialog already has focus.
 
-At the top of the chat there is an identity row, "✿" and her name ("Jenny" unless you renamed her) with a small status dot next to it — this scrolls away with the rest of the conversation, it is not a fixed header. The dot reflects only the WebSocket link between the WebUI and the local gateway inside the app, not your internet connection in general:
+At the top of the chat there is an identity row, "✿" and her name ("Jafta" unless you renamed her) with a small status dot next to it — this scrolls away with the rest of the conversation, it is not a fixed header. The dot reflects only the WebSocket link between the WebUI and the local gateway inside the app, not your internet connection in general:
 
 | Dot | Label | Meaning |
 |---|---|---|
@@ -56,7 +56,7 @@ A reply is built incrementally, not delivered all at once:
 
 ## The Subagents panel
 
-Most real work is done by subagents rather than by the agent you're typing to (see [Scheduling and proactivity](scheduling.md#subagents-spawn)). The turn that starts one does not wait for it: Jenny tells you the job started and the turn ends, so you can keep talking; the result comes back later as a message of its own. Without something on screen, that would mean minutes of silence with no way to tell a working job from a stuck one. The Subagents panel is that something: a strip in the workshop that appears just above the message box whenever background work exists. The home shows the short version — a chip saying how many agents are working for that conversation — and pressing and holding it opens the workshop.
+Most real work is done by subagents rather than by the agent you're typing to (see [Scheduling and proactivity](scheduling.md#subagents-spawn)). The turn that starts one does not wait for it: Jafta tells you the job started and the turn ends, so you can keep talking; the result comes back later as a message of its own. Without something on screen, that would mean minutes of silence with no way to tell a working job from a stuck one. The Subagents panel is that something: a strip in the workshop that appears just above the message box whenever background work exists. The home shows the short version — a chip saying how many agents are working for that conversation — and pressing and holding it opens the workshop.
 
 **It shows live work, not history.** When nothing is running the panel isn't collapsed, it's absent — the header alone would cost space above the composer for no information. A card that reaches a terminal state stays for the rest of the current turn so you can see the transition, then disappears when the turn ends. Nothing from a past turn is ever shown, including after a reload.
 
@@ -64,7 +64,7 @@ The header reads **Subagents** with a count ("2 running", or "1 running · 1 jus
 
 Each running job gets a card showing:
 
-- the label Jenny gave the job, and its state (running / stalled / done / failed / cancelled);
+- the label Jafta gave the job, and its state (running / stalled / done / failed / cancelled);
 - the agent type (`researcher`, `coder`, `sysadmin`, …);
 - **elapsed** and **idle** time side by side — these two answer "is it working or is it stuck?", and they never get truncated;
 - the current phase, the iteration number, and the last tool it called.
@@ -94,7 +94,7 @@ A few honest caveats:
 
 ## Clickable file paths in replies
 
-Separately from the "files modified" pill, Jenny turns file-path-looking text inside a reply into clickable links. A string only becomes a link if it looks like a **relative path with a directory prefix and a file extension** — for example `jenny/foo.py` or `./notes.md` work, but a bare `config.json` or an absolute path like `/data/.../file.py` does not.
+Separately from the "files modified" pill, Jafta turns file-path-looking text inside a reply into clickable links. A string only becomes a link if it looks like a **relative path with a directory prefix and a file extension** — for example `jafta/foo.py` or `./notes.md` work, but a bare `config.json` or an absolute path like `/data/.../file.py` does not.
 
 Tapping such a link opens a read-only inline preview attached to that message: file path, detected language, size, and syntax-highlighted content with line numbers, plus an **"Open in editor"** link that jumps to the Memory drawer (**The real files**) with the file loaded there for editing. Tapping the path again (or the close button) closes the preview.
 
@@ -128,7 +128,7 @@ Scrolling to the very top of the chat automatically loads older history (infinit
 ## Related pages
 
 - [Tour of the WebUI](webui-tour.md) — the Session Info popover, the dock, and how the Console fits into the rest of the app, and the home's plainer chat.
-- [Scheduling and proactivity](scheduling.md) — why delegation is the normal path, the six subagent types, and what Jenny can do to a running subagent from her side.
+- [Scheduling and proactivity](scheduling.md) — why delegation is the normal path, the six subagent types, and what Jafta can do to a running subagent from her side.
 - [Files and attachments](attachments.md) — sending images/files, attachment limits, and what the agent can actually read from them.
 - [Slash commands](slash-commands.md) — the command list, including `/stop` and `/new`, which commands work where, and the workshop's Commands chip that shows the ones this conversation can use.
 - [Memory and Dream](memory.md) — the difference between what stays on screen and what the model actually remembers.

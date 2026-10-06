@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-ANDROID_SRC = Path(__file__).resolve().parents[1] / "android/app/src/main/java/com/flagdizero/jafta"
+ANDROID_SRC = Path(__file__).resolve().parents[1] / "android/app/src/main/java/za/nastech/jafta"
 
 
 def test_no_kdoc_is_followed_by_another_kdoc() -> None:

@@ -4,7 +4,7 @@ Il fallimento riprodotto qui è stato catturato sul device un'ora dopo aver reso
 `working_dir` reale (B5). Il modello ha scritto da sé, dentro un ciclo di
 heartbeat, questa chiamata::
 
-    {"working_dir": "/data/data/com.flagdizero.jafta/files/workspace",
+    {"working_dir": "/data/data/za.nastech.jafta/files/workspace",
      "code": "import sys, os\\n"
              "sys.path.insert(0, os.path.join(os.getcwd(), 'skills', 'raincheck', 'scripts'))\\n"
              "import re, rc_probe\\n..."}

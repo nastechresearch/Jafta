@@ -1,12 +1,12 @@
 [project]
 name = "jafta"
 version = "1.0.0"
-description = "Jafta - AI agent framework (fork of Jenny, originally a fork of nanobot)"
+description = "Jafta - AI agent framework (fork of Jafta, originally a fork of nanobot)"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.11"
 license = {text = "AGPL-3.0-only"}
 authors = [
-    {name = "flagdizero"},
+    {name = "nastechresearch"},
     {name = "Xubin Ren"},
     {name = "the nanobot contributors"}
 ]

@@ -16,7 +16,7 @@ from support.kotlin_source import read_source
 
 _BRIDGE = (
     Path(__file__).resolve().parents[1]
-    / "android/app/src/main/java/com/flagdizero/jafta/InstalledAppsBridge.kt"
+    / "android/app/src/main/java/za/nastech/jafta/InstalledAppsBridge.kt"
 )
 
 

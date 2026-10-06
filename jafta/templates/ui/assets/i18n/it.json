@@ -38,7 +38,7 @@
     "message": "Messaggio",
     "scrollToBottom": "Vai in fondo",
     "newChat": "Nuova chat",
-    "newChatConfirm": "Iniziare una chat nuova? Jenny smette di ricordare quel che è stato detto finora. La conversazione non viene cancellata: si rilegge scorrendo in su.",
+    "newChatConfirm": "Iniziare una chat nuova? Jafta smette di ricordare quel che è stato detto finora. La conversazione non viene cancellata: si rilegge scorrendo in su.",
     "newChatConfirmOk": "Nuova chat",
     "loadPrevious": "Mostra la conversazione precedente"
   },
@@ -198,16 +198,16 @@
       "gardenerNumbersHint": "Un giro che non trova righe nuove non spende token, quindi guardare spesso è economico: a decidere è il silenzio. Il giardiniere lavora a mente fredda — entrare mentre parli vorrebbe dire promuovere metà di un discorso e riscrivere la mappa mentre la leggi. La distanza è la lezione del degrado di Dream scritta come numero: un secondo giro ravvicinato sulla stessa materia rimpasta invece di aggiungere.",
       "compact": "Cronologia dei quaderni",
       "compactEnabled": "Archivia la chat di un quaderno fermo",
-      "compactHint": "Da spenta, un quaderno può stare fermo tre settimane e riprendere dove era. Accesa, la sua conversazione si compatta come quella personale: Jenny ha in contesto quel che è stato scritto nelle pagine, non quel che è stato detto. Il registro che leggi tu non viene toccato.",
+      "compactHint": "Da spenta, un quaderno può stare fermo tre settimane e riprendere dove era. Accesa, la sua conversazione si compatta come quella personale: Jafta ha in contesto quel che è stato scritto nelle pagine, non quel che è stato detto. Il registro che leggi tu non viene toccato.",
       "compactRestart": "Questa vale dal prossimo avvio del gateway.",
       "savedRestart": "Salvato. Vale dal prossimo avvio.",
       "notAWholeNumber": "Ci vuole un numero intero."
     },
     "system": "Sistema",
     "configRecoveredBackup": "Le impostazioni sono state recuperate dall'ultimo backup valido: all'avvio config.json non era leggibile.",
-    "configRecoveredDefaults": "config.json non era leggibile e non c'era un backup utilizzabile, quindi Jenny è partita dai valori predefiniti — la chiave API va rimessa. Il file illeggibile è stato messo da parte qui:",
+    "configRecoveredDefaults": "config.json non era leggibile e non c'era un backup utilizzabile, quindi Jafta è partita dai valori predefiniti — la chiave API va rimessa. Il file illeggibile è stato messo da parte qui:",
     "cronRecoveredBackup": "I promemoria programmati sono stati recuperati dall'ultimo backup valido: all'avvio l'elenco dei job non era leggibile. Controlla che ci siano tutti.",
-    "cronRecoveredEmpty": "L'elenco dei promemoria programmati non era leggibile e non c'era un backup utilizzabile, quindi Jenny è partita senza nessuno: quelli che avevi creato non suoneranno più e vanno ricreati. Il file illeggibile è stato messo da parte qui:",
+    "cronRecoveredEmpty": "L'elenco dei promemoria programmati non era leggibile e non c'era un backup utilizzabile, quindi Jafta è partita senza nessuno: quelli che avevi creato non suoneranno più e vanno ricreati. Il file illeggibile è stato messo da parte qui:",
     "themeLabel": "Tema",
     "mascotVisible": "Mostra la mascotte",
     "mascotSize": "Dimensione mascotte",
@@ -241,13 +241,13 @@
       "hint": "{name} usa il GPS del telefono per sapere dove sei: la posizione recente entra nel contesto a ogni messaggio, un fix preciso solo su richiesta. Serve il permesso di localizzazione Android. Le posizioni condivise via Telegram valgono solo lì e scadono dopo un'ora.",
       "on": "Posizione attivata",
       "off": "Posizione disattivata",
-      "denied": "Android non ha ancora concesso a Jenny la posizione: finché non lo fa, lei non sa dove sei.",
+      "denied": "Android non ha ancora concesso a Jafta la posizione: finché non lo fa, lei non sa dove sei.",
       "allow": "Consenti la posizione"
     },
     "ssh": {
       "title": "SSH",
       "enable": "Abilita l'accesso SSH",
-      "hint": "Jenny può eseguire comandi sulle macchine che registri qui. Ogni host va abilitato a mano: l'agente può solo nominare un alias che hai già dichiarato, mai un indirizzo qualunque.",
+      "hint": "Jafta può eseguire comandi sulle macchine che registri qui. Ogni host va abilitato a mano: l'agente può solo nominare un alias che hai già dichiarato, mai un indirizzo qualunque.",
       "on": "Accesso SSH attivato",
       "off": "Accesso SSH disattivato",
       "empty": "Nessun host registrato",
@@ -255,7 +255,7 @@
       "addHost": "Aggiungi host",
       "editHost": "Modifica host",
       "alias": "Alias",
-      "aliasHint": "È l'unico nome che Jenny usa per questo host. Non si può cambiare dopo.",
+      "aliasHint": "È l'unico nome che Jafta usa per questo host. Non si può cambiare dopo.",
       "aliasPlaceholder": "nas",
       "host": "Host",
       "hostPlaceholder": "nas.casa.lan",
@@ -293,7 +293,7 @@
       "verify": "Verifica impronta",
       "verifying": "Lettura dell'impronta…",
       "fingerprintTitle": "Impronta dell'host",
-      "fingerprintIntro": "Confronta questa impronta con quella di {alias} prima di accettarla. Da qui in poi Jenny parlerà solo con la macchina che la presenta.",
+      "fingerprintIntro": "Confronta questa impronta con quella di {alias} prima di accettarla. Da qui in poi Jafta parlerà solo con la macchina che la presenta.",
       "fingerprintServerHint": "Sul server: ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub",
       "fingerprintPasswordWarning": "Questo host si autentica con password: al primo comando la password viene consegnata alla macchina che presenta questa impronta. Se non è la tua, l'hai data a lei. Con la password questo passaggio conta più che con la chiave, non meno.",
       "accept": "Accetta",
@@ -346,7 +346,7 @@
       "install": "Installa ora",
       "starting": "Avvio dell'installazione…",
       "startFailed": "Non sono riuscita ad avviare l'installazione.",
-      "restarting": "Installazione avviata: Jenny si riavvia da sola tra poco. La connessione cadrà e tornerà da sé, non serve fare niente.",
+      "restarting": "Installazione avviata: Jafta si riavvia da sola tra poco. La connessione cadrà e tornerà da sé, non serve fare niente.",
       "promptNote": "L'ultimo passo tocca a te: Android deve chiederti conferma per sostituire l'app. Se non vedi la sua schermata, la richiesta è arrivata come notifica — aprila e conferma lì. Se l'hai già chiusa, puoi ripremere «Installa ora».",
       "phaseDownloading": "Scaricamento in corso…",
       "phaseInstalling": "Installazione in corso…",
@@ -378,7 +378,7 @@
     },
     "battery": {
       "title": "Attività in background",
-      "hint": "Senza l'esenzione dall'ottimizzazione batteria Android sospende Jenny a schermo spento: lavori programmati, promemoria e controlli proattivi arrivano in ritardo o non arrivano.",
+      "hint": "Senza l'esenzione dall'ottimizzazione batteria Android sospende Jafta a schermo spento: lavori programmati, promemoria e controlli proattivi arrivano in ritardo o non arrivano.",
       "otaHint": "Un aggiornamento di sistema può aver azzerato l'esenzione dall'ottimizzazione batteria. Senza, i lavori programmati e i promemoria tornano a slittare: conviene riattivarla.",
       "button": "Esenta dalla batteria",
       "granted": "Esenzione attiva: lavori programmati, promemoria e controlli proattivi girano anche a schermo spento.",
@@ -393,14 +393,14 @@
         "turns": "Sveglia il processore per un turno, un cron o un comando SSH, poi lo rilascia: a riposo non costa niente.",
         "always": "Niente ritardi, ma consuma batteria di continuo: ha senso per un telefono in carica."
       },
-      "keepAwakeHint": "L'esenzione dice ad Android di non rallentare Jenny; questa scelta decide se Jenny tiene sveglio il processore da sé. A schermo spento la CPU si sospende e i timer non scattano.",
-      "keepAwakeRestart": "La nuova scelta vale dal prossimo riavvio di Jenny: il blocco per l'intera durata del servizio viene preso una volta sola all'avvio.",
-      "keepAwakeSaved": "Salvato — attivo dal prossimo riavvio di Jenny",
+      "keepAwakeHint": "L'esenzione dice ad Android di non rallentare Jafta; questa scelta decide se Jafta tiene sveglio il processore da sé. A schermo spento la CPU si sospende e i timer non scattano.",
+      "keepAwakeRestart": "La nuova scelta vale dal prossimo riavvio di Jafta: il blocco per l'intera durata del servizio viene preso una volta sola all'avvio.",
+      "keepAwakeSaved": "Salvato — attivo dal prossimo riavvio di Jafta",
       "diagTitle": "Stato attuale",
       "diagExempt": "Esenzione dall'ottimizzazione batteria",
       "diagExactAlarms": "Sveglie precise",
-      "exactAlarmsHint": "Android non concede da sé il permesso per le sveglie precise: senza, accorpa i risvegli di Jenny a quelli di altre app e lavori programmati, promemoria e controlli proattivi arrivano con minuti — a volte un'ora — di ritardo.",
-      "exactAlarmsRestart": "Le sveglie già in coda restano imprecise anche dopo il permesso: tornano al minuto esatto dal prossimo riavvio di Jenny.",
+      "exactAlarmsHint": "Android non concede da sé il permesso per le sveglie precise: senza, accorpa i risvegli di Jafta a quelli di altre app e lavori programmati, promemoria e controlli proattivi arrivano con minuti — a volte un'ora — di ritardo.",
+      "exactAlarmsRestart": "Le sveglie già in coda restano imprecise anche dopo il permesso: tornano al minuto esatto dal prossimo riavvio di Jafta.",
       "exactAlarmsButton": "Consenti le sveglie precise",
       "exactAlarmsFailed": "Schermata del permesso non raggiungibile su questo telefono.",
       "diagWakelock": "CPU tenuta sveglia adesso",
@@ -408,15 +408,15 @@
       "diagNo": "No",
       "diagUnavailable": "Diagnostica non disponibile in questo momento.",
       "gapsTitle": "Interruzioni registrate",
-      "gapsHint": "Un'interruzione è un periodo di almeno {minutes} minuti in cui Jenny non stava girando: in quel tempo promemoria, lavori programmati e controlli proattivi non sono partiti.",
-      "gapsEmpty": "Nessuna interruzione registrata: Jenny è rimasta attiva.",
+      "gapsHint": "Un'interruzione è un periodo di almeno {minutes} minuti in cui Jafta non stava girando: in quel tempo promemoria, lavori programmati e controlli proattivi non sono partiti.",
+      "gapsEmpty": "Nessuna interruzione registrata: Jafta è rimasta attiva.",
       "gapDays": "{days}g {hours}h",
       "gapHours": "{hours}h {minutes}m",
       "gapMinutes": "{minutes}m",
       "gapToday": "oggi alle {time}",
       "gapYesterday": "ieri alle {time}",
       "gapOn": "{date} alle {time}",
-      "oemHint": "Le interruzioni qui sopra non sono un guasto di Jenny: è il gestore energetico del telefono che la chiude quando lo schermo è spento. Nessuna riga di codice dell'app può impedirlo — la restrizione va tolta a mano, nelle impostazioni del produttore.",
+      "oemHint": "Le interruzioni qui sopra non sono un guasto di Jafta: è il gestore energetico del telefono che la chiude quando lo schermo è spento. Nessuna riga di codice dell'app può impedirlo — la restrizione va tolta a mano, nelle impostazioni del produttore.",
       "oemButton": "Apri le impostazioni del produttore",
       "oemLink": "Istruzioni per {brand}",
       "oemUnknownBrand": "il tuo telefono",
@@ -430,7 +430,7 @@
     "telegram": {
       "enable": "Canale attivo",
       "title": "Telegram",
-      "intro": "Collega un bot Telegram per parlare con Jenny da qualsiasi dispositivo: il telefono resta il server.",
+      "intro": "Collega un bot Telegram per parlare con Jafta da qualsiasi dispositivo: il telefono resta il server.",
       "step1": "Apri @BotFather su Telegram e invia /newbot",
       "step2": "Scegli nome e username del bot",
       "step3": "Incolla qui il token che ricevi",
@@ -446,9 +446,9 @@
       "paired": "Collegato a {who}",
       "aChat": "una chat",
       "unpair": "Scollega",
-      "unpairConfirm": "Scollegare Jenny da {who}? Da quel momento su Telegram non risponde più e non ti manda avvisi. Il token resta: per ricollegarla basta mandare al bot il codice nuovo. Per una pausa basta l'interruttore «Canale attivo».",
+      "unpairConfirm": "Scollegare Jafta da {who}? Da quel momento su Telegram non risponde più e non ti manda avvisi. Il token resta: per ricollegarla basta mandare al bot il codice nuovo. Per una pausa basta l'interruttore «Canale attivo».",
       "disabled": "Canale Telegram disattivato",
-      "batteryHint": "Per risposte immediate anche a telefono non in carica, esenta Jenny dall'ottimizzazione batteria.",
+      "batteryHint": "Per risposte immediate anche a telefono non in carica, esenta Jafta dall'ottimizzazione batteria.",
       "batteryButton": "Esenta dalla batteria",
       "enabled": "Canale Telegram attivato",
       "disabledTitle": "Canale disattivato",
@@ -555,11 +555,11 @@
     "folderEmpty": "Questa cartella è vuota",
     "fileHelp": {
       "open": "Apri comunque nell'editor",
-      "agents": "Le convenzioni di lavoro di questo workspace: preferenze di progetto e modi di procedere che si ripetono. Le sezioni compaiono man mano che le concordi con Jenny; un titolo senza niente sotto non ci sta bene.\n\nNon qui: i fatti su di te (USER.md), il carattere e le regole di comportamento (SOUL.md), il contesto dei progetti (memory/MEMORY.md), le procedure con passi e formati precisi (le Skill, nella sezione App).",
-      "user": "Quello che Jenny sa di te: identità, lingua, stile di comunicazione, abitudini e interessi. Si riempie man mano che ti conosce, non c'è niente da precompilare.\n\nNon qui: il contesto dei progetti (memory/MEMORY.md), le regole di comportamento (SOUL.md), le procedure ripetibili (le Skill). E nemmeno ora, fuso orario o posizione: il runtime li misura da sé a ogni turno, mentre una copia scritta qui non la aggiorna nessuno ed è già vecchia appena salvata.",
-      "soul": "Chi è Jenny e come si comporta: il carattere, il modo di parlare, quello che fa e quello che non fa mai. E le regole fisse che le hai dato tu — come rivolgersi a te, cosa evitare, dove andarci piano.\n\nLo mantiene Dream, la consolidazione che gira dopo le conversazioni: una correzione che le fai a voce finisce qui. Puoi leggerlo e sistemarlo, ma di solito non serve scriverci a mano.\n\nNon qui: i fatti su di te (USER.md), le convenzioni di lavoro (AGENTS.md), le procedure ripetibili (le Skill). E nemmeno come si comporta l'app: cosa accetta uno strumento, cosa rifiuta la sandbox, dov'è un limite — è uguale su ogni installazione e glielo dice già il prompt di sistema.",
+      "agents": "Le convenzioni di lavoro di questo workspace: preferenze di progetto e modi di procedere che si ripetono. Le sezioni compaiono man mano che le concordi con Jafta; un titolo senza niente sotto non ci sta bene.\n\nNon qui: i fatti su di te (USER.md), il carattere e le regole di comportamento (SOUL.md), il contesto dei progetti (memory/MEMORY.md), le procedure con passi e formati precisi (le Skill, nella sezione App).",
+      "user": "Quello che Jafta sa di te: identità, lingua, stile di comunicazione, abitudini e interessi. Si riempie man mano che ti conosce, non c'è niente da precompilare.\n\nNon qui: il contesto dei progetti (memory/MEMORY.md), le regole di comportamento (SOUL.md), le procedure ripetibili (le Skill). E nemmeno ora, fuso orario o posizione: il runtime li misura da sé a ogni turno, mentre una copia scritta qui non la aggiorna nessuno ed è già vecchia appena salvata.",
+      "soul": "Chi è Jafta e come si comporta: il carattere, il modo di parlare, quello che fa e quello che non fa mai. E le regole fisse che le hai dato tu — come rivolgersi a te, cosa evitare, dove andarci piano.\n\nLo mantiene Dream, la consolidazione che gira dopo le conversazioni: una correzione che le fai a voce finisce qui. Puoi leggerlo e sistemarlo, ma di solito non serve scriverci a mano.\n\nNon qui: i fatti su di te (USER.md), le convenzioni di lavoro (AGENTS.md), le procedure ripetibili (le Skill). E nemmeno come si comporta l'app: cosa accetta uno strumento, cosa rifiuta la sandbox, dov'è un limite — è uguale su ogni installazione e glielo dice già il prompt di sistema.",
       "memory": "La memoria a lungo termine: quello che deve restare da una sessione all'altra — contesto dei progetti, fatti utili, note da ricordare.\n\nLa mantiene Dream, la consolidazione che gira dopo le conversazioni. Puoi leggerla e correggerla, ma di solito non serve scriverci a mano.\n\nNon qui: i fatti su di te (USER.md), le convenzioni di lavoro (AGENTS.md), le procedure ripetibili (le Skill).",
-      "heartbeat": "I controlli ricorrenti che Jenny ripassa a ogni battito.\n\nVanno scritti sotto «## Active Tasks»: è l'unica sezione che viene letta. Quando un'attività è finita, cancellala invece di lasciarla lì — un elenco di cose già fatte viene riletto a ogni battito.\n\nNon qui: le richieste una tantum (basta chiederle in chat) e le procedure ripetibili (le Skill)."
+      "heartbeat": "I controlli ricorrenti che Jafta ripassa a ogni battito.\n\nVanno scritti sotto «## Active Tasks»: è l'unica sezione che viene letta. Quando un'attività è finita, cancellala invece di lasciarla lì — un elenco di cose già fatte viene riletto a ogni battito.\n\nNon qui: le richieste una tantum (basta chiederle in chat) e le procedure ripetibili (le Skill)."
     },
     "deleteProjectConfirm": "Eliminare il quaderno «{name}»? Spariscono le sue pagine e la sua conversazione.",
     "deleteProjectConfirmWithChat": "Eliminare il quaderno «{name}»? Spariscono le sue pagine e la sua conversazione: {count} messaggi.",
@@ -572,10 +572,10 @@
   "launcher": {
     "open": "Apri app",
     "kindSkill": "Skill",
-    "kindJennyApp": "Jenny App",
+    "kindJaftaApp": "Jafta App",
     "kindAndroidApp": "App Android",
     "loading": "Caricamento...",
-    "empty": "Nessuna app o Jenny App da aprire.",
+    "empty": "Nessuna app o Jafta App da aprire.",
     "recent": "Più usate",
     "results": "Risultati",
     "searchPlaceholder": "Cerca un'app…",
@@ -596,7 +596,7 @@
     "appInfo": "Info app",
     "enable": "Abilita",
     "close": "Chiudi",
-    "brokenConfirm": "L'app \"{name}\" è rotta: {error}. Chiedo a Jenny di sistemarla?",
+    "brokenConfirm": "L'app \"{name}\" è rotta: {error}. Chiedo a Jafta di sistemarla?",
     "brokenPrompt": "L'app \"{slug}\" risulta rotta con questo errore: {error}. Puoi sistemarla?",
     "uninstalled": "{name} disinstallata",
     "uninstalledMany": "Disinstallate: {names}",
@@ -604,7 +604,7 @@
     "launchFailed": "Impossibile avviare {name}: forse è stata disinstallata o disattivata.",
     "deleteFailed": "Eliminazione non riuscita",
     "appDeleted": "App eliminata",
-    "editAppPrompt": "Voglio modificare la Jenny App \"{name}\" (slug: {slug}). Puoi aiutarmi?",
+    "editAppPrompt": "Voglio modificare la Jafta App \"{name}\" (slug: {slug}). Puoi aiutarmi?",
     "chatAboutApp": "Parliamo dell'app \"{name}\": {text}",
     "frameCleartextBlocked": "{host} non si carica: usa http e la policy di rete dell'app permette il traffico in chiaro solo verso il gateway locale. Servono un server in https, oppure un'app di tipo vista esterna.",
     "frameLoadFailed": "{host} non si è caricato: {reason}",
@@ -612,7 +612,7 @@
     "pinAsPage": "Metti come pagina",
     "unpinPage": "Togli dalle pagine",
     "unpinned": "Tolta dalle pagine",
-    "pageExternal": "Si apre fuori da Jenny: non può stare in una pagina",
+    "pageExternal": "Si apre fuori da Jafta: non può stare in una pagina",
     "pageBroken": "È rotta: va riparata prima",
     "pageFull": "Le pagine sono piene"
   },
@@ -626,14 +626,14 @@
     "back": "Indietro",
     "refresh": "Aggiorna"
   },
-  "jenny": {
+  "jafta": {
     "closeMinichat": "Chiudi la minichat",
     "askHere": "Chiedi qui...",
-    "askJenny": "Chiedi a Jenny",
+    "askJafta": "Chiedi a Jafta",
     "send": "Invia",
     "workingReply": "Ci sto ancora lavorando... la risposta arriva qui ✿",
     "connectionError": "Non riesco a inviare: controlla la connessione.",
-    "busy": "Jenny sta rispondendo..."
+    "busy": "Jafta sta rispondendo..."
   },
   "themes": {
     "chanel": {
@@ -683,7 +683,7 @@
     "snapshotCreate": "Crea snapshot ora",
     "snapshotCreated": "Snapshot creato!",
     "snapshotNoChanges": "Nessuna modifica dall'ultimo snapshot",
-    "snapshotRestoreConfirm": "Riportare Jenny allo stato del {date}? Prima verrà salvato uno snapshot dello stato attuale, per poter tornare indietro.",
+    "snapshotRestoreConfirm": "Riportare Jafta allo stato del {date}? Prima verrà salvato uno snapshot dello stato attuale, per poter tornare indietro.",
     "files": "file",
     "trigger": {
       "auto": "automatico",
@@ -702,7 +702,7 @@
     "retentionYear": "1 anno",
     "retentionForever": "Per sempre",
     "retentionDays": "{days} giorni",
-    "snapshotDesc": "Jenny fotografa il workspace da sola — quando smetti di scrivere, prima di ogni passata di Dream, allo spegnimento. Serve a rimettere a posto una cosa cancellata per sbaglio. Vive su questo telefono: il backup che porti via si fa in Impostazioni › Backup.",
+    "snapshotDesc": "Jafta fotografa il workspace da sola — quando smetti di scrivere, prima di ogni passata di Dream, allo spegnimento. Serve a rimettere a posto una cosa cancellata per sbaglio. Vive su questo telefono: il backup che porti via si fa in Impostazioni › Backup.",
     "snapshotSummary": "{count} istantanee · la più vecchia {when}",
     "snapshotSummaryEmpty": "nessuna istantanea"
   },
@@ -785,7 +785,7 @@
       "pause": "Metti in pausa",
       "resume": "Riprendi",
       "remove": "Elimina",
-      "removeConfirm": "Eliminare «{name}»? Non torna più: se ti serve di nuovo, chiedilo a Jenny.",
+      "removeConfirm": "Eliminare «{name}»? Non torna più: se ti serve di nuovo, chiedilo a Jafta.",
       "done": {
         "pause": "Messo in pausa.",
         "resume": "Ripreso.",
@@ -831,10 +831,10 @@
     "selectOrEnterModel": "Seleziona o inserisci un nome modello",
     "failedToSave": "Salvataggio configurazione fallito",
     "restoreFromBackup": "Ripristina da backup",
-    "restoreFromBackupHint": "Hai già usato Jenny? Riporta tutto com'era da un file di backup cifrato.",
+    "restoreFromBackupHint": "Hai già usato Jafta? Riporta tutto com'era da un file di backup cifrato.",
     "telegram": {
       "title": "Collega Telegram (opzionale)",
-      "desc": "Trasforma questo telefono in un server sempre acceso: chatta con Jenny da Telegram ovunque sei.",
+      "desc": "Trasforma questo telefono in un server sempre acceso: chatta con Jafta da Telegram ovunque sei.",
       "skip": "Salta per ora",
       "finish": "Fine",
       "pairedToast": "Telegram collegato!"
@@ -990,7 +990,7 @@
     "you": {
       "workshopHint": "osserva, regola, ripara"
     },
-    "jenny": {
+    "jafta": {
       "title": "{name}",
       "hidden": "nascosta",
       "floatingShort": "flottante",
@@ -1034,7 +1034,7 @@
       "cancel": "Annulla",
       "saved": "Salvata.",
       "saveFailed": "Non sono riuscita a salvare questa pagina.",
-      "conflict": "Jenny ha cambiato questa pagina mentre la modificavi. La ricarico? Quel che hai scritto qui si perde.",
+      "conflict": "Jafta ha cambiato questa pagina mentre la modificavi. La ricarico? Quel che hai scritto qui si perde.",
       "discardConfirm": "Esci senza salvare? Le modifiche a questa pagina si perdono."
     },
     "map": {
@@ -1079,8 +1079,8 @@
       "export": "Esporta un backup",
       "import": "Ripristina da un file",
       "exportHint": "Un file cifrato con una passphrase che scegli tu: dentro c'è tutto — le conversazioni, i quaderni, le impostazioni. Mettilo da qualche parte che non sia questo telefono.",
-      "importHint": "Sostituisce tutto quello che c'è adesso con quello che c'è nel file, e riavvia Jenny.",
-      "snapshots": "Jenny tiene anche una storia locale del workspace, automatica: serve a rimettere a posto una cosa cancellata per sbaglio, e si sfoglia in officina. Vive però su questo telefono — di un telefono perso non salva niente.",
+      "importHint": "Sostituisce tutto quello che c'è adesso con quello che c'è nel file, e riavvia Jafta.",
+      "snapshots": "Jafta tiene anche una storia locale del workspace, automatica: serve a rimettere a posto una cosa cancellata per sbaglio, e si sfoglia in officina. Vive però su questo telefono — di un telefono perso non salva niente.",
       "snapshotsOff": "La storia locale del workspace è spenta: l'unica rete è il backup che esporti tu. Si riaccende in officina."
     },
     "audit": {
@@ -1127,7 +1127,7 @@
   },
   "workshop": {
     "eyebrow": "officina",
-    "homePill": "Jenny",
+    "homePill": "Jafta",
     "sub": {
       "brain": "quali marche ci sono, con che testa pensa, e cosa le lascia fare il telefono",
       "hands": "cosa può fare, con che permessi, e quando parte da sola",
@@ -1158,10 +1158,10 @@
     "panel": "Skill",
     "yours": "Le tue",
     "builtIn": "Integrate",
-    "service": "Più {n} di servizio, che Jenny usa da sé.",
+    "service": "Più {n} di servizio, che Jafta usa da sé.",
     "emptyTitle": "Non gliene hai ancora insegnata nessuna",
     "emptyText": "Spiegale una cosa che le chiedi spesso: la trasforma in una skill.",
-    "ask": "Chiedi a Jenny",
+    "ask": "Chiedi a Jafta",
     "askPrompt": "Voglio insegnarti una nuova skill. Usa la skill \"skill-creator\" e guidami passo passo.",
     "active": "Attiva la skill {name}",
     "builtInLocked": "Viene con l'app: non si spegne da qui.",
@@ -1169,11 +1169,11 @@
     "readError": "L'elenco delle skill non si è potuto leggere.",
     "retry": "Riprova",
     "userSummary": {
-      "app-creator": "Le Jenny Apps sono piccole app con una loro interfaccia che Jenny costruisce su richiesta (una lista della spesa, un contatore, uno strumento su misura). Basta chiederglielo in chat.",
-      "cron": "Promemoria, controlli ricorrenti e avvisi condizionati: chiedi a Jenny di ricordarti qualcosa a un'ora precisa, di ripetere un'azione nel tempo, o di avvertirti solo se una certa condizione si verifica.",
-      "llm-wiki": "La wiki è il tuo secondo cervello: usala per fare ingest di articoli, note e ricerche. Jenny compila e collega le pagine per te, e puoi farle domande sui contenuti raccolti.",
-      "skill-creator": "Se Jenny non sa ancora fare qualcosa che ti serve spesso, puoi chiederle di imparare una nuova skill: le spieghi cosa vuoi e lei si costruisce da sola le istruzioni per farlo la prossima volta.",
-      "ssh": "Comandi sulle macchine remote che hai registrato in Impostazioni → Officina → Mani → SSH: Jenny può controllare un servizio, leggere un log, aggiornare un server o scambiare un file. Raggiunge solo gli host che hai dichiarato tu, e i comandi lunghi restano in corso anche a telefono spento."
+      "app-creator": "Le Jafta Apps sono piccole app con una loro interfaccia che Jafta costruisce su richiesta (una lista della spesa, un contatore, uno strumento su misura). Basta chiederglielo in chat.",
+      "cron": "Promemoria, controlli ricorrenti e avvisi condizionati: chiedi a Jafta di ricordarti qualcosa a un'ora precisa, di ripetere un'azione nel tempo, o di avvertirti solo se una certa condizione si verifica.",
+      "llm-wiki": "La wiki è il tuo secondo cervello: usala per fare ingest di articoli, note e ricerche. Jafta compila e collega le pagine per te, e puoi farle domande sui contenuti raccolti.",
+      "skill-creator": "Se Jafta non sa ancora fare qualcosa che ti serve spesso, puoi chiederle di imparare una nuova skill: le spieghi cosa vuoi e lei si costruisce da sola le istruzioni per farlo la prossima volta.",
+      "ssh": "Comandi sulle macchine remote che hai registrato in Impostazioni → Officina → Mani → SSH: Jafta può controllare un servizio, leggere un log, aggiornare un server o scambiare un file. Raggiunge solo gli host che hai dichiarato tu, e i comandi lunghi restano in corso anche a telefono spento."
     }
   }
 }

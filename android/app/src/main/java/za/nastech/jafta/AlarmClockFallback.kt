@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.content.Context
 import android.util.Log
@@ -36,7 +36,7 @@ import android.util.Log
  * scadere: `configure(false)` chiama `cancel`, altrimenti l'icona resterebbe lì
  * fino allo scatto successivo e l'impostazione sembrerebbe non funzionare.
  *
- * Le impostazioni arrivano da Python (`jenny/runtime/power.py::
+ * Le impostazioni arrivano da Python (`jafta/runtime/power.py::
  * apply_alarm_clock_config`, via `PowerBridge.setAlarmClockFallback`) e vivono
  * in SharedPreferences, non in
  * `config.json`: Kotlin non parsa il config — stessa convenzione di
@@ -55,7 +55,7 @@ object AlarmClockFallback {
 
     /** Stesso file di preferenze di `Watchdog` e `MainActivity`: una sola
      *  `SharedPreferences` per app, chiavi nuove e basta. */
-    private const val PREFS_NAME = "jenny"
+    private const val PREFS_NAME = "jafta"
     private const val KEY_ENABLED = "alarmClockFallbackEnabled"
 
     /** 8 ore ≈ 3 risvegli al giorno. Vedi il KDoc della classe per il perché

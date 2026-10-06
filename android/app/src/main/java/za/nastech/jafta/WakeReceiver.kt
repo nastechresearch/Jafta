@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -67,7 +67,7 @@ class WakeReceiver : BroadcastReceiver() {
     }
 
     companion object {
-        private const val TAG = "Jenny"
+        private const val TAG = "Jafta"
 
         /** Request code fittizio per una sveglia senza extra: vedi `onReceive`. */
         private const val RECOVERY_FALLBACK = PowerBridge.REQUEST_CODE_SERVICE_RESTART
@@ -81,7 +81,7 @@ class WakeReceiver : BroadcastReceiver() {
 
         /** Stesso file di preferenze di `Watchdog` e `AlarmClockFallback`: una
          *  sola `SharedPreferences` per app, chiavi nuove e basta. */
-        private const val PREFS_NAME = "jenny"
+        private const val PREFS_NAME = "jafta"
         private const val KEY_EXACT_ALARMS_GRANTED = "exactAlarmsGranted"
 
         /** Valore che significa "non l'ho mai guardato": distinto sia da

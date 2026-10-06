@@ -1,6 +1,6 @@
 # Publishing a release
 
-How a new version of Jenny gets out of this repository and onto the phones that already have
+How a new version of Jafta gets out of this repository and onto the phones that already have
 it installed. This page is for whoever is doing the publishing — it assumes you have the
 signing keystore and push access. It does not explain how the in-app updater is coded, but it
 does describe [what the person holding the phone ends up seeing](#what-the-user-actually-sees),
@@ -9,7 +9,7 @@ because that is what you are deciding when you fill in the manifest.
 **The first version that ships the updater still has to be installed by hand.** An app that
 does not know how to look for updates will never find one. The whole mechanism described here
 starts working from the *next* release onwards: everyone running an older build has to
-[sideload the APK](../start/install.md) once, the normal way, and only after that does Jenny
+[sideload the APK](../start/install.md) once, the normal way, and only after that does Jafta
 start offering updates to herself.
 
 ## The short version
@@ -28,9 +28,9 @@ python3 scripts/release.py 0.7.0 --manifest-only \
     --summary-en "Automatic updates and assorted fixes."
 
 # 4. publish — the script printed this command, it never runs it for you
-gh release create v0.7.0 dist/release/jenny-0.7.0.apk dist/release/latest.json \
-    --repo flagdizero/jenny-android-ai-agent \
-    --title "Jenny 0.7.0" --notes "Automatic updates and assorted fixes."
+gh release create v0.7.0 dist/release/jafta-0.7.0.apk dist/release/latest.json \
+    --repo nastechresearch/jafta-android-ai-agent \
+    --title "Jafta 0.7.0" --notes "Automatic updates and assorted fixes."
 ```
 
 Add `--dry-run` to any `release.py` invocation to see exactly what it would do — every file it
@@ -45,7 +45,7 @@ a mismatch until it is already on someone's phone:
 | Where | What |
 |---|---|
 | `pyproject.toml` | `version = "0.7.0"` — the Python package version |
-| `jenny/__init__.py` | the hardcoded fallback the app reports on Android, where package metadata does not exist |
+| `jafta/__init__.py` | the hardcoded fallback the app reports on Android, where package metadata does not exist |
 | `android/app/build.gradle.kts` | `versionName` (what the user sees) **and** `versionCode` (the integer Android compares) |
 | `latest.json` | the update manifest, which has to describe the APK you actually built |
 
@@ -123,12 +123,12 @@ python3 scripts/release.py 0.7.0 --manifest-only \
 
 `--manifest-only` skips the bump (already done in step 1) and reuses the `versionCode` that is
 in the tree. The script hashes the APK, writes `dist/release/latest.json`, and stages a copy of
-the APK named `jenny-0.7.0.apk`, because GitHub names an asset after the file you upload and the
+the APK named `jafta-0.7.0.apk`, because GitHub names an asset after the file you upload and the
 manifest's `apk_url` has to match it exactly. `dist/` is gitignored, so nothing it stages ends
 up in a commit.
 
 The two summaries are one-liners shown inside the app when the update is offered — write them
-for the person holding the phone, not for the changelog. Both are required: Jenny picks one
+for the person holding the phone, not for the changelog. Both are required: Jafta picks one
 according to **her configured language** (`agents.defaults.language`, written once by onboarding
 from the phone's language; there is no setting for it), not the current device locale, and falls back to `summary_en` if the matching one is missing. Anything
 past 400 characters is truncated, so keep them to a line.
@@ -148,7 +148,7 @@ The manifest must be attached to the release under exactly that name, because th
 it from GitHub's stable redirect:
 
 ```
-https://github.com/flagdizero/jenny-android-ai-agent/releases/latest/download/latest.json
+https://github.com/nastechresearch/jafta-android-ai-agent/releases/latest/download/latest.json
 ```
 
 GitHub resolves `/latest/` to whatever the most recent non-draft, non-prerelease release is. That
@@ -171,7 +171,7 @@ three things happen on their own.
 
 **A message in chat, once per version.** The `update_check` cron job runs every
 `updates.checkIntervalH` hours (24 by default), and the first time it finds a version this device
-can take, it has Jenny say so in her own words, in the conversation — the version number, your
+can take, it has Jafta say so in her own words, in the conversation — the version number, your
 summary, and a question about installing now. It is recorded as announced at that point and never
 brought up again for that version, however the user answers. If `updates.notifyInChat` is off, this
 step is skipped entirely and nothing is recorded, so turning it back on still gets the
@@ -192,12 +192,12 @@ For a `critical` release there is also a system notification, so it lands even w
 
 ### What installing looks like
 
-Jenny downloads the APK, checks its SHA-256 and its exact size, and hands it to Android's
+Jafta downloads the APK, checks its SHA-256 and its exact size, and hands it to Android's
 `PackageInstaller`. From there, one of two things happens, and **which one is not up to us** —
 it is up to the Android version, the ROM and who owns the package:
 
 - **Unattended.** The system accepts the update without asking. The user sees nothing at all: the
-  process is killed mid-sentence, the app is replaced, and Jenny comes back up by herself a few
+  process is killed mid-sentence, the app is replaced, and Jafta comes back up by herself a few
   seconds later. The WebUI says so in advance, because the connection dropping would otherwise
   look like a crash.
 - **With a confirmation.** The system refuses to install unattended and returns its own installer
@@ -211,10 +211,10 @@ installed by us, and unattended self-update is a concession the system may withh
 is knowable in advance — the answer only arrives at commit time.
 
 One consequence worth internalising before you read a log or a bug report: **"committed" is not
-"installed".** When Jenny reports the unattended path she is saying the system accepted the
+"installed".** When Jafta reports the unattended path she is saying the system accepted the
 session, not that the new APK is running. The only proof of a completed update is the app coming
 back on a higher `versionCode`. A release that fails verification after the commit fails after
-Jenny has already stopped being able to tell you.
+Jafta has already stopped being able to tell you.
 
 ## What each manifest field means
 
@@ -223,10 +223,10 @@ Jenny has already stopped being able to tell you.
   "schema": 1,
   "version_code": 9,
   "version_name": "0.7.0",
-  "apk_url": "https://github.com/flagdizero/jenny-android-ai-agent/releases/download/v0.7.0/jenny-0.7.0.apk",
+  "apk_url": "https://github.com/nastechresearch/jafta-android-ai-agent/releases/download/v0.7.0/jafta-0.7.0.apk",
   "sha256": "05592b9d8bc11f615c6217a942854399b9d8db5bbba29d69dfb3163cd7e696fc",
   "size": 2097152,
-  "notes_url": "https://github.com/flagdizero/jenny-android-ai-agent/releases/tag/v0.7.0",
+  "notes_url": "https://github.com/nastechresearch/jafta-android-ai-agent/releases/tag/v0.7.0",
   "summary_it": "Aggiornamenti automatici e correzioni varie.",
   "summary_en": "Automatic updates and assorted fixes.",
   "min_supported_code": 0,
@@ -268,7 +268,7 @@ A cautious release looks like this:
 # publish at 10%
 python3 scripts/release.py 0.7.0 --manifest-only --apk … --rollout 10 \
     --summary-it "…" --summary-en "…"
-gh release create v0.7.0 dist/release/jenny-0.7.0.apk dist/release/latest.json …
+gh release create v0.7.0 dist/release/jafta-0.7.0.apk dist/release/latest.json …
 
 # a day later, nothing on fire — widen it
 python3 scripts/release.py 0.7.0 --manifest-only --apk … --rollout 50 \
@@ -334,12 +334,12 @@ Concretely, it does four things:
   between 1 and 100, every device that can take it is offered it immediately. The single
   exception is `rollout: 0`, the [kill switch](#the-kill-switch), which stops critical releases
   too — that is a deliberate stop, not a wave.
-- Jenny is told to say plainly that it is a security update, instead of describing a new version.
+- Jafta is told to say plainly that it is a security update, instead of describing a new version.
 - The Updates page calls it a security update instead of a new version, and the *Install now*
   button is styled to match.
 - A system notification is posted, so the announcement lands even if nobody had the chat open.
 
-It is still not a forced install. `critical` changes how insistently Jenny asks and who gets
+It is still not a forced install. `critical` changes how insistently Jafta asks and who gets
 asked — never whether the user can say no. It also has no bearing on whether Android installs
 unattended or shows its confirmation screen: that decision belongs to the system and is made at
 install time, not in the manifest.
@@ -370,7 +370,7 @@ new `version_code`, which would lock out literally everyone.
 | `--critical` | Mark the release critical. Default off. |
 | `--min-supported-code N` | Oldest `versionCode` allowed to update. Default: previous manifest, else `0`. |
 | `--out PATH` | Output directory, or a path ending in `latest.json`. Default `dist/release/`. |
-| `--repo SLUG` | Repository the URLs point at. Default `flagdizero/jenny-android-ai-agent`. |
+| `--repo SLUG` | Repository the URLs point at. Default `nastechresearch/jafta-android-ai-agent`. |
 | `--dry-run` | Print everything, write nothing. |
 
 ## Reference: the knobs on the device

@@ -31,6 +31,10 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          # Pin cmdline-tools to a version that still ships the legacy
+          # `tools` package name (removed in 16.0+). 15.0 is the last known good.
+          cmdline-tools-version: 15.0
 
       - name: Grant execute permission for gradlew
         run: chmod +x android/gradlew

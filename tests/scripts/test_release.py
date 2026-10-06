@@ -61,7 +61,7 @@ def _version() -> str:
 GRADLE = """\
 android {
     defaultConfig {
-        applicationId = "com.flagdizero.jafta"
+        applicationId = "za.nastech.jafta"
         minSdk = 26
         // versionCode must increase monotonically on every published build.
         versionCode = 8
@@ -130,7 +130,7 @@ def test_bump_preserves_the_rest_of_each_file(repo: Path) -> None:
     assert 'name = "jafta"' in content["pyproject"]
     assert "line-length = 100" in content["pyproject"]
     assert "versionCode must increase monotonically" in content["gradle"]
-    assert 'applicationId = "com.flagdizero.jafta"' in content["gradle"]
+    assert 'applicationId = "za.nastech.jafta"' in content["gradle"]
 
 
 def test_version_code_increments_by_one(repo: Path) -> None:
@@ -311,7 +311,7 @@ def test_manifest_matches_the_agreed_schema(repo: Path, apk: Path, tmp_path: Pat
             "--summary-en",
             "Automatic updates.",
             "--repo",
-            "flagdizero/jafta-android-ai-agent",
+            "nastechresearch/Jafta",
         )
         == 0
     )
@@ -337,11 +337,11 @@ def test_manifest_matches_the_agreed_schema(repo: Path, apk: Path, tmp_path: Pat
     assert manifest["version_code"] == 9
     assert manifest["version_name"] == "0.7.0"
     assert manifest["apk_url"] == (
-        "https://github.com/flagdizero/jafta-android-ai-agent/releases/download/"
+        "https://github.com/nastechresearch/Jafta/releases/download/"
         "v0.7.0/jafta-0.7.0.apk"
     )
     assert manifest["notes_url"] == (
-        "https://github.com/flagdizero/jafta-android-ai-agent/releases/tag/v0.7.0"
+        "https://github.com/nastechresearch/Jafta/releases/tag/v0.7.0"
     )
     assert manifest["sha256"] == hashlib.sha256(apk.read_bytes()).hexdigest()
     assert manifest["size"] == apk.stat().st_size

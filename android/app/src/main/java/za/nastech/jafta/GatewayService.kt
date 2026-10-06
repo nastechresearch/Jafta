@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.Manifest
 import android.app.Notification
@@ -22,7 +22,7 @@ import com.chaquo.python.android.AndroidPlatform
 import kotlin.concurrent.thread
 
 /**
- * Foreground service hosting the jenny gateway thread.
+ * Foreground service hosting the jafta gateway thread.
  *
  * Runs independently of MainActivity's lifecycle so the Python gateway (and
  * therefore the WebSocket session) survives the screen turning off or the
@@ -33,7 +33,7 @@ import kotlin.concurrent.thread
 class GatewayService : Service() {
 
     companion object {
-        private const val TAG = "Jenny"
+        private const val TAG = "Jafta"
         private const val NOTIFICATION_CHANNEL_ID = "jenny_gateway"
         private const val NOTIFICATION_ID = 1
         // Distinto dai request code degli alert (NotifierBridge usa tag.hashCode()),
@@ -48,21 +48,21 @@ class GatewayService : Service() {
 
         /** Extra con cui `WakeReceiver` segnala che questo avvio è il tick di
          *  una sveglia di lavoro, non un semplice "assicurati che sia su". */
-        const val EXTRA_WAKE_TICK = "com.flagdizero.jenny.extra.WAKE_TICK"
+        const val EXTRA_WAKE_TICK = "za.nastech.jafta.extra.WAKE_TICK"
 
         /** Testo scritto dall'utente nella tendina, da consegnare al gateway.
          *  Lo mette `ReplyReceiver`. */
-        const val EXTRA_REPLY_TEXT = "com.flagdizero.jenny.extra.REPLY_TEXT"
+        const val EXTRA_REPLY_TEXT = "za.nastech.jafta.extra.REPLY_TEXT"
 
         /** Tag dell'alert da cui è partita la risposta: serve solo a rimetterlo
          *  nella notifica di mancata consegna, così il "Rimanda" sa a quale
          *  avviso apparteneva. */
-        const val EXTRA_REPLY_SOURCE_TAG = "com.flagdizero.jenny.extra.REPLY_SOURCE_TAG"
+        const val EXTRA_REPLY_SOURCE_TAG = "za.nastech.jafta.extra.REPLY_SOURCE_TAG"
 
         /** Le due superfici native da cui può entrare del testo dell'utente.
          *
          *  Valori di protocollo, non etichette: Python li riconosce per stringa
-         *  (`_CHANNEL_BY_SOURCE` in `jenny/runtime/native_input.py`, elenco
+         *  (`_CHANNEL_BY_SOURCE` in `jafta/runtime/native_input.py`, elenco
          *  chiuso) e da lì decide **dove torna la risposta** — un alert per la
          *  tendina, il fumetto per la mascotte. Una stringa che diverge non
          *  rompe la compilazione: fa rifiutare ogni messaggio di quella
@@ -160,7 +160,7 @@ class GatewayService : Service() {
                 false
             } else {
                 Python.getInstance()
-                    .getModule("jenny.runtime.native_input")
+                    .getModule("jafta.runtime.native_input")
                     .callAttr("on_native_text", text, source, sourceTag)
                     .toBoolean()
             }
@@ -185,7 +185,7 @@ class GatewayService : Service() {
          *   per dire una cosa che si vede già.
          */
         fun deliverFloatingText(text: String, onResult: (Boolean) -> Unit) {
-            thread(name = "jenny-floating-text") {
+            thread(name = "jafta-floating-text") {
                 val ok = try {
                     deliverWithRetry(text, NATIVE_SOURCE_FLOATING, null, FLOATING_DELIVERY_BUDGET_MS)
                 } catch (e: InterruptedException) {
@@ -202,7 +202,7 @@ class GatewayService : Service() {
 
         /** Pausa fra l'uscita di `run_gateway` e il tentativo di rilanciarlo
          *  nello stesso thread. Allineata a `RETRY_DELAY_S` di
-         *  `jenny/android_entry.py`: è lo stesso ordine di grandezza di attesa
+         *  `jafta/android_entry.py`: è lo stesso ordine di grandezza di attesa
          *  che il lato Python si concede fra due tentativi. */
         private const val SELF_RESTART_DELAY_MS = 5_000L
 
@@ -369,7 +369,7 @@ class GatewayService : Service() {
         }
         isRunning = true
         Watchdog.noteAlive(this)
-        // In foreground, quindi «Jenny è ferma» non è più vero: da qualunque
+        // In foreground, quindi «Jafta è ferma» non è più vero: da qualunque
         // strada si sia arrivati — il tocco sulla notifica, l'app aperta a
         // mano, il boot — la notifica di riavvio se ne va qui.
         if (intent?.getBooleanExtra(RestartNotice.EXTRA_FROM_NOTICE, false) == true) {
@@ -408,13 +408,13 @@ class GatewayService : Service() {
      * recupero della scadenza mancata è già lavoro di `CronService.start`.
      */
     private fun deliverWakeTick() {
-        thread(name = "jenny-wake-tick") {
+        thread(name = "jafta-wake-tick") {
             try {
                 if (!Python.isStarted()) {
                     Log.i(TAG, "Wake tick dropped: python runtime not started yet")
                     return@thread
                 }
-                val module = Python.getInstance().getModule("jenny.runtime.power")
+                val module = Python.getInstance().getModule("jafta.runtime.power")
                 val delivered = module.callAttr("on_wake_tick").toBoolean()
                 Log.i(TAG, "Wake tick delivered=$delivered")
             } catch (e: Exception) {
@@ -455,7 +455,7 @@ class GatewayService : Service() {
      * non sta guardando nulla e va raggiunto dove scriveva.
      */
     private fun deliverNativeText(text: String, sourceTag: String?) {
-        thread(name = "jenny-native-text") {
+        thread(name = "jafta-native-text") {
             var delivered = false
             try {
                 delivered = deliverWithRetry(
@@ -491,7 +491,7 @@ class GatewayService : Service() {
      * processo o l'app viene "congelata" dal gestore batteria dell'OEM: lì il
      * riavvio sticky non arriva mai, e senza questa sveglia il gateway resta
      * giù finché l'utente non riapre l'app a mano — cioè finché non si accorge
-     * che Jenny ha smesso di rispondere. L'alarm sopravvive al kill perché vive
+     * che Jafta ha smesso di rispondere. L'alarm sopravvive al kill perché vive
      * nell'AlarmManager di sistema, non nel nostro processo.
      *
      * Vale anche quando lo stop è VOLUTO (MainActivity.restartApp ferma il
@@ -517,7 +517,7 @@ class GatewayService : Service() {
         //
         // Il motivo per cui il rilascio esiste resta intatto: il lock lo prende
         // Python all'avvio del gateway
-        // (jenny/runtime/power.py::apply_service_lock) e solo il service sa di
+        // (jafta/runtime/power.py::apply_service_lock) e solo il service sa di
         // stare morendo, quindi un lock orfano su un processo che sopravvive al
         // service — è il caso di MainActivity.restartApp — terrebbe la CPU
         // accesa a schermo spento senza che nessuno possa più spegnerlo, e il
@@ -604,7 +604,7 @@ class GatewayService : Service() {
         // site-packages and can take several seconds; it must never run on the
         // main/UI Looper thread, or all touch input and WebView compositing
         // stalls for that entire window (same effect as an ANR).
-        gatewayThread = thread(name = "jenny-gateway") {
+        gatewayThread = thread(name = "jafta-gateway") {
             try {
                 // Provider crittografico: UNA SOLA registrazione per processo, e
                 // qui. Questo servizio e l'unico ingresso del runtime — ci si
@@ -618,7 +618,7 @@ class GatewayService : Service() {
                 // dettaglio: misurato su questo dispositivo, in posizione 1
                 // cambiava il provider di AES/GCM per TUTTA l'app — compreso il
                 // container di backup cifrato
-                // (jenny/snapshot/crypto_backends/android.py) — passando dal
+                // (jafta/snapshot/crypto_backends/android.py) — passando dal
                 // BoringSSL accelerato in hardware al Java puro di BouncyCastle.
                 // In coda serve solo Ed25519, che nessun altro provider offre.
                 // Il JSON loggato porta `aesGcmUnchanged`: se diventa false,
@@ -629,7 +629,7 @@ class GatewayService : Service() {
                     Python.start(AndroidPlatform(applicationContext))
                 }
                 val py = Python.getInstance()
-                val module = py.getModule("jenny.android_entry")
+                val module = py.getModule("jafta.android_entry")
                 runGatewayUntilGivenUp(module)
             } catch (e: Exception) {
                 // Solo il bootstrap (provider, Python.start, import del modulo)
@@ -700,7 +700,7 @@ class GatewayService : Service() {
             try {
                 module.callAttr("run_gateway", filesDir.absolutePath, applicationContext)
                 // RITORNO = uscita PULITA, e i due esiti non vanno scambiati:
-                // `jenny/android_entry.py` ritorna solo dopo un `asyncio.run`
+                // `jafta/android_entry.py` ritorna solo dopo un `asyncio.run`
                 // finito da sé (riga 184, `return  # clean exit`); i retry
                 // esauriti fanno `raise` (riga 211) e finiscono nel `catch`.
                 // Alle 3 di notte la riga sbagliata manda a cercare un crash
@@ -783,7 +783,7 @@ class GatewayService : Service() {
     }
 
     /**
-     * Tap sulla notifica → apre Jenny. È l'unica via di rientro sempre visibile
+     * Tap sulla notifica → apre Jafta. È l'unica via di rientro sempre visibile
      * quando l'app non è il launcher attivo, e senza questo intent la notifica
      * persistente non fa assolutamente niente al tocco.
      *

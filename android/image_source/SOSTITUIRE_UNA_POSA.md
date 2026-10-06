@@ -13,14 +13,14 @@ bisogno di altro.
 
 | Posa (runtime)                      | Sorgente               |
 |-------------------------------------|------------------------|
-| idle (mini Jenny dell'onboarding)   | `idle.PNG`             |
-| side                                | `jenny-side.PNG`       |
-| side-talk                           | `jenny-side-talk.PNG`  |
-| hang (appesa)                       | `jenny-hang.PNG`       |
-| fall (caduta)                       | `jenny-fall.PNG`       |
-| ground (atterrata)                  | `jenny-ground.PNG`     |
-| walk1                               | `jenny-walk1.PNG`      |
-| walk2                               | `jenny-walk2.PNG`      |
+| idle (mini Jafta dell'onboarding)   | `idle.PNG`             |
+| side                                | `jafta-side.PNG`       |
+| side-talk                           | `jafta-side-talk.PNG`  |
+| hang (appesa)                       | `jafta-hang.PNG`       |
+| fall (caduta)                       | `jafta-fall.PNG`       |
+| ground (atterrata)                  | `jafta-ground.PNG`     |
+| walk1                               | `jafta-walk1.PNG`      |
+| walk2                               | `jafta-walk2.PNG`      |
 | hello1                              | `hello1.PNG`           |
 | hello2                              | `hello2.PNG`           |
 
@@ -57,7 +57,7 @@ Dalla cartella `android/image_source/`:
 python3 gen_pose_webp.py
 ```
 
-Rigenera **tutti e 23** i webp in `jenny/templates/ui/assets/` (10 pose cotte +
+Rigenera **tutti e 23** i webp in `jafta/templates/ui/assets/` (10 pose cotte +
 13 livelli), non solo quello che hai toccato — è normale e voluto, è
 idempotente.
 
@@ -79,7 +79,7 @@ Poi, dalla cartella `android/` (non da `image_source/`):
 ```
 
 **Un riavvio dell'app non basta**: Chaquopy ri-estrae il bundle
-`jenny/templates/ui` dentro l'APK solo a ogni installazione, quindi serve
+`jafta/templates/ui` dentro l'APK solo a ogni installazione, quindi serve
 davvero la build/install per vedere le immagini nuove sul dispositivo.
 
 ## Riepilogo one-liner

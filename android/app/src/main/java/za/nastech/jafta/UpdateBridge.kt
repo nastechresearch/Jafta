@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Aggiornamento dell'APK dall'interno dell'app: scarico, verifica, installazione.
- * Esposto a Python via Chaquopy (`jclass("com.flagdizero.jenny.UpdateBridge")`),
+ * Esposto a Python via Chaquopy (`jclass("za.nastech.jafta.UpdateBridge")`),
  * mai istanziato da Kotlin — stesso pattern di NotifierBridge.
  *
  * I metodi sono BLOCCANTI e non lanciano mai verso Python: il lato Python li
@@ -76,7 +76,7 @@ class UpdateBridge(context: Context) {
          *  sistema deve poter buttare via quando lo spazio finisce, e perché
          *  non ha senso includerlo nei backup. */
         private const val UPDATES_DIR = "updates"
-        private const val APK_NAME = "jenny-update.apk"
+        private const val APK_NAME = "jafta-update.apk"
 
         private const val CONNECT_TIMEOUT_MS = 30_000
         private const val READ_TIMEOUT_MS = 60_000
@@ -100,7 +100,7 @@ class UpdateBridge(context: Context) {
         /** Action della broadcast di stato. Il `PendingIntent` la porta con sé
          *  ed è l'unico modo per collegare un esito alla sessione che l'ha
          *  prodotto. */
-        private const val ACTION_INSTALL_STATUS = "com.flagdizero.jenny.INSTALL_STATUS"
+        private const val ACTION_INSTALL_STATUS = "za.nastech.jafta.INSTALL_STATUS"
 
         private const val UPDATE_CHANNEL_ID = "jenny_updates"
         private const val UPDATE_NOTIFICATION_ID = 3

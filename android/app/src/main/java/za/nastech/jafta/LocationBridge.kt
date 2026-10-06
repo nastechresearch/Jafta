@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.Manifest
 import android.content.Context
@@ -17,12 +17,12 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Bridge per la posizione del dispositivo, esposto a Python via Chaquopy
- * (`jclass("com.flagdizero.jenny.LocationBridge")`), mai istanziato da Kotlin —
+ * (`jclass("za.nastech.jafta.LocationBridge")`), mai istanziato da Kotlin —
  * stesso pattern di NotifierBridge / InstalledAppsBridge.
  *
  * Politica: qui vive solo l'accesso nativo (permesso, LocationManager,
  * Geocoder). La decisione "se e quando leggere la posizione" vive in Python
- * (jenny/runtime/location.py) ed è gattata dal toggle utente; questo bridge è
+ * (jafta/runtime/location.py) ed è gattata dal toggle utente; questo bridge è
  * gattato dal permesso runtime `ACCESS_FINE_LOCATION` — senza permesso ogni
  * metodo ritorna `null` (mai un'eccezione verso Python).
  *

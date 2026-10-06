@@ -1,4 +1,4 @@
-"""Esporta l'arte di Jenny (riposo + volo Pegman) come webp per la WebUI.
+"""Esporta l'arte di Jafta (riposo + volo Pegman) come webp per la WebUI.
 
 Sorgenti: canvas QUADRATI 3000x3000 in questa cartella, disegnati
 dall'artista gia' alla scala giusta e coerenti tra loro (personaggio della
@@ -10,10 +10,10 @@ relativa tra le pose non viene mai toccata).
 A runtime il layer di volo coincide esattamente col box del duo (tutte le
 img sono width:100% del quadrato): l'unica costante calcolata qui a build
 time e' il pivot della posa appesa — la punta della manica alzata (la
-"mano"), misurata a mano sul canvas di jenny-hang.png perche' la sagoma
+"mano"), misurata a mano sul canvas di jafta-hang.png perche' la sagoma
 li' attorno e' ambigua (le ciocche superano la manica in altezza).
 
-Output in jenny/templates/ui/assets/: jenny-{side,side-talk,hang,fall,
+Output in jafta/templates/ui/assets/: jafta-{side,side-talk,hang,fall,
 ground,walk1,walk2,hello1,hello2,idle}.webp, tutti SIZE x SIZE.
 
 Il pensa e i quattro frame del parlato non si esportano piu': quello stato
@@ -41,27 +41,27 @@ from pathlib import Path
 from PIL import Image
 
 SRC = Path(__file__).resolve().parent
-OUT = SRC.parent.parent / "jenny" / "templates" / "ui" / "assets"
+OUT = SRC.parent.parent / "jafta" / "templates" / "ui" / "assets"
 SIZE = 768
 QUALITY = 80
 
-# Punta della manica alzata (la mano) sul canvas 3000x3000 di jenny-hang.png.
+# Punta della manica alzata (la mano) sul canvas 3000x3000 di jafta-hang.png.
 HAND_PIVOT = (1525, 1300)
 
 FILES = [
-    ("side", "jenny-side.PNG"),
-    ("hang", "jenny-hang.PNG"),
-    ("fall", "jenny-fall.PNG"),
-    ("ground", "jenny-ground.PNG"),
-    ("walk1", "jenny-walk1.PNG"),
-    ("walk2", "jenny-walk2.PNG"),
+    ("side", "jafta-side.PNG"),
+    ("hang", "jafta-hang.PNG"),
+    ("fall", "jafta-fall.PNG"),
+    ("ground", "jafta-ground.PNG"),
+    ("walk1", "jafta-walk1.PNG"),
+    ("walk2", "jafta-walk2.PNG"),
     ("hello1", "hello1.PNG"),
     ("hello2", "hello2.PNG"),
     ("idle", "idle.PNG"),
-    ("side-talk", "jenny-side-talk.PNG"),
+    ("side-talk", "jafta-side-talk.PNG"),
 ]
 
-# Sorgenti a due livelli, esportati come jenny-<stem con i trattini>.webp.
+# Sorgenti a due livelli, esportati come jafta-<stem con i trattini>.webp.
 # Nome del file = cosa e': ``face_front_happy`` e' la faccia di **riposo**
 # dell'espressione (per happy e' un sorriso a bocca aperta, ed e' giusto),
 # ``_talk`` e' l'altra bocca. All'animatore del parlato serve la coppia, e
@@ -102,8 +102,8 @@ def _export(src_png: Path, dest: Path) -> None:
 
 if __name__ == "__main__":
     for name, png in FILES:
-        _export(SRC / png, OUT / f"jenny-{name}.webp")
+        _export(SRC / png, OUT / f"jafta-{name}.webp")
     for stem in LAYERS:
-        _export(SRC / f"{stem}.PNG", OUT / f"jenny-{stem.replace('_', '-')}.webp")
+        _export(SRC / f"{stem}.PNG", OUT / f"jafta-{stem.replace('_', '-')}.webp")
 
     print(f"PIVOT_X = {HAND_PIVOT[0] / 3000:.4f}; PIVOT_Y = {HAND_PIVOT[1] / 3000:.4f}")

@@ -75,7 +75,7 @@ def test_the_floating_mascot_takes_its_size_from_the_same_place():
     `@JavascriptInterface` che la riceve, e il fatto che il controller non
     reintroduca una taglia fissa come misura di lavoro.
     """
-    android = Path(__file__).resolve().parents[2] / "android/app/src/main/java/com/flagdizero/jafta"
+    android = Path(__file__).resolve().parents[2] / "android/app/src/main/java/za/nastech/jafta"
 
     mascot_js = (UI_ASSETS / "shared" / "mascot.js").read_text("utf-8")
     assert "JennyNative?.setMascotSize?.(px, window.devicePixelRatio" in mascot_js, (

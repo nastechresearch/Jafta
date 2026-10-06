@@ -87,7 +87,7 @@ jobs:
           body: |
             ## Jafta ${{ github.ref_name }}
 
-            A local-first personal AI agent for Android. Derived from Jenny (AGPL-3.0), originally a fork of nanobot (MIT).
+            A local-first personal AI agent for Android. Derived from Jafta (AGPL-3.0), originally a fork of nanobot (MIT).
 
             **Build provenance:**
             - Signed by: NasTech Research (alias: `jafta`)

@@ -1,18 +1,18 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.content.Context
 
 /**
  * Bridge per la mascotte flottante, esposto a Python via Chaquopy
- * (`jclass("com.flagdizero.jenny.FloatingBridge")`), mai istanziato da Kotlin —
+ * (`jclass("za.nastech.jafta.FloatingBridge")`), mai istanziato da Kotlin —
  * stesso pattern di `NotifierBridge`.
  *
  * Due metodi, uno per verso:
  *
  * * `setEnabled` — la volontà, letta da `config.floating.enabled` all'avvio del
- *   gateway (`jenny/runtime/floating.py`);
+ *   gateway (`jafta/runtime/floating.py`);
  * * `showReply` — il testo da aggiungere alla conversazione nella finestra,
- *   chiamato dal canale (`jenny/channels/floating.py`) a ogni risposta. Può
+ *   chiamato dal canale (`jafta/channels/floating.py`) a ogni risposta. Può
  *   rispondere `false` senza che sia un guasto: a finestra chiusa non si
  *   disegna niente, e non la si riapre.
  *

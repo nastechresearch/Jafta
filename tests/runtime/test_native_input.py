@@ -129,7 +129,7 @@ class TestBoundaryWithKotlin:
     @staticmethod
     def _gateway_service() -> str:
         repo = pathlib.Path(__file__).resolve().parents[2]
-        kt = repo / "android/app/src/main/java/com/flagdizero/jafta/GatewayService.kt"
+        kt = repo / "android/app/src/main/java/za/nastech/jafta/GatewayService.kt"
         return read_source(kt)
 
     def test_kotlin_calls_this_module(self):

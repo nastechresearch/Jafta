@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.util.Log
 import android.view.Choreographer
@@ -12,7 +12,7 @@ import kotlin.math.sin
  * Il volo Pegman della mascotte flottante.
  *
  * **Non è fisica nuova.** È la stessa macchina a quattro fasi che
- * `jenny/templates/ui/assets/mobile-jenny.js` fa girare in `requestAnimationFrame`
+ * `jafta/templates/ui/assets/mobile-jafta.js` fa girare in `requestAnimationFrame`
  * per la mascotte in chat — dove il CSS la chiama già «Volo Pegman» — portata
  * qui perché la finestra overlay disegna con delle `View` e non con del DOM.
  *
@@ -60,8 +60,8 @@ class FloatingFlight(
     private enum class Phase { HELD, FALL, DOWN, SLIDE }
 
     companion object {
-        // --- copiate da mobile-jenny.js, riga per riga ---
-        /** La punta della manica alzata di `jenny-hang`, in frazioni del canvas. */
+        // --- copiate da mobile-jafta.js, riga per riga ---
+        /** La punta della manica alzata di `jafta-hang`, in frazioni del canvas. */
         const val PIVOT_X = 0.5083f
         const val PIVOT_Y = 0.4333f
 

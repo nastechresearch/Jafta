@@ -1,14 +1,14 @@
 # SSH access
 
-Jenny can log into machines you own — a home NAS, a VPS, a Raspberry Pi — and run commands there on your behalf. This is the only capability in the whole app that acts on a computer that isn't your phone, so it is off by default and every host has to be declared by hand.
+Jafta can log into machines you own — a home NAS, a VPS, a Raspberry Pi — and run commands there on your behalf. This is the only capability in the whole app that acts on a computer that isn't your phone, so it is off by default and every host has to be declared by hand.
 
 ## What this actually is
 
 Three things define the shape of this feature, and it's worth reading them before you turn it on:
 
-- **Jenny can only reach hosts you registered.** The agent doesn't pass an address, a username or a password to anything — it passes an *alias* you already created in Settings. There is no tool that takes "connect to 10.0.0.7 as root". If the alias isn't in your list, the answer is an error, not a connection.
-- **Jenny herself has no SSH.** The assistant you talk to delegates remote work to a **`sysadmin` subagent**, which is the only kind of agent that gets the SSH tools — and which has no web access and no local code execution in exchange. Whoever reads untrusted web pages is not whoever holds a shell on your server.
-- **The credential never leaves the phone.** With key authentication — the default — Jenny generates an ed25519 key pair on device, shows you the public half to install on the server, and keeps the private half in a directory the agent's own file tools cannot read. Password authentication is also available, is more convenient and is weaker; the differences are spelled out in [Password instead of a key](#password-instead-of-a-key) below.
+- **Jafta can only reach hosts you registered.** The agent doesn't pass an address, a username or a password to anything — it passes an *alias* you already created in Settings. There is no tool that takes "connect to 10.0.0.7 as root". If the alias isn't in your list, the answer is an error, not a connection.
+- **Jafta herself has no SSH.** The assistant you talk to delegates remote work to a **`sysadmin` subagent**, which is the only kind of agent that gets the SSH tools — and which has no web access and no local code execution in exchange. Whoever reads untrusted web pages is not whoever holds a shell on your server.
+- **The credential never leaves the phone.** With key authentication — the default — Jafta generates an ed25519 key pair on device, shows you the public half to install on the server, and keeps the private half in a directory the agent's own file tools cannot read. Password authentication is also available, is more convenient and is weaker; the differences are spelled out in [Password instead of a key](#password-instead-of-a-key) below.
 
 The SSH client is native (jsch + Bouncy Castle, on the Android side), not a Python library. You don't have to care, except for one visible consequence: SSH works in the Android app. Outside it there is only a test backend (asyncssh, which is not a runtime dependency) used by the test suite.
 
@@ -22,7 +22,7 @@ Flip **Enable SSH access**, then **Add host**:
 
 | Field | Notes |
 |---|---|
-| **Alias** | The only name Jenny uses for this machine (`nas`, `vps`). 1–32 characters, letters/digits/`-`/`_`. **It cannot be changed later** — it's also the name of the key file on disk. |
+| **Alias** | The only name Jafta uses for this machine (`nas`, `vps`). 1–32 characters, letters/digits/`-`/`_`. **It cannot be changed later** — it's also the name of the key file on disk. |
 | **Host** | Hostname or IP (`nas.home.lan`, `192.168.1.10`). |
 | **Port** | Default 22. |
 | **User** | The account to log in as. |
@@ -31,31 +31,31 @@ Flip **Enable SSH access**, then **Add host**:
 
 Saving a host is a command sent over the WebUI's authenticated WebSocket (`ssh.host.save`), not an HTTP GET, so a password never travels in a URL or lands in a request log.
 
-The address is checked against Jenny's network policy when you save it, and again on every connection. Private LAN ranges are allowed — a home server is the main use case — and so is the carrier-grade-NAT range Tailscale hands out, so a Tailscale hostname works with no extra configuration. Loopback, link-local and cloud-metadata addresses are refused: those point at the phone itself, so refusing them stops the agent from SSHing into its own device or using the tool as a way back into Jenny's own API.
+The address is checked against Jafta's network policy when you save it, and again on every connection. Private LAN ranges are allowed — a home server is the main use case — and so is the carrier-grade-NAT range Tailscale hands out, so a Tailscale hostname works with no extra configuration. Loopback, link-local and cloud-metadata addresses are refused: those point at the phone itself, so refusing them stops the agent from SSHing into its own device or using the tool as a way back into Jafta's own API.
 
 This policy is deliberately wider than the one guarding `web_fetch`, and the difference is who picks the address. There, the model does. Here, you type the host in Settings and accept its fingerprint by hand before a single byte is sent — the same two steps that make key pinning worth anything.
 
 ### 2. Generate the key and install it on the server
 
-Tap **Generate key**. Jenny creates an ed25519 pair *for that alias* — each host gets its own key — and shows you the public line. Paste it into `~/.ssh/authorized_keys` of the user you configured:
+Tap **Generate key**. Jafta creates an ed25519 pair *for that alias* — each host gets its own key — and shows you the public line. Paste it into `~/.ssh/authorized_keys` of the user you configured:
 
 ```
-echo 'ssh-ed25519 AAAA... jenny' >> ~/.ssh/authorized_keys
+echo 'ssh-ed25519 AAAA... jafta' >> ~/.ssh/authorized_keys
 ```
 
-The public key is kept so you can read it again later; the private key is never displayed, never sent to the WebUI, and never readable by any of Jenny's tools. **Regenerate key** asks for confirmation, because a new pair revokes the access you already installed on the server.
+The public key is kept so you can read it again later; the private key is never displayed, never sent to the WebUI, and never readable by any of Jafta's tools. **Regenerate key** asks for confirmation, because a new pair revokes the access you already installed on the server.
 
 ### Password instead of a key
 
-If you set **Authentication** to **Password**, Jenny logs in with the account password instead of a key pair. The "Generate key" button and the public-key block disappear from that host's panel — there is nothing to install on the server — and its row shows whether a password is set rather than whether a key exists.
+If you set **Authentication** to **Password**, Jafta logs in with the account password instead of a key pair. The "Generate key" button and the public-key block disappear from that host's panel — there is nothing to install on the server — and its row shows whether a password is set rather than whether a key exists.
 
 This is genuinely more convenient: nothing to paste into `authorized_keys`, nothing to install on a machine you can't easily reach, and it works on a server where you can't edit `authorized_keys` at all. It is also weaker, in three concrete ways, and none of them are hypothetical:
 
-- **The password is stored in `config.json`.** That is the same place as your Telegram bot token and your provider API keys — inside the app's private storage, which no other app on the phone can read. It is **not encrypted at rest**, and unlike the SSH private key, `config.json` sits *inside* the workspace, so Jenny's own file tools can read it. The private key deliberately lives outside the workspace precisely so that they can't. A password does not get that protection.
+- **The password is stored in `config.json`.** That is the same place as your Telegram bot token and your provider API keys — inside the app's private storage, which no other app on the phone can read. It is **not encrypted at rest**, and unlike the SSH private key, `config.json` sits *inside* the workspace, so Jafta's own file tools can read it. The private key deliberately lives outside the workspace precisely so that they can't. A password does not get that protection.
 - **It goes into your backups.** `config.json` is part of the workspace, so it is inside snapshots and inside an exported `.jbk` (which is encrypted with your backup passphrase — that passphrase is what protects it there). The private key never travels that way.
-- **You can't revoke it in isolation.** A key installed for Jenny is a key you can delete from `authorized_keys` and nothing else changes — you keep logging in the way you always did. The password is the same one you use yourself: taking it away from Jenny means changing it for you too.
+- **You can't revoke it in isolation.** A key installed for Jafta is a key you can delete from `authorized_keys` and nothing else changes — you keep logging in the way you always did. The password is the same one you use yourself: taking it away from Jafta means changing it for you too.
 
-If you can install a key, install a key. If you can't, a password is a reasonable trade — just make it a dedicated account with only the rights Jenny actually needs, rather than the one you use for everything.
+If you can install a key, install a key. If you can't, a password is a reasonable trade — just make it a dedicated account with only the rights Jafta actually needs, rather than the one you use for everything.
 
 Switching an existing host from password back to key **erases the stored password**. That's on purpose: a credential nothing uses any more has no business sitting in the file, and you'd reasonably assume that flipping the switch removed it. Switching back to password later means typing it again.
 
@@ -63,13 +63,13 @@ Editing a password host without retyping the password keeps the saved one — th
 
 ### 3. Verify the host fingerprint
 
-Tap **Verify fingerprint**. Jenny contacts the host without authenticating, reads the key it presents, and shows you the SHA256 fingerprint. Compare it with what the server itself says:
+Tap **Verify fingerprint**. Jafta contacts the host without authenticating, reads the key it presents, and shows you the SHA256 fingerprint. Compare it with what the server itself says:
 
 ```
 ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
 ```
 
-If they match, tap **Accept**. From that moment Jenny only talks to the machine presenting that exact key.
+If they match, tap **Accept**. From that moment Jafta only talks to the machine presenting that exact key.
 
 There is **no trust-on-first-use**. Until a person has accepted a fingerprint, every SSH tool call for that alias fails with an error telling the model to ask you to open Settings — and the model has no way around it. The fingerprint you accept is the one you were shown: accepting does not contact the host again, it records the exact key read when you tapped Verify. If that reading is older than 10 minutes, the acceptance is refused and you have to probe again.
 
@@ -77,7 +77,7 @@ This step is mandatory in both authentication modes, and **with a password it ma
 
 ### If the fingerprint changes later
 
-An already-accepted host that starts presenting a different key does **not** get updated silently. Jenny shows both fingerprints side by side, says plainly that this is what a man-in-the-middle looks like, and requires a second explicit confirmation to replace it. Reinstalling a server does cause this legitimately — but so does an attack, and only you know which one happened.
+An already-accepted host that starts presenting a different key does **not** get updated silently. Jafta shows both fingerprints side by side, says plainly that this is what a man-in-the-middle looks like, and requires a second explicit confirmation to replace it. Reinstalling a server does cause this legitimately — but so does an attack, and only you know which one happened.
 
 Editing an existing host's address or port has the same effect from the other direction: the accepted fingerprint is dropped and the `known_hosts` line forgotten, because a verification of the old address says nothing about the new one. You'll have to verify again.
 
@@ -96,34 +96,34 @@ Anything you'd type in a terminal, described in words:
 - "Update the packages on the VPS and tell me when it's done."
 - "Fetch `/etc/nginx/sites-enabled/default` from the VPS so we can go through it together."
 
-Jenny hands the job to a `sysadmin` subagent, and while that agent works you can keep talking to her about something else. The subagent's activity is visible live in the workshop's Console, you can send it a correction mid-run ("no, restart the container instead of rebuilding it"), and you can cancel it outright.
+Jafta hands the job to a `sysadmin` subagent, and while that agent works you can keep talking to her about something else. The subagent's activity is visible live in the workshop's Console, you can send it a correction mid-run ("no, restart the container instead of rebuilding it"), and you can cancel it outright.
 
 Ask which machine it worked on if you have more than one — the agent is instructed to name the alias in what it reports back, but the habit is worth checking.
 
-If SSH is switched off, or no host is registered yet, Jenny does not start the subagent at all: she tells you which of the two it is and where to fix it. A `sysadmin` without SSH would only improvise, and the useful answer is one sentence, not one round trip. Turning SSH on, or adding a host, takes effect on the next job — no restart.
+If SSH is switched off, or no host is registered yet, Jafta does not start the subagent at all: she tells you which of the two it is and where to fix it. A `sysadmin` without SSH would only improvise, and the useful answer is one sentence, not one round trip. Turning SSH on, or adding a host, takes effect on the next job — no restart.
 
 ## Short commands vs long jobs
 
-This is the distinction that matters most in practice, and Jenny makes it for you — but knowing it explains what you'll see.
+This is the distinction that matters most in practice, and Jafta makes it for you — but knowing it explains what you'll see.
 
 **Short commands** (`ssh_exec`) run and return their output right away: exit code, stdout, stderr. They are capped at **60 seconds** by default (300 maximum) and about **10,000 characters** of output. Beyond either cap, the result is truncated or the command times out.
 
-**Long commands** (`ssh_job`) are not waited for at all. Jenny launches them detached from the connection, with output going to a log file on the server (`/tmp/jenny-jobs/<job-id>.log` by default), and then reads that log *incrementally* — each check returns only what's new since the last one. You get a job id back straight away.
+**Long commands** (`ssh_job`) are not waited for at all. Jafta launches them detached from the connection, with output going to a log file on the server (`/tmp/jafta-jobs/<job-id>.log` by default), and then reads that log *incrementally* — each check returns only what's new since the last one. You get a job id back straight away.
 
-The reason is your phone. Jenny does hold a wake lock while a command is running, so the CPU no longer suspends mid-wait — but a wake lock keeps the processor awake, not the connection. A walk from wifi to mobile data still kills the TCP session underneath an open SSH channel, and so does the gateway being restarted. An `apt upgrade` waited for over an open SSH channel doesn't fail cleanly — it fails halfway, and nobody knows how far it got. A detached job doesn't care: the server keeps working, the output accumulates safely on the server, and Jenny picks up from the exact byte she'd reached, whether that's thirty seconds or a day later. Jobs survive a dropped connection, a gateway restart, and the app being killed.
+The reason is your phone. Jafta does hold a wake lock while a command is running, so the CPU no longer suspends mid-wait — but a wake lock keeps the processor awake, not the connection. A walk from wifi to mobile data still kills the TCP session underneath an open SSH channel, and so does the gateway being restarted. An `apt upgrade` waited for over an open SSH channel doesn't fail cleanly — it fails halfway, and nobody knows how far it got. A detached job doesn't care: the server keeps working, the output accumulates safely on the server, and Jafta picks up from the exact byte she'd reached, whether that's thirty seconds or a day later. Jobs survive a dropped connection, a gateway restart, and the app being killed.
 
 What you'll notice:
 
-- A long job gets acknowledged immediately ("started, I'll check on it"), not on completion. Ask "how's the upgrade going?" and Jenny reads the new output.
-- Jenny doesn't sit and poll in a loop. If you want to know the moment it finishes, ask her to set a reminder — that's what [`cron`](scheduling.md) is for.
+- A long job gets acknowledged immediately ("started, I'll check on it"), not on completion. Ask "how's the upgrade going?" and Jafta reads the new output.
+- Jafta doesn't sit and poll in a loop. If you want to know the moment it finishes, ask her to set a reminder — that's what [`cron`](scheduling.md) is for.
 - Stopping a job sends a SIGTERM to the remote process and its children. It's best-effort: a deep process tree or a program that ignores SIGTERM survives it, and the only honest confirmation is checking the job afterwards.
-- A job can come back as **lost** rather than finished: the process is gone but never recorded an exit code, which means it was killed — the OOM killer, or the server rebooting. That work is unfinished, and Jenny is told to treat it as such rather than assume success.
+- A job can come back as **lost** rather than finished: the process is gone but never recorded an exit code, which means it was killed — the OOM killer, or the server rebooting. That work is unfinished, and Jafta is told to treat it as such rather than assume success.
 
 ## Moving files
 
 `ssh_transfer` copies **one file at a time** in either direction, over SFTP on the same connection. The local side is always inside the workspace — a path outside it is refused — and transfers are capped at **50 MB** by default, checked before anything is written, so you never end up with a truncated download that looks complete.
 
-There is no directory sync and no recursive copy. For a whole tree, ask Jenny to `tar` it up on the server with a job first and then fetch the single archive.
+There is no directory sync and no recursive copy. For a whole tree, ask Jafta to `tar` it up on the server with a job first and then fetch the single archive.
 
 ## Limits and surprises
 
@@ -145,27 +145,27 @@ You will still have to verify the fingerprint again either way: `known_hosts` is
 
 Every command runs without a TTY and without stdin. Anything that stops to ask a question doesn't prompt — it hangs until it times out. In practice:
 
-- **`sudo` that asks for a password will not work** — including on a host that authenticates with a password. Registering one is not the same as having something that answers prompts: the command still runs with no TTY and no stdin, so the prompt hangs until the timeout. Configure `NOPASSWD` for the specific commands you want Jenny to run, or log in as a user that already has the rights it needs.
-- Package managers and installers need their non-interactive flags (`-y`, `DEBIAN_FRONTEND=noninteractive`, …). Jenny knows to add them, but a tool that hides a prompt in an unusual place will still stall.
+- **`sudo` that asks for a password will not work** — including on a host that authenticates with a password. Registering one is not the same as having something that answers prompts: the command still runs with no TTY and no stdin, so the prompt hangs until the timeout. Configure `NOPASSWD` for the specific commands you want Jafta to run, or log in as a user that already has the rights it needs.
+- Package managers and installers need their non-interactive flags (`-y`, `DEBIAN_FRONTEND=noninteractive`, …). Jafta knows to add them, but a tool that hides a prompt in an unusual place will still stall.
 - There is no `ssh` session you can attach to, no shell history, no `screen`/`tmux` integration. Each command is independent, and a `cd` in one does not carry into the next.
 
 ### The agent sees your hostnames and usernames
 
 `ssh_hosts` lists alias, host, username, port and description to the model — it has to, or it couldn't choose between two machines or tell you which one it touched. Those go to your LLM provider like everything else in the context. Neither the private key nor the password is ever in that list, in a tool argument, or in a tool result.
 
-One honest caveat on top of that: `config.json` lives in the workspace, so Jenny's file tools can *read* the file that holds a password — the same way they can already read your Telegram token and API keys. The SSH private key is the thing that got moved outside the workspace to make that impossible. If that difference matters to you, that's the argument for a key.
+One honest caveat on top of that: `config.json` lives in the workspace, so Jafta's file tools can *read* the file that holds a password — the same way they can already read your Telegram token and API keys. The SSH private key is the thing that got moved outside the workspace to make that impossible. If that difference matters to you, that's the argument for a key.
 
 ### Other edges worth knowing
 
-- **One key per alias**, not one key for all hosts. Deleting a host deletes its key, its public key, its accepted fingerprint and — on a password host — its stored password. An alias recreated later with the same name starts from scratch, which is the point: deleting really revokes. (On a password host, deleting removes Jenny's copy; the password itself still works for you, because it's yours.)
-- **Job logs stay on the server.** `/tmp/jenny-jobs` is not cleaned up by Jenny, and on most systems `/tmp` is wiped on reboot — which will make an old job unreadable. The per-host `jobLogDir` can be pointed somewhere durable, but only by editing `config.json` (there is no field for it in Settings).
+- **One key per alias**, not one key for all hosts. Deleting a host deletes its key, its public key, its accepted fingerprint and — on a password host — its stored password. An alias recreated later with the same name starts from scratch, which is the point: deleting really revokes. (On a password host, deleting removes Jafta's copy; the password itself still works for you, because it's yours.)
+- **Job logs stay on the server.** `/tmp/jafta-jobs` is not cleaned up by Jafta, and on most systems `/tmp` is wiped on reboot — which will make an old job unreadable. The per-host `jobLogDir` can be pointed somewhere durable, but only by editing `config.json` (there is no field for it in Settings).
 - **The job registry keeps 100 entries**, pruning finished ones first. On top of that, any record older than 30 days is dropped whatever its state — a job "running" for a month is one nobody can verify any more.
-- **Output is truncated, not paged.** When a command produces more than the cap, Jenny is told how many characters were dropped and to re-run it narrowed with `grep`/`tail` rather than guess. Expect the occasional second command instead of a wall of text.
+- **Output is truncated, not paged.** When a command produces more than the cap, Jafta is told how many characters were dropped and to re-run it narrowed with `grep`/`tail` rather than guess. Expect the occasional second command instead of a wall of text.
 - **A connection you stop using is closed.** `idleCloseS` (default 300 s, floor 30) is how long a pooled session may sit unused before a reaper drops it, in both the Android and the development backend. It cannot be disabled from config, and that is deliberate: on a phone a forgotten session survives a wifi-to-mobile switch as a socket that will fail on the next command anyway.
 
 ## See also
 
 - [Tool reference](../reference/tools.md) — the exact behavior and limits of `ssh_hosts`, `ssh_exec`, `ssh_job` and `ssh_transfer`.
 - [Settings](../reference/settings.md#ssh) and [Configuration](../reference/configuration.md) — every field of the SSH section and the `tools.ssh.*` keys.
-- [Security model](../internals/security-model.md) — where SSH sits among Jenny's containment layers.
+- [Security model](../internals/security-model.md) — where SSH sits among Jafta's containment layers.
 - [Backup and restore](backup.md) — what a `.jbk` does and does not carry (spoiler: not your SSH key).

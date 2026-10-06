@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
@@ -13,7 +13,7 @@ import android.util.Log
 
 /**
  * Bridge per il sottosistema energetico (wakelock + sveglie AlarmManager),
- * esposto a Python via Chaquopy (`jclass("com.flagdizero.jenny.PowerBridge")`),
+ * esposto a Python via Chaquopy (`jclass("za.nastech.jafta.PowerBridge")`),
  * mai istanziato da Kotlin — stesso pattern di NotifierBridge / LocationBridge.
  *
  * Perché serve: il foreground service tiene il processo VIVO (non lo fa
@@ -41,7 +41,7 @@ class PowerBridge(context: Context) {
          *  Android si aspetta (`"pkg:motivo"`) e senza la quale i tool di
          *  diagnostica batteria attribuiscono il consumo a un tag anonimo,
          *  rendendo impossibile capire chi tiene sveglio il telefono. */
-        private const val TAG_PREFIX = "jenny:"
+        private const val TAG_PREFIX = "jafta:"
 
         /** Request code riservato alla sveglia di auto-recovery del
          *  GatewayService (vedi `GatewayService.onDestroy`). Python usa request
@@ -82,7 +82,7 @@ class PowerBridge(context: Context) {
          * dati, componente), non gli extra — quindi `cancelWake`, che ricostruisce
          * l'intent con `FLAG_NO_CREATE`, continua a trovare la sveglia giusta.
          */
-        const val EXTRA_REQUEST_CODE = "com.flagdizero.jenny.extra.REQUEST_CODE"
+        const val EXTRA_REQUEST_CODE = "za.nastech.jafta.extra.REQUEST_CODE"
 
         /**
          * Wakelock corto dell'handoff sveglia → service.
@@ -127,7 +127,7 @@ class PowerBridge(context: Context) {
         /**
          * Accende o spegne il wakelock che copre l'INTERA vita del gateway.
          *
-         * Il chiamante è Python (`jenny/runtime/power.py::apply_service_lock`),
+         * Il chiamante è Python (`jafta/runtime/power.py::apply_service_lock`),
          * una volta all'avvio del gateway. Per lo spegnimento i chiamanti sono
          * due, e insieme coprono l'invariante "il lock è tenuto se e solo se un
          * thread del gateway vivo lo vuole": `GatewayService.onDestroy`, ma

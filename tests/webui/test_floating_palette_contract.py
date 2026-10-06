@@ -31,7 +31,7 @@ ROOT = Path(__file__).resolve().parents[2]
 ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 THEME_JS = ASSETS / "shared" / "theme.js"
 SPA_CSS = ASSETS / "mobile-style.css"
-ANDROID = ROOT / "android/app/src/main/java/com/flagdizero/jafta"
+ANDROID = ROOT / "android/app/src/main/java/za/nastech/jafta"
 
 
 # I sei token che vestono la finestra, nell'ordine in cui viaggiano sul ponte.

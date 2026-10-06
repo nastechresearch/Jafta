@@ -3,12 +3,12 @@
   //
   // Adoption model (the two `migliorie/*.md` notes this used to cite never existed in this
   // repo; the model itself is described below and in docs/contribute/code-style.md):
-  //   - This config defines the FULL perimeter ("jenny" minus templates/skills). Running
+  //   - This config defines the FULL perimeter ("jafta" minus templates/skills). Running
   //     `npx pyright` against it is NON-blocking visibility: it surfaces the residual errors
   //     we intend to tighten over time.
   //   - CI's BLOCKING step runs pyright only over the already-error-clean subset
-  //     (jenny/bus jenny/command jenny/runtime jenny/session jenny/snapshot
-  //     jenny/gateway_runtime.py) via CLI path args, which reuse the settings below. That
+  //     (jafta/bus jafta/command jafta/runtime jafta/session jafta/snapshot
+  //     jafta/gateway_runtime.py) via CLI path args, which reuse the settings below. That
   //     subset is 0 errors today and must stay green.
   //
   // Tightening waves (promote a directory into the blocking CLI path list once it is
@@ -23,12 +23,12 @@
   // pydantic_compat is dynamic metaprogramming (homemade BaseModel) -> relaxed environment.
   "typeCheckingMode": "basic",
   "pythonVersion": "3.11",
-  "include": ["jenny"],
-  "exclude": ["jenny/templates", "jenny/skills", "**/__pycache__"],
+  "include": ["jafta"],
+  "exclude": ["jafta/templates", "jafta/skills", "**/__pycache__"],
   "reportMissingImports": false,
   "executionEnvironments": [
     {
-      "root": "jenny/pydantic_compat",
+      "root": "jafta/pydantic_compat",
       "reportGeneralTypeIssues": "none",
       "reportAttributeAccessIssue": "none"
     }

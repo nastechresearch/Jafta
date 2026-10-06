@@ -32,7 +32,7 @@ MASCOT_JS = UI_ASSETS / "shared" / "mascot.js"
 DRAG_JS = UI_ASSETS / "shared" / "mascot-drag.js"
 ANDROID = (
     Path(__file__).resolve().parents[2]
-    / "android" / "app" / "src" / "main" / "java" / "com" / "flagdizero" / "jafta"
+    / "android" / "app" / "src" / "main" / "java" / "com" / "nastechresearch" / "jafta"
 )
 
 node = requires_node

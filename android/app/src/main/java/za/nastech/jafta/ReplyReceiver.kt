@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
@@ -9,7 +9,7 @@ import androidx.core.app.RemoteInput
 
 /**
  * Riceve ciò che l'utente scrive nella tendina — la risposta rapida
- * (`RemoteInput`) su un alert di Jenny — e lo passa al gateway.
+ * (`RemoteInput`) su un alert di Jafta — e lo passa al gateway.
  *
  * Non esportato nel manifest, come `WakeReceiver`: non ha un intent-filter, e
  * un broadcast fabbricato da un'altra app non arriva. Lo raggiunge il nostro
@@ -18,7 +18,7 @@ import androidx.core.app.RemoteInput
  * extra: un'app con l'accesso alle notifiche (`NotificationListenerService`)
  * vede le azioni degli alert e può mandare questa con un testo suo, nel
  * `RemoteInput` o in `EXTRA_REPLY_RETRY_TEXT`. È lo stesso meccanismo con cui
- * un orologio o l'auto rispondono a una notifica, e Jenny lo riceve come testo
+ * un orologio o l'auto rispondono a una notifica, e Jafta lo riceve come testo
  * dell'utente. Il confine vero è quindi l'accesso alle notifiche, che l'utente
  * concede app per app; `exported="false"` chiude solo il resto.
  *
@@ -68,7 +68,7 @@ class ReplyReceiver : BroadcastReceiver() {
         // L'avviso a cui si è risposto **diventa** la conversazione, con dentro
         // ciò che l'utente ha appena scritto. Prima lo si cancellava: era un
         // ripiego per non lasciare in giro un avviso già evaso, e lasciava la
-        // risposta di Jenny senza un posto dove andare se non una scheda nuova.
+        // risposta di Jafta senza un posto dove andare se non una scheda nuova.
         //
         // Due guadagni, oltre alla forma. Android tiene viva la notifica a cui
         // si è risposto (`LIFETIME_EXTENDED_BY_DIRECT_REPLY`) **aspettando che

@@ -1,6 +1,6 @@
 # Configuration (config.json)
 
-Every key Jenny reads from `config.json`, with the default value that actually ships in the code and what changing it does.
+Every key Jafta reads from `config.json`, with the default value that actually ships in the code and what changing it does.
 
 Most people never need this page: the [Settings screen](./settings.md) covers the common choices, and everything it writes ends up here anyway. Come here for the settings that have no UI — heartbeat, timezone, tool toggles, snapshot retention, model presets — and for exact defaults and ranges.
 
@@ -13,21 +13,21 @@ The in-app file browser **never lists `config.json`**, along with its backup and
 Three things to know before you hand-edit it:
 
 - **Changes need an app restart.** The only hot-reload path in the app is the WebUI settings screen, which reloads model and provider on the fly after it writes. Nothing watches `config.json` for external edits.
-- **Broken JSON no longer blocks boot.** Jenny keeps the last good copy as `config.json.bak` and refreshes it before every successful save. If the live file cannot be read at startup, the backup is used and promoted; if there is no usable backup either, the unreadable file is set aside as `config.corrupt-<timestamp>.json` and Jenny starts on defaults — which means the API key has to be set up again. Either way the gateway comes online, and Settings shows a notice saying what happened and where the broken file went. Keep your own copy anyway before editing by hand.
+- **Broken JSON no longer blocks boot.** Jafta keeps the last good copy as `config.json.bak` and refreshes it before every successful save. If the live file cannot be read at startup, the backup is used and promoted; if there is no usable backup either, the unreadable file is set aside as `config.corrupt-<timestamp>.json` and Jafta starts on defaults — which means the API key has to be set up again. Either way the gateway comes online, and Settings shows a notice saying what happened and where the broken file went. Keep your own copy anyway before editing by hand.
 - **Prefer Settings when the setting exists there.** The UI validates ranges, serialises concurrent writes, and writes atomically (temp file + rename + fsync), so a save interrupted by the OS killing the app cannot leave a half-written file.
 
 ## Key naming
 
-Jenny writes camelCase (`apiKey`, `maxTokens`, `intervalS`), and this page uses camelCase throughout. snake_case is accepted on read (`api_key`, `max_tokens`, `interval_s`), so a hand-written config in either style loads fine — but a save from the UI rewrites the whole file in camelCase. There is one exception: `agents.defaults.idleCompactAfterMinutes` is read under that name and under its legacy name (`sessionTtlMinutes` / `session_ttl_minutes`), but **not** as `idle_compact_after_minutes`, which is silently ignored — a typo-shaped key like any other unknown one.
+Jafta writes camelCase (`apiKey`, `maxTokens`, `intervalS`), and this page uses camelCase throughout. snake_case is accepted on read (`api_key`, `max_tokens`, `interval_s`), so a hand-written config in either style loads fine — but a save from the UI rewrites the whole file in camelCase. There is one exception: `agents.defaults.idleCompactAfterMinutes` is read under that name and under its legacy name (`sessionTtlMinutes` / `session_ttl_minutes`), but **not** as `idle_compact_after_minutes`, which is silently ignored — a typo-shaped key like any other unknown one.
 
 Two more parsing rules worth knowing:
 
-- **Unknown keys are kept, not applied.** A typo in a key name does not raise, and the setting never applies — but the key survives in the file (a save from the UI no longer erases it) and startup logs a warning listing every key this version does not recognise. If an edit seems to do nothing, check that warning, then the spelling. The same rule is what lets a config written by a newer Jenny survive a downgrade. One limit: unknown keys *inside array items* — an extra field on a single provider entry, say — are not preserved, because merging list items would need a notion of which entry is which.
+- **Unknown keys are kept, not applied.** A typo in a key name does not raise, and the setting never applies — but the key survives in the file (a save from the UI no longer erases it) and startup logs a warning listing every key this version does not recognise. If an edit seems to do nothing, check that warning, then the spelling. The same rule is what lets a config written by a newer Jafta survive a downgrade. One limit: unknown keys *inside array items* — an extra field on a single provider entry, say — are not preserved, because merging list items would need a notion of which entry is which.
 - **`${VAR_NAME}` in any string value is resolved from the environment at startup**, in memory only. Resolved values are never written back, so editing through the WebUI preserves the placeholder. A referenced variable that is not set aborts startup with `Environment variable 'NAME' referenced in config is not set`. On Android there is no practical way to set environment variables for the app process, so this is a desktop/testing feature — on the phone, secrets live in the file (see [Security model](../internals/security-model.md)).
 
 ## providers
 
-The list of LLM endpoints you configured, plus which one is active. There is no built-in provider catalog: Jenny never infers an endpoint from a model name or key prefix.
+The list of LLM endpoints you configured, plus which one is active. There is no built-in provider catalog: Jafta never infers an endpoint from a model name or key prefix.
 
 ```json
 {
@@ -52,7 +52,7 @@ The list of LLM endpoints you configured, plus which one is active. There is no 
 | `providers.providers[].format` | `"openai_compat"` \| `"anthropic"` | required | Selects the wire format. The only field that decides which client is built. |
 | `providers.providers[].apiKey` | string \| null | `null` | Credential, stored in clear text. Local servers that ignore auth still usually want a placeholder such as `"EMPTY"`. |
 | `providers.providers[].apiBase` | string \| null | `null` | Full base URL including the version path. When unset: `https://api.openai.com/v1` for `openai_compat`, `https://api.anthropic.com` for `anthropic`. |
-| `providers.providers[].caBundle` | string \| null | `null` | Path to a PEM certificate to trust **in addition to** the bundled default roots, for a server whose certificate is signed by your own CA. A relative path is resolved against the workspace. If the file is missing or unreadable the provider refuses to be built — Jenny never falls back to the default bundle silently. Android's own certificate store is not consulted: the Python runtime inside the APK carries its own. |
+| `providers.providers[].caBundle` | string \| null | `null` | Path to a PEM certificate to trust **in addition to** the bundled default roots, for a server whose certificate is signed by your own CA. A relative path is resolved against the workspace. If the file is missing or unreadable the provider refuses to be built — Jafta never falls back to the default bundle silently. Android's own certificate store is not consulted: the Python runtime inside the APK carries its own. |
 | `providers.providers[].apiType` | `"auto"` \| `"chat_completions"` \| `"responses"` | `"auto"` | `openai_compat` only, and only against a direct `api.openai.com` base. `auto` uses Chat Completions and probes the Responses API when a reasoning effort is requested or the model is a known OpenAI reasoning model, with a circuit breaker that stops probing after repeated failures. |
 | `providers.providers[].extraHeaders` | object \| null | `null` | Headers merged into every request. |
 | `providers.providers[].extraBody` | object \| null | `null` | Body fields deep-merged into every request. |
@@ -110,9 +110,9 @@ A number outside its range in a file written by an older version is **clamped to
 | Key | Type | Default | Effect |
 |---|---|---|---|
 | `agents.defaults.timezone` | string | `""` | **Empty means auto**: the device timezone detected at startup, falling back to `UTC` only when detection fails. Resolved once per config load, and written back as `""` when it still matches the device — so it keeps following the phone. Set an IANA name (`"Europe/Rome"`) to pin it. Drives runtime time context, cron schedules without an explicit `tz`, and one-shot `at` times without an offset. |
-| `agents.defaults.botName` | string | `"Jenny"` | Assistant name in chat and in the welcome message. Requires a restart to fully apply. |
+| `agents.defaults.botName` | string | `"Jafta"` | Assistant name in chat and in the welcome message. Requires a restart to fully apply. |
 | `agents.defaults.botIcon` | string | `"✿"` | Emoji shown next to the name. No UI field; restart to apply. |
-| `agents.defaults.mascotMood` | bool | `true` | After each WebUI turn the mascot wears a face for a few seconds — happy, sad or angry — read from the emoji in the reply Jenny just gave (😊 is happy, 😔 is sad, 😤 is angry; code and quoted lines don't count, and a reply with no emotional emoji shows no face). No request is made to the model, so it costs nothing. Off means no faces. Read per turn: a change applies to the next turn without a restart. `mascotMoodModelPreset`, which chose the model for the old mood request, is retired: a file that still has it loads fine and drops it on the next write. |
+| `agents.defaults.mascotMood` | bool | `true` | After each WebUI turn the mascot wears a face for a few seconds — happy, sad or angry — read from the emoji in the reply Jafta just gave (😊 is happy, 😔 is sad, 😤 is angry; code and quoted lines don't count, and a reply with no emotional emoji shows no face). No request is made to the model, so it costs nothing. Off means no faces. Read per turn: a change applies to the next turn without a restart. `mascotMoodModelPreset`, which chose the model for the old mood request, is retired: a file that still has it loads fine and drops it on the next write. |
 | `agents.defaults.language` | string | `"it"` | Language for backend-generated text (welcome message and similar). Written once by onboarding from the UI locale. **Not** the UI language — that lives in the device's `localStorage`. |
 | `agents.defaults.orchestratorMode` | bool | `true` | The main agent runs as an orchestrator: it keeps `spawn`, the subagent-control tools, cron, `message`, `ui_view`, `long_task`, introspection, logs, location and **read-only** file access (`read_file`, `list_dir`), and loses the tools whose output bloats your conversation — `python_exec`, `write_file`/`edit_file`, `apply_patch`, `download_file`, the web tools, exec sessions and search. That work goes to subagents instead. Set it to `false` to give the main agent the full toolset back (the pre-0.5 behaviour); restart to apply. |
 | `agents.defaults.maxConcurrentSubagents` | int ≥ 1 | `3` | How many `spawn`ed subagents may run at once. One slot is reserved for short jobs: an ordinary spawn may take at most `limit - 1` slots (no reservation when the limit is `1`, which therefore serialises every fan-out). Beyond that, `spawn` returns an error so the agent can wait or reorder its work. Each slot is a live LLM request from a phone, so raising this hits your provider's rate limit and the battery well before it hits the CPU. Installations created before 0.5 carry the old default of `1` in their file and are moved to `3` once, with a warning in the log — see `configVersion` below. |
@@ -153,7 +153,7 @@ The channel the WebUI talks over. On-device, the runtime forces `host` and `port
 | `websocket.host` | string | `"127.0.0.1"` | Bind address. Forced to the runtime value on-device. |
 | `websocket.port` | int | `8765` | Off-device default. On the phone this is always overwritten with `18790`. |
 | `websocket.path` | string | `"/"` | WebSocket path. Must start with `/`. |
-| `websocket.tokenIssueSecret` | string | `""` | The install's shared secret. Generated once at first boot (32 random URL-safe bytes) and persisted here with `chmod 600`. It authenticates both the WebSocket handshake (`?token=…`) and the HTTP API (`Authorization: Bearer …` or `X-Jenny-Auth:`). Never regenerate it casually — the WebUI receives it through the bootstrap route. |
+| `websocket.tokenIssueSecret` | string | `""` | The install's shared secret. Generated once at first boot (32 random URL-safe bytes) and persisted here with `chmod 600`. It authenticates both the WebSocket handshake (`?token=…`) and the HTTP API (`Authorization: Bearer …` or `X-Jafta-Auth:`). Never regenerate it casually — the WebUI receives it through the bootstrap route. |
 | `websocket.websocketRequiresToken` | bool | `true` | Requires the token in the handshake. |
 | `websocket.allowFrom` | string[] | `["*"]` | Client-ID allowlist for connections. This is the real key — there is no `channels.*.allowFrom` anywhere in the codebase. |
 | `websocket.streaming` | bool | `true` | Stream assistant text as it is generated. |
@@ -191,7 +191,7 @@ Toggles for the built-in tool groups. Only web search, location and SSH (`tools.
 | Key | Type | Default | Effect |
 |---|---|---|---|
 | `tools.file.enable` | bool | `true` | Registers the filesystem tools (`read_file`, `write_file`, `edit_file`, `apply_patch`, `list_dir`, `find_files`, `grep`). Off means the agent cannot touch files at all. |
-| `tools.file.exposePackageSource` | bool | `true` | Adds Jenny's own extracted Python source as an extra **read-only** root, so the agent can inspect the framework it runs on. Never writable. |
+| `tools.file.exposePackageSource` | bool | `true` | Adds Jafta's own extracted Python source as an extra **read-only** root, so the agent can inspect the framework it runs on. Never writable. |
 
 ### tools.pythonExec
 
@@ -245,10 +245,10 @@ Access to remote machines. Both gates are closed by default and **both are neces
           "alias": "nas",
           "host": "nas.home.lan",
           "port": 22,
-          "username": "jenny",
+          "username": "jafta",
           "description": "The home NAS",
           "auth": "key",
-          "jobLogDir": "/tmp/jenny-jobs"
+          "jobLogDir": "/tmp/jafta-jobs"
         }
       ]
     }
@@ -277,9 +277,9 @@ Per host:
 | `username` | string | required | Login account. |
 | `description` | string | `""` | Shown **to the model** by `ssh_hosts`, so it can pick between machines and tell you which one it acted on. |
 | `hostKeyFingerprint` | string \| null | `null` | **Display only.** The enforcement is the `known_hosts` file next to the private key; without a matching line there, the connection is refused no matter what this says. Required in both `auth` modes. |
-| `auth` | `"key"` \| `"password"` | `"key"` | How Jenny logs in. The default is unchanged, so hosts registered before this option existed keep behaving exactly as they did. |
+| `auth` | `"key"` \| `"password"` | `"key"` | How Jafta logs in. The default is unchanged, so hosts registered before this option existed keep behaving exactly as they did. |
 | `password` | string \| null | `null` | Only read when `auth` is `"password"`, where it is mandatory — Settings refuses to save a password host without one. **Stored in clear text in `config.json`**, like `telegram.botToken` and `providers[].apiKey`. Never returned by the settings API (the payload carries a `has_password` boolean instead), never in a tool argument, never in a tool result, and kept out of `repr()` so it can't fall into a log line. Switching a host back to `auth: "key"` through Settings clears it. |
-| `jobLogDir` | string | `"/tmp/jenny-jobs"` | Where `ssh_job` writes its per-job log and exit-code files **on the server**. No field in Settings — config-only. Nothing cleans these up, and `/tmp` is wiped on reboot on most systems, so point it somewhere durable if you want old job output to survive. |
+| `jobLogDir` | string | `"/tmp/jafta-jobs"` | Where `ssh_job` writes its per-job log and exit-code files **on the server**. No field in Settings — config-only. Nothing cleans these up, and `/tmp` is wiped on reboot on most systems, so point it somewhere durable if you want old job output to survive. |
 
 The private key (`<alias>_ed25519`, one per host) and `known_hosts` live in `<filesDir>/ssh` — **outside** the workspace, alongside it. That is why the agent's file tools cannot read them, and also why they are absent from snapshots and from an exported `.jbk`: a restore brings back this host list but no keys.
 
@@ -291,8 +291,8 @@ A `password` does **not** get that protection, and the difference is worth stati
 |---|---|---|---|
 | `tools.my.enable` | bool | `true` | Registers the `my` self-inspection tool. |
 | `tools.my.allowSet` | bool | **`false`** | The only restrictive default in the whole tools section. When false, `my` is read-only and a write attempt returns `Error: set is disabled (tools.my.allow_set is false)`. |
-| `tools.introspect.enable` | bool | `true` | Registers `get_source` — read-only access to Jenny's own package source. |
-| `tools.diagnostics.enable` | bool | `true` | Registers `get_recent_logs` (in-memory buffer, ~500 lines, cleared on restart). It is the first stop for troubleshooting: ask Jenny to check her own logs. |
+| `tools.introspect.enable` | bool | `true` | Registers `get_source` — read-only access to Jafta's own package source. |
+| `tools.diagnostics.enable` | bool | `true` | Registers `get_recent_logs` (in-memory buffer, ~500 lines, cleared on restart). It is the first stop for troubleshooting: ask Jafta to check her own logs. |
 
 `tools.restrictToWorkspace` also appears under `tools` — it is a **mirror**, not a setting. See below.
 
@@ -308,7 +308,7 @@ The canonical home for the two policy switches.
 Two things people get wrong here:
 
 - **The old location still loads, but is not where you edit.** A legacy config carrying `tools.restrictToWorkspace` / `tools.ssrfWhitelist` and no `security` block is migrated into `security` automatically by a validator, and `tools.restrictToWorkspace` is then kept in sync as a mirror the tool layer reads. Write to `security`.
-- **The SSRF whitelist covers agent tools, not provider calls.** It gates `web_fetch`, `download_file`, the `python_exec` HTTP helpers, media ingestion, and — through a looser blocklist that permits private LAN ranges — Jenny App servers and `tools.ssh` targets. Requests to your LLM endpoint do not go through it — a self-hosted model on a private address works without whitelisting anything (see [Local models](./local-models.md)).
+- **The SSRF whitelist covers agent tools, not provider calls.** It gates `web_fetch`, `download_file`, the `python_exec` HTTP helpers, media ingestion, and — through a looser blocklist that permits private LAN ranges — Jafta App servers and `tools.ssh` targets. Requests to your LLM endpoint do not go through it — a self-hosted model on a private address works without whitelisting anything (see [Local models](./local-models.md)).
 
 Full threat model: [Security model](../internals/security-model.md).
 
@@ -316,13 +316,13 @@ Full threat model: [Security model](../internals/security-model.md).
 
 Anti-doze: the wake lock, the scheduled wake-ups, and the outage log behind **Background activity** in the workshop's Brain drawer.
 
-The problem this section exists for is worth stating plainly, because it is not obvious: **a foreground service keeps the *process* alive, not the *processor*.** With the screen off the phone suspends, the agent's own timers stop advancing, and anything waiting on one waits with them. A job that fires late isn't late because the code was slow — it's late because the clock it was sleeping on was frozen. Only a `PARTIAL_WAKE_LOCK` prevents the CPU suspending, and only an alarm registered with Android can wake it up again at a known moment. These keys decide how much of each Jenny asks for.
+The problem this section exists for is worth stating plainly, because it is not obvious: **a foreground service keeps the *process* alive, not the *processor*.** With the screen off the phone suspends, the agent's own timers stop advancing, and anything waiting on one waits with them. A job that fires late isn't late because the code was slow — it's late because the clock it was sleeping on was frozen. Only a `PARTIAL_WAKE_LOCK` prevents the CPU suspending, and only an alarm registered with Android can wake it up again at a known moment. These keys decide how much of each Jafta asks for.
 
 | Key | Type | Default | Effect |
 |---|---|---|---|
-| `power.keepAwake` | `"off"` \| `"turns"` \| `"always"` | **`"turns"`** | How much of the time Jenny holds a wake lock. `turns` takes one around real work — an agent turn, a cron/Dream/heartbeat job, an SSH command, a Telegram update being processed — and releases it immediately after. `always` holds one for the entire life of the gateway service: nothing drifts, and it costs real battery, so it's the setting for a phone that lives on a charger. `off` is the pre-0.6.6 behaviour, kept as an escape hatch if the lock misbehaves on some device. A value that isn't one of the three is a typo, not a reason to refuse to boot: it's logged and treated as `turns`. **This is the one key here with a UI control** (Background activity, in the workshop's Brain drawer), and it takes effect at the next gateway restart — the service-lifetime lock is taken once, at startup. |
+| `power.keepAwake` | `"off"` \| `"turns"` \| `"always"` | **`"turns"`** | How much of the time Jafta holds a wake lock. `turns` takes one around real work — an agent turn, a cron/Dream/heartbeat job, an SSH command, a Telegram update being processed — and releases it immediately after. `always` holds one for the entire life of the gateway service: nothing drifts, and it costs real battery, so it's the setting for a phone that lives on a charger. `off` is the pre-0.6.6 behaviour, kept as an escape hatch if the lock misbehaves on some device. A value that isn't one of the three is a typo, not a reason to refuse to boot: it's logged and treated as `turns`. **This is the one key here with a UI control** (Background activity, in the workshop's Brain drawer), and it takes effect at the next gateway restart — the service-lifetime lock is taken once, at startup. |
 | `power.wakelockRotateMin` | int 0–240 | `50` | Minutes after which the service-lifetime lock (`keepAwake: "always"` only) is released and immediately re-acquired. `0` disables rotation. This is not hygiene for its own sake: PowerGenie, the battery manager on Honor/Huawei, kills an app that has held a wake lock for more than 60 minutes, so the default sits deliberately under that line. Per-turn locks are short-lived and never rotated. |
-| `power.watchdogEnabled` | bool | `true` | A self-chaining alarm that checks whether the gateway is still alive and starts it again if it isn't. It exists because the gateway can be killed without anything noticing — nothing in the app is in a position to report its own death. Setting this to `false` is also how you dismantle a chain armed by an earlier run: the alarms live in Android's `AlarmManager`, not in Jenny's process, so nothing disarms them on their own. |
+| `power.watchdogEnabled` | bool | `true` | A self-chaining alarm that checks whether the gateway is still alive and starts it again if it isn't. It exists because the gateway can be killed without anything noticing — nothing in the app is in a position to report its own death. Setting this to `false` is also how you dismantle a chain armed by an earlier run: the alarms live in Android's `AlarmManager`, not in Jafta's process, so nothing disarms them on their own. |
 | `power.watchdogIntervalMin` | int 5–120 | `15` | Base interval between watchdog checks. The interval adapts rather than holding steady: ×2 with the screen off, ×4 in deep Doze. Spacing them out there is not battery thrift — an app that wakes the system on a fixed beat while it should be idle is exactly what OEM battery managers flag and then kill. The gateway is considered dead once its heartbeat is three (worst-case) periods stale; a false positive costs one no-op start, a false negative leaves the agent down until you notice. |
 | `power.alarmDrivenCron` | bool | `true` | Arms an OS alarm for the scheduler's next real deadline, alongside the ordinary in-process timer. The timer sleeps on a clock that stops while the SoC is suspended; the alarm doesn't. The alarm targets the true next deadline, not the scheduler's shorter internal poll, so an idle phone isn't woken every few minutes for nothing. |
 | `power.alarmClockFallback` | bool | `true` | An 8-hourly wake-up registered as an *alarm clock* — the one alarm category no ROM dares suppress. It is the last net under everything else, but only where it can actually register as one: measured on-device, `setAlarmClock` still needs the exact-alarm permission, and without it this net degrades to the same inexact alarm as the rest rather than outranking them. It has a flag of its own for a cosmetic reason that is nonetheless real: on many ROMs a pending alarm-clock lights the alarm icon in the status bar. Three wake-ups a day, rather than one every quarter hour, is what keeps it under any "this app wakes the system too much" heuristic. Switching it off *cancels* the queued alarm rather than merely not re-arming it — otherwise the icon you wanted gone would linger for up to eight hours. |
@@ -363,13 +363,13 @@ Local versioning of the workspace, plus the key derivation used by encrypted bac
 | `snapshots.pbkdf2Iterations` | int 100000–10000000 | `600000` | PBKDF2 iterations for the exported `.jbk` backup key. The ceiling mirrors the container format's own limit. |
 | `snapshots.excludeGlobs` | string[] | see below | Paths never captured. |
 
-Default excludes: `ui/**`, `logs/**`, `.jenny/logs/**`, `.jenny/snapshots/**`, `.jenny/backup_staging/**`, `**/__pycache__/**`, `*.tmp`, `*.tmp.*`. See [Backup and restore](../using/backup.md).
+Default excludes: `ui/**`, `logs/**`, `.jafta/logs/**`, `.jafta/snapshots/**`, `.jafta/backup_staging/**`, `**/__pycache__/**`, `*.tmp`, `*.tmp.*`. See [Backup and restore](../using/backup.md).
 
 ## apps
 
 | Key | Type | Default | Effect |
 |---|---|---|---|
-| `apps.enabled` | bool | `true` | Enables the Jenny Apps runtime and the dynamic `<slug>_<action>` tools it registers. |
+| `apps.enabled` | bool | `true` | Enables the Jafta Apps runtime and the dynamic `<slug>_<action>` tools it registers. |
 | `apps.httpTimeoutS` | float 1–120 | `20.0` | Timeout for an app's outbound HTTP proxy calls. |
 | `apps.maxCollectionBytes` | int | `5000000` | Per-collection storage ceiling (5 MB). Writes past it fail with `413`. |
 
@@ -377,7 +377,7 @@ See [Mini-apps](../using/mini-apps.md).
 
 ## updates
 
-The in-app update check. It is the one outbound connection you did not switch on, so it is documented here rather than left to a contributor page — see [Privacy and security](https://github.com/flagdizero/jenny-android-ai-agent#privacy-and-security) in the README for what it does and does not send.
+The in-app update check. It is the one outbound connection you did not switch on, so it is documented here rather than left to a contributor page — see [Privacy and security](https://github.com/nastechresearch/jafta-android-ai-agent#privacy-and-security) in the README for what it does and does not send.
 
 | Key | Type | Default | Effect |
 |---|---|---|---|
@@ -390,24 +390,24 @@ Turning `enabled` off stops the check; the `install_update` tool remains availab
 
 ## floating
 
-The floating mascot: Jenny above your other apps. Tap her and a text field opens; what you write becomes an ordinary turn in the one conversation — same session, same memory, all of it there when you next open the app — and the answer comes back in a bubble over her head. The bubble shows the last reply only; tapping it opens the full chat.
+The floating mascot: Jafta above your other apps. Tap her and a text field opens; what you write becomes an ordinary turn in the one conversation — same session, same memory, all of it there when you next open the app — and the answer comes back in a bubble over her head. The bubble shows the last reply only; tapping it opens the full chat.
 
 | Key | Type | Default | Effect |
 |---|---|---|---|
-| `floating.enabled` | bool | `false` | Whether the window exists. Off by default because switching it on needs Android's `SYSTEM_ALERT_WINDOW`, granted on a system screen — a default of `true` would promise a window Android wouldn't open. The switch is **Floating mascot**, on the home's **Settings → Jenny** page, and applies immediately, without restarting the app. |
+| `floating.enabled` | bool | `false` | Whether the window exists. Off by default because switching it on needs Android's `SYSTEM_ALERT_WINDOW`, granted on a system screen — a default of `true` would promise a window Android wouldn't open. The switch is **Floating mascot**, on the home's **Settings → Jafta** page, and applies immediately, without restarting the app. |
 | `floating.replyHoldS` | int 5–120 | `20` | Seconds the bubble stays up after a reply before the mascot goes back to resting. Not a reading time — whoever just wrote the question is watching — but how long a forgotten reply may sit on top of someone else's app. Typing resets the countdown. |
 
-She hides herself whenever Jenny's own UI is in the foreground: this app is the phone's launcher, and the home screen already has a mascot in it. The window lives inside the gateway service and is destroyed with it, so it can never sit there with no agent behind it. See [Android permissions](android-permissions.md#requested-permissions) for what the overlay permission does and does not allow.
+She hides herself whenever Jafta's own UI is in the foreground: this app is the phone's launcher, and the home screen already has a mascot in it. The window lives inside the gateway service and is destroyed with it, so it can never sit there with no agent behind it. See [Android permissions](android-permissions.md#requested-permissions) for what the overlay permission does and does not allow.
 
 ## home
 
-The home screen's pages. The home is a row of pages you swipe between, the way any launcher works, and their names run along the top of the screen: the page you are on is written large, the others small. Tap a name to jump to it, or swipe sideways. Four pages are always there — **Apps** (the app drawer), **Jenny** (the conversation), **Notebooks** and **Settings** — and the home always opens on Jenny. Beside them you can keep pages of your own: press and hold a mini-app in the drawer or a notebook in Notebooks and choose *Add as a page* (a mini-app that opens outside Jenny, or a broken one, cannot be a page).
+The home screen's pages. The home is a row of pages you swipe between, the way any launcher works, and their names run along the top of the screen: the page you are on is written large, the others small. Tap a name to jump to it, or swipe sideways. Four pages are always there — **Apps** (the app drawer), **Jafta** (the conversation), **Notebooks** and **Settings** — and the home always opens on Jafta. Beside them you can keep pages of your own: press and hold a mini-app in the drawer or a notebook in Notebooks and choose *Add as a page* (a mini-app that opens outside Jafta, or a broken one, cannot be a page).
 
-Every page can be moved, the four fixed ones included: press and hold a name at the top and drag it where you want it. The pages you added can also be removed there; the four fixed ones cannot, or a home without its Settings page would have no way back to them. Back always returns to Jenny, wherever it sits in the row.
+Every page can be moved, the four fixed ones included: press and hold a name at the top and drag it where you want it. The pages you added can also be removed there; the four fixed ones cannot, or a home without its Settings page would have no way back to them. Back always returns to Jafta, wherever it sits in the row.
 
 | Key | Type | Default | Effect |
 |---|---|---|---|
-| `home.pages` | list | `[]` | The pages you added. Each entry is `{"id": "...", "kind": "...", "ref": "..."}`. `kind` is `app` (a Jenny App, `ref` is its slug) or `conversation` (a notebook's chat, `ref` is `project:<name>`). At most 8, the ids must differ, and none may be one of the fixed page ids below. Pages that were rooms of the home (kind `stanza` in the old `casa` block, see below) existed briefly and were retired: a file that still has one loads normally and simply loses that page, instead of failing validation. |
+| `home.pages` | list | `[]` | The pages you added. Each entry is `{"id": "...", "kind": "...", "ref": "..."}`. `kind` is `app` (a Jafta App, `ref` is its slug) or `conversation` (a notebook's chat, `ref` is `project:<name>`). At most 8, the ids must differ, and none may be one of the fixed page ids below. Pages that were rooms of the home (kind `stanza` in the old `casa` block, see below) existed briefly and were retired: a file that still has one loads normally and simply loses that page, instead of failing validation. |
 | `home.order` | list | `[]` | Where each page sits, left to right: the fixed ids `app`, `chat`, `notebooks`, `settings` and the `id` of each page you added. Empty means you never moved anything, and reads as `app, chat, <your pages>, notebooks, settings`. |
 
 Up to version 0.11.0 this block was called `casa`, with Italian names inside (`schermate`, `ordine`, the kind `conversazione`, the fixed ids `quaderni` and `impostazioni`). A file that still has it loads with everything translated, and the old block is dropped the first time the file is written.

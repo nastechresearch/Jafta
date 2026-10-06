@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Tutto il tema dell'app sta qui; Theme.Jenny aggiunge solo, da API 31
+    <!-- Tutto il tema dell'app sta qui; Theme.Jafta aggiunge solo, da API 31
          in su, lo sfondo dello splash di sistema (values-v31/themes.xml). -->
-    <style name="Base.Theme.Jenny" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Base.Theme.Jafta" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Colori della starting window, cioè dei pochi istanti prima di
              onCreate: sono quelli di `synthwave`, il tema di default della WebUI.
              Da onCreate in poi finestra, barre, loading view ed error view
@@ -14,5 +14,5 @@
         <item name="android:windowBackground">#111013</item>
     </style>
 
-    <style name="Theme.Jenny" parent="Base.Theme.Jenny" />
+    <style name="Theme.Jafta" parent="Base.Theme.Jafta" />
 </resources>

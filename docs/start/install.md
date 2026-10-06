@@ -1,19 +1,19 @@
-# Installing Jenny
+# Installing Jafta
 
-Jenny is not on the Play Store. The normal way to get it onto a phone is to download the
+Jafta is not on the Play Store. The normal way to get it onto a phone is to download the
 signed APK from GitHub Releases, verify it, and sideload it. Building from source is the
 alternative, described further down, for anyone who'd rather not run someone else's binary.
 
 ## Download the APK
 
-Grab it from [**Releases**](https://github.com/flagdizero/jenny-android-ai-agent/releases/latest). It targets Android 8.0 or newer and is
+Grab it from [**Releases**](https://github.com/nastechresearch/jafta-android-ai-agent/releases/latest). It targets Android 8.0 or newer and is
 about 72 MB, most of which is the embedded CPython runtime.
 
 Verify what you downloaded before installing it. The expected hash is published on the
 release page:
 
 ```bash
-shasum -a 256 jenny-1.0.0.apk
+shasum -a 256 jafta-1.0.0.apk
 ```
 
 You'll have to allow installation from outside the Play Store; Android will prompt you for
@@ -42,7 +42,7 @@ needs a computer, not just the phone.
 | USB debugging enabled on the device, and the device visible to `adb` | See below |
 | Network access on the first build | Gradle downloads the Chaquopy Python 3.11 runtime and every wheel in `requirements-android.lock.txt` (17 pinned packages, direct and transitive) the first time you build |
 
-You do **not** need anything installed on the phone beyond the APK itself. Jenny bundles a full Python 3.11 interpreter and its entire dependency set inside the app via [Chaquopy](https://chaquo.com/chaquopy/) — there is no separate Python install, no Termux, nothing to `pip install` on-device.
+You do **not** need anything installed on the phone beyond the APK itself. Jafta bundles a full Python 3.11 interpreter and its entire dependency set inside the app via [Chaquopy](https://chaquo.com/chaquopy/) — there is no separate Python install, no Termux, nothing to `pip install` on-device.
 
 The build targets four Android ABIs (`arm64-v8a`, `armeabi-v7a`, `x86_64`, `x86`), so the same command works whether the target is a real phone or an x86 emulator image.
 
@@ -76,14 +76,14 @@ For day-to-day use on your own device, `installDebug` is the right command; ther
 
 A few things worth knowing before you install, none of them bugs — all deliberate, and all a little surprising the first time:
 
-- **Jenny declares itself as a home-screen launcher**, not just an app. Alongside the normal launcher/app-drawer entry, its manifest also lists the `HOME` intent category. Press the phone's Home button and Android may offer Jenny as a candidate default launcher. This is intentional — the project is designed as much for a spare "phone in a drawer acting as a server" as for a primary phone — but it will surprise you if you install it on your daily driver. See [Set it as your launcher](launcher-setup.md) for what that actually looks like and how to say no.
-- **The gateway runs as a persistent foreground service**, which means an ongoing, low-priority, silent notification stays in your notification shade the entire time Jenny is running: "Jenny is running", with the body "Ready to reply and to run scheduled tasks". It follows your *phone's* language (Italian or English), not Jenny's own UI language setting, because it's an Android string resource rather than part of the WebUI. **Tap it to open Jenny** — which is the fastest way back into the app if you're not using Jenny as your launcher. Its notification channel is called "Background service" and carries a description explaining that Android requires the notification and that it stays until Jenny is stopped, so the shade itself can answer "what is this and why can't I dismiss it?". The notification can't be swiped away without stopping the service (which also stops the agent), and it deliberately survives you swiping Jenny out of Recents (`stopWithTask=false`) — closing the recent-apps card does not stop Jenny.
-- **Jenny restarts itself after a device reboot.** A boot receiver relaunches the gateway service automatically, so after you restart the phone, Jenny comes back on its own without you opening the app — useful for the "server in a drawer" case, but worth knowing if you expect a fresh reboot to leave things off. Coming back after Android has *killed* it is a different matter: on Android 12+ that needs exact alarms allowed or the battery-optimization exemption, and without either Jenny posts a **"Jenny has stopped — Tap to restart her"** notification instead. See [Android permissions](../reference/android-permissions.md).
-- **Cloud backup is on, with a real caveat.** The app has Android's `allowBackup` flag enabled with no exclusion rules configured. In practice this means Google's automatic app-data backup can sweep up Jenny's private storage — including `config.json`, which stores your LLM provider API keys in plain text. If you use Android's device backup/Google One backup, your API keys can end up on Google's servers as a side effect, with no separate encryption of Jenny's making. See [Security model](../internals/security-model.md) and [Privacy](../internals/privacy.md) for the full picture; if this bothers you, disable app backup for Jenny in your phone's backup settings.
+- **Jafta declares itself as a home-screen launcher**, not just an app. Alongside the normal launcher/app-drawer entry, its manifest also lists the `HOME` intent category. Press the phone's Home button and Android may offer Jafta as a candidate default launcher. This is intentional — the project is designed as much for a spare "phone in a drawer acting as a server" as for a primary phone — but it will surprise you if you install it on your daily driver. See [Set it as your launcher](launcher-setup.md) for what that actually looks like and how to say no.
+- **The gateway runs as a persistent foreground service**, which means an ongoing, low-priority, silent notification stays in your notification shade the entire time Jafta is running: "Jafta is running", with the body "Ready to reply and to run scheduled tasks". It follows your *phone's* language (Italian or English), not Jafta's own UI language setting, because it's an Android string resource rather than part of the WebUI. **Tap it to open Jafta** — which is the fastest way back into the app if you're not using Jafta as your launcher. Its notification channel is called "Background service" and carries a description explaining that Android requires the notification and that it stays until Jafta is stopped, so the shade itself can answer "what is this and why can't I dismiss it?". The notification can't be swiped away without stopping the service (which also stops the agent), and it deliberately survives you swiping Jafta out of Recents (`stopWithTask=false`) — closing the recent-apps card does not stop Jafta.
+- **Jafta restarts itself after a device reboot.** A boot receiver relaunches the gateway service automatically, so after you restart the phone, Jafta comes back on its own without you opening the app — useful for the "server in a drawer" case, but worth knowing if you expect a fresh reboot to leave things off. Coming back after Android has *killed* it is a different matter: on Android 12+ that needs exact alarms allowed or the battery-optimization exemption, and without either Jafta posts a **"Jafta has stopped — Tap to restart her"** notification instead. See [Android permissions](../reference/android-permissions.md).
+- **Cloud backup is on, with a real caveat.** The app has Android's `allowBackup` flag enabled with no exclusion rules configured. In practice this means Google's automatic app-data backup can sweep up Jafta's private storage — including `config.json`, which stores your LLM provider API keys in plain text. If you use Android's device backup/Google One backup, your API keys can end up on Google's servers as a side effect, with no separate encryption of Jafta's making. See [Security model](../internals/security-model.md) and [Privacy](../internals/privacy.md) for the full picture; if this bothers you, disable app backup for Jafta in your phone's backup settings.
 
 ## Permissions
 
-Jenny requests a specific, short list of permissions at install and at first run — see [Android permissions](../reference/android-permissions.md) for the full table of what each one does and what happens if you say no. Notably, it never asks for the camera permission (photo capture is handed off to your phone's own camera app) or any storage permission (file saves and backups go through Android's Storage Access Framework and system pickers instead).
+Jafta requests a specific, short list of permissions at install and at first run — see [Android permissions](../reference/android-permissions.md) for the full table of what each one does and what happens if you say no. Notably, it never asks for the camera permission (photo capture is handed off to your phone's own camera app) or any storage permission (file saves and backups go through Android's Storage Access Framework and system pickers instead).
 
 ## After installing
 
@@ -91,7 +91,7 @@ The app opens straight into a loading screen the first time — that's normal, a
 
 ## See also
 
-- [Introduction](introduction.md) — what Jenny is before you install it
+- [Introduction](introduction.md) — what Jafta is before you install it
 - [First run](first-run.md) — what happens the first time you open the app
 - [Set it as your launcher](launcher-setup.md) — the HOME-launcher behavior, in detail
 - [Android permissions](../reference/android-permissions.md) — every permission, why, and what denial does

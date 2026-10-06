@@ -19,7 +19,7 @@ from jafta.snapshot.locations import backup_staging_dir_for
 from jafta.webui.backup_routes import BACKUP_DATA_HEADER
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-KOTLIN_MAIN = REPO_ROOT / "android/app/src/main/java/com/flagdizero/jafta/MainActivity.kt"
+KOTLIN_MAIN = REPO_ROOT / "android/app/src/main/java/za/nastech/jafta/MainActivity.kt"
 UI_ASSETS = REPO_ROOT / "jafta/templates/ui/assets"
 BACKUP_FLOW_JS = UI_ASSETS / "shared/backup-flow.js"
 API_CLIENT_JS = UI_ASSETS / "shared/api-client.js"

@@ -17,7 +17,7 @@ from support.kotlin_source import read_source
 
 ROOT = Path(__file__).resolve().parents[2]
 SETTINGS_JS = ROOT / "jafta" / "templates" / "ui" / "assets" / "mobile-settings.js"
-MAIN_ACTIVITY = ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "flagdizero" / "jafta" / "MainActivity.kt"
+MAIN_ACTIVITY = ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "nastechresearch" / "jafta" / "MainActivity.kt"
 
 
 @requires_node

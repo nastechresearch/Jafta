@@ -57,7 +57,7 @@
 
   function refusal(kind) {
     return new DOMException(
-      'Jenny: ' + kind + ' to a private or local address refused', 'SecurityError');
+      'Jafta: ' + kind + ' to a private or local address refused', 'SecurityError');
   }
 
   // Sostituisce window[name] con un costruttore che controlla l'URL, tenendo
@@ -90,7 +90,7 @@
     var Native = window[name];
     if (typeof Native !== 'function') return;
     var Forbidden = function () {
-      throw new DOMException('Jenny: ' + name + ' is disabled in this browser', 'NotSupportedError');
+      throw new DOMException('Jafta: ' + name + ' is disabled in this browser', 'NotSupportedError');
     };
     Forbidden.prototype = Native.prototype;
     try {

@@ -1,14 +1,14 @@
 # image_source/
 
-Sorgenti "grezze" (disegnate dall'artista) dell'arte di Jenny e i due script
+Sorgenti "grezze" (disegnate dall'artista) dell'arte di Jafta e i due script
 che le esportano verso il resto del repo. Niente in questa cartella viene
 letto a runtime: è solo il punto di partenza della build degli asset.
 
 ## Cosa c'è
 
 - `icon.png` — sorgente dell'icona app (viso + linee, sfondo trasparente).
-- `jenny-side.PNG`, `jenny-side-talk.PNG`, `jenny-hang.PNG`, `jenny-fall.PNG`,
-  `jenny-ground.PNG`, `jenny-walk1.PNG`, `jenny-walk2.PNG`, `hello1/2.PNG`,
+- `jafta-side.PNG`, `jafta-side-talk.PNG`, `jafta-hang.PNG`, `jafta-fall.PNG`,
+  `jafta-ground.PNG`, `jafta-walk1.PNG`, `jafta-walk2.PNG`, `hello1/2.PNG`,
   `idle.PNG` — pose della mascotte, canvas 3000×3000, tutte cablate in
   `gen_pose_webp.py`.
 - `think.PNG`, `talk_1a.PNG`, `talk_1b.PNG` — pose cotte di prima dei due
@@ -56,7 +56,7 @@ si vede.
 | facce | `face_front_normal`, `face_front_normal_talk` | la coppia del parlato |
 | | `face_front_thinking` | mentre aspetta la risposta |
 | | `face_front_happy`, `face_front_sad`, `face_front_angry` | le tre reazioni |
-| di lato | `body_side_idle` | il corpo di `jenny-side` senza faccia |
+| di lato | `body_side_idle` | il corpo di `jafta-side` senza faccia |
 | | `face_side_happy`, `face_side_sad`, `face_side_angry` | le tre reazioni al bordo (dal 28/09/2026) |
 
 In riserva, **importati e non esportati** (10): `face_{front,side}_{happy,sad,angry}_talk`
@@ -71,12 +71,12 @@ Attenzione ai nomi del saluto: `body_front_wave1` è il corpo di `hello1` e
 incrociati, e all'import si sono raddrizzati.
 
 **Manca la coppia neutra `side`** (`face_side_normal` e il suo `_talk`): non
-serve, perché al bordo senza umore resta la posa cotta `jenny-side`, e con un
+serve, perché al bordo senza umore resta la posa cotta `jafta-side`, e con un
 umore la faccia è quella dell'umore (`SIDE_FACE`, dal 28/09/2026: prima al bordo
 l'umore non si mostrava, e l'utente lo cercava). Se
 un giorno servisse, **si deriva dall'arte cotta** invece di disegnarla:
-`body_side_idle` è `jenny-side` senza faccia, quindi basta tenere di
-`jenny-side.PNG` i pixel che si discostano dal corpo e azzerare l'alfa
+`body_side_idle` è `jafta-side` senza faccia, quindi basta tenere di
+`jafta-side.PNG` i pixel che si discostano dal corpo e azzerare l'alfa
 altrove. Verificato: ricomposta torna con uno scarto massimo di 15 su 13 pixel
 di frangia (bocca chiusa) e di 2 su nessun pixel (bocca aperta).
 
@@ -135,12 +135,12 @@ script **non scala, non ritaglia e non normalizza nulla**: ogni webp è il
 quadrato intero ridotto a 768×768 (`SIZE`) con lo stesso fattore per tutti,
 qualità 80. La scala relativa fra le pose non viene mai toccata a valle.
 
-A runtime (`jenny/templates/ui/assets/shared/mascot-drag.js`) il layer di volo
-`.jenny-fly` coincide esattamente col box della mascotte — tutte le img sono
+A runtime (`jafta/templates/ui/assets/shared/mascot-drag.js`) il layer di volo
+`.jafta-fly` coincide esattamente col box della mascotte — tutte le img sono
 `width:100%` dello stesso quadrato condiviso, quindi nessuna scala o offset
 viene calcolata lì. L'unica costante calcolata a **build time** in
 `gen_pose_webp.py` è il pivot della posa appesa (`HAND_PIVOT`): la punta
-della manica alzata ("la mano") su `jenny-hang.png`, misurata a mano perché
+della manica alzata ("la mano") su `jafta-hang.png`, misurata a mano perché
 la sagoma in quella zona è ambigua (le ciocche superano la manica in
 altezza). Lo script stampa `PIVOT_X`/`PIVOT_Y` come frazione del canvas: quei
 due valori vanno copiati a mano nelle costanti `PIVOT_X`/`PIVOT_Y` di
@@ -148,7 +148,7 @@ due valori vanno copiati a mano nelle costanti `PIVOT_X`/`PIVOT_Y` di
 
 ### Regole di utilizzo delle pose (runtime, non generazione)
 
-Gli stati "in posizione" (`shared/jenny-mascot.js`, lo stesso per casa e
+Gli stati "in posizione" (`shared/jafta-mascot.js`, lo stesso per casa e
 officina dal 24/09/2026), a mascotte intera sono **due livelli**, corpo e
 faccia (v. *Due livelli* sopra):
 
@@ -181,18 +181,18 @@ la mascotte viene trascinata:
   di `fall` congelata al momento del contatto.
 - **walk1**/**walk2**: alternate ogni `WALK_FRAME_MS` (500ms) durante il
   rientro verso il bordo.
-- **hello1**/**hello2**: saluto a due frame usato dalla mini Jenny
+- **hello1**/**hello2**: saluto a due frame usato dalla mini Jafta
   dell'onboarding (`mobile-onboarding.js`): cade dall'alto (`fall`), atterra
   stordita (`ground`), poi alterna hello1/hello2 e si ferma in `idle`.
 
 ### Output
 
 `FILES` mappa nome-posa → PNG sorgente e scrive **10 webp** cotti in
-`jenny/templates/ui/assets/`, uno per posa:
-`jenny-{side,side-talk,hang,fall,ground,walk1,walk2,hello1,hello2,idle}.webp`.
+`jafta/templates/ui/assets/`, uno per posa:
+`jafta-{side,side-talk,hang,fall,ground,walk1,walk2,hello1,hello2,idle}.webp`.
 `LAYERS` ne aggiunge **13 a due livelli**,
-`jenny-<stem coi trattini>.webp` (per esempio `body_front_idle.PNG` →
-`jenny-body-front-idle.webp`). Ogni sorgente deve essere esattamente 3000×3000
+`jafta-<stem coi trattini>.webp` (per esempio `body_front_idle.PNG` →
+`jafta-body-front-idle.webp`). Ogni sorgente deve essere esattamente 3000×3000
 (assert esplicito) o lo script si ferma.
 
 ## Rigenerare
@@ -204,18 +204,18 @@ telefono" (con tabella nomi file e checklist) vedi
 ```bash
 # dalla cartella android/image_source/
 python3 gen_icons.py        # -> ../app/src/main/res/**
-python3 gen_pose_webp.py    # -> ../../jenny/templates/ui/assets/*.webp
+python3 gen_pose_webp.py    # -> ../../jafta/templates/ui/assets/*.webp
 ```
 
 **Regola del manifest**: ogni webp nuovo va aggiunto anche a `_UI_MANIFEST`
-in `jenny/utils/android_assets.py`. Su Android gli asset della WebUI vengono
+in `jafta/utils/android_assets.py`. Su Android gli asset della WebUI vengono
 estratti dall'APK seguendo quella lista statica: un file non elencato esiste
 nel bundle ma non arriva mai in `workspace/ui/` sul device (la `<img>` fa
 404 in silenzio).
 
 Dopo aver rigenerato le pose (o le icone), **serve una build/installazione
 dell'APK** per vederle sul dispositivo: Chaquopy ri-estrae il bundle
-`jenny/templates/ui` dentro l'APK a ogni installazione, quindi un semplice
+`jafta/templates/ui` dentro l'APK a ogni installazione, quindi un semplice
 riavvio dell'app non basta.
 
 ```bash
@@ -228,10 +228,10 @@ In cartella ci sono tre famiglie: le 10 pose cotte in `FILES`, i 13 livelli
 in `LAYERS`, e ciò che **non** si esporta di proposito — i 10 livelli in
 riserva (v. *Due livelli*) e le tre pose cotte che fanno da riferimento al
 test dei livelli (`think`, `talk_1a`, `talk_1b`). `idle.PNG` oggi serve solo
-alla mini Jenny dell'onboarding (`JENNY_POSES`): la mascotte intera è a due
+alla mini Jafta dell'onboarding (`JENNY_POSES`): la mascotte intera è a due
 livelli.
 
 Se si cablano nuovi sorgenti, aggiornare `FILES` (o `LAYERS`) qui e i
-riferimenti runtime: `ART`/`BODY`/`FACE` in `shared/jenny-mascot.js`,
+riferimenti runtime: `ART`/`BODY`/`FACE` in `shared/jafta-mascot.js`,
 `FLY_POSES` in `shared/mascot-drag.js`, `JENNY_POSES` in
 `mobile-onboarding.js`.

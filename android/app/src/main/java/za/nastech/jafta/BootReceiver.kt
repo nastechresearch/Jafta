@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -20,7 +20,7 @@ import android.util.Log
  * inaccessibile, e l'avvio fallirebbe comunque. Servirebbe portare tutto in
  * `createDeviceProtectedStorageContext()` — cioè tenere chiavi API e memoria
  * fuori dalla cifratura legata al PIN, che non è un compromesso accettabile.
- * Dopo un reboot Jenny riparte al primo sblocco: è il comportamento voluto.
+ * Dopo un reboot Jafta riparte al primo sblocco: è il comportamento voluto.
  *
  * `BOOT_COMPLETED` NON SIGNIFICA "IL TELEFONO SI È APPENA ACCESO", e chi legge
  * un log a mezzanotte lo darà per scontato: da Android 15 il sistema manda
@@ -76,7 +76,7 @@ class BootReceiver : BroadcastReceiver() {
         // `BOOT_COMPLETED` non vuol dire che il telefono si sia acceso (vedi il
         // KDoc della classe). Da qui in giù il senso è comunque uno solo:
         // ri-armare tutto e rimettere su il gateway.
-        Log.i("Jenny", "Received $action: re-arming alarms and starting gateway service")
+        Log.i("Jafta", "Received $action: re-arming alarms and starting gateway service")
         // Prima del service, e fuori dal try: sia un reboot sia l'uscita dallo
         // stato stopped azzerano le sveglie registrate nell'AlarmManager, quindi
         // la catena del watchdog è morta per definizione a questo punto e

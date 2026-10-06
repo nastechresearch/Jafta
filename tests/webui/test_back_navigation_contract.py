@@ -27,7 +27,7 @@ from support.kotlin_source import read_source
 ROOT = Path(__file__).resolve().parents[2]
 ASSETS = ROOT / "jafta" / "templates" / "ui" / "assets"
 APP_JS = ASSETS / "mobile-app.js"
-MAIN_ACTIVITY = ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "flagdizero" / "jafta" / "MainActivity.kt"
+MAIN_ACTIVITY = ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "nastechresearch" / "jafta" / "MainActivity.kt"
 
 
 def _app() -> str:

@@ -46,4 +46,4 @@ Information about the user to help personalize interactions.
 
 ---
 
-*Edit this file to customize Jenny's behavior for your needs.*
+*Edit this file to customize Jafta's behavior for your needs.*

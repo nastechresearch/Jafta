@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.content.Context
 import android.util.AttributeSet
@@ -8,7 +8,7 @@ import android.view.autofill.AutofillValue
 import android.webkit.WebView
 
 /**
- * The WebView that hosts Jenny's UI, with autofill silenced at the source.
+ * The WebView that hosts Jafta's UI, with autofill silenced at the source.
  *
  * There is no login anywhere behind this WebView. What the user types into it is
  * configuration: API keys, a Telegram token, a backup passphrase, the password

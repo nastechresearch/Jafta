@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.content.Context
 import android.os.PowerManager
@@ -22,7 +22,7 @@ import android.util.Log
  * sola non è arrivata sul dispositivo reale (vedi `syncExactAlarmState`).
  *
  * Le impostazioni (`abilitato`, `intervallo`) arrivano da Python
- * (`jenny/runtime/power.py::apply_watchdog_config`) e vengono parcheggiate in
+ * (`jafta/runtime/power.py::apply_watchdog_config`) e vengono parcheggiate in
  * SharedPreferences, non lette da `config.json`: Kotlin non parsa il config —
  * stessa convenzione di `PowerBridge.setServiceLock` — e le prefs sono l'unico
  * posto dove quel valore sopravvive alla morte del processo, che è esattamente
@@ -41,7 +41,7 @@ object Watchdog {
     /** Stesso file di preferenze di MainActivity: una sola `SharedPreferences`
      *  per app, chiavi nuove e basta. Due file separati sarebbero due lock e
      *  due punti da ricordare al momento di un wipe. */
-    private const val PREFS_NAME = "jenny"
+    private const val PREFS_NAME = "jafta"
     private const val KEY_ENABLED = "watchdogEnabled"
     private const val KEY_INTERVAL_MIN = "watchdogIntervalMin"
     private const val KEY_HEARTBEAT_MS = "gatewayHeartbeatMs"

@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.content.Context
 import android.content.Intent
@@ -19,7 +19,7 @@ import java.io.ByteArrayOutputStream
 /**
  * Bridge exposing PackageManager's launchable-app list and launch capability
  * to Python, for the WebUI "App Android" tab. Resolved lazily via Chaquopy
- * (`jclass("com.flagdizero.jenny.InstalledAppsBridge")`), never instantiated
+ * (`jclass("za.nastech.jafta.InstalledAppsBridge")`), never instantiated
  * from Kotlin — same pattern as AgenticSearchBridge.
  */
 class InstalledAppsBridge(context: Context) {
@@ -118,7 +118,7 @@ class InstalledAppsBridge(context: Context) {
         // Un task suo, non quello di Impostazioni. Con il solo NEW_TASK l'affinita'
         // la faceva entrare nel task di Impostazioni gia' aperto, e Indietro
         // tornava alla schermata lasciata li' (sul Titan 2, «Rete e Internet»)
-        // invece che a Jenny. NEW_DOCUMENT le da' un task per pacchetto: Indietro
+        // invece che a Jafta. NEW_DOCUMENT le da' un task per pacchetto: Indietro
         // lo chiude e torna a chi l'ha aperta, e riaprirla non ne accumula altri.
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
         return try {

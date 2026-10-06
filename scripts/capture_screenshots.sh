@@ -20,15 +20,15 @@ OUT_DIR="$REPO_ROOT/docs/img"
 # name|description of the state to set up before the capture.
 # The set the docs use, 1080x1920; see docs/img/. In English: the README and the site are.
 SHOTS=(
-"hero-chat|Home, Jenny page: a real exchange where she uses a tool on a mini-app she wrote (e.g. log a meal, read the day back), plus one more short turn. This is the shot people judge the project by."
-"apps|A Jenny App open from the Apps page, with some data in it."
+"hero-chat|Home, Jafta page: a real exchange where she uses a tool on a mini-app she wrote (e.g. log a meal, read the day back), plus one more short turn. This is the shot people judge the project by."
+"apps|A Jafta App open from the Apps page, with some data in it."
 "themes|Home -> Settings, the theme card at the top."
 "wiki-graph|Notebooks -> a notebook with ~10+ linked pages -> Pages -> Map tab."
 "wiki-reader|The same notebook -> a page open in the reader, a passage selected so the Report bar shows."
 "notebook-open|The same notebook's Chat, with a short question and her answer under the header."
 "onboarding-format|First run (fresh install), step 1: the two format cards."
 "onboarding-model|First run, step 3: the model list with one selected. Never capture step 2 once the key is typed."
-"app-card|Apps page, long press on a Jenny App: the card with Open / Add as a page / Edit / Delete."
+"app-card|Apps page, long press on a Jafta App: the card with Open / Add as a page / Edit / Delete."
 "workshop-console|Settings -> Workshop, Console: a reply with its tool pills and Show thinking, keyboard closed."
 )
 

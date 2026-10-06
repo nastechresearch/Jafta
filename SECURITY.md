@@ -1,12 +1,12 @@
 # Security Policy
 
-Jenny is a personal AI agent that runs on your own Android device with your own
+Jafta is a personal AI agent that runs on your own Android device with your own
 API key. It has real power on that device: it reads and writes files, executes
 Python, fetches from the network, and can act on a schedule without you
 watching. This document describes the actual trust boundaries — not an
 aspirational list — so you can decide what you are comfortable running.
 
-> Jenny is a fork of [nanobot](https://github.com/HKUDS/nanobot). This policy
+> Jafta is a fork of [nanobot](https://github.com/HKUDS/nanobot). This policy
 > covers the fork.
 
 ## Reporting a vulnerability
@@ -18,7 +18,7 @@ Use GitHub's private vulnerability reporting on this repository
 what you expected, and the impact you think it has. A proof of concept helps a
 lot.
 
-We aim to acknowledge reports within 72 hours. Jenny is maintained by one
+We aim to acknowledge reports within 72 hours. Jafta is maintained by one
 person, so please allow reasonable time for a fix before disclosing.
 
 ## Supported versions
@@ -31,12 +31,12 @@ check inside the app offers the newest release, and that is the way to get a fix
 Two sentences that matter more than the rest of this file:
 
 1. **The model is inside the trust boundary, the device sandbox is the boundary.**
-   Jenny does not defend against the model it is running. It defends the
+   Jafta does not defend against the model it is running. It defends the
    *device* against the agent's mistakes, and defends the agent against
    *hostile input from the network*.
 2. **`python_exec` is not a sandbox.** See below.
 
-If you run a model you do not trust, or point Jenny at untrusted content with
+If you run a model you do not trust, or point Jafta at untrusted content with
 tools enabled, assume the agent can do anything your Android app UID can do.
 
 ## Code execution: `python_exec` is not a sandbox
@@ -52,7 +52,7 @@ The real containment lives outside the interpreter:
 - the **Android app sandbox** (the app's own UID and permissions);
 - the **workspace path policy** for filesystem writes, enforced for the builtin
   `open` / `io.open` / `pathlib` paths as well as the registered helpers and
-  `os.open` (`jenny/security/workspace_policy.py`);
+  `os.open` (`jafta/security/workspace_policy.py`);
 - the **SSRF policy** for outbound network.
 
 `httpx` is deliberately **not** in the default allowlist: outbound network from
@@ -79,11 +79,11 @@ concrete reason.
 ## Network access (SSRF)
 
 Outbound requests from agent tools pass through `validate_url_target`
-(`jenny/security/network.py`), which blocks loopback, RFC1918 private ranges,
+(`jafta/security/network.py`), which blocks loopback, RFC1918 private ranges,
 CGNAT, link-local, and cloud metadata endpoints including `169.254.169.254`.
 The only escape hatch is `security.ssrf_whitelist`.
 
-**Jenny Apps use a second, deliberately more permissive policy.** An app's
+**Jafta Apps use a second, deliberately more permissive policy.** An app's
 `http` action goes through `validate_app_server_target`, which *allows* RFC1918,
 IPv6 ULA **and** CGNAT (`100.64.0.0/10`, the range Tailscale assigns) on purpose:
 an app server is a LAN or tailnet device the user declared and approved in the
@@ -93,12 +93,12 @@ redirects are never followed.
 
 ## App updates and self-install
 
-Jenny checks for a new release **every 24 hours by default** (`updates.enabled`,
+Jafta checks for a new release **every 24 hours by default** (`updates.enabled`,
 `updates.checkIntervalH`) and can install one on request. This is the one
 outbound connection the user did not switch on, so it belongs in this list.
 
 - **What goes out**: a plain `GET` of the release's `latest.json`. No
-  identifier, no version, no headers of Jenny's own, no query string. Redirects
+  identifier, no version, no headers of Jafta's own, no query string. Redirects
   are validated per hop like every other outbound path, the response is
   size-capped, and the version comparison happens on the device. Nothing about
   the user or the device is transmitted.
@@ -110,7 +110,7 @@ outbound connection the user did not switch on, so it belongs in this list.
 - **Installing** needs three manifest permissions — `REQUEST_INSTALL_PACKAGES`,
   `UPDATE_PACKAGES_WITHOUT_USER_ACTION`, `REQUEST_DELETE_PACKAGES`. None of them
   bypasses the user: the per-app "Install unknown apps" switch is still yours to
-  grant, `UPDATE_PACKAGES_WITHOUT_USER_ACTION` only covers packages Jenny is
+  grant, `UPDATE_PACKAGES_WITHOUT_USER_ACTION` only covers packages Jafta is
   already the installer of (itself), and on Android 14+ the system answers with
   its own confirmation prompt as the normal path. `QUERY_ALL_PACKAGES` and
   `INSTALL_PACKAGES` are deliberately **not** declared.
@@ -124,7 +124,7 @@ The SSH tools are in a scope of their own (`remote`) that **no agent loads by
 default**; only the `sysadmin` subagent type asks for it. Host targets go
 through `validate_ssh_target`, a third policy distinct from the two above: it
 allows RFC1918, IPv6 ULA **and** CGNAT (`100.64.0.0/10`), blocking only
-`0.0.0.0/8`, loopback and link-local/metadata. Jenny Apps' server policy opens
+`0.0.0.0/8`, loopback and link-local/metadata. Jafta Apps' server policy opens
 CGNAT the same way. It is opened in these two policies rather than through
 `security.ssrf_whitelist` on purpose — the whitelist is global, so widening it
 for a Tailscale host would also open CGNAT to `web_fetch` and the other tools
@@ -143,12 +143,12 @@ what they stop:
   plus `style-src 'self' 'unsafe-inline'`, `img-src 'self' data: blob:`,
   `font-src 'self'`, `connect-src 'self'` (which covers the WebSocket to the
   same host and port, and nothing else) and `frame-src 'self' http://127.0.0.1:*`
-  (for a Jenny App's external view, served by the local proxy on an ephemeral
+  (for a Jafta App's external view, served by the local proxy on an ephemeral
   port). No inline scripts.
 - **Model output is sanitized** with DOMPurify before it reaches `innerHTML`,
   and it **fails safe**: if the sanitizer did not load, the markdown is rendered
   as escaped plain text rather than injected as HTML.
-- **Jenny Apps run in `sandbox="allow-scripts"` iframes with an opaque origin.**
+- **Jafta Apps run in `sandbox="allow-scripts"` iframes with an opaque origin.**
   An app cannot read the SPA's DOM, its storage, or its API token; it talks to
   the gateway only through the SDK's `postMessage` bridge.
 
@@ -194,9 +194,9 @@ persisted code.
 - **Logs may contain sensitive content.** Redaction is applied to known secret
   fields, not to arbitrary conversation text.
 - **Your LLM provider sees your prompts.** That is the one unavoidable outbound
-  flow; review your provider's privacy policy. Jenny sends no telemetry of its
+  flow; review your provider's privacy policy. Jafta sends no telemetry of its
   own (the update check described above only fetches a public file). When
-  using OpenRouter, Jenny sends the `HTTP-Referer`, `X-OpenRouter-Title` and
+  using OpenRouter, Jafta sends the `HTTP-Referer`, `X-OpenRouter-Title` and
   `X-OpenRouter-Categories` attribution headers, which identify the app (not you)
   to that provider.
 
@@ -207,7 +207,7 @@ persisted code.
 - Do not grant broad Android storage permissions.
 - Review what the agent did: the transcript records tool calls.
 - Treat content fetched from the web as hostile input, not as instructions. Be
-  especially careful about asking Jenny to "read this URL and do what it says" —
+  especially careful about asking Jafta to "read this URL and do what it says" —
   that is handing an untrusted party the agent's tools.
 
 ## Known limitations
@@ -229,7 +229,7 @@ Stated plainly, because they are design trade-offs rather than oversights:
 
 ## What we do not claim
 
-Jenny is not a multi-tenant service, not a hardened sandbox for untrusted code,
+Jafta is not a multi-tenant service, not a hardened sandbox for untrusted code,
 and not audited by a third party. It is a personal agent for your own device,
 built so that you can read the source and decide for yourself — which is why
 the source is public.

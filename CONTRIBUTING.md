@@ -1,6 +1,6 @@
-# Contributing to Jenny
+# Contributing to Jafta
 
-Thanks for your interest in contributing! Jenny is young and moving fast, so
+Thanks for your interest in contributing! Jafta is young and moving fast, so
 a few simple rules keep things sane for everyone.
 
 ## Before you start
@@ -65,7 +65,7 @@ project name and logo are covered by a separate
 
 ## Design rules
 
-- **The core stays small; extend at the edges.** `jenny/agent/loop.py` and
+- **The core stays small; extend at the edges.** `jafta/agent/loop.py` and
   `runner.py` are the critical path: a feature that can live in a channel, a
   tool or a skill goes there.
 - **Duplication over premature abstraction.** Channels and providers may repeat
@@ -73,13 +73,13 @@ project name and logo are covered by a separate
 - **The HTTP surface is for reads.** `/api/` never reads a request body, so its
   parameters travel in the query string or a header. Anything that writes, or
   carries content or a secret, is a command over the WebSocket
-  (`jenny/webui/commands.py`, see [WebSocket protocol](docs/reference/websocket.md#commands-rpc)).
+  (`jafta/webui/commands.py`, see [WebSocket protocol](docs/reference/websocket.md#commands-rpc)).
   Do not smuggle a payload into a header.
-- **Every `config.json` write goes through `jenny/config/store.py::mutate()`**
+- **Every `config.json` write goes through `jafta/config/store.py::mutate()`**
   (see [`AGENTS.md`](AGENTS.md)); calling `save_config()` directly loses other
   writers' changes silently.
 - **Explicit over magical.** Configuration is declared in
-  `jenny/config/schema.py`; bad input raises instead of being corrected. The one
+  `jafta/config/schema.py`; bad input raises instead of being corrected. The one
   exception is loading an unusable `config.json`, which falls back loudly (to
   the `.bak`, or to defaults with the broken file kept) because on a phone a
   config the gateway refuses is an app nobody can repair.

@@ -1,4 +1,4 @@
-package com.flagdizero.jenny
+package za.nastech.jafta
 
 import android.content.Context
 import android.content.Intent
@@ -61,7 +61,7 @@ object GatewayStarter {
      * l'app in primo piano, un tocco su una notifica — e l'app esente
      * dall'ottimizzazione batteria, per cui l'avvio non viene rifiutato affatto.
      * Il tocco lo si chiede: senza sveglia armata `ensureUp` posta
-     * [RestartNotice], «Jenny è ferma — tocca per riavviarla».
+     * [RestartNotice], «Jafta è ferma — tocca per riavviarla».
      */
     private const val ALARM_FALLBACK_DELAY_MS = 10_000L
 
