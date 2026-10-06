@@ -92,7 +92,7 @@ def repo(tmp_path: Path) -> Path:
     return root
 
 
-def _commit(repo: Path, message: str, *, body: str = "") -> None:
+def _commit(repo: Path, message: str, *, body: str = "", env_extra: dict | None = None) -> None:
     """Aggiunge un file e committa con subject e body separati."""
     marker = f"// {len(_git(repo, 'log', '--oneline'))}\n"
     (repo / "notes.txt").write_text(marker, encoding="utf-8")
@@ -100,7 +100,7 @@ def _commit(repo: Path, message: str, *, body: str = "") -> None:
     args = ["commit", "-q", "-m", message]
     if body:
         args += ["-m", body]
-    _git(repo, *args)
+    _git(repo, *args, env_extra=env_extra)
 
 
 def _tag(repo: Path, name: str, *, when: str) -> None:
@@ -343,11 +343,13 @@ def test_the_latest_tag_by_creation_date_wins_even_on_an_older_commit(repo: Path
     tag più vicino a HEAD, che non è necessariamente l'ultimo rilasciato — e
     ripubblicherebbe da capo una versione già fuori.
     """
-    _commit(repo, "feat: first")
+    _commit(repo, "feat: first", env_extra={"GIT_COMMITTER_DATE": "2026-10-05T09:00:00+00:00"})
     _tag(repo, "v0.1.0", when="2026-10-05T10:00:00+00:00")
-    _commit(repo, "feat: second")
-    _git(repo, "tag", "v9.9.9", env_extra={"GIT_COMMITTER_DATE": "2026-10-05T09:00:00+00:00"})
-    _commit(repo, "docs: prose")
+    _commit(repo, "feat: second", env_extra={"GIT_COMMITTER_DATE": "2026-10-05T11:00:00+00:00"})
+    # Un tag lw ereda la data del commit; GIT_COMMITTER_DATE su `git tag`
+    # non produce nulla, l'unica via deterministica è datare il commit.
+    _git(repo, "tag", "v9.9.9")
+    _commit(repo, "docs: prose", env_extra={"GIT_COMMITTER_DATE": "2026-10-06T09:00:00+00:00"})
     _tag(repo, "v0.2.0", when="2026-10-06T10:00:00+00:00")
     # v9.9.9 è su un commit più vicino a HEAD di v0.2.0, ma è stato creato prima.
     assert nv.last_tag(repo) == "v0.2.0"
