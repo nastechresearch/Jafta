@@ -64,8 +64,8 @@ android {
         // uno di quelli e' installato. Pubblicare a 12 avrebbe significato non
         // poter provare l'aggiornamento proprio sul dispositivo che lo riceve:
         // l'updater pretende un codice STRETTAMENTE maggiore di quello installato.
-        versionCode = 21
-        versionName = "1.0.4"
+        versionCode = 22
+        versionName = "1.1.0"
 
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64", "x86")

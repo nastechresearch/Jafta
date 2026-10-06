@@ -1,6 +1,6 @@
 [project]
 name = "jafta"
-version = "1.0.4"
+version = "1.1.0"
 description = "Jafta - AI agent framework (fork of nanobot)"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.11"
