@@ -17,7 +17,7 @@
 #
 # KNOWN GAP: check_termux_mirror_health() loads scripts/android_visual_harness.py,
 # which this fork does not carry, so --check-mirrors raises until that file is copied
-# too. Nothing on the Gradle/Gradle-CI path calls it.
+# too. Nothing on the Gradle or CI path calls it.
 #
 from __future__ import annotations
 
