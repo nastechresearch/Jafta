@@ -6,13 +6,17 @@
 # Upstream source: yuga-hashimoto/and-code @ 247ff996 (v1.2.27),
 # scripts/prepare_android_runtime_native_libs.py. Inherited code stays in English.
 #
+# One non-upstream change: `ruff check --fix` sorted the three stdlib imports.
+# Upstream runs no ruff at all (no config, no lint step), so its import order is
+# not isort-clean; Jafta selects "I" and lints jafta/, so leaving it as upstream
+# would fail CI over three lines with no functional effect.
+#
 from __future__ import annotations
 
 import argparse
-import shutil
 import re
+import shutil
 from pathlib import Path
-
 
 ANDROID_ABIS = ("arm64-v8a", "x86_64")
 NATIVE_EXECUTABLES = {
