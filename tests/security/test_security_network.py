@@ -124,9 +124,9 @@ def test_allows_public_ip():
         assert ok, f"Should allow public IP, got: {err}"
 
 
-def test_allows_normal_https():
+def test_allows_normal_https() -> None:
     with patch("jafta.security.network.socket.getaddrinfo", _fake_resolve("github.com", ["140.82.121.3"])):
-        ok, err = validate_url_target("https://github.za/nastech/jafta")
+        ok, err = validate_url_target("https://github.com/nastechresearch/Jafta")
         assert ok
 
 

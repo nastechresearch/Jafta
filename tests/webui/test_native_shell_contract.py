@@ -24,7 +24,7 @@ from support.kotlin_source import read_source
 
 ROOT = Path(__file__).resolve().parents[2]
 ANDROID = ROOT / "android" / "app" / "src" / "main"
-JAVA = ANDROID / "java" / "com" / "nastechresearch" / "jafta"
+JAVA = ANDROID / "java" / "za" / "nastech" / "jafta"
 MANIFEST = ANDROID / "AndroidManifest.xml"
 MAIN_ACTIVITY = JAVA / "MainActivity.kt"
 NOTIFIER = JAVA / "NotifierBridge.kt"

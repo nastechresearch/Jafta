@@ -78,7 +78,7 @@ jobs:
             </ul>
 
             <h2>Open source</h2>
-            <p>Jafta is derived from <a href="https://github.com/nastechresearch/jafta-android-ai-agent">Jafta</a> (AGPL-3.0), which is itself derived from <a href="https://github.com/HKUDS/nanobot">nanobot</a> (MIT). Built and maintained by <a href="https://nastechresearch.github.io">NasTech Research</a>.</p>
+            <p>Jafta is derived from <a href="https://github.com/nastechresearch/Jafta">Jafta</a> (AGPL-3.0), which is itself derived from <a href="https://github.com/HKUDS/nanobot">nanobot</a> (MIT). Built and maintained by <a href="https://nastechresearch.github.io">NasTech Research</a>.</p>
 
             <div class="meta">
               <p>Jafta v0.1.0 · <a href="https://github.com/nastechresearch/Jafta">Source on GitHub</a></p>

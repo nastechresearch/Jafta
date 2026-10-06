@@ -7,7 +7,7 @@ breaks something you rely on gets a new major number.
 Releases before 1.0 are described only on their
 [GitHub release pages](https://github.com/nastechresearch/Jafta/releases).
 
-> **Jafta note:** Jafta is a rebrand and continuation of [Jafta 1.0.0](https://github.com/nastechresearch/jafta-android-ai-agent)
+> **Jafta note:** Jafta is a rebrand and continuation of [Jafta 1.0.0](https://github.com/nastechresearch/Jafta)
 > (released 2026-10-02). All Jafta 1.0.0 entries below describe behavior that ships
 > unmodified in Jafta. New Jafta-specific entries appear at the top of each version block.
 
