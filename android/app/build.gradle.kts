@@ -52,7 +52,17 @@ val keystoreProps = Properties().apply {
 // prebuilt `.deb`s. It is deliberately not wired here: it needs an NDK and a
 // Termux cross-toolchain, and the pinned mirror path reproduces the same
 // artefacts for anyone building this repo.
-val runtimeRoot = rootProject.projectDir
+// `rootProject.projectDir` e' la directory di `android/`, non quella del
+// repository: i path del payload devono risalire di un livello. Usare
+// `rootProject.projectDir` produce `/…/Jafta/android/jafta/runtime/proot/…`, che
+// non esiste, e Gradle fallisce la configurazione della task con un
+// "An input file was expected to be present but it doesn't exist" — un errore
+// che nomina i file mancanti senza dire che il root e' sbagliato.
+//
+// `rootDir.parentFile` e' la stessa directory per un altro verso, ed e' l'idioma
+// che questo file usa gia' per risalire al repository (vedi `srcDir("../../")`
+// e `rootDir.parentFile` sotto): i due equivalenti, scelti per coerenza.
+val runtimeRoot = rootDir.parentFile
 val generatedRuntimeAssets = rootProject.layout.buildDirectory.dir("generated/runtime-assets")
 val generatedRuntimeJni = rootProject.layout.buildDirectory.dir("generated/runtime-jni")
 
