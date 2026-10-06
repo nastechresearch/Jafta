@@ -186,8 +186,24 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           set -euo pipefail
-          SHA=$(git rev-list -n1 "v$VERSION")
           git fetch --tags --force --quiet || true
+
+          # Before anything else, and as a named failure. Resolving a tag that
+          # does not exist is `git rev-list`'s exit 128 with "ambiguous
+          # argument", which reads like a workflow bug and says nothing about
+          # the real cause: the version was never tagged. That happened on a
+          # hand dispatch of a version auto-tag had not cut yet, and the step
+          # that failed was four steps away from the word "tag".
+          if ! git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
+            echo "::error::Tag v$VERSION does not exist yet, so there is no commit to release."
+            echo "::error::Tags present: $(git tag -l 'v*' | tr '\n' ' ')"
+            echo "::error::auto-tag.yml creates the tag after CI passes on the bump. Dispatch"
+            echo "::error::it (bump: none) to cut this version, or run this pipeline against"
+            echo "::error::a tag that already exists."
+            exit 1
+          fi
+
+          SHA=$(git rev-list -n1 "v$VERSION")
 
           if ! git merge-base --is-ancestor "$SHA" origin/main; then
             echo "::error::Tag v$VERSION ($SHA) is not an ancestor of main."
