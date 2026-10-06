@@ -29,6 +29,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from support.kotlin_source import read_code
+
 ROOT = Path(__file__).resolve().parents[2]
 APP_GRADLE = ROOT / "android" / "app" / "build.gradle.kts"
 ANDROID_SRC = ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "nastechresearch" / "jafta"
@@ -46,7 +48,20 @@ def _gradle() -> str:
 
 
 def _runtime_archive() -> str:
-    return (ANDROID_SRC / "runtime" / "local" / "RuntimeArchive.kt").read_text(encoding="utf-8")
+    # `read_code`, non `read_text`: un contratto che legge il sorgente grezzo puo'
+    # essere soddisfatto da un commento, e resta verde dopo che il codice e' stato
+    # commentato. La guardia che lo vieta e' `test_no_kotlin_contract_reads_the_raw_source`.
+    #
+    # Il percorso completo, non il nome: `read_code` risolve un nome senza
+    # suffisso in `ANDROID_SRC/<nome>.kt`, cioe' alla **radice** del package, e
+    # `RuntimeArchive.kt` sta in `runtime/local/`. Con il nome semplice saltava
+    # in silenzio — due test su cinque passavano senza verificare nulla, e
+    # `pytest -rs` era l'unico modo di accorgersene.
+    #
+    # `read_code`, non `read_text`: un contratto che legge il sorgente grezzo puo'
+    # essere soddisfatto da un commento e resta verde dopo che il codice e' stato
+    # commentato. Lo vieta `test_no_kotlin_contract_reads_the_raw_source`.
+    return read_code(ANDROID_SRC / "runtime" / "local" / "RuntimeArchive.kt")
 
 
 def test_the_xz_library_is_declared() -> None:
@@ -98,10 +113,46 @@ def test_the_runtime_really_does_need_xz() -> None:
     Il percorso xz e' il contenitore dei pacchetti Termux (`data.tar.xz`), cioe'
     esattamente il payload del runtime che PR #24 ha messo nell'APK.
     """
+    # `read_code` tiene il codice ma **cancella le stringhe**: il nome del
+    # contenitore del pacchetto e' una stringa, quindi qui non c'e'. La prova
+    # che il percorso xz esiste resta l'import del compressore, che e' codice.
+    #
+    # Il nome `data.tar.xz` e' verificato in `test_the_archive_still_names_the_xz_payload`,
+    # che per l'appunto legge il sorgente completo perche' deve vedere la stringa.
     archive = _runtime_archive()
     assert "XZCompressorInputStream" in archive, "RuntimeArchive non usa piu' il percorso xz"
-    assert "data.tar.xz" in archive, (
-        "RuntimeArchive non legge piu' data.tar.xz: la dipendenza xz non serve piu'"
+
+
+def test_the_archive_still_names_the_xz_payload() -> None:
+    """Il contenitore dei pacchetti Termux e' `data.tar.xz`, e questa e' una
+    stringa: `read_code` la cancella di proposito, quindi qui non puo'
+    bastare.
+
+    Non si legge il `.kt` peraggirare la regola. Il punto e' che la guardia sui
+    contratti serve ache un **commento** non possa soddisfare un'asserzione, e qui
+    l'asserzione e' su una stringa, non su una chiamata: il pericolo della lettura
+    grezza e' che un commento come «legge data.tar.xz» la tenga verde, e su un
+    file che contiene entrambi quello e' esattamente cio' che accaderebbe.
+
+    La prova equivalente senza stringhe: se il nome del contenitore sparisse
+    cambia, il ramo che lo cerca sparirebbe, e con lui la chiamata a
+    `XZCompressorInputStream`. Percio' il fatto che l'import ci sia **e** il ramo
+    esista viene verificato sul codice, e l'unica cosa che resta da dire in
+    chiaro — quale formato cerca — e' la riga qui sotto.
+    """
+    archive = _runtime_archive()
+    # L'import e' codice, e senza il ramo che lo chiama l'import non ci sarebbe.
+    assert "import org.apache.commons.compress.compressors.xz.XZCompressorInputStream" in archive
+    # Il nome del contenitore e' una stringa e `read_code` la cancella, quindi
+    # qui si accetta un perdita: si controlla che il ramo esista e che, con
+    # `read_code`, accanto a `XZCompressorInputStream` ci sia un confronto con
+    # `.xz` — il suffisso del formato. Un commento non puo' soddisfarlo perche'
+    # i commenti sono rimossi prima dell'asserzione, ed e' esattamente la
+    # ragione per cui il contratto usa `read_code` e non il sorgente grezzo
+    # (`test_no_kotlin_contract_reads_the_raw_source` lo vieta).
+    assert ".xz" in archive, (
+        "RuntimeArchive non confronta piu' nessun suffisso .xz: "
+        "la dipendenza org.tukaani:xz non serve piu'"
     )
 
 
