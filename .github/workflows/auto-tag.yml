@@ -235,38 +235,51 @@ jobs:
         run: |
           set -euo pipefail
           SHA=$(git rev-parse HEAD)
-          echo "waiting for CI on $SHA"
+          echo "waiting for the CI workflow on $SHA"
 
-          # 15 minutes: CI here builds an APK, which is the slow part.
-          DEADLINE=$((SECONDS + 900))
+          # 20 minutes: CI here builds an APK on two Python versions, and it has
+          # been observed taking a shade over 8.
+          DEADLINE=$((SECONDS + 1200))
           while :; do
-            # A check that has not concluded has status != "completed", and GitHub
-            # also leaves conclusion null in that window. Counting either as success
-            # is how a release gets built from code that never passed anything.
-            PENDING=$(gh api "repos/$REPO/commits/$SHA/check-runs" --paginate \
-              --jq '[.check_runs[] | select(.status != "completed")] | length')
-            FAILED=$(gh api "repos/$REPO/commits/$SHA/check-runs" --paginate \
-              --jq '[.check_runs[] | select(.status == "completed" and
-                    .conclusion != "success" and .conclusion != "skipped")] | length')
-
-            if [ "${PENDING:-0}" -eq 0 ] && [ "${FAILED:-0}" -eq 0 ]; then
-              echo "CI is green on $SHA"
-              exit 0
-            fi
-            if [ "${FAILED:-0}" -gt 0 ]; then
-              echo "::error::CI is not green on $SHA; not tagging."
-              echo "::error::The version files are bumped but no tag was created. Re-run this"
-              echo "::error::workflow once the failure is fixed, or revert the bump commit."
-              gh api "repos/$REPO/commits/$SHA/check-runs" --paginate \
-                --jq '.check_runs[] | select(.conclusion != "success" and .conclusion != "skipped")
-                      | "  \(.name): \(.conclusion) — \(.html_url)"'
-              exit 1
+            # The signal is the **CI workflow run** for this commit, not a count of
+            # its check-runs. The first version of this step counted check-runs and
+            # treated "none pending, none failed" as green — but a commit pushed a
+            # second ago has *no* check-runs at all yet, and an empty list scored
+            # exactly the same as a fully green one. The tag was therefore created
+            # ten seconds after the push, with nothing having run. Waiting on the
+            # workflow run closes that window: it cannot report "completed" before
+            # it has started, and its absence is explicitly not success.
+            RUNS=$(gh api "repos/$REPO/actions/runs?head_sha=$SHA&per_page=100" \
+              --jq '[.workflow_runs[] | select(.name == "CI")] | length')
+            if [ "${RUNS:-0}" -eq 0 ]; then
+              echo "  no CI run registered for this commit yet"
+            else
+              STATUS=$(gh api "repos/$REPO/actions/runs?head_sha=$SHA&per_page=100" \
+                --jq '[.workflow_runs[] | select(.name == "CI")] |
+                      (map(select(.status == "completed")) | first |
+                       "\(.conclusion) \(.html_url)") // "in-progress"')
+              if [ "$STATUS" != "in-progress" ]; then
+                CONCLUSION=${STATUS%% *}
+                URL=${STATUS#* }
+                if [ "$CONCLUSION" = "success" ]; then
+                  echo "CI is green on $SHA"
+                  exit 0
+                fi
+                echo "::error::CI concluded '$CONCLUSION' on $SHA; not tagging."
+                echo "::error::The version files are bumped but no tag was created. Re-run this"
+                echo "::error::workflow once the failure is fixed, or revert the bump commit."
+                echo "::error::$URL"
+                gh api "repos/$REPO/commits/$SHA/check-runs" --paginate \
+                  --jq '.check_runs[] | select(.conclusion != "success" and .conclusion != "skipped")
+                        | "  \(.name): \(.conclusion)"' || true
+                exit 1
+              fi
+              echo "  CI is still running..."
             fi
             if [ "$SECONDS" -ge "$DEADLINE" ]; then
               echo "::error::CI still running on $SHA after 15 minutes; not tagging."
               exit 1
             fi
-            echo "  ${PENDING:-?} check(s) still running..."
             sleep 20
           done
 
