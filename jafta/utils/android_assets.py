@@ -153,6 +153,23 @@ _RETIRED_TEMPLATE_DIGESTS: dict[str, dict[str, str]] = {
         "addbed97527987dcf22a17a55dcb292d186c48e6e60fba322ad500616bd4565f":
             "v0.3.0 to v0.7.1, rebranded (dd448c8)",
     },
+    # La personalità di serie: la versione che scriveva la *sua* idea di sé come
+    # un unico costume ("I'm not a corporate drone"), senza la regola che il tono
+    # richiesto dall'utente vinca. Con quel testo, un "be professional" si
+    # scontrava con l'identità e la risposta era "professional? boring" — la
+    # personalità vinceva l'utente, che è l'inverso di chi è stato scritto per.
+    #
+    # È il **solo** file di bootstrap che si ritira pur restando in
+    # ``_BOOTSTRAP_SKIP_IF_TEMPLATE`` fuori, quindi a differenza degli altri qui
+    # dentro riceve l'etichetta di default intatto in prompt: per questo il ramo
+    # che la stampa ha una seconda etichetta per le versioni ritirate
+    # (``ContextBuilder._BOOTSTRAP_RETIRED_NOTICE``). Il ritiro è comunque
+    # byte-per-byte: un ``SOUL.md`` che l'utente o Dream hanno toccato non
+    # combacia con nessun digest e resta intatto.
+    "SOUL.md": {
+        "e80febe4e68a587c9544815a44fe9207e1c3b2534ade9891395f31ef71b859c7":
+            "the single-register personality (through v1.0.3)",
+    },
 }
 
 # Un BOM UTF-8 in testa al file. Non è testo — è un residuo di codifica che

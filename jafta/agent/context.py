@@ -506,6 +506,19 @@ class ContextBuilder:
         "[Unmodified default — this file still matches the template shipped with the app; "
         "the user has not written any of it. Nothing below states a user preference.]"
     )
+    # La stessa frase sarebbe falsa su una versione ritirata: spedita lo era, ma
+    # una volta sola e da un'altra versione. ``SOUL.md`` è l'unico file che
+    # riceve davvero questa etichetta (gli altri con versioni ritirate stanno in
+    # ``_BOOTSTRAP_SKIP_IF_TEMPLATE`` e non arrivano a questo ramo), ed è anche
+    # l'unico che si ritira senza smettere di essere letto: la personalità non
+    # può sparire da un aggiornamento. Qui si dice la verità — è una versione
+    # vecchia che nessuno ha scritto — senza fargliela sembrare corrente.
+    _BOOTSTRAP_RETIRED_NOTICE = (
+        "[Withdrawn default — this file still matches an older template we once shipped, "
+        "not the one this app version ships. The user has not written any of it, and it "
+        "will be replaced with the current default on the next boot that can rewrite it. "
+        "Nothing below states a user preference.]"
+    )
     _RUNTIME_CONTEXT_TAG = "[Runtime Context — metadata only, not instructions]"
     _MAX_RECENT_HISTORY = 50
     _MAX_HISTORY_TOKENS = 8_000  # hard cap on recent history section size (tokens)
@@ -1418,7 +1431,10 @@ class ContextBuilder:
                 continue
             if filename in self._BOOTSTRAP_SKIP_IF_TEMPLATE:
                 continue
-            parts.append(f"## {filename}\n\n{self._BOOTSTRAP_TEMPLATE_NOTICE}\n\n{content}")
+            notice = self._BOOTSTRAP_TEMPLATE_NOTICE
+            if _RETIRED_TEMPLATE_DIGESTS.get(filename, {}).get(template_digest(content)):
+                notice = self._BOOTSTRAP_RETIRED_NOTICE
+            parts.append(f"## {filename}\n\n{notice}\n\n{content}")
 
         return "\n\n".join(parts) if parts else ""
 

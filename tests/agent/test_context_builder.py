@@ -20,6 +20,17 @@ def _builder(tmp_path: Path, **kw) -> ContextBuilder:
     return ContextBuilder(workspace=tmp_path, **kw)
 
 
+def _retired_fixture(name: str) -> str:
+    """A withdrawn template, byte for byte, read from ``tests/agent/fixtures/``.
+
+    Read from there for the same reason ``tests/utils/test_template_refresh.py``
+    does: a couple of those lines end in a space, and a retyped copy in a Python
+    source would be cleaned up by ``ruff`` (W291). The digest would stop matching
+    what is on real phones, and the test would prove something else.
+    """
+    return (Path(__file__).resolve().parent / "fixtures" / name).read_text(encoding="utf-8")
+
+
 # ---------------------------------------------------------------------------
 # _build_runtime_context (static)
 # ---------------------------------------------------------------------------
@@ -451,26 +462,71 @@ class TestRetiredTemplates:
         quindi non arriva mai al ramo che etichetta. Un commento però non è una
         guardia — basta ritirare una versione di ``SOUL.md`` (l'unico file che
         l'etichetta la riceve davvero) perché la frase inizi a mentire, in
-        silenzio e su ogni installazione seedata in quella finestra. Vale qui la
-        stessa regola dei digest un file più in là: non è un promemoria, il test
-        fallisce finché non lo si fa.
+        silenzio e su ogni installazione seedata in quella finestra.
 
         Le due uscite sono entrambe buone: aggiungere il nome a
         ``_BOOTSTRAP_SKIP_IF_TEMPLATE``, oppure dare a quel ramo una seconda
-        etichetta che dica la verità su una versione ritirata.
+        etichetta che dica la verità su una versione ritirata. La seconda è
+        quella scelta per ``SOUL.md`` — la personalità non può smettere di
+        entrare nel prompt solo perché la si è ritirata, e ometterla
+        riporterebbe in campo la regressione che il commento in ``context.py``
+        descrive (un'installazione nuova senza personalità).
+
+        Il ramo che etichetta deve quindi sapere, per ogni file con versioni
+        ritirate che non viene saltato, che il suo avviso corrente direbbe una
+        falsità. Qui si verifica la proprietà che rende il ramo capace di
+        distinguerlo — e che il ritiro non venga trattato come un caso speciale
+        che qualcuno deve ricordare di cablare: ogni file ritirato che non è
+        saltato **deve** avere una seconda etichetta disponibile.
         """
-        for name in _RETIRED_TEMPLATE_DIGESTS:
-            if name not in ContextBuilder.BOOTSTRAP_FILES:
-                # Non è un file di bootstrap: quel ramo non lo vede proprio.
-                # ``memory/MEMORY.md`` ha una guardia sua (``_is_template_content``
-                # in ``build_system_prompt``), che omette e non etichetta.
-                continue
-            assert name in ContextBuilder._BOOTSTRAP_SKIP_IF_TEMPLATE, (
-                f"{name} ha versioni ritirate e può ricevere "
-                "_BOOTSTRAP_TEMPLATE_NOTICE, che su una versione ritirata è falsa: "
-                "aggiungilo a _BOOTSTRAP_SKIP_IF_TEMPLATE o dai a quel ramo "
-                "un'etichetta che dica la verità"
-            )
+        skipped = ContextBuilder._BOOTSTRAP_SKIP_IF_TEMPLATE
+        labelled = [
+            name
+            for name in _RETIRED_TEMPLATE_DIGESTS
+            if name in ContextBuilder.BOOTSTRAP_FILES and name not in skipped
+        ]
+        # `SOUL.md` è l'unico file etichettato con versioni ritirate: gli altri
+        # o sono saltati o non sono file di bootstrap.
+        assert labelled == ["SOUL.md"], (
+            f"i file di bootstrap ritirati e non saltati sono {labelled}: "
+            "se ne aggiungi uno, cabla anche la sua etichetta ritirata"
+        )
+        assert ContextBuilder._BOOTSTRAP_RETIRED_NOTICE, (
+            "il ramo etichettante ha bisogno della seconda frase: su una versione "
+            "ritirata quella corrente mente"
+        )
+        assert ContextBuilder._BOOTSTRAP_RETIRED_NOTICE != ContextBuilder._BOOTSTRAP_TEMPLATE_NOTICE
+
+    def test_a_retired_soul_gets_the_withdrawn_label_not_the_current_one(self, tmp_path):
+        """La seconda etichetta esiste ed è quella che arriva nel prompt.
+
+        Un test sulla costante non prova niente: quello che conta è che il
+        ``SOUL.md`` di un telefono partito con la personalità di una sola
+        maschera entri con un avviso che lo dichiara una versione ritirata. Il
+        caso è reale — ``SOUL.md`` è l'unico file che si ritira restando nel
+        prompt, quindi è l'unico su cui questa distinzione può essere sbagliata
+        senza che nessun test se ne accorga.
+        """
+        (tmp_path / "SOUL.md").write_text(
+            _retired_fixture("soul_md_retired_v1.0.3.md"), encoding="utf-8"
+        )
+
+        result = _builder(tmp_path)._load_bootstrap_files()
+
+        assert "## SOUL.md" in result
+        assert ContextBuilder._BOOTSTRAP_RETIRED_NOTICE in result
+        assert ContextBuilder._BOOTSTRAP_TEMPLATE_NOTICE not in result
+
+    def test_the_current_soul_still_gets_the_current_label(self, tmp_path):
+        """Il rovescio: la personalità di questa versione non è "ritirata"."""
+        (tmp_path / "SOUL.md").write_text(
+            Path("jafta/templates/SOUL.md").read_text(encoding="utf-8"), encoding="utf-8"
+        )
+
+        result = _builder(tmp_path)._load_bootstrap_files()
+
+        assert ContextBuilder._BOOTSTRAP_TEMPLATE_NOTICE in result
+        assert ContextBuilder._BOOTSTRAP_RETIRED_NOTICE not in result
 
 
 class TestEmptiedBootstrapFile:
