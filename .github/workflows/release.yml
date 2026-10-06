@@ -290,8 +290,8 @@ jobs:
             --manifest-only \
             --apk "$APK" \
             --repo "${{ github.repository }}" \
-            --summary-it "${{ inputs.summary_it || 'Aggiornamento di sicurezza e correzioni.' }}" \
-            --summary-en "${{ inputs.summary_en || 'Security and bug fixes.' }}" \
+            --summary-it "${{ inputs.summary_it || 'Correzioni e miglioramenti.' }}" \
+            --summary-en "${{ inputs.summary_en || 'Bug fixes and improvements.' }}" \
             --out dist/release
 
           # release.py writes dist/release/latest.json and stages the APK under
