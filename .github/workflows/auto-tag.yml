@@ -128,9 +128,8 @@ jobs:
           python3 scripts/next_version.py "${ARGS[@]}" | tee decision.env
 
           # Sourcing a file another script wrote is the one way this can go wrong
-          # quietly, so every key is checked rather than trusted: an unset variable
-          # under `set -u` would fail here instead of three steps later with an
-          # empty tag name.
+          # quietly, so every key is checked rather than trusted: a missing one
+          # becomes an empty tag name three steps later, with nothing saying why.
           for key in LEVEL CURRENT BASE VERSION TAG COMMITS DRIFT REASON; do
             if ! grep -q "^$key=" decision.env; then
               echo "::error::decision.env has no $key line:"
@@ -139,15 +138,43 @@ jobs:
             fi
           done
 
+          # Each key is read ONCE into a shell variable and used for both the step
+          # output and the log line below. The first version of this step grepped
+          # the file twice and then referenced `$REASON` directly as a shell
+          # variable, which had never been assigned: under `set -u` that is an
+          # unbound-variable error, so the step died on a cosmetic `::notice::`
+          # *after* writing correct outputs.
+          LEVEL=$(grep '^LEVEL=' decision.env | cut -d= -f2-)
+          CURRENT=$(grep '^CURRENT=' decision.env | cut -d= -f2-)
+          BASE=$(grep '^BASE=' decision.env | cut -d= -f2-)
+          VERSION=$(grep '^VERSION=' decision.env | cut -d= -f2-)
+          TAG=$(grep '^TAG=' decision.env | cut -d= -f2-)
+          COMMITS=$(grep '^COMMITS=' decision.env | cut -d= -f2-)
+          DRIFT=$(grep '^DRIFT=' decision.env | cut -d= -f2-)
+          REASON=$(grep '^REASON=' decision.env | cut -d= -f2-)
+
+          # The two values that decide what gets published are checked here rather
+          # than trusted, because everything downstream is a tag built out of them:
+          # an unexpected level would fall through to no bump, and a malformed
+          # version would become a tag nothing can release.
+          case "$LEVEL" in
+            none|patch|minor|major) ;;
+            *) echo "::error::unexpected LEVEL '$LEVEL' from next_version.py"; exit 1 ;;
+          esac
+          if [ "$LEVEL" != "none" ] && ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::LEVEL is '$LEVEL' but VERSION is '$VERSION', not X.Y.Z"
+            exit 1
+          fi
+
           {
-            echo "level=$(grep '^LEVEL=' decision.env | cut -d= -f2-)"
-            echo "current=$(grep '^CURRENT=' decision.env | cut -d= -f2-)"
-            echo "base=$(grep '^BASE=' decision.env | cut -d= -f2-)"
-            echo "version=$(grep '^VERSION=' decision.env | cut -d= -f2-)"
-            echo "tag=$(grep '^TAG=' decision.env | cut -d= -f2-)"
-            echo "commits=$(grep '^COMMITS=' decision.env | cut -d= -f2-)"
-            echo "drift=$(grep '^DRIFT=' decision.env | cut -d= -f2-)"
-            echo "reason=$(grep '^REASON=' decision.env | cut -d= -f2-)"
+            echo "level=$LEVEL"
+            echo "current=$CURRENT"
+            echo "base=$BASE"
+            echo "version=$VERSION"
+            echo "tag=$TAG"
+            echo "commits=$COMMITS"
+            echo "drift=$DRIFT"
+            echo "reason=$REASON"
           } >> "$GITHUB_OUTPUT"
 
           echo "::notice::$REASON"
