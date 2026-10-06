@@ -523,3 +523,97 @@ def test_cli_json_reports_drift_as_false_when_they_agree(
     payload = json.loads(capsys.readouterr().out)
     assert payload["drift"] is False
     assert payload["base"] == payload["current"] == "0.1.0"
+
+
+# --------------------------------------------------------------------------
+# Un bump rimasto senza tag
+# --------------------------------------------------------------------------
+
+
+def test_a_bump_written_but_never_tagged_is_reported_as_pending(repo: Path) -> None:
+    """Il caso in cui un run scrive i file e poi fallisce prima del tag.
+
+    I file sono avanti rispetto all'ultimo tag e non esiste un tag per quella
+    versione: la release è a metà. Alzare ancora produrrebbe un altro numero per
+    la stessa release — è così che 1.0.2 e 1.0.3 sono finiti sulla spalla di
+    1.0.1 senza che nessuno dei due fosse mai stato pubblicato.
+    """
+    _commit(repo, "fix: a real bug")
+    _tag(repo, "v0.1.0", when="2026-10-05T10:00:00+00:00")
+    assert nv.decide(repo).pending_tag is False
+
+    # Un run che alza i file e poi non arriva a taggare.
+    for path, old, new in (
+        (repo / "pyproject.toml", '"0.1.0"', '"0.1.1"'),
+        (repo / "jafta" / "__init__.py", '"0.1.0"', '"0.1.1"'),
+        (repo / "android" / "app" / "build.gradle.kts", '"0.1.0"', '"0.1.1"'),
+    ):
+        text = path.read_text(encoding="utf-8")
+        path.write_text(text.replace(old, new), encoding="utf-8")
+    _commit(repo, "chore(release): 0.1.1")
+
+    decision = nv.decide(repo)
+    assert decision.current == "0.1.1"
+    assert decision.tag == "v0.1.0"
+    assert decision.pending_tag is True
+
+
+def test_a_pending_bump_needs_no_releasable_commit_to_be_tagged(repo: Path) -> None:
+    """Il commit di bump è ``chore``, quindi non rilascia nulla: e va benissimo.
+
+    È il punto della recovery: la release pendente è già scritta, non c'è bisogno
+    di un altro commit che la giustifichi. Se il recovery pretendesse un commit
+    rilasciabile, il caso si auto-cancella e la versione resta appesa per sempre.
+    """
+    _commit(repo, "fix: a real bug")
+    _tag(repo, "v0.1.0", when="2026-10-05T10:00:00+00:00")
+    _commit(repo, "chore(release): 0.1.1")
+    for path, old, new in (
+        (repo / "pyproject.toml", '"0.1.0"', '"0.1.1"'),
+        (repo / "jafta" / "__init__.py", '"0.1.0"', '"0.1.1"'),
+        (repo / "android" / "app" / "build.gradle.kts", '"0.1.0"', '"0.1.1"'),
+    ):
+        text = path.read_text(encoding="utf-8")
+        path.write_text(text.replace(old, new), encoding="utf-8")
+
+    decision = nv.decide(repo)
+    assert decision.level == "none"
+    assert decision.pending_tag is True
+
+
+def test_no_pending_without_any_tag(repo: Path) -> None:
+    """Senza tag «avanti rispetto a» non vuol dire niente: è il primo rilascio."""
+    _commit(repo, "feat: the first thing")
+    decision = nv.decide(repo)
+    assert decision.tag is None
+    assert decision.pending_tag is False
+
+
+def test_files_behind_the_tag_are_not_pending(repo: Path) -> None:
+    """I file *indietro* rispetto al tag non sono un bump pendente: è drift."""
+    _commit(repo, "fix: a real bug")
+    _tag(repo, "v0.2.0", when="2026-10-05T10:00:00+00:00")
+    _commit(repo, "docs: prose")
+    decision = nv.decide(repo)
+    assert decision.drift is True
+    assert decision.pending_tag is False
+
+
+def test_cli_reports_pending_tag(repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    _commit(repo, "fix: a real bug")
+    _tag(repo, "v0.1.0", when="2026-10-05T10:00:00+00:00")
+    for path, old, new in (
+        (repo / "pyproject.toml", '"0.1.0"', '"0.1.1"'),
+        (repo / "jafta" / "__init__.py", '"0.1.0"', '"0.1.1"'),
+        (repo / "android" / "app" / "build.gradle.kts", '"0.1.0"', '"0.1.1"'),
+    ):
+        text = path.read_text(encoding="utf-8")
+        path.write_text(text.replace(old, new), encoding="utf-8")
+    _commit(repo, "chore(release): 0.1.1")
+
+    assert nv.main(["--repo-root", str(repo)]) == 0
+    out = capsys.readouterr().out
+    assert "PENDING_TAG=yes" in out
+
+    assert nv.main(["--repo-root", str(repo), "--format", "json"]) == 0
+    assert json.loads(capsys.readouterr().out)["pending_tag"] is True

@@ -130,7 +130,7 @@ jobs:
           # Sourcing a file another script wrote is the one way this can go wrong
           # quietly, so every key is checked rather than trusted: a missing one
           # becomes an empty tag name three steps later, with nothing saying why.
-          for key in LEVEL CURRENT BASE VERSION TAG COMMITS DRIFT REASON; do
+          for key in LEVEL CURRENT BASE VERSION TAG COMMITS DRIFT REASON PENDING_TAG; do
             if ! grep -q "^$key=" decision.env; then
               echo "::error::decision.env has no $key line:"
               cat decision.env
@@ -152,6 +152,7 @@ jobs:
           COMMITS=$(grep '^COMMITS=' decision.env | cut -d= -f2-)
           DRIFT=$(grep '^DRIFT=' decision.env | cut -d= -f2-)
           REASON=$(grep '^REASON=' decision.env | cut -d= -f2-)
+          PENDING_TAG=$(grep '^PENDING_TAG=' decision.env | cut -d= -f2-)
 
           # The two values that decide what gets published are checked here rather
           # than trusted, because everything downstream is a tag built out of them:
@@ -175,6 +176,7 @@ jobs:
             echo "commits=$COMMITS"
             echo "drift=$DRIFT"
             echo "reason=$REASON"
+            echo "pending_tag=$PENDING_TAG"
           } >> "$GITHUB_OUTPUT"
 
           echo "::notice::$REASON"
@@ -189,8 +191,20 @@ jobs:
       # A dry run stops here: every step below is gated on dry_run == 'no', so
       # nothing is written, committed or tagged and the decision is still on the
       # run's summary.
+      # A pending bump means main already carries a version that was never tagged —
+      # a previous run got this far and then failed. Re-bumping would burn another
+      # number for the same single release (1.0.2, 1.0.3, ...) and the skipped ones
+      # would sit in the history forever. The recovery is to tag what is already
+      # there, which is why the bump steps below are skipped.
+      - name: Explain a pending bump
+        if: steps.next.outputs.pending_tag == 'yes'
+        run: |
+          echo "::notice::main is at ${{ steps.next.outputs.current }} but only ${{ steps.next.outputs.tag }} is tagged."
+          echo "::notice::That version was written by a run that then failed. Tagging it as-is"
+          echo "::notice::instead of bumping again — no new commit, no new number."
+
       - name: Write the version files
-        if: steps.next.outputs.level != 'none' && steps.opts.outputs.dry_run == 'no'
+        if: steps.next.outputs.level != 'none' && steps.opts.outputs.dry_run == 'no' && steps.next.outputs.pending_tag != 'yes'
         run: |
           set -euo pipefail
           # All three files in one call: pyproject.toml, the fallback literal in
@@ -200,7 +214,7 @@ jobs:
           git --no-pager diff --stat
 
       - name: Commit the version bump
-        if: steps.next.outputs.level != 'none' && steps.opts.outputs.dry_run == 'no'
+        if: steps.next.outputs.level != 'none' && steps.opts.outputs.dry_run == 'no' && steps.next.outputs.pending_tag != 'yes'
         env:
           VERSION: ${{ steps.next.outputs.version }}
           LEVEL: ${{ steps.next.outputs.level }}
@@ -216,7 +230,7 @@ jobs:
           git --no-pager log -1 --format='%H %s'
 
       - name: Push the bump
-        if: steps.next.outputs.level != 'none' && steps.opts.outputs.dry_run == 'no'
+        if: steps.next.outputs.level != 'none' && steps.opts.outputs.dry_run == 'no' && steps.next.outputs.pending_tag != 'yes'
         run: |
           set -euo pipefail
           # A plain push, never --force: this workflow must not rewrite history a
@@ -227,14 +241,31 @@ jobs:
       # and it checks that on the tag's own commit. Tagging straight after the bump
       # would race CI: the tag could land while the checks were still queued, and
       # the release would refuse for a reason that has nothing to do with the code.
-      - name: Wait for CI on the bump commit
-        if: steps.next.outputs.level != 'none' && steps.opts.outputs.dry_run == 'no'
+      #
+      # The wait is on the PARENT, not on the bump commit, and that is not a
+      # shortcut. A push made with GITHUB_TOKEN does not trigger workflow runs —
+      # GitHub suppresses them to stop workflows recursing — so the bump commit
+      # this workflow just created will never have CI, Android Build, Pages or
+      # anything else run against it. Waiting for it waits forever. Measured: a
+      # merge to main gets 5 runs, the bot's own bump commit gets 0.
+      #
+      # The code that ships is the parent's tree plus three version strings, so CI
+      # on the parent is CI on the code. What the bump itself could have changed is
+      # checked immediately after, by name, rather than assumed.
+      - name: Wait for CI on the code being released
+        if: (steps.next.outputs.level != 'none' || steps.next.outputs.pending_tag == 'yes') && steps.opts.outputs.dry_run == 'no'
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
           SHA=$(git rev-parse HEAD)
+          # The parent, deliberately — see the comment on this step. On the first
+          # release there is no parent, and then there is nothing to wait for: the
+          # tag points at a root commit and release.yml has its own gate.
+          if git rev-parse -q --verify HEAD^ >/dev/null; then
+            SHA=$(git rev-parse HEAD^)
+          fi
           echo "waiting for the CI workflow on $SHA"
 
           # 20 minutes: CI here builds an APK on two Python versions, and it has
@@ -277,14 +308,37 @@ jobs:
               echo "  CI is still running..."
             fi
             if [ "$SECONDS" -ge "$DEADLINE" ]; then
-              echo "::error::CI still running on $SHA after 15 minutes; not tagging."
+              echo "::error::CI still running on $SHA after 20 minutes; not tagging."
               exit 1
             fi
             sleep 20
           done
 
+      # What the bump was allowed to change. Small enough to be a list, and the
+      # alternative is trusting that a script only ever writes the version — which
+      # is exactly the assumption that produced a tag ten seconds after a push.
+      - name: Check the bump touched only the version files
+        if: (steps.next.outputs.level != 'none' || steps.next.outputs.pending_tag == 'yes') && steps.opts.outputs.dry_run == 'no'
+        run: |
+          set -euo pipefail
+          if ! git rev-parse -q --verify HEAD^ >/dev/null; then
+            echo "first release: nothing to compare against"
+            exit 0
+          fi
+          CHANGED=$(git diff --name-only HEAD^ HEAD | sort)
+          echo "bump changed:"
+          echo "$CHANGED" | sed 's/^/  /'
+          UNEXPECTED=$(echo "$CHANGED" | grep -vE             '^(pyproject\.toml|jafta/__init__\.py|android/app/build\.gradle\.kts)$' || true)
+          if [ -n "$UNEXPECTED" ]; then
+            echo "::error::the version bump changed files that are not version files:"
+            echo "$UNEXPECTED" | sed 's/^/  /'
+            echo "::error::Those are shipped code. Not tagging."
+            exit 1
+          fi
+          echo "bump is version-only"
+
       - name: Create and push the tag
-        if: steps.next.outputs.level != 'none' && steps.opts.outputs.dry_run == 'no'
+        if: (steps.next.outputs.level != 'none' || steps.next.outputs.pending_tag == 'yes') && steps.opts.outputs.dry_run == 'no'
         env:
           VERSION: ${{ steps.next.outputs.version }}
           LEVEL: ${{ steps.next.outputs.level }}
@@ -316,6 +370,7 @@ jobs:
           VERSION: ${{ steps.next.outputs.version }}
           DRIFT: ${{ steps.next.outputs.drift }}
           DRY: ${{ steps.opts.outputs.dry_run }}
+          PENDING: ${{ steps.next.outputs.pending_tag }}
           REASON: ${{ steps.next.outputs.reason }}
         run: |
           set -euo pipefail
@@ -329,7 +384,9 @@ jobs:
               echo "- **Bumped from**: \`$BASE\` — the tag was ahead of the files, so the higher one won"
             fi
             echo ""
-            if [ -z "$LEVEL" ] || [ "$LEVEL" = "none" ]; then
+            if [ "$PENDING" = "yes" ]; then
+              echo "Tagged **\`v$VERSION\`**, a bump that an earlier run wrote and never tagged."
+            elif [ -z "$LEVEL" ] || [ "$LEVEL" = "none" ]; then
               echo "Nothing to release. Run this workflow with an explicit bump to publish anyway."
             elif [ "$DRY" = "yes" ]; then
               echo "Dry run: **\`v$VERSION\` would have been tagged**, but nothing was written."

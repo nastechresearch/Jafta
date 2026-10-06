@@ -237,6 +237,25 @@ class Decision:
     def releasable(self) -> bool:
         return self.level != "none"
 
+    @property
+    def pending_tag(self) -> bool:
+        """True when the files already carry a version that was never tagged.
+
+        A run that bumped the files and then failed — the wait step refusing, a
+        runner lost, the run cancelled — leaves exactly this state: the version is
+        ahead of the last tag and nothing was tagged. Bumping again would burn
+        another number for the same single release, which is how 1.0.2 and 1.0.3
+        came to exist with no release behind either. The recovery is to tag the
+        version already written, not to invent a later one.
+
+        Only true once at least one tag exists: with none, "ahead of" is vacuous
+        and the ordinary first-release path applies.
+        """
+        if self.tag is None:
+            return False
+        tagged = _tag_version(self.tag)
+        return tagged is not None and _compare(self.current, tagged) > 0
+
 
 def _tag_version(tag: str | None) -> str | None:
     """La versione numerica di un tag ``vX.Y.Z``, o ``None`` se non c'è."""
@@ -369,6 +388,7 @@ def main(argv: list[str] | None = None) -> int:
                     "commits": len(decision.commits),
                     "releasable": decision.releasable,
                     "drift": decision.drift,
+                    "pending_tag": decision.pending_tag,
                     "reason": reason,
                 }
             )
@@ -381,6 +401,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"TAG={decision.tag or ''}")
         print(f"COMMITS={len(decision.commits)}")
         print(f"DRIFT={'yes' if decision.drift else 'no'}")
+        print(f"PENDING_TAG={'yes' if decision.pending_tag else 'no'}")
         print(f"REASON={reason}")
     return 0
 
