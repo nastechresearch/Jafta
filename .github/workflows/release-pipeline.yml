@@ -588,6 +588,8 @@ jobs:
       # not the latest, that URL serves a different file and the app can be told
       # about a version that is not published yet — or miss one that is.
       - name: Verify the update path the app fetches
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           VERSION="${{ steps.version.outputs.version }}"
