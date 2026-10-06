@@ -32,12 +32,11 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          # cmdline-tools default (v22.0) ships without the legacy `tools`
-          # package. The preinstalled 12.0 on the runner still has it.
-          # Long build number 12266719 = short version 12.0.
+          # cmdline-tools 12.0 (long build 12266719) is the preinstalled version
+          # on the runner. The `tools` package is no longer served by Google
+          # (action warns + skips if requested). Build doesn't need it.
           cmdline-tools-version: 12266719
           packages: >-
-            tools
             platform-tools
             build-tools;35.0.0
             platforms;android-35
