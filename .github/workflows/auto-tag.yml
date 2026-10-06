@@ -297,10 +297,14 @@ jobs:
             if [ "${RUNS:-0}" -eq 0 ]; then
               echo "  no CI run registered for this commit yet"
             else
+              # Never stream a half-built string: map(...) returns [] when no
+              # run has completed, `first` of that is a *string* "null null", and
+              # the `// "in-progress"` fallback never reaches it because string
+              # interpolation already stringified the nulls. CI in progress then
+              # reads as concluded 'null' and stops the tag. Building the string
+              # only inside `if` length > 0 makes the fallback real.
               STATUS=$(gh api "repos/$REPO/actions/runs?head_sha=$SHA&per_page=100" \
-                --jq '[.workflow_runs[] | select(.name == "CI")] |
-                      (map(select(.status == "completed")) | first |
-                       "\(.conclusion) \(.html_url)") // "in-progress"')
+                --jq '[.workflow_runs[] | select(.name == "CI" and .status == "completed")] | if length > 0 then "\(.[0].conclusion) \(.[0].html_url)" else "in-progress" end')
               if [ "$STATUS" != "in-progress" ]; then
                 CONCLUSION=${STATUS%% *}
                 URL=${STATUS#* }
