@@ -80,6 +80,7 @@ from jafta.webui.android_apps_api import (
 )
 from jafta.webui.file_preview import WebUIFilePreviewError, file_preview_payload
 from jafta.webui.media_gateway import WebUIMediaGateway
+from jafta.webui.runtime_routes import RUNTIME_ROUTES
 from jafta.webui.transcript import build_webui_thread_response
 from jafta.webui.workspaces import WebUIWorkspaceController
 
@@ -402,6 +403,11 @@ class GatewayHTTPHandler:
         response = await self.settings_routes.dispatch(request, got)
         if response is not None:
             return response
+
+        # Runtime routes (delegated)
+        for route_path, (handler, _name) in RUNTIME_ROUTES.items():
+            if got == route_path.split(" ", 1)[1]:
+                return await handler(request, self.bus)
 
         # Session routes
         response = await self._dispatch_session_routes(request, got)

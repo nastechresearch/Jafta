@@ -125,14 +125,15 @@ export class OnboardingController {
     switch (this.step) {
       case 0: this._renderStep0(); break;
       case 1: this._renderStep1(); break;
-      case 2: this._renderStep2(); break;
-      case 3: this._renderStep3(); break;
+      case 2: this._renderStepRuntime(); break;
+      case 3: this._renderStep2(); break;
+      case 4: this._renderStep3(); break;
     }
   }
 
   _progress() {
     const dots = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 5; i++) {
       const cls = i < this.step ? 'onboarding-dot done' : i === this.step ? 'onboarding-dot active' : 'onboarding-dot';
       dots.push(`<div class="${cls}"></div>`);
     }
@@ -275,25 +276,149 @@ export class OnboardingController {
 
   _goToStep2() {
     this._captureStep1();
-    // L'indirizzo storpiato si dice qui, prima di chiedere i modelli a un
-    // indirizzo che non esiste; «Http://» si corregge da solo.
-    const base = normalizeApiBase(this.apiBase);
-    if (base.error) {
-      showToast(i18n.t('onboarding.baseUrlInvalid'), 'error');
-      this.contentEl?.querySelector('#api-base')?.focus();
-      return;
-    }
-    this.apiBase = base.value;
-    // Il modello scelto prima vale solo per lo stesso provider: cambiati
-    // formato, chiave o indirizzo, Launch partiva col modello dell'altro.
-    const fingerprint = this._modelsFingerprint();
-    if (this._modelsFor !== null && this._modelsFor !== fingerprint) this.model = '';
-    this._modelsFor = fingerprint;
     this.step = 2;
-    this._loadModels();
+    this.render();
   }
 
-  // ── Step 2: Model + Launch ──────────────────────────────────────────
+  // ── Step 2: Runtime ─────────────────────────────────────────────────
+
+  async _renderStepRuntime() {
+    const r = (await api.getRuntimeStatus()) || { status: 'absent' };
+    const status = r.status || 'absent';
+    const progress = Math.max(0, Math.min(100, Math.round(Number(r.progress) || 0)));
+    const abiOk = r.abi_supported !== false;
+
+    const statusNoteKey = {
+      absent: 'onboarding.runtime.statusAbsent',
+      downloading: 'onboarding.runtime.statusDownloading',
+      extracting: 'onboarding.runtime.statusExtracting',
+      activating: 'onboarding.runtime.statusActivating',
+      starting: 'onboarding.runtime.statusStarting',
+      ready: 'onboarding.runtime.statusReady',
+      error: 'onboarding.runtime.statusError',
+      unsupported: 'onboarding.runtime.statusUnsupported',
+      prompt: 'onboarding.runtime.statusPrompt',
+    }[r.status] || 'onboarding.runtime.statusAbsent';
+
+    const installing = ['downloading','extracting','activating','starting'].includes(r.status);
+    const terminal = ['ready','error','unsupported','prompt'].includes(r.status);
+
+    this.contentEl.innerHTML = `
+      <div class="onboarding-step onboarding-center">
+        <h2 class="onboarding-heading">${i18n.t('onboarding.runtime.title')}</h2>
+        <p class="onboarding-desc">${i18n.t('onboarding.runtime.desc')}</p>
+        ${this._progress()}
+
+        <div class="runtime-onboarding-panel" data-status="${r.status}" aria-live="polite" aria-atomic="true">
+          <div class="runtime-header">
+            <h3>${i18n.t('onboarding.runtime.title')}</h3>
+            <span class="runtime-phase-badge">${i18n.t(phaseNoteKey)} ${['ready','error','unsupported','prompt'].includes(r.status) ? '' : Math.max(0, Math.min(100, Math.round(Number(r.progress) || 0))) + '%'}</span>
+          </div>
+
+          <div class="runtime-progress-wrap" role="progressbar" aria-valuenow="${Math.max(0, Math.min(100, Math.round(Number(r.progress) || 0)))}" aria-valuemin="0" aria-valuemax="100" aria-label="${i18n.t('settings.runtime.status')}">
+            <div class="runtime-progress-bar" style="width:${Math.max(0, Math.min(100, Math.round(Number(r.progress) || 0)))}%"></div>
+          </div>
+
+          <div class="runtime-actions" style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+            ${['absent','error','unsupported'].includes(r.status)
+              ? `<button class="onboarding-btn onboarding-btn-primary" id="btn-runtime-install" ${!abiOk ? 'disabled' : ''} aria-disabled="${!abiOk}"><i class="ti ti-download" aria-hidden="true"></i> ${i18n.t('onboarding.runtime.install')}</button>`
+              : ''}
+            ${!['absent','ready','error','unsupported','prompt'].includes(r.status)
+              ? `<button class="onboarding-btn onboarding-btn-secondary" id="btn-runtime-stop" aria-busy="${['downloading','extracting','activating','starting'].includes(r.status)}"><i class="ti ti-stop" aria-hidden="true"></i> ${i18n.t('onboarding.runtime.stop')}</button>`
+              : ''}
+            ${r.status === 'ready'
+              ? `<button class="onboarding-btn onboarding-btn-secondary" id="btn-runtime-diag"><i class="ti ti-activity-heartbeat" aria-hidden="true"></i> ${i18n.t('onboarding.runtime.diagnostics')}</button>`
+              : ''}
+            ${!['absent','unsupported'].includes(r.status)
+              ? `<button class="onboarding-btn onboarding-btn-danger" id="btn-runtime-delete"><i class="ti ti-trash" aria-hidden="true"></i> ${i18n.t('onboarding.runtime.delete')}</button>`
+              : ''}
+          </div>
+
+          ${!abiOk
+            ? `<p class="runtime-abi-warning" style="margin-top:12px;padding:8px;background:var(--error);color:var(--on-error);border-radius:var(--radius);font-size:13px"><i class="ti ti-alert-triangle" aria-hidden="true"></i> ${i18n.t('onboarding.runtime.noAbi')}</p>`
+            : ''}
+
+          <p class="onboarding-hint" style="margin-top:12px;font-size:12px;color:var(--text-faint)">${i18n.t('onboarding.runtime.installHint')}</p>
+        </div>
+
+        <div class="onboarding-nav">
+          <button class="onboarding-btn onboarding-btn-secondary" id="btn-back-runtime">${i18n.t('onboarding.back')}</button>
+          <button class="onboarding-btn onboarding-btn-primary" id="btn-next-runtime" ${['ready','error','unsupported'].includes(r.status) ? '' : 'disabled'}>${i18n.t('onboarding.next')}</button>
+        </div>
+      </div>`;
+
+    this.contentEl.querySelector('#btn-back-runtime').addEventListener('click', () => this._goToStep1());
+    this.contentEl.querySelector('#btn-next-runtime').addEventListener('click', () => this._goToStep3());
+
+    if (this.contentEl.querySelector('#btn-runtime-install')) {
+      this.contentEl.querySelector('#btn-runtime-install').addEventListener('click', async () => {
+        await api.postRuntimeInstall();
+        showToast(i18n.t('onboarding.runtime.installing'), 'info');
+        this._pollRuntimeStatus();
+      });
+    }
+    if (this.contentEl.querySelector('#btn-runtime-stop')) {
+      this.contentEl.querySelector('#btn-runtime-stop').addEventListener('click', async () => {
+        await api.postRuntimeStop();
+        showToast(i18n.t('onboarding.runtime.stopping'), 'info');
+        this._pollRuntimeStatus();
+      });
+    }
+    if (this.contentEl.querySelector('#btn-runtime-delete')) {
+      this.contentEl.querySelector('#btn-runtime-delete').addEventListener('click', async () => {
+        if (!confirm(i18n.t('onboarding.runtime.deleteConfirm'))) return;
+        await api.postRuntimeDelete();
+        showToast(i18n.t('onboarding.runtime.deleting'), 'info');
+        this._pollRuntimeStatus();
+      });
+    }
+    if (this.contentEl.querySelector('#btn-runtime-diag')) {
+      this.contentEl.querySelector('#btn-runtime-diag').addEventListener('click', async () => {
+        const diag = await api.getRuntimeDiagnostics();
+        // Show diag in a modal or toast
+        showToast(JSON.stringify(diag), 'info');
+      });
+    }
+  }
+
+  _pollRuntimeStatus() {
+    const poll = async () => {
+      const r = await api.getRuntimeStatus();
+      if (['ready','error','unsupported','prompt'].includes(r.status)) {
+        this._renderStepRuntime();
+        return;
+      }
+      // Update progress bar live
+      const bar = this.contentEl.querySelector('.runtime-progress-bar');
+      const badge = this.contentEl.querySelector('.runtime-phase-badge');
+      if (bar) bar.style.width = Math.max(0, Math.min(100, Math.round(Number(r.progress) || 0))) + '%';
+      if (badge) {
+        const noteKey = {
+          absent: 'onboarding.runtime.statusAbsent',
+          downloading: 'onboarding.runtime.statusDownloading',
+          extracting: 'onboarding.runtime.statusExtracting',
+          activating: 'onboarding.runtime.statusActivating',
+          starting: 'onboarding.runtime.statusStarting',
+          ready: 'onboarding.runtime.statusReady',
+          error: 'onboarding.runtime.statusError',
+          unsupported: 'onboarding.runtime.statusUnsupported',
+          prompt: 'onboarding.runtime.statusPrompt',
+        }[r.status] || 'onboarding.runtime.statusAbsent';
+        badge.textContent = `${i18n.t(noteKey)} ${Math.max(0, Math.min(100, Math.round(Number(r.progress) || 0)))}%`;
+      }
+      if (!['ready','error','unsupported','prompt'].includes(r.status)) {
+        setTimeout(poll, 3000);
+      }
+    };
+    poll();
+  }
+
+  _goToStep3() {
+    this.step = 3;
+    this.render();
+  }
+
+  // ── Step 3: Model + Launch ──────────────────────────────────────────
 
   async _loadModels() {
     // La fetch dura secondi: nel frattempo l'utente può essere tornato allo
