@@ -414,8 +414,23 @@ export class OnboardingController {
   }
 
   _goToStep3() {
+    this._captureStep1();
+    // L'indirizzo storpiato si dice qui, prima di chiedere i modelli a un
+    // indirizzo che non esiste; «Http://» si corregge da solo.
+    const base = normalizeApiBase(this.apiBase);
+    if (base.error) {
+      showToast(i18n.t('onboarding.baseUrlInvalid'), 'error');
+      this.contentEl?.querySelector('#api-base')?.focus();
+      return;
+    }
+    this.apiBase = base.value;
+    // Il modello scelto prima vale solo per lo stesso provider: cambiati
+    // formato, chiave o indirizzo, Launch partiva col modello dell'altro.
+    const fingerprint = this._modelsFingerprint();
+    if (this._modelsFor !== null && this._modelsFor !== fingerprint) this.model = '';
+    this._modelsFor = fingerprint;
     this.step = 3;
-    this.render();
+    this._loadModels();
   }
 
   // ── Step 3: Model + Launch ──────────────────────────────────────────
