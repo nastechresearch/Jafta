@@ -1,3 +1,7 @@
+import android.content.Context
+import java.io.File
+import kotlin.jvm.Volatile
+
 // Adapted from nastechresearch/and-code (MIT) — Nsamba/Jafta 2026
 // https://github.com/nastechresearch/Jafta
 
@@ -666,5 +670,25 @@ class LocalRuntimeManager(
                 }
                 true
             }.getOrDefault(false)
+    }
+}
+
+companion object {
+    @Volatile private var INSTANCE: LocalRuntimeManager? = null
+
+    /**
+     * Returns the singleton instance, creating it if necessary.
+     * Uses double-checked locking for thread safety.
+     */
+    fun getOrCreate(context: Context): LocalRuntimeManager {
+        return INSTANCE ?: synchronized(this) {
+            INSTANCE ?: LocalRuntimeManager(
+                runtimeDirectory = File(context.filesDir, "runtime"),
+                abi = when (context.packageManager.getSystemAvailableFeatures().any { it.name == "android.hardware.arm64" }) {
+                    true -> "arm64-v8a"
+                    false -> "x86_64"
+                }
+            ).also { INSTANCE = it }
+        }
     }
 }
