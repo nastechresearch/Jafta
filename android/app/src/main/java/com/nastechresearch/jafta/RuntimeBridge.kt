@@ -3,10 +3,13 @@ package com.nastechresearch.jafta
 import android.content.Context
 import android.util.Log
 import com.nastechresearch.jafta.runtime.local.LocalRuntimeManager
+import com.nastechresearch.jafta.runtime.LocalRuntimeStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * Bridge per il runtime OpenCode locale (proot), esposto a Python via Chaquopy
@@ -29,8 +32,9 @@ class RuntimeBridge(context: Context) {
 
     private val manager = LocalRuntimeManager.getOrCreate(context)
 
-    /** Stato osservabile: Disconnected / Connecting / Connected(version) / Failed(msg) / Unavailable(reason) */
-    val state: StateFlow<com.nastechresearch.jafta.runtime.LocalRuntimeStatus> = manager.status
+    /** Stato osservabile come StateFlow per la UI. */
+    private val _state = MutableStateFlow<LocalRuntimeStatus>(manager.status())
+    val state: StateFlow<LocalRuntimeStatus> = _state.asStateFlow()
 
     /** Avvia l'installazione completa (scarica rootfs + OpenCode, estrae, configura). Non blocca. */
     fun install(): Boolean = runCatching {
@@ -52,7 +56,7 @@ class RuntimeBridge(context: Context) {
 
     /** Ferma il runtime (kill del processo proot + servizio). Non blocca. */
     fun stop(): Boolean = runCatching {
-        manager.stop()
+        CoroutineScope(Dispatchers.IO).launch { manager.stop() }
         true
     }.getOrElse { e ->
         Log.e(TAG, "stop failed", e)
@@ -61,32 +65,24 @@ class RuntimeBridge(context: Context) {
 
     /** Cancella tutto: rootfs, binari, log, cache. Non blocca. */
     fun delete(): Boolean = runCatching {
-        manager.deleteRuntime()
+        CoroutineScope(Dispatchers.IO).launch { manager.deleteRuntime() }
         true
     }.getOrElse { e ->
         Log.e(TAG, "delete failed", e)
         false
     }
 
-    /** Diagnostica leggibile: disco, memoria, PID, uptime, log tail. */
-    fun diagnostics(): String = runCatching {
-        manager.diagnostics()
+    /** Stato corrente sincrono per polling. */
+    fun status(): LocalRuntimeStatus = runCatching {
+        manager.status()
     }.getOrElse { e ->
-        Log.e(TAG, "diagnostics failed", e)
-        """{"error": "diagnostics unavailable"}"""
-    }
-
-    /** True se l'ABI del device è supportata (arm64-v8a o x86_64). */
-    fun supportsAbi(): Boolean = runCatching {
-        manager.supportsAbi()
-    }.getOrElse { e ->
-        Log.e(TAG, "supportsAbi failed", e)
-        false
+        Log.e(TAG, "status failed", e)
+        LocalRuntimeStatus.NotInstalled
     }
 
     /** Porta HTTP su cui il server OpenCode ascolta (se running). -1 se non running. */
     fun installedPort(): Int = runCatching {
-        manager.installedPort()
+        manager.installedPort() ?: -1
     }.getOrElse { e ->
         Log.e(TAG, "installedPort failed", e)
         -1
@@ -97,6 +93,17 @@ class RuntimeBridge(context: Context) {
         manager.isHealthy()
     }.getOrElse { e ->
         Log.e(TAG, "isHealthy failed", e)
+        false
+    }
+
+    /** True se l'ABI del device è supportata (arm64-v8a o x86_64). */
+    fun supportsAbi(): Boolean = runCatching {
+        when (val abi = android.os.Build.SUPPORTED_ABIS.firstOrNull()) {
+            "arm64-v8a", "x86_64" -> true
+            else -> false
+        }
+    }.getOrElse { e ->
+        Log.e(TAG, "supportsAbi failed", e)
         false
     }
 }
