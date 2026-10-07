@@ -1,13 +1,10 @@
-import android.content.Context
-import java.io.File
-import kotlin.jvm.Volatile
-
 // Adapted from nastechresearch/and-code (MIT) — Nsamba/Jafta 2026
 // https://github.com/nastechresearch/Jafta
 
-
 package com.nastechresearch.jafta.runtime.local
 
+import android.content.Context
+import kotlin.jvm.Volatile
 import com.nastechresearch.jafta.runtime.LocalAgent
 import com.nastechresearch.jafta.runtime.LocalRuntimeStatus
 import kotlinx.coroutines.CancellationException
@@ -22,7 +19,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import java.io.File
 import java.net.InetSocketAddress
 import java.net.Socket
 
