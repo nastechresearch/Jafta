@@ -324,7 +324,7 @@ export class OnboardingController {
               ? `<button class="onboarding-btn onboarding-btn-primary" id="btn-runtime-install" ${!abiOk ? 'disabled' : ''} aria-disabled="${!abiOk}"><i class="ti ti-download" aria-hidden="true"></i> ${i18n.t('onboarding.runtime.install')}</button>`
               : ''}
             ${!['absent','ready','error','unsupported','prompt'].includes(r.status)
-              ? `<button class="onboarding-btn onboarding-btn-secondary" id="btn-runtime-stop" aria-busy="${['downloading','extracting','activating','starting'].includes(r.status)}"><i class="ti ti-stop" aria-hidden="true"></i> ${i18n.t('onboarding.runtime.stop')}</button>`
+              ? `<button class="onboarding-btn onboarding-btn-secondary" id="btn-runtime-stop" aria-busy="${['downloading','extracting','activating','starting'].includes(r.status)}"><i class="ti ti-player-stop" aria-hidden="true"></i> ${i18n.t('onboarding.runtime.stop')}</button>`
               : ''}
             ${r.status === 'ready'
               ? `<button class="onboarding-btn onboarding-btn-secondary" id="btn-runtime-diag"><i class="ti ti-activity-heartbeat" aria-hidden="true"></i> ${i18n.t('onboarding.runtime.diagnostics')}</button>`

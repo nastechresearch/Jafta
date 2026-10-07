@@ -86,7 +86,7 @@ export const HANDS_JOBS = (job) => job.kind !== 'system' || job.id === 'heartbea
  */
 export const DRAWERS = {
   brain: {
-    sections: ['whoThinks', 'parameters', 'battery', 'system'],
+    sections: ['whoThinks', 'parameters', 'battery', 'system', 'runtime'],
   },
   hands: {
     sections: ['webSearch', 'position', 'ssh', 'telegram', 'skill', 'scheduling'],
@@ -2374,10 +2374,10 @@ export class SettingsController {
             ? `<button class="settings-btn-primary" id="btn-runtime-install" ${!abiOk ? 'disabled' : ''} aria-disabled="${!abiOk}"><i class="ti ti-download" aria-hidden="true"></i> ${i18n.t('settings.runtime.install')}</button>`
             : ''}
           ${status !== 'absent' && status !== 'ready' && status !== 'error' && status !== 'unsupported' && status !== 'prompt'
-            ? `<button class="settings-btn-secondary" id="btn-runtime-stop" aria-busy="${busy}"><i class="ti ti-stop" aria-hidden="true"></i> ${i18n.t('settings.runtime.stop')}</button>`
+            ? `<button class="settings-btn-secondary" id="btn-runtime-stop" aria-busy="${busy}"><i class="ti ti-player-stop" aria-hidden="true"></i> ${i18n.t('settings.runtime.stop')}</button>`
             : ''}
           ${status === 'ready'
-            ? `<button class="settings-btn-secondary" id="btn-runtime-stop"><i class="ti ti-stop" aria-hidden="true"></i> ${i18n.t('settings.runtime.stop')}</button>
+            ? `<button class="settings-btn-secondary" id="btn-runtime-stop"><i class="ti ti-player-stop" aria-hidden="true"></i> ${i18n.t('settings.runtime.stop')}</button>
                <button class="settings-btn-secondary" id="btn-runtime-diag"><i class="ti ti-activity-heartbeat" aria-hidden="true"></i> ${i18n.t('settings.runtime.diagnostics')}</button>`
             : ''}
           ${status !== 'absent' && status !== 'unsupported'
