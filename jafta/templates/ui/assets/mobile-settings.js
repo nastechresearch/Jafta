@@ -86,7 +86,7 @@ export const HANDS_JOBS = (job) => job.kind !== 'system' || job.id === 'heartbea
  */
 export const DRAWERS = {
   brain: {
-    sections: ['whoThinks', 'parameters', 'battery', 'system'],
+    sections: ['whoThinks', 'parameters', 'battery', 'system', 'runtime'],
   },
   hands: {
     sections: ['webSearch', 'position', 'ssh', 'telegram', 'skill', 'scheduling'],
@@ -370,6 +370,8 @@ export class SettingsController {
       workers: () => this._group('workers', i18n.t('workshop.groups.gardener'), this._renderWorkers(d)),
       file: () => this._group('file', i18n.t('workshop.groups.file'), this._renderFile()),
       backup: () => this._group('backup', i18n.t('backup.snapshotHistory'), this._renderBackup()),
+      // Runtime
+      runtime: () => this._renderRuntimeSection(d),
     };
     const drawer = DRAWERS[this._drawer];
     const which = drawer ? drawer.sections : Object.keys(sections);
@@ -2327,6 +2329,85 @@ export class SettingsController {
       ${this._summary('history', i18n.t('backup.snapshotHistory'), i18n.t('settings.loading'))}`;
   }
 
+  /** Runtime — local OpenCode install/manage, with animated live progress. */
+  _renderRuntimeSection(d) {
+    const r = d.runtime || {};
+    const status = r.status || 'absent';
+    const progress = Math.max(0, Math.min(100, Math.round(Number(r.progress) || 0)));
+    const detail = r.detail || '';
+    const abiOk = r.abi_supported !== false;
+    const diag = r.diagnostics || {};
+
+    const phaseNoteKey = {
+      absent: 'settings.runtime.statusAbsent',
+      downloading: 'settings.runtime.statusDownloading',
+      extracting: 'settings.runtime.statusExtracting',
+      activating: 'settings.runtime.statusActivating',
+      starting: 'settings.runtime.statusStarting',
+      ready: 'settings.runtime.statusReady',
+      error: 'settings.runtime.statusError',
+      unsupported: 'settings.runtime.statusUnsupported',
+      prompt: 'settings.runtime.statusPrompt',
+    }[status] || 'settings.runtime.statusAbsent';
+
+    const phase = i18n.t(phaseNoteKey);
+    const progressPct = status === 'prompt' ? '' : `${progress}%`;
+    const busy = ['downloading','extracting','activating','starting'].includes(status);
+    const terminal = ['ready','error','unsupported','prompt'].includes(status);
+
+    return `
+      <section class="runtime-panel" data-status="${status}" data-progress="${progress}" aria-live="polite" aria-atomic="true">
+        <div class="runtime-header">
+          <h3>${i18n.t('settings.runtime.title')}</h3>
+          <span class="runtime-phase-badge">${i18n.t(phaseNoteKey)} ${progressPct}</span>
+        </div>
+
+        <div class="runtime-progress-wrap" role="progressbar" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100" aria-label="${i18n.t('settings.runtime.status')}">
+          <div class="runtime-progress-bar" style="width:${progress}%"></div>
+          ${!busy && !terminal ? `<span class="runtime-progress-text">${i18n.t('settings.runtime.installing')}</span>` : ''}
+        </div>
+
+        ${detail ? `<p class="runtime-detail" aria-live="polite">${escapeHtml(detail)}</p>` : ''}
+
+        <div class="runtime-actions" style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+          ${status === 'absent' || status === 'error' || status === 'unsupported'
+            ? `<button class="settings-btn-primary" id="btn-runtime-install" ${!abiOk ? 'disabled' : ''} aria-disabled="${!abiOk}"><i class="ti ti-download" aria-hidden="true"></i> ${i18n.t('settings.runtime.install')}</button>`
+            : ''}
+          ${status !== 'absent' && status !== 'ready' && status !== 'error' && status !== 'unsupported' && status !== 'prompt'
+            ? `<button class="settings-btn-secondary" id="btn-runtime-stop" aria-busy="${busy}"><i class="ti ti-player-stop" aria-hidden="true"></i> ${i18n.t('settings.runtime.stop')}</button>`
+            : ''}
+          ${status === 'ready'
+            ? `<button class="settings-btn-secondary" id="btn-runtime-stop"><i class="ti ti-player-stop" aria-hidden="true"></i> ${i18n.t('settings.runtime.stop')}</button>
+               <button class="settings-btn-secondary" id="btn-runtime-diag"><i class="ti ti-activity-heartbeat" aria-hidden="true"></i> ${i18n.t('settings.runtime.diagnostics')}</button>`
+            : ''}
+          ${status !== 'absent' && status !== 'unsupported'
+            ? `<button class="settings-btn-danger" id="btn-runtime-delete"><i class="ti ti-trash" aria-hidden="true"></i> ${i18n.t('settings.runtime.delete')}</button>`
+            : ''}
+        </div>
+
+        ${!abiOk
+          ? `<p class="runtime-abi-warning" style="margin-top:12px;padding:8px;background:var(--error);color:var(--on-error);border-radius:var(--radius);font-size:13px"><i class="ti ti-alert-triangle" aria-hidden="true"></i> ${i18n.t('settings.runtime.abiUnsupported')}</p>`
+          : ''}
+
+        ${diag.disk_free !== undefined || diag.memory_used !== undefined
+          ? `<details class="runtime-diagnostics" style="margin-top:16px">
+               <summary>${i18n.t('settings.runtime.diagnostics')}</summary>
+               <div class="runtime-diag-grid" style="display:grid;gap:8px;margin-top:8px;font-size:12px;color:var(--text-faint)">
+                 ${diag.disk_free !== undefined ? `<div>${i18n.t('settings.runtime.freeSpace')}: ${this._formatBytes(diag.disk_free)}</div>` : ''}
+                 ${diag.disk_total !== undefined ? `<div>${i18n.t('settings.runtime.totalSpace')}: ${this._formatBytes(diag.disk_total)}</div>` : ''}
+                 ${diag.memory_used !== undefined ? `<div>${i18n.t('settings.runtime.memoryUsage')}: ${this._formatBytes(diag.memory_used)}</div>` : ''}
+                 ${diag.pid ? `<div>${i18n.t('settings.runtime.pid')}: ${diag.pid}</div>` : ''}
+                 ${diag.uptime_seconds ? `<div>${i18n.t('settings.runtime.uptime')}: ${this._formatUptime(diag.uptime_seconds)}</div>` : ''}
+                 ${diag.log_tail ? `<div style="margin-top:8px;font-family:monospace;font-size:11px;background:var(--overlay);padding:8px;border-radius:var(--radius);overflow:auto;max-height:120px">${escapeHtml(diag.log_tail)}</div>` : ''}
+               </div>
+             </details>`
+          : ''}
+
+        <p class="settings-hint" style="margin-top:12px;font-size:12px;color:var(--text-faint)">${i18n.t('settings.runtime.installHint')}</p>
+      </section>
+    `;
+  }
+
   /** Una riga di riepilogo: cosa c'e', in due numeri, e una freccina.
    *
    *  `value` e' la risposta breve; il tocco apre `drawer-<id>`. Il bottone e'
@@ -3505,5 +3586,33 @@ export class SettingsController {
     if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
     if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
     return String(n);
+  }
+
+  /** Format bytes to human-readable string. */
+  _formatBytes(bytes) {
+    if (bytes == null) return '—';
+    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    let i = 0;
+    let value = bytes;
+    while (value >= 1024 && i < units.length - 1) {
+      value /= 1024;
+      i++;
+    }
+    return `${value.toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
+  }
+
+  /** Format uptime seconds to human-readable string. */
+  _formatUptime(seconds) {
+    if (seconds == null) return '—';
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    const parts = [];
+    if (days) parts.push(`${days}d`);
+    if (hours) parts.push(`${hours}h`);
+    if (minutes) parts.push(`${minutes}m`);
+    if (secs || parts.length === 0) parts.push(`${secs}s`);
+    return parts.join(' ');
   }
 }

@@ -460,34 +460,35 @@ def test_a_model_of_another_provider_does_not_survive() -> None:
         "class W {\n"
         "  _captureStep1() {}\n"
         "  _loadModels() {}\n"
+        "  render() {}\n"
         f"{member(source, '_modelsFingerprint')}\n"
-        f"{member(source, '_goToStep2')}\n"
+        f"{member(source, '_goToStep3')}\n"
         "}\n"
         """
 const w = new W();
 Object.assign(w, { format: 'openai_compat', apiKey: 'a', apiBase: '', model: '', _modelsFor: null });
-w._goToStep2();
+w._goToStep3();
 w.model = 'gpt-x';
-w._goToStep2();
+w._goToStep3();
 assert.equal(w.model, 'gpt-x', 'stesso provider: il modello si tiene');
 w.apiKey = 'b';
-w._goToStep2();
+w._goToStep3();
 assert.equal(w.model, '', 'chiave cambiata: il modello era di un altro provider');
 w.model = 'gpt-y';
 w.format = 'anthropic';
-w._goToStep2();
+w._goToStep3();
 assert.equal(w.model, '', 'formato cambiato: il modello era di un altro provider');
 
 // L'indirizzo storpiato dall'autocorrezione si ferma qui, e «Http://» si
 // corregge da solo (collaudo del 27/09/2026).
 w.step = 1;
 w.apiBase = 'Http:/10.0.2.2:8765/v1';
-w._goToStep2();
+w._goToStep3();
 assert.equal(w.step, 1, 'con un indirizzo storpiato si e andati a chiedere i modelli');
 assert.deepEqual(toasts, ['onboarding.baseUrlInvalid']);
 w.apiBase = 'Http://10.0.2.2:8765/v1';
-w._goToStep2();
-assert.equal(w.step, 2);
+w._goToStep3();
+assert.equal(w.step, 3);
 assert.equal(w.apiBase, 'http://10.0.2.2:8765/v1');
 """
     )

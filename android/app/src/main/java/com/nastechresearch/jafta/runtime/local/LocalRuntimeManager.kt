@@ -1,9 +1,10 @@
 // Adapted from nastechresearch/and-code (MIT) — Nsamba/Jafta 2026
 // https://github.com/nastechresearch/Jafta
 
-
 package com.nastechresearch.jafta.runtime.local
 
+import android.content.Context
+import kotlin.jvm.Volatile
 import com.nastechresearch.jafta.runtime.LocalAgent
 import com.nastechresearch.jafta.runtime.LocalRuntimeStatus
 import kotlinx.coroutines.CancellationException
@@ -644,6 +645,8 @@ class LocalRuntimeManager(
     }
 
     companion object {
+        @Volatile private var INSTANCE: LocalRuntimeManager? = null
+
         private const val METADATA_FILE = "metadata.json"
         private val SUPPORTED_ABIS = setOf("arm64-v8a", "x86_64")
 
@@ -666,5 +669,21 @@ class LocalRuntimeManager(
                 }
                 true
             }.getOrDefault(false)
+
+        /**
+         * Returns the singleton instance, creating it if necessary.
+         * Uses double-checked locking for thread safety.
+         */
+        fun getOrCreate(context: Context): LocalRuntimeManager {
+            return INSTANCE ?: synchronized(this) {
+                INSTANCE ?: LocalRuntimeManager(
+                    runtimeDirectory = File(context.filesDir, "runtime"),
+                    abi = when (context.packageManager.getSystemAvailableFeatures().any { it.name == "android.hardware.arm64" }) {
+                        true -> "arm64-v8a"
+                        false -> "x86_64"
+                    }
+                )
+            }.also { INSTANCE = it }
+        }
     }
 }
